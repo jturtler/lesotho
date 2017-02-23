@@ -1,0 +1,12 @@
+# Eclipse and library Files
+*.jar
+*.class
+.classpath
+.project
+.settings
+.metadata
+build
+Documents
+libs
+resources
+WebContent/META-INF
