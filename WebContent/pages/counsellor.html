@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1.0">
+<title>LS - Discovery & Design</title>
+
+<meta name="viewport" content="initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="TZ eReferrals">
+<meta name="apple-mobile-web-app-title" content="TZ eReferrals">
+<link rel="icon" href="../images/appIcon.jpg">
+<link rel="apple-touch-icon" href="../images/appIcon.jpg">
+<link rel="apple-touch-icon-precomposed" href="../images/appIcon.jpg" />
+
+<link rel="stylesheet" href="../css/jQuery/jquery-ui.css">
+<script src="../js/jQuery/jquery-1.11.1.min.js"></script>
+<script src="../js/jQuery/jquery-ui.min.js"></script>
+<script src="../js/jQuery/jquery.dateFormat-1.0.js"></script>
+<script src="../js/jQuery/jquery.blockUI.js" type="text/javascript"></script>
+
+<script src="../js/jQuery/jquery.tablesorter.min.js" type="text/javascript"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link type="text/css" rel="stylesheet" media="screen" href="../css/style.css" />
+<script src="../js/utils/utils.js"></script>
+<script src="../js/utils/storage.js"></script>
+<script src="../js/utils/validation.js"></script>
+<script src="../js/utils/menu.js"></script>
+<script src="../js/counsellor.js"></script>
+
+</head>
+<body>
+
+	<div id="wrapper">
+		<div class="overlay"></div>
+
+		<!-- Sidebar -->
+		<nav class="navbar navbar-fixed-top" id="sidebar-wrapper"
+			role="navigation">
+			<ul class="nav sidebar-nav">
+				<li class="sidebar-brand"><a data-toggle="offcanvasmenu"
+					style="cursor: pointer;">PI LS HTS</a></li>
+				<li><a id="todayCaseLink" href="#">Today Cases</a></li>
+				<li><a id="previousCaseLink" href="#">Previous Cases</a></li>
+				<li><a id="positiveCaseLink" href="#">Positive Cases</a></li>
+				<li><a id="consumablesLink" href="#">Consumables</a></li>
+				<li><a id="statsLink" href="#">Stats</a></li>
+				<li role="separator" class="divider"></li>
+				<li><a id="searchClientLink" href="#">Search/Create Client</a></li>
+				<li role="separator" class="divider"></li>
+				<li><a id="settingsLink">Settings</a></li>
+				<li><a id="aboutLink">About</a></li>
+				<li><a onclick="window.location.href='..'">Log off</a></li>
+			</ul>
+		</nav>
+
+		<!-- /#sidebar-wrapper -->
+
+
+
+		<!-- Page Content -->
+
+		<div id="page-content-wrapper">
+			<div id="headerPage">
+				<button type="button" class="btn btn-lg hamburger is-closed" data-toggle="offcanvas" >
+            		<span class="glyphicon glyphicon-align-justify" style="color:#225588;"></span>
+            	</button>
+				<span id="headerText" style="left: 50px;">PI LS HTS</span>
+				<div class="headerRightSideControls">
+					Counsellor: <span name="userFullName"></span>
+				</div>
+			</div>
+
+
+
+			<!--  Message DIV  -->
+			
+			<div id="divMsgArea" style="display: none;">
+				<span id="spanMsgAreaClose"><img src="../images/hide.png" title="Close" id="btnMsgAreaClose"></span>
+				<span id="spanMsgAreaText"></span>
+			</div>
+	
+			<!--  END Message DIV  -->
+			
+			
+			<div style="padding-left:5px;">
+			
+				<!--  Warming "Ask" to select an orgunit -->
+				    
+				<div style="display:none;" class="alert alert-danger" id="selectOrgUnitWarningMsg">Please select an orgUnit in <a href="#" id="moveToSettingLink">Setting</a></div>
+				
+			
+				<!-- List Cases -->				
+				
+				<div id="clientList" style="display: none;">
+				 	
+					<div class="headerList"><span id="headerList"></span><span id="listDate"></span></div>
+				    
+					<div id="contentList" class="scroll-div"></div>
+					<button id="registerClientBtn" class="btn btn-lg glyphicon glyphicon-plus addButton" title="Search/Create client"></button>
+					
+				</div>
+
+				<!--  END Issued clients && Completed clients -->
+
+				
+				
+				<!-- Search and Create Client FORM -->
+				
+				<div id="searchClientForm" style="display:none;">
+		  			<div class="headerList">Search/Create client</div>
+		  			
+		  			<form class="form-horizontal" id="seachAddClientForm"></form>
+					
+					<div style="text-align:center;margin-bottom:10px;">
+							<button class="btn btn-default actionBtn" id="searchClientBtn">Search/Create Client</button>
+	  				</div>
+		  				
+				</div>	
+				
+				<div id="searchResult" style="display:none;">
+				
+					<div class="headerList">Matches for your search <span name="searchResultKey"></span></div>
+					
+					<div class="scroll-div">
+						<table class='table table-hover table-striped listTable tablesorter' id="searchResultTb">
+							<thead>
+								<tr style='background-color:#cfe2f3;'>
+									<th>First Name</th>
+									<th>Surname</th>
+									<th>DoB</th>
+									<th>District o B</th>
+									<th>Twin</th>
+									<th>Adquisition</th>
+									<th>Last test NS</th>
+									<th>Last Contact</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+					
+					<div>
+						<p id="searchResultOptions">Select a client from from above or<p>
+						<ul>
+							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="addNewClient"><span class="labelOpt"> Add new <span name="searchResultKey"></label></span></li>
+							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="backToSearchClientForm"><span class="labelOpt"> Edit Search criteria (go back to search screen)</label></span></li>
+							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="showTodayCase"><span class="labelOpt"> Cancel</label></span></li>
+						</ul>						
+						
+						<button class="btn btn-default actionBtn" id="searchResultNextBtn">Next</button>
+					</div>
+				</div>
+				
+								
+				<div id="addClientFormTab" style="display:none;">
+		  			<div class="headerList">Add client</div>
+					<ul>
+			    		<li><a href="#clientAttributeDiv">Client Attributes</a></li>
+			    		<li><a href="#previousTestDiv">Previous Tests</a></li>
+			    		<li><a href="#thisTestDiv">This test</a></li>
+			  		</ul>
+			  		
+			  		
+  					<div id="clientAttributeDiv">
+  						<form class="form-horizontal" id="addClientForm" ></form>
+  						
+ 						<div class="form-group">
+							<span class="col-sm-2"></span>
+							<button class="btn btn-default actionBtn" id="saveClientBtn">Save</button>
+							<button class="btn btn-default actionBtn" id="showEventFormBtn">Add Event</button>
+							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn">Back</button>
+						</div>
+					
+					</div>
+  
+				   	<div id="previousTestDiv">
+				   		<div id="previousTests"></div>
+ 						<div class="form-group">
+							<span class="col-sm-2"></span>
+							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn">Back</button>
+						</div>
+				   	</div>
+ 
+			      	<div id="thisTestDiv">
+			  			<form class="form-horizontal" id="addEventForm"></form>
+			  			
+ 						<div class="form-group">
+							<span class="col-sm-2"></span>
+							<button class="btn btn-default actionBtn" id="saveEventBtn">Save</button>
+							<button class="btn btn-default actionBtn" id="completedEventBtn">Complete</button>
+							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn">Back</button>
+						</div>
+			  		</div>
+   				
+					
+		  		</div>	
+				
+				<!-- END Search and Create Client  -->
+				
+				
+				<!--  Settings page -->
+
+				<div id="settingsDiv" style="display: none;">
+					
+					<h4>Settings</h4>
+					<table class="table">
+						<tr>
+							<td>Organisation Unit</td>
+							<td><select id="orgUnitList" class="form-control" ></select></td>
+						</tr>
+					</table>
+				</div>
+				
+				<!-- END Settings page -->
+				
+				
+				
+				<!--  About page -->
+
+				<div id="aboutDiv" style="display: none;">
+					<h4>About</h4>
+					<table class="table">
+						<tr>
+							<td>Current user</td>
+							<td name="userFullName"></td>
+						</tr>
+						<tr>
+							<td>Version</td>
+							<td><a
+								href="https://docs.google.com/document/d/1sI_0HVrUjnRdGP1IJtJtwN1veqFgxML26tBVXDSci4Y"
+								target="_blank" style="font-size:12px;">v 0.1</a></td>
+						</tr>
+						<tr>
+							<td>DHIS server</td>
+							<td id="dhisServer"></td>
+						</tr>
+					</table>
+				</div>
+
+				<!-- END About page -->
+
+			</div>
+
+			<!-- /#page-content-wrapper -->
+
+
+		</div>
+		
+		<!-- /#wrapper -->
+		
+	</div>
+	
+</body>
+
+<script>
+	$(document).ready()
+	{
+		new Menu();
+		new Counsellor( new Storage() );
+	}
+</script>
+
+</html>
