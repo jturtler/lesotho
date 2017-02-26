@@ -47,6 +47,10 @@ function Counsellor( storageObj )
 	me.selectOrgUnitWarningMsgTag = $("#selectOrgUnitWarningMsg");
 	me.settingsDivTag = $("#settingsDiv");
 	me.moveToSettingLinkTag = $("#moveToSettingLink");
+	me.divSessionExpireMsgTag =  $( "#divSessionExpireMsg" );
+	me.menuIcon = $("button.hamburger");
+	me.headerRightSideControlsTag = $("div.headerRightSideControls");
+	me.mainContentTags = ("div.mainContent");
 	
 	me.attr_FirstName = "mW2l3T2zL0N";
 	me.attr_LastName = "mUxDHgywnn2";
@@ -76,16 +80,25 @@ function Counsellor( storageObj )
 	
 	me.init = function()
 	{		
-		MsgManager.initialSetup();
-		MsgManager.appBlock( "Initializing ... ");
-		
+		MsgManager.initialSetup();		
 		me.validationObj = new Validation();
-
-		me.loadCurrentUserInfo();
-		me.loadMetadata();
+		me.loadInitData();
 	};
 	
 
+	me.loadInitData = function()
+	{
+		Commons.checkSession( function( isInSession ) {
+			if ( isInSession ) {
+				MsgManager.appBlock( "Initializing ... ");
+				me.loadCurrentUserInfo();
+				me.loadMetadata();
+			} else {
+				me.showExpireSessionMessage();					
+			}
+		});	
+	};
+	
 	// ----------------------------------------------------------------------------
 	// Set up Events
 	// ----------------------------------------------------------------------------
@@ -118,26 +131,26 @@ function Counsellor( storageObj )
 		});
 		
 		me.searchClientLinkTag.click(function(){
-			me.hideAllForms();
+			me.resetPageDisplay();
 			me.resetSearchClientForm();
 			me.showSearchClientForm();
 			$('.overlay').click();
 		});
 		
 		me.settingsLinkTag.click(function(){
-			me.hideAllForms();
+			me.resetPageDisplay();
 			me.settingsDivTag.show("fast");
 			$('.overlay').click();
 		});
 		
 		me.aboutLinkTag.click(function(){
-			me.hideAllForms();
+			me.resetPageDisplay();
 			me.aboutDivTag.show("fast");
 			$('.overlay').click();
 		});
 		
 		me.moveToSettingLinkTag.click(function(){
-			me.hideAllForms();
+			me.resetPageDisplay();
 			me.settingsDivTag.show("fast");
 		});
 		
@@ -164,7 +177,7 @@ function Counsellor( storageObj )
 		me.searchResultNextBtnTag.click(function(){
 			var optionVal = me.searchResultTag.find("input:radio:checked").val();
 			if( optionVal === "backToSearchClientForm" ) {
-				me.hideAllForms();
+				me.resetPageDisplay();
 				me.showSearchClientForm();
 			}
 			else if( optionVal === "addNewClient" ) {
@@ -203,7 +216,7 @@ function Counsellor( storageObj )
 		});
 		
 		me.registerClientBtnTag.click(function(){
-			me.hideAllForms();
+			me.resetPageDisplay();
 			me.resetSearchClientForm();
 			me.showSearchClientForm();
 		});
@@ -231,6 +244,7 @@ function Counsellor( storageObj )
 			var clientId = me.addClientFormTabTag.attr("clientId");
 			var eventId = me.addClientFormTabTag.attr("eventId");
 			var event = me.addClientFormTabTag.attr("event");
+			
 			if( event !== undefined ){
 				event = JSON.parse( event );
 			}
@@ -275,7 +289,7 @@ function Counsellor( storageObj )
 		me.createSearchClientForm();
 		me.createClientEntryForm();
 		
-		// Remove the 'madatory' SPAN from the Search table
+		// Remove the 'mandatory' SPAN from the Search table
 		me.seachAddClientFormTag.find("span.required").remove();
 	};
 	
@@ -606,7 +620,7 @@ function Counsellor( storageObj )
 	
 	me.listCases = function( url, headerList, headerColor, headerText, isTime, isSpecialCase, showOrgUnitSelector )
 	{
-		me.hideAllForms();
+		me.resetPageDisplay();
 		MsgManager.appBlock("Loading data ...");
 		
 		// STEP 0. Show the 'Add' button which can move to 'Search/Create Client' function
@@ -616,54 +630,64 @@ function Counsellor( storageObj )
 			me.registerClientBtnTag.show();
 		}
 		
-		$.ajax(
+		Commons.checkSession( function( isInSession ) 
+		{
+			if( isInSession ) 
 			{
-				type: "POST"
-				,url: url
-				,dataType: "json"
-	            ,contentType: "application/json;charset=utf-8"
-				,success: function( response ) 
-				{
-					var tableTag = $("<table class='table table-hover table-striped listTable tablesorter'></table>");
-					me.contentListTag.append(tableTag);
-					
-					// STEP 1. Display div header
-					
-					me.headerListTag.html( headerText );						
-					
-					// STEP 2. Generate headers
-					
-					var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
-					for( var i=0; i<headerList.length; i++ )
+				$.ajax(
 					{
-						rowTag.append( "<th>" + headerList[i] + "</th>" );
-					}
-					
-					var theadTag = $("<thead></thead>");
-					theadTag.append(rowTag);
-					tableTag.append( theadTag );
-					
+						type: "POST"
+						,url: url
+						,dataType: "json"
+			            ,contentType: "application/json;charset=utf-8"
+						,success: function( response ) 
+						{
+							var tableTag = $("<table class='table table-hover table-striped listTable tablesorter'></table>");
+							me.contentListTag.append(tableTag);
+							
+							// STEP 1. Display div header
+							
+							me.headerListTag.html( headerText );						
+							
+							// STEP 2. Generate headers
+							
+							var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
+							for( var i=0; i<headerList.length; i++ )
+							{
+								rowTag.append( "<th>" + headerList[i] + "</th>" );
+							}
+							
+							var theadTag = $("<thead></thead>");
+							theadTag.append(rowTag);
+							tableTag.append( theadTag );
+							
 
-					// STEP 3. Populate data
+							// STEP 3. Populate data
 
-					if( !isSpecialCase ){
-						me.populateAllCaseData( response.rows, tableTag, isTime );
-					}
-					else {
-						me.populatePositiveCaseData( response.rows, tableTag, isTime );
-					}
+							if( !isSpecialCase ){
+								me.populateAllCaseData( response.rows, tableTag, isTime );
+							}
+							else {
+								me.populatePositiveCaseData( response.rows, tableTag, isTime );
+							}
 
-					// STEP 4. Show table
-					
-					MsgManager.appUnblock();
-					me.contentListTag.show();
-					me.clientListTag.show("fast");
-				}
-				,error: function(response)
-				{
-					console.log(response);
-				}
-			});
+							// STEP 4. Show table
+							
+							MsgManager.appUnblock();
+							me.contentListTag.show();
+							me.clientListTag.show("fast");
+						}
+						,error: function(response)
+						{
+							console.log(response);
+						}
+					});
+			} 
+			else {
+				me.showExpireSessionMessage();					
+			}
+		});	
+		
 	};
 	
 	me.populateAllCaseData = function( list, tableTag, isTime )
@@ -749,52 +773,61 @@ function Counsellor( storageObj )
 	me.searchClients = function(event)
 	{
 		event.preventDefault();
-		var clientData = me.getArrayJsonData( "attribute",  me.searchClientFormTag );
-		var requestData = {
-				"attributes": clientData
-		};
 		
-		if( requestData.attributes.length > 0 )
-		{
-			MsgManager.appBlock( "Searching ..." );
-			me.searchResultTbTag.find("tbody").html("");
-			$.ajax(
+		Commons.checkSession( function( isInSession ) {
+			if ( isInSession ) {
+				var clientData = me.getArrayJsonData( "attribute",  me.searchClientFormTag );
+				var requestData = {
+						"attributes": clientData
+				};
+				
+				if( requestData.attributes.length > 0 )
 				{
-					type: "POST"
-					,url: "../client/search"
-					,dataType: "json"
-					,data: JSON.stringify( requestData )
-		            ,contentType: "application/json;charset=utf-8"
-					,success: function( response ) 
-					{
-						var searchCriteria = me.getSearchCriteria( me.searchClientFormTag );
-						me.searchResultKeyTag.html( searchCriteria );
-						
-						var clientList = response.trackedEntityInstances;
-						
-						if( clientList.length > 0 )
+					MsgManager.appBlock( "Searching ..." );
+					me.searchResultTbTag.find("tbody").html("");
+					$.ajax(
 						{
-							me.populateSearchClientData( clientList );
-							me.showSearchClientTableResult();
-						}
-						else
-						{
-							me.showSearchClientNoResult();
-						}
-						MsgManager.appUnblock();
-					}
-					,error: function(response)
-					{
-						alert(response);
-						console.log(response);
-					}
-				});
-			
-		}
-		else if( requestData.attributes.length == 0 )
-		{
-			MsgManager.msgAreaShow( "Please enter value in at least one field in form.", "ERROR" );
-		}
+							type: "POST"
+							,url: "../client/search"
+							,dataType: "json"
+							,data: JSON.stringify( requestData )
+				            ,contentType: "application/json;charset=utf-8"
+							,success: function( response ) 
+							{
+								var searchCriteria = me.getSearchCriteria( me.searchClientFormTag );
+								me.searchResultKeyTag.html( searchCriteria );
+								
+								var clientList = response.trackedEntityInstances;
+								
+								if( clientList.length > 0 )
+								{
+									me.populateSearchClientData( clientList );
+									me.showSearchClientTableResult();
+								}
+								else
+								{
+									me.showSearchClientNoResult();
+								}
+								MsgManager.appUnblock();
+							}
+							,error: function(response)
+							{
+								alert(response);
+								console.log(response);
+							}
+						});
+					
+				}
+				else if( requestData.attributes.length == 0 )
+				{
+					MsgManager.msgAreaShow( "Please enter value in at least one field in form.", "ERROR" );
+				}
+			} else {
+				me.showExpireSessionMessage();					
+			}
+		});
+		
+		
 	};
 	
 	me.populateSearchClientData = function( clientList )
@@ -885,24 +918,32 @@ function Counsellor( storageObj )
 	
 	me.loadClientDetails = function( clientId ){
 
-		MsgManager.appBlock( "Loading client data ..." );
+		Commons.checkSession( function( isInSession ) {
+			if ( isInSession ) {
+
+				MsgManager.appBlock( "Loading client data ..." );
+				
+				$.ajax(
+					{
+						type: "POST"
+						,url: "../client/details?clientId=" + clientId
+			            ,contentType: "application/json;charset=utf-8"
+						,success: function( response ) 
+						{
+							var eventJson = response.events;					
+							me.showUpdateClientForm( response );
+							MsgManager.appUnblock();
+						}
+						,error: function(response)
+						{
+							console.log(response);
+						}
+					});
+			} else {
+				me.showExpireSessionMessage();					
+			}
+		});
 		
-		$.ajax(
-			{
-				type: "POST"
-				,url: "../client/details?clientId=" + clientId
-	            ,contentType: "application/json;charset=utf-8"
-				,success: function( response ) 
-				{
-					var eventJson = response.events;					
-					me.showUpdateClientForm( response );
-					MsgManager.appUnblock();
-				}
-				,error: function(response)
-				{
-					console.log(response);
-				}
-			});
 	};
 	
 	
@@ -912,117 +953,131 @@ function Counsellor( storageObj )
 
 	me.saveClient = function()
 	{
-		MsgManager.msgAreaHide();
-		
-		if( me.validationObj.checkFormEntryTagsData(me.addClientFormTabTag) )
-		{
-			MsgManager.appBlock( "Saving client ..." );
-			
-			// STEP 1. Get client & event JSON data from attribute of the tab
-			
-			var attributeData = me.getArrayJsonData( "attribute", me.addClientFormTag );
-			
-			var clientData = me.addClientFormTabTag.attr( "client" );
-			if( clientData !== undefined ) {
-				clientData = JSON.parse( clientData );
-				clientData.attributes = attributeData;			
-			}
-			else
-			{
-				clientData = {"attributes": attributeData};
-			}
-			
-			// STEP 2. Add client
-			var clientId = me.addClientFormTabTag.attr("clientId");
-			
-			var url ="../client/save?ouId=" + me.orgUnitListTag.val();
-			if( clientId !== undefined )
-			{
-				url += "&clientId=" + clientId;
-			}
-			
-			$.ajax(
+		Commons.checkSession( function( isInSession ) {
+			if ( isInSession ) {
+				MsgManager.msgAreaHide();
+				
+				if( me.validationObj.checkFormEntryTagsData(me.addClientFormTabTag) )
 				{
-					type: "POST"
-					,url: url
-					,dataType: "json"
-					,data: JSON.stringify( clientData )
-		            ,contentType: "application/json;charset=utf-8"
-					,success: function( response ) 
-					{
-						// STEP 3. Set the clientId as attribute for the form. 
-						
-						var clientId = response.trackedEntityInstance;
-						me.addClientFormTabTag.attr( "clientId", clientId );
-						me.addClientFormTabTag.attr( "client", JSON.stringify( response ) );
-						
-						// STEP 4. Change the header of the form && and show the 'Add Event' button
-						
-						me.addClientFormTabTag.find(".headerList").html("Edit Client");
-						me.showEventFormBtnTag.show();
-						Util.disableTag( me.completedEventBtnTag, true );
-						
-						// STEP 5. Unblock form
-						
-						MsgManager.msgAreaShow( "The client is saved.", "SUCCESS" );						
-						MsgManager.appUnblock();
+					MsgManager.appBlock( "Saving client ..." );
+					
+					// STEP 1. Get client & event JSON data from attribute of the tab
+					
+					var attributeData = me.getArrayJsonData( "attribute", me.addClientFormTag );
+					
+					var clientData = me.addClientFormTabTag.attr( "client" );
+					if( clientData !== undefined ) {
+						clientData = JSON.parse( clientData );
+						clientData.attributes = attributeData;			
 					}
-					,error: function(response)
+					else
 					{
-						console.log(response);
-						MsgManager.appUnblock();
+						clientData = {"attributes": attributeData};
 					}
-				});
-		}
-		else
-		{
-			MsgManager.msgAreaShow( "Please check error fields.", "ERROR" );	
-			MsgManager.appUnblock();
-		}
+					
+					// STEP 2. Add client
+					var clientId = me.addClientFormTabTag.attr("clientId");
+					
+					var url ="../client/save?ouId=" + me.orgUnitListTag.val();
+					if( clientId !== undefined )
+					{
+						url += "&clientId=" + clientId;
+					}
+					
+					$.ajax(
+						{
+							type: "POST"
+							,url: url
+							,dataType: "json"
+							,data: JSON.stringify( clientData )
+				            ,contentType: "application/json;charset=utf-8"
+							,success: function( response ) 
+							{
+								// STEP 3. Set the clientId as attribute for the form. 
+								
+								var clientId = response.trackedEntityInstance;
+								me.addClientFormTabTag.attr( "clientId", clientId );
+								me.addClientFormTabTag.attr( "client", JSON.stringify( response ) );
+								
+								// STEP 4. Change the header of the form && and show the 'Add Event' button
+								
+								me.addClientFormTabTag.find(".headerList").html("Edit Client");
+								me.showEventFormBtnTag.show();
+								Util.disableTag( me.completedEventBtnTag, true );
+								
+								// STEP 5. Unblock form
+								
+								MsgManager.msgAreaShow( "The client is saved.", "SUCCESS" );						
+								MsgManager.appUnblock();
+							}
+							,error: function(response)
+							{
+								console.log(response);
+								MsgManager.appUnblock();
+							}
+						});
+				}
+				else
+				{
+					MsgManager.msgAreaShow( "Please check error fields.", "ERROR" );	
+					MsgManager.appUnblock();
+				}
+			} else {
+				me.showExpireSessionMessage();					
+			}
+		});
 		
 	};
 	
 	me.saveEvent = function( jsonData, clientId, eventId, exeFunc )
 	{
-		MsgManager.appBlock( "Saving event ..." );
-		
-		var url = "../event/save?ouId=" + me.orgUnitListTag.val();
-		
-		if( clientId !== undefined )
-		{
-			url += "&clientId=" + clientId;
-		}
-		
-		if( eventId !== undefined )
-		{
-			url += "&eventId=" + eventId;
-		}
-		
-		jsonData.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag )
-		
-		$.ajax(
-			{
-				type: "POST"
-				,url: url
-				,dataType: "json"
-				,data: JSON.stringify( jsonData )
-	            ,contentType: "application/json;charset=utf-8"
-				,success: function( response ) 
-				{
-					var eventId = response.event;
-					me.addClientFormTabTag.attr( "eventId", eventId );
-					me.addClientFormTabTag.attr( "event", JSON.stringify( response ) );
+		Commons.checkSession( function( isInSession ) {
+			if ( isInSession ) {
 
-					Util.disableTag( me.completedEventBtnTag, false );
-					
-					if( exeFunc !== undefined ) exeFunc();
-					
-					// STEP 4. Unblock form
-					
-					MsgManager.msgAreaShow( "The event is saved.", "SUCCESS" );
-					MsgManager.appUnblock();
+				MsgManager.appBlock( "Saving event ..." );
+				
+				var url = "../event/save?ouId=" + me.orgUnitListTag.val();
+				
+				if( clientId !== undefined )
+				{
+					url += "&clientId=" + clientId;
 				}
-			});
+				
+				if( eventId !== undefined )
+				{
+					url += "&eventId=" + eventId;
+				}
+				
+				jsonData.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag )
+				
+				$.ajax(
+					{
+						type: "POST"
+						,url: url
+						,dataType: "json"
+						,data: JSON.stringify( jsonData )
+			            ,contentType: "application/json;charset=utf-8"
+						,success: function( response ) 
+						{
+							var eventId = response.event;
+							me.addClientFormTabTag.attr( "eventId", eventId );
+							me.addClientFormTabTag.attr( "event", JSON.stringify( response ) );
+
+							Util.disableTag( me.completedEventBtnTag, false );
+							
+							if( exeFunc !== undefined ) exeFunc();
+							
+							// STEP 4. Unblock form
+							
+							MsgManager.msgAreaShow( "The event is saved.", "SUCCESS" );
+							MsgManager.appUnblock();
+						}
+					});
+			} else {
+				me.showExpireSessionMessage();					
+			}
+		});
+		
 	}
 	
 	me.addEventClickHandle = function()
@@ -1115,21 +1170,10 @@ function Counsellor( storageObj )
 		}
 	};
 	
-	me.hideAllForms = function()
+	me.resetPageDisplay = function()
 	{
 		me.contentListTag.html("");
-		me.registerClientBtnTag.hide();
-		me.contentListTag.hide();
-		me.aboutDivTag.hide();
-		me.searchResultTag.hide();
-		me.searchClientFormTag.hide();
-		MsgManager.msgAreaHide();
-		me.clientListTag.hide();
-		me.addClientFormTabTag.hide();
-		me.searchResultTbTag.hide();
-		me.updateClientBtnTag.hide();
-		me.selectOrgUnitWarningMsgTag.hide();
-		me.settingsDivTag.hide();
+		me.mainContentTags.hide();
 	};
 	
 	me.showSearchClientForm = function()
@@ -1497,6 +1541,15 @@ function Counsellor( storageObj )
 		var index = tabHeader.index();
 		me.addClientFormTabTag.tabs('select', index);
 	}
+	
+
+	me.showExpireSessionMessage = function()
+	{
+		me.menuIcon.hide(); 
+		me.headerRightSideControlsTag.hide();
+		MsgManager.appUnblock();
+		me.divSessionExpireMsgTag.show().html("Session is expired. Please login in again <a style=\"cursor:pointer;\" onclick='window.location.href=\"../index.html\"'>here</a>.");
+	};
 	
 	// -------------------------------------------------------------------
 	// RUN Init method

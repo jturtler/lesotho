@@ -27,6 +27,7 @@
 <script src="../js/utils/storage.js"></script>
 <script src="../js/utils/validation.js"></script>
 <script src="../js/utils/menu.js"></script>
+<script src="../js/utils/commons.js"></script>
 <script src="../js/counsellor.js"></script>
 
 </head>
@@ -90,12 +91,19 @@
 				    
 				<div style="display:none;" class="alert alert-danger" id="selectOrgUnitWarningMsg">Please select an orgUnit in <a href="#" id="moveToSettingLink">Setting</a></div>
 				
+				
+				
+				<!--  Session Expired message -->
+          	
+				<div id="divSessionExpireMsg" class="sessionExpire mainContent" style="display:none;"></div>
+			
+			
 			
 				<!-- List Cases -->				
 				
-				<div id="clientList" style="display: none;">
+				<div id="clientList" style="display: none;" class="mainContent">
 				 	
-					<div class="headerList"><span id="headerList"></span><span id="listDate"></span></div>
+					<h4 class="headerList"><span id="headerList"></span><span id="listDate"></span></h4>
 				    
 					<div id="contentList" class="scroll-div"></div>
 					<button id="registerClientBtn" class="btn btn-lg glyphicon glyphicon-plus addButton" title="Search/Create client"></button>
@@ -108,8 +116,8 @@
 				
 				<!-- Search and Create Client FORM -->
 				
-				<div id="searchClientForm" style="display:none;">
-		  			<div class="headerList">Search/Create client</div>
+				<div id="searchClientForm" style="display:none;" class="mainContent">
+		  			<h4 class="headerList">Search/Create client</h4>
 		  			
 		  			<form class="form-horizontal" id="seachAddClientForm"></form>
 					
@@ -119,9 +127,9 @@
 		  				
 				</div>	
 				
-				<div id="searchResult" style="display:none;">
+				<div id="searchResult" style="display:none;" class="mainContent">
 				
-					<div class="headerList">Matches for your search <span name="searchResultKey"></span></div>
+					<h4 class="headerList">Matches for your search <span name="searchResultKey"></span></h4>
 					
 					<div class="scroll-div">
 						<table class='table table-hover table-striped listTable tablesorter' id="searchResultTb">
@@ -154,8 +162,8 @@
 				</div>
 				
 								
-				<div id="addClientFormTab" style="display:none;">
-		  			<div class="headerList">Add client</div>
+				<div id="addClientFormTab" style="display:none;" class="mainContent">
+		  			<h4 class="headerList">Add client</h4>
 					<ul>
 			    		<li><a href="#clientAttributeDiv">Client Attributes</a></li>
 			    		<li><a href="#previousTestDiv">Previous Tests</a></li>
@@ -202,7 +210,7 @@
 				
 				<!--  Settings page -->
 
-				<div id="settingsDiv" style="display: none;">
+				<div id="settingsDiv" style="display:none;" class="mainContent">
 					
 					<h4>Settings</h4>
 					<table class="table">
@@ -219,7 +227,7 @@
 				
 				<!--  About page -->
 
-				<div id="aboutDiv" style="display: none;">
+				<div id="aboutDiv" style="display:none;" class="mainContent">
 					<h4>About</h4>
 					<table class="table">
 						<tr>

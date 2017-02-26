@@ -14,7 +14,9 @@ import java.util.Date;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONArray;
@@ -465,4 +467,5 @@ public final class Util
             responseInfo.outMessage = "{ \"id\": \"" + responseInfo.referenceId + "\" }";
         }
     }
+    
 }
