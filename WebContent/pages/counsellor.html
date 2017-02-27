@@ -215,11 +215,28 @@
 				<div id="settingsDiv" style="display:none;" class="mainContent">
 					
 					<h4 keyword="settings_headerTitle">Settings</h4>
-					<table class="table">
+					<table class="table aboutTable">
 						<tr>
-							<td keyword="settings_orgUnit">Organisation Unit</td>
+							<td keyword="settings_rowHeader_orgUnit">Org Unit</td>
 							<td><select id="orgUnitList" class="form-control" ></select></td>
 						</tr>
+						
+						<tr>
+							<td  keyword="settings_rowHeader_language"></td>
+							<td>
+								<select id="languageSelector" class="form-control" >
+						        	<option value="en">English</option>
+						        </select>  
+						        
+						        <img id="translationStatusImg_checked" src="../images/checked.png" class="checkingImages" style="display: none;">
+						        <img id="translationStatusImg_loading" src="../images/ajax-loader-bar.gif" class="checkingImages" style="display: none;">
+						        <img id="translationStatusImg_download" src="../images/download.png" class="checkingImages" style="display: none; cursor: pointer;">
+		    
+							</td>
+						</tr>
+					
+
+		      
 					</table>
 				</div>
 				
@@ -270,7 +287,7 @@
 	{
 		new lesothoApp( "../", function( translationObj ){
 			new Menu();
-			new Counsellor( new Storage() );
+			new Counsellor( new Storage(), translationObj );
 		});
 	}
 	

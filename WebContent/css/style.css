@@ -640,3 +640,9 @@ table.tablesorter thead tr .headerSortDown {
 	background-color: #FFFFE0;
 	border: 1px solid Yellow;	
 }
+
+.aboutTable td
+{
+	background-color: #FAFAFA;	
+}
+

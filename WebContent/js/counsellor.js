@@ -1,7 +1,8 @@
-function Counsellor( storageObj )
+function Counsellor( storageObj, translationObj )
 {
 	var me = this;
 	me.storageObj = storageObj;
+	me.translationObj = translationObj;
 	me.validationObj;
 	
 	me.dateFormat = "dd M yy";
@@ -599,29 +600,37 @@ function Counsellor( storageObj )
 	
 	me.listTodayCases = function()
 	{
+		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "todayCases_headerTitle" );
+		
 		me.listDateTag.html( Util.getLastNDate(0) );
 		var headerList = ["Time", "Name", "Result", "What else?", "Indexed?"];
-		me.listCases( "../event/todayCases", headerList, "#cfe2f3", "Tested clients today - ", true, false, true );
+		me.listCases( "../event/todayCases", headerList, "#cfe2f3", tranlatedHeaderText + " - ", true, false, true );
 	}
 		
 	me.listPreviousCases = function()
 	{
+		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "previousCases_headerTitle" );
+	
 		me.listDateTag.html( "" );
 		var headerList = ["Date", "Name", "Result", "What else?", "Indexed?"];
-		me.listCases( "../event/previousCases", headerList, "#cfe2f3", "Previous cases, not including today", false, false, false );
+		me.listCases( "../event/previousCases", headerList, "#cfe2f3", tranlatedHeaderText, false, false, false );
 	}
 	
 	me.listPositiveCases = function()
 	{
+		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "positiveCases_headerTitle" );
+		
 		me.listDateTag.html( "" );
 		var headerList = ["Date", "Name", "What else?", "???", "Referral ART closed?"];
-		me.listCases( "../event/positiveCases", headerList, "#cfe2f3", "Positive Cases last 12 months", false, true, false );
+		me.listCases( "../event/positiveCases", headerList, "#cfe2f3", tranlatedHeaderText, false, true, false );
 	}
 	
 	me.listCases = function( url, headerList, headerColor, headerText, isTime, isSpecialCase, showOrgUnitSelector )
 	{
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
+		
 		me.resetPageDisplay();
-		MsgManager.appBlock("Loading data ...");
+		MsgManager.appBlock( tranlatedText + " ..." );
 		
 		// STEP 0. Show the 'Add' button which can move to 'Search/Create Client' function
 		
@@ -651,6 +660,7 @@ function Counsellor( storageObj )
 							
 							// STEP 2. Generate headers
 							
+							// TODO : Need to translate header
 							var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
 							for( var i=0; i<headerList.length; i++ )
 							{
@@ -820,7 +830,9 @@ function Counsellor( storageObj )
 				}
 				else if( requestData.attributes.length == 0 )
 				{
-					MsgManager.msgAreaShow( "Please enter value in at least one field in form.", "ERROR" );
+					var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
+					
+					MsgManager.msgAreaShow( tranlatedText, "ERROR" );
 				}
 			} else {
 				me.showExpireSessionMessage();					
@@ -832,6 +844,8 @@ function Counsellor( storageObj )
 	
 	me.populateSearchClientData = function( clientList )
 	{
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_rowTooltip" );
+		
 		for( var i in clientList )
 		{
 			var firstName = "";
@@ -882,7 +896,7 @@ function Counsellor( storageObj )
 				}
 			}
 			
-			var rowTag = $("<tr title='Click to edit the client' clientId='" + clientList[i].trackedEntityInstance + "'></tr>");
+			var rowTag = $("<tr title='" + tranlatedText + "' clientId='" + clientList[i].trackedEntityInstance + "'></tr>");
 			rowTag.append( "<td>" + firstName + "</td>" );
 			rowTag.append( "<td>" + lastName + "</td>" );
 			rowTag.append( "<td>" + dob + "</td>" );
@@ -921,7 +935,9 @@ function Counsellor( storageObj )
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
 
-				MsgManager.appBlock( "Loading client data ..." );
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_loadingClientDetails" );
+				
+				MsgManager.appBlock( tranlatedText + " ..." );
 				
 				$.ajax(
 					{
@@ -959,7 +975,9 @@ function Counsellor( storageObj )
 				
 				if( me.validationObj.checkFormEntryTagsData(me.addClientFormTabTag) )
 				{
-					MsgManager.appBlock( "Saving client ..." );
+					var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingClient" );
+					
+					MsgManager.appBlock( tranlatedText + " ..." );
 					
 					// STEP 1. Get client & event JSON data from attribute of the tab
 					
@@ -972,7 +990,7 @@ function Counsellor( storageObj )
 					}
 					else
 					{
-						clientData = {"attributes": attributeData};
+						clientData = { "attributes": attributeData };
 					}
 					
 					// STEP 2. Add client
@@ -1001,13 +1019,16 @@ function Counsellor( storageObj )
 								
 								// STEP 4. Change the header of the form && and show the 'Add Event' button
 								
-								me.addClientFormTabTag.find(".headerList").html("Edit Client");
+								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_editForm_headerTitle" );
+								
+								me.addClientFormTabTag.find(".headerList").html( tranlatedText );
 								me.showEventFormBtnTag.show();
 								Util.disableTag( me.completedEventBtnTag, true );
 								
 								// STEP 5. Unblock form
-								
-								MsgManager.msgAreaShow( "The client is saved.", "SUCCESS" );						
+
+								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
+								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
 								MsgManager.appUnblock();
 							}
 							,error: function(response)
@@ -1019,7 +1040,9 @@ function Counsellor( storageObj )
 				}
 				else
 				{
-					MsgManager.msgAreaShow( "Please check error fields.", "ERROR" );	
+					var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_validation_checkErrorFields" );
+					
+					MsgManager.msgAreaShow( tranlatedText, "ERROR" );	
 					MsgManager.appUnblock();
 				}
 			} else {
@@ -1033,8 +1056,10 @@ function Counsellor( storageObj )
 	{
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
-
-				MsgManager.appBlock( "Saving event ..." );
+				
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingEvent" );
+				
+				MsgManager.appBlock( tranlatedText + " ..." );
 				
 				var url = "../event/save?ouId=" + me.orgUnitListTag.val();
 				
@@ -1068,8 +1093,9 @@ function Counsellor( storageObj )
 							if( exeFunc !== undefined ) exeFunc();
 							
 							// STEP 4. Unblock form
+							tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );
 							
-							MsgManager.msgAreaShow( "The event is saved.", "SUCCESS" );
+							MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );
 							MsgManager.appUnblock();
 						}
 					});
@@ -1082,7 +1108,9 @@ function Counsellor( storageObj )
 	
 	me.addEventClickHandle = function()
 	{
-		MsgManager.appBlock("Creating new event ...");
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_creatingEvent" );
+	
+		MsgManager.appBlock( tranlatedText + " ..." );
 		
 		// STEP 1. Check if the form has any event which existed
 		
@@ -1097,8 +1125,9 @@ function Counsellor( storageObj )
 			// STEP 2. Add the event data to "Previous test" tab
 			// -------------------------------------------------------------------
 			
+			tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );			
 			var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
-			headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> Test on " + Util.formatDate_DisplayDateTine( event.eventDate ) + "</th>");
+			headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTine( event.eventDate ) + "</th>");
 			
 			
 			// STEP 2.1. Create tbody to display data values of an event
@@ -1245,9 +1274,12 @@ function Counsellor( storageObj )
 	
 	me.showUpdateClientForm = function( data )
 	{
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_editClient" );		
+
+		me.addClientFormTabTag.find(".headerList").html( tranlatedText );
+		
 		me.showEventFormBtnTag.show();
 		me.showOrgUnitWarningMsg();	
-		me.addClientFormTabTag.find(".headerList").html("Edit Client");
 		me.addClientFormTabTag.removeAttr( "clientId" );
 		me.addClientFormTabTag.removeAttr( "client" );
 		me.addClientFormTabTag.removeAttr( "eventId" );
@@ -1313,8 +1345,9 @@ function Counsellor( storageObj )
 				
 				// STEP 2.1. Create header for one event
 				
+				tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_headerTitle" );				
 				var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
-				headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> Test on " + Util.formatDate_DisplayDateTine( event.eventDate ) + "</th>");
+				headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTine( event.eventDate ) + "</th>");
 				
 				
 				// STEP 2.2. Create tbody to display data values of an event
@@ -1486,7 +1519,9 @@ function Counsellor( storageObj )
 	{
 		me.searchClientFormTag.hide();
 		me.searchResultTbTag.hide();
-		me.searchResultOptionsTag.html("No client found. Select an option below");
+		
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_noClientFound" );		
+		me.searchResultOptionsTag.html( tranlatedText );
 		
 		me.searchResultTag.show("fast");
 	};
@@ -1561,7 +1596,11 @@ function Counsellor( storageObj )
 		me.menuIcon.hide(); 
 		me.headerRightSideControlsTag.hide();
 		MsgManager.appUnblock();
-		me.divSessionExpireMsgTag.show().html("Session is expired. Please login in again <a style=\"cursor:pointer;\" onclick='window.location.href=\"../index.html\"'>here</a>.");
+		
+		var sessionExpiredText = me.translationObj.getTranslatedValueByKey( "session_msg_expired" );
+		var loginAgainText = me.translationObj.getTranslatedValueByKey( "session_msg_loginAgain" );
+		var hereText = me.translationObj.getTranslatedValueByKey( "session_msg_here" ); 
+		var sessionExpiredText = me.divSessionExpireMsgTag.show().html( sessionExpiredText + ". " + loginAgainText + " <a style=\"cursor:pointer;\" onclick='window.location.href=\"../index.html\"'>" + hereText + "</a>.");
 	};
 	
 	// -------------------------------------------------------------------
