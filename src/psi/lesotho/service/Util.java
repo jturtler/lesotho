@@ -34,12 +34,8 @@ public final class Util
     public static String REQUEST_PARAM_PASSWORD = "pwd";
 
     public static String KEY_FULLNAME = "fullName";
-    public static String KEY_USER_NAME = "username";
+    public static String KEY_LOGGED_SUCCESS = "logged";
     public static String KEY_DHIS_SERVER = "dhisServer";
-    public static String KEY_USER_ACTIVE = "active";
-    public static String KEY_USER_ORGUNITS = "userOrgUnits";
-    public static String KEY_ACCESS_SERVER_USERNAME = "username";
-    public static String KEY_ACCESS_SERVER_PASSWORD = "password";
     public static String KEY_LOGIN_USERNAME = "loginUsername";
     public static String KEY_LOGIN_PASSWORD = "loginPassword";
 
@@ -98,7 +94,6 @@ public final class Util
             br = new BufferedReader( new InputStreamReader( is ) );
             while ( (line = br.readLine()) != null )
             {
-                byte [] b = line.getBytes();
                 sb.append( line );
             }
         }
@@ -126,12 +121,15 @@ public final class Util
     }
 
     public static ResponseInfo sendRequest( String requestType, String url, JSONObject jsonData,
-        Map<String, Object> params, String username, String password )
+        Map<String, Object> params )
         throws Exception, IOException
     {
 
         System.out.println( "\n\n ====== \n requestUrl : " + url );
 
+        String username = Util.ACCESS_SERVER_USERNAME;
+        String password = Util.ACCESS_SERVER_PASSWORD;
+        
         ResponseInfo responseInfo = new ResponseInfo();
         StringBuffer responseMsg = new StringBuffer();
 

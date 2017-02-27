@@ -11,6 +11,8 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
 
+import psi.lesotho.service.Util;
+
 public class CheckSession
     extends HttpServlet
 {
@@ -28,10 +30,11 @@ public class CheckSession
         throws ServletException, IOException
     {
         HttpSession session = request.getSession();
-
+        boolean loggedSuccess = (boolean) session.getAttribute( Util.KEY_LOGGED_SUCCESS );
+        
         JSONObject responseData = new JSONObject();
         
-        if (!request.getRequestedSessionId().equals(session.getId()) )
+        if (!request.getRequestedSessionId().equals(session.getId()) || !loggedSuccess )
         {
             responseData.put( "msg", "session_expired" );
         }

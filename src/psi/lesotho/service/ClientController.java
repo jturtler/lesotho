@@ -29,13 +29,12 @@ public class ClientController
     {
         try
         {
-            // STEP 1. Get username/password from session
+            // STEP 1. Get loginUsername from session
 
             HttpSession session = request.getSession( true );
-            String username = (String) session.getAttribute( Util.KEY_ACCESS_SERVER_USERNAME );
-            String password = (String) session.getAttribute( Util.KEY_ACCESS_SERVER_PASSWORD );
+            String loginUsername = (String) session.getAttribute( Util.KEY_LOGIN_USERNAME );
 
-            // STEP 2. Check username/password
+            // STEP 2. Check loginUsername/password
             ResponseInfo responseInfo = null;
             
             if ( request.getPathInfo() != null && request.getPathInfo().split( "/" ).length >= 2 )
@@ -48,18 +47,18 @@ public class ClientController
                 if ( key.equals( Util.KEY_SEARCH_CASES ) )
                 {
                     JSONObject receivedData = Util.getJsonFromInputStream( request.getInputStream() );
-                    responseInfo = ClientController.searchClients( request, receivedData, username, password );
+                    responseInfo = ClientController.searchClients( request, receivedData );
                 }
                 // STEP 3.2. Get All events of an client
                 else if ( key.equals( Util.KEY_CLIENT_DETAILS ) )
                 {
                     String outputData = "";
                     String clientId = request.getParameter( "clientId" );
-                    responseInfo = ClientController.getClientDetails( clientId, username, password );
+                    responseInfo = ClientController.getClientDetails( clientId );
                     if ( responseInfo.responseCode == 200 )
                     {
                         outputData = "\"client\":" + responseInfo.output;
-                        responseInfo = EventController.getEventsByClient( clientId, username, password );
+                        responseInfo = EventController.getEventsByClient( clientId );
                         if ( responseInfo.responseCode == 200 )
                         {
                             outputData += ",\"events\":" + responseInfo.output;
@@ -78,12 +77,12 @@ public class ClientController
                     // Update client
                     if( clientId != null )
                     {
-                        responseInfo = ClientController.updateClient( clientId, receivedData, username, password );
+                        responseInfo = ClientController.updateClient( clientId, receivedData );
                     }
                     // Add client
                     else
                     {
-                        responseInfo = ClientController.createClient( receivedData, ouId, username, password );
+                        responseInfo = ClientController.createClient( receivedData, ouId );
 
                         StringBuffer output = new StringBuffer();
                         output.append( responseInfo.output );
@@ -92,11 +91,11 @@ public class ClientController
                         {
                             // STEP 5. Enroll Client
                             clientId = responseInfo.referenceId;
-                            responseInfo = ClientController.enrollClient( clientId, ouId, username, password );
+                            responseInfo = ClientController.enrollClient( clientId, ouId );
                            
                             if ( responseInfo.responseCode == 200 )
                             {
-                                responseInfo = EventController.createEvent( new JSONObject(), clientId, ouId, username, password );
+                                responseInfo = EventController.createEvent( new JSONObject(), clientId, ouId, loginUsername );
                             }
                         }
                         
@@ -125,8 +124,7 @@ public class ClientController
     // Supportive methods
     // ===============================================================================================================
 
-    private static ResponseInfo searchClients( HttpServletRequest request, JSONObject jsonData, String username,
-        String password )
+    private static ResponseInfo searchClients( HttpServletRequest request, JSONObject jsonData )
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
         ResponseInfo responseInfo = null;
@@ -142,7 +140,7 @@ public class ClientController
                 requestUrl += "&filter=" + attribute.getString( "attribute" ) + ":LIKE:" + value;
             }
 
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
 
         }
         catch ( Exception ex )
@@ -153,7 +151,7 @@ public class ClientController
         return responseInfo;
     }
 
-    private static ResponseInfo createClient( JSONObject receivedData, String ouId, String username, String password )
+    private static ResponseInfo createClient( JSONObject receivedData, String ouId )
         throws IOException, Exception
     {
         ResponseInfo responseInfo = null;
@@ -163,8 +161,7 @@ public class ClientController
             receivedData.put( "trackedEntity", TRACKED_ENTITY );
             receivedData.put( "orgUnit", ouId );
             String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances";
-            responseInfo = Util
-                .sendRequest( Util.REQUEST_TYPE_POST, requestUrl, receivedData, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, receivedData, null );
 
             Util.processResponseMsg( responseInfo, "" );
             String clientId = responseInfo.referenceId;
@@ -180,7 +177,7 @@ public class ClientController
         return responseInfo;
     }
 
-    private static ResponseInfo updateClient( String clientId, JSONObject receivedData, String username, String password )
+    private static ResponseInfo updateClient( String clientId, JSONObject receivedData )
         throws IOException, Exception
     {
         ResponseInfo responseInfo = null;
@@ -188,7 +185,7 @@ public class ClientController
         try
         {
             String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + clientId;
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, receivedData, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, receivedData, null );
 
             responseInfo.output = receivedData.toString();
             Util.processResponseMsg( responseInfo, "" );
@@ -201,7 +198,7 @@ public class ClientController
         return responseInfo;
     }
 
-    private static ResponseInfo enrollClient( String clientId, String ouId, String username, String password )
+    private static ResponseInfo enrollClient( String clientId, String ouId )
         throws IOException, Exception
     {
         ResponseInfo responseInfo = new ResponseInfo();
@@ -211,8 +208,7 @@ public class ClientController
             JSONObject enrollmentJson = ClientController.getEnrollmentJson( clientId, Util.PROGRAM_ID, ouId );
 
             String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/enrollments";
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, enrollmentJson, null, username,
-                password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, enrollmentJson, null );
         }
         catch ( Exception ex )
         {
@@ -222,13 +218,13 @@ public class ClientController
         return responseInfo;
     }
 
-    private static ResponseInfo getClientDetails( String clientId, String username, String password )
+    private static ResponseInfo getClientDetails( String clientId )
     {
         ResponseInfo responseInfo = null;
         try
         {
             String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + clientId + ".json";
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
         {

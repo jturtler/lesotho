@@ -1,7 +1,6 @@
 package psi.lesotho.service;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 import javax.servlet.ServletException;
@@ -77,14 +76,23 @@ public class LoginController
             // STEP 2. Check username/password
          
             ResponseInfo responseInfo = LoginController.processPostMsg( request, loginUsername, loginPassword, accessServerUsername, accessServerPassword );
+            HttpSession session = request.getSession( true );                
             if ( responseInfo.responseCode == 200 )
             {
-                HttpSession session = request.getSession( true );
-                session.setAttribute( Util.KEY_ACCESS_SERVER_USERNAME, accessServerUsername );
-                session.setAttribute( Util.KEY_ACCESS_SERVER_PASSWORD, accessServerPassword );  
-                
-                session.setAttribute( Util.KEY_LOGIN_USERNAME, loginUsername );
-                session.setAttribute( Util.KEY_LOGIN_PASSWORD, loginPassword );  
+                if( responseInfo.data.getBoolean( Util.KEY_LOGGED_SUCCESS ) )
+                {
+                    session.setAttribute( Util.KEY_LOGIN_USERNAME, loginUsername );
+                    session.setAttribute( Util.KEY_LOGIN_PASSWORD, loginPassword );
+                    session.setAttribute( Util.KEY_LOGGED_SUCCESS, true );
+                }
+                else
+                {
+                    session.setAttribute( Util.KEY_LOGGED_SUCCESS, false );
+                }
+            }
+            else
+            {
+                session.setAttribute( Util.KEY_LOGGED_SUCCESS, false );
             }
 
             // STEP 3. Send back the messages
@@ -113,7 +121,7 @@ public class LoginController
            String requestUrl = Util.LOCATION_DHIS_SERVER
                 + "/api/categoryOptions.json?pagging=false&filter=categories.id:eq:" + Util.USER_CATEGORY_ID + "&fields=displayName&filter=code:eq:" + loginUsername + "&filter=attributeValues.value:eq:" + loginPassword;
 
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null, accessServerUsername, accessServerPassword );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
 
             
             if ( responseInfo.responseCode == 200 )
@@ -128,12 +136,16 @@ public class LoginController
                     JSONObject responseJson = new JSONObject();
                     responseJson.put( Util.KEY_FULLNAME, categoryOptions.getJSONObject( 0 ).getString( "displayName" ) );
                     responseJson.put( Util.KEY_DHIS_SERVER, Util.LOCATION_DHIS_SERVER );
+                    responseJson.put( Util.KEY_LOGGED_SUCCESS, true );
 
                     responseInfo.outMessage = responseJson.toString();
                     responseInfo.data = responseJson;
                 }
                 else
                 {
+                    JSONObject data = new JSONObject();
+                    data.put( Util.KEY_LOGGED_SUCCESS, false );
+                    responseInfo.data = data;
                     responseInfo.responseCode = 401;
                 }
             }

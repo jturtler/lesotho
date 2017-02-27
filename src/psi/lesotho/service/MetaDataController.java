@@ -1,13 +1,11 @@
 package psi.lesotho.service;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 public class MetaDataController
     extends HttpServlet
@@ -26,10 +24,6 @@ public class MetaDataController
             ResponseInfo responseInfo = null;
             
             // STEP 1. Get username/password from session
-
-            HttpSession session = request.getSession( true );
-            String username = Util.ACCESS_SERVER_USERNAME;
-            String password = Util.ACCESS_SERVER_PASSWORD;
             
             if ( request.getPathInfo() != null && request.getPathInfo().split( "/" ).length >= 2 )
             {
@@ -42,23 +36,23 @@ public class MetaDataController
                 {
                     StringBuffer outputData = new StringBuffer();
                     
-                    responseInfo = MetaDataController.getAttributeGroups( username, password );
+                    responseInfo = MetaDataController.getAttributeGroups( );
                     
                     if( responseInfo.responseCode == 200 )
                     {
                         outputData.append( "\"attGroups\":" + responseInfo.output );
 
-                        responseInfo = MetaDataController.getProgramAttributes( username, password ); 
+                        responseInfo = MetaDataController.getProgramAttributes(); 
                         if( responseInfo.responseCode == 200 )
                         {                       
                             outputData.append( ",\"programAttributes\":" + responseInfo.output );
                             
-                            responseInfo = MetaDataController.getSections( username, password );
+                            responseInfo = MetaDataController.getSections();
                             if( responseInfo.responseCode == 200 )
                             {
                                 outputData.append( ",\"sections\":" + responseInfo.output );
                                 
-                                responseInfo = MetaDataController.getOrgUnitList( username, password );
+                                responseInfo = MetaDataController.getOrgUnitList();
                                 if( responseInfo.responseCode == 200 )
                                 {
                                     outputData.append( ",\"ouList\":" + responseInfo.output );
@@ -73,7 +67,7 @@ public class MetaDataController
                 // Load orgUnit List only
                 else if ( key.equals( Util.KEY_METADATA_OULIST ) )
                 {
-                    responseInfo = MetaDataController.getOrgUnitList( username, password );
+                    responseInfo = MetaDataController.getOrgUnitList();
                 }
             }
 
@@ -92,14 +86,14 @@ public class MetaDataController
         }
     }
 
-    private static ResponseInfo getSections( String username, String password )
+    private static ResponseInfo getSections()
     {
         ResponseInfo responseInfo = null;
         try
         {
             String url = Util.LOCATION_DHIS_SERVER + "/api/programStages/" + Util.STAGE_ID
                 + ".json?fields=programStageSections[id,displayName,programStageDataElements[dataElement[id,name,valueType,optionSet[options[code,name]]]";
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
         {
@@ -110,13 +104,13 @@ public class MetaDataController
     }
     
 
-    private static ResponseInfo getAttributeGroups( String username, String password )
+    private static ResponseInfo getAttributeGroups()
     {
         ResponseInfo responseInfo = null;
         try
         {
             String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributeGroups.json?filter=code:like:LSHTC&paging=false&fields=name,trackedEntityAttributes[id,name,valueType,optionSet[options[code,name]]";
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
         {
@@ -127,13 +121,13 @@ public class MetaDataController
     }
     
 
-    private static ResponseInfo getProgramAttributes( String username, String password )
+    private static ResponseInfo getProgramAttributes()
     {
         ResponseInfo responseInfo = null;
         try
         {
             String url = Util.LOCATION_DHIS_SERVER + "/api/programs/" + Util.PROGRAM_ID + ".json?fields=programTrackedEntityAttributes[mandatory,trackedEntityAttribute[id,name]]";
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
         {
@@ -144,14 +138,13 @@ public class MetaDataController
     }
     
 
-    private static ResponseInfo getOrgUnitList( String username, String password )
+    private static ResponseInfo getOrgUnitList()
     {
         ResponseInfo responseInfo = null;
         try
         {
             String url = Util.LOCATION_DHIS_SERVER + "/api/organisationUnits/" + Util.ROOT_ORGTUNIT_LESOTHO + ".json?includeDescendants=true&fields=id,name,level&filter=level:eq:" + Util.REGISTER_ORGUNIT_LEVEL;
-           System.out.println("\n\n URL : " + url);
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
         {

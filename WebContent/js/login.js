@@ -42,9 +42,7 @@ function LoginForm( storageObj )
 			
 			setTimeout( function() 
 			{
-				var userName = 'tranc';
-									
-				me.userNameTag.val( userName ).css( 'background-color', '' );
+				me.userNameTag.val( "TES001" ).css( 'background-color', '' );
 				me.passwordTag.val( 'Test1234' ).css( 'background-color', '' );
 			}
 			, 300 );				

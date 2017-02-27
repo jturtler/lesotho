@@ -39,13 +39,12 @@ public class EventController
     {
         try
         {
-            // STEP 1. Get username/password from session
+            // STEP 1. Get loginUsername/password from session
 
             HttpSession session = request.getSession( true );
-            String username = (String) session.getAttribute( Util.KEY_ACCESS_SERVER_USERNAME );
-            String password = (String) session.getAttribute( Util.KEY_ACCESS_SERVER_PASSWORD );
+            String loginUsername = (String) session.getAttribute( Util.KEY_LOGIN_USERNAME );
 
-            // STEP 2. Check username/password
+            // STEP 2. Check loginUsername/password
 
             ResponseInfo responseInfo = null;
 
@@ -58,19 +57,19 @@ public class EventController
                 // Load Today's case
                 if ( key.equals( Util.KEY_TODAY_CASES ) )
                 {
-                    responseInfo = EventController.getTodayCases( request, username, password );
+                    responseInfo = EventController.getTodayCases( request, loginUsername );
                 }
 
                 // Load Previous case
                 else if ( key.equals( Util.KEY_PREVIOUS_CASES ) )
                 {
-                    responseInfo = EventController.getPreviousCases( request, username, password );
+                    responseInfo = EventController.getPreviousCases( request, loginUsername );
                 }
 
                 // Load Previous case
                 else if ( key.equals( Util.KEY_POSITIVE_CASES ) )
                 {
-                    responseInfo = EventController.getPositiveCases( request, username, password );
+                    responseInfo = EventController.getPositiveCases( request, loginUsername );
                 }
                 // Add / Update Event
                 else if ( key.equals( Util.KEY_SAVE_EVENT ) )
@@ -83,12 +82,12 @@ public class EventController
                     // Create Event
                     if ( eventId == null )
                     {
-                        responseInfo = EventController.createEvent( receivedData, clientId, ouId, username, password );
+                        responseInfo = EventController.createEvent( receivedData, clientId, ouId, loginUsername );
                     }
                     // Update Event
                     else
                     {
-                        responseInfo = EventController.updateEvent( eventId, receivedData, username, password );
+                        responseInfo = EventController.updateEvent( eventId, receivedData, loginUsername );
                     }
                 }
             }
@@ -112,7 +111,7 @@ public class EventController
     // Suportive methods
     // ===============================================================================================================
 
-    private static ResponseInfo getTodayCases( HttpServletRequest request, String username, String password )
+    private static ResponseInfo getTodayCases( HttpServletRequest request, String loginUsername )
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
         ResponseInfo responseInfo = null;
@@ -123,11 +122,11 @@ public class EventController
             String tomorrow = Util.getXLastDate( -1 );
 
             String requestUrl = EventController.URL_QUERY_CASES_BY_TIME;
-            requestUrl = requestUrl.replace( PARAM_USERNAME, username );
+            requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
             requestUrl = requestUrl.replace( PARAM_START_DATE, curDate );
             requestUrl = requestUrl.replace( PARAM_END_DATE, tomorrow );
 
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
 
         }
         catch ( Exception ex )
@@ -138,7 +137,7 @@ public class EventController
         return responseInfo;
     }
 
-    private static ResponseInfo getPreviousCases( HttpServletRequest request, String username, String password )
+    private static ResponseInfo getPreviousCases( HttpServletRequest request, String loginUsername )
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
         ResponseInfo responseInfo = null;
@@ -149,11 +148,11 @@ public class EventController
             String endDate = Util.getCurrentDate();
 
             String requestUrl = EventController.URL_QUERY_CASES_BY_TIME;
-            requestUrl = requestUrl.replace( PARAM_USERNAME, username );
+            requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
             requestUrl = requestUrl.replace( PARAM_START_DATE, startDate );
             requestUrl = requestUrl.replace( PARAM_END_DATE, endDate );
 
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
 
         }
         catch ( Exception ex )
@@ -164,7 +163,7 @@ public class EventController
         return responseInfo;
     }
 
-    private static ResponseInfo getPositiveCases( HttpServletRequest request, String username, String password )
+    private static ResponseInfo getPositiveCases( HttpServletRequest request, String loginUsername )
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
         ResponseInfo responseInfo = null;
@@ -175,11 +174,11 @@ public class EventController
             String endDate = Util.getXLastDate( -1 );
 
             String requestUrl = EventController.URL_QUERY_POSITIVE_CASES;
-            requestUrl = requestUrl.replace( PARAM_USERNAME, username );
+            requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
             requestUrl = requestUrl.replace( PARAM_START_DATE, startDate );
             requestUrl = requestUrl.replace( PARAM_END_DATE, endDate );
 
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
 
         }
         catch ( Exception ex )
@@ -190,14 +189,13 @@ public class EventController
         return responseInfo;
     }
 
-    private static ResponseInfo getCatOptionComboUid( String username, String password )
+    private static ResponseInfo getCatOptionComboUid( String loginUsername )
     {
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/categoryOptions.json?fields=id,name,code&filter=code:eq:"
-                + username;
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null, username, password );
+            String url = Util.LOCATION_DHIS_SERVER + "/api/categoryOptions.json?fields=id,name,code&filter=code:eq:" + loginUsername;
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
         {
@@ -207,15 +205,14 @@ public class EventController
         return responseInfo;
     }
 
-    public static ResponseInfo createEvent( JSONObject eventData, String clientId, String ouId, String username,
-        String password )
+    public static ResponseInfo createEvent( JSONObject eventData, String clientId, String ouId, String loginUsername )
         throws IOException, Exception
     {
         ResponseInfo responseInfo = new ResponseInfo();
 
         try
         {
-            responseInfo = EventController.getCatOptionComboUid( username, password );
+            responseInfo = EventController.getCatOptionComboUid( loginUsername );
 
             if ( responseInfo.responseCode == 200 )
             {
@@ -226,8 +223,7 @@ public class EventController
                 JSONObject eventJson = EventController.composeJsonEvent( eventData, clientId, ouId, catOptionComboId );
 
                 String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events";
-                responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, eventJson, null, username,
-                    password );
+                responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, eventJson, null );
 
                 Util.processResponseMsg( responseInfo, "importSummaries" );
 
@@ -245,14 +241,14 @@ public class EventController
         return responseInfo;
     }
 
-    public static ResponseInfo updateEvent( String eventId, JSONObject eventData, String username, String password )
+    public static ResponseInfo updateEvent( String eventId, JSONObject eventData, String loginUsername )
         throws IOException, Exception
     {
         ResponseInfo responseInfo = new ResponseInfo();
 
         try
         {
-            responseInfo = EventController.getCatOptionComboUid( username, password );
+            responseInfo = EventController.getCatOptionComboUid( loginUsername );
 
             if ( responseInfo.responseCode == 200 )
             {
@@ -260,8 +256,7 @@ public class EventController
                 eventData.put( "status", "COMPLETED" );
                 
                 String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events/" + eventId;
-                responseInfo = Util
-                    .sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, eventData, null, username, password );
+                responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, eventData, null );
 
                 Util.processResponseMsg( responseInfo, "importSummaries" );
                 responseInfo.output = eventData.toString();
@@ -276,7 +271,7 @@ public class EventController
         return responseInfo;
     }
 
-    public static ResponseInfo getEventsByClient( String clientId, String username, String password )
+    public static ResponseInfo getEventsByClient( String clientId )
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
         ResponseInfo responseInfo = null;
@@ -285,7 +280,7 @@ public class EventController
         {
             String requestUrl = Util.LOCATION_DHIS_SERVER
                 + "/api/events.json?ouMode=ACCESSIBLE&skipPaging=true&trackedEntityInstance=" + clientId;
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null, username, password );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
         }
         catch ( Exception ex )
         {
