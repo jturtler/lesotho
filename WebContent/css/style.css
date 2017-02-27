@@ -474,11 +474,6 @@ table.tablesorter thead tr .headerSortDown {
 	display:none;
 }
 
-.scroll-div
-{
-	max-height:500px;
-	overflow:auto;
-}
 
 /*-------------------------------*/
 /*        Previous Test Table     */

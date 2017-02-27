@@ -29,6 +29,10 @@
     <servlet-name>MetaDataController</servlet-name>
     <servlet-class>psi.lesotho.service.MetaDataController</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>TranslationController</servlet-name>
+    <servlet-class>psi.lesotho.service.TranslationController</servlet-class>
+  </servlet>
   
   
   <servlet-mapping>
@@ -54,5 +58,9 @@
   <servlet-mapping>
     <servlet-name>MetaDataController</servlet-name>
     <url-pattern>/metaData/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TranslationController</servlet-name>
+    <url-pattern>/translation/*</url-pattern>
   </servlet-mapping>
 </web-app>

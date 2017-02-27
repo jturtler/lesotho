@@ -1114,7 +1114,16 @@ function Counsellor( storageObj )
 			for( var j in dataValues )
 			{
 				var dataValue = dataValues[j];
-				tbody.find("td[dataElement='" + dataValue.dataElement + "']").html( dataValue.value );
+				var value = dataValue.value;
+				if( value === "true" )
+				{
+					value = "Yes";
+				}
+				else if( value === "false" )
+				{
+					value = "No";
+				}
+				tbody.find("td[dataElement='" + dataValue.dataElement + "']").html( value );
 			}
 			
 			// STEP 2.3. Add event for Header row
@@ -1131,11 +1140,10 @@ function Counsellor( storageObj )
 			event.status = "COMPLETED";		
 			me.saveEvent( event, undefined, eventId, function(){
 				Util.disableTag( me.completedEventBtnTag, true );
+				
+				// Empty fields from "This Test" tab
+				me.thisTestDivTag.find("input,select").val("");
 			} );
-			
-			// Empty fields from "This Test" tab
-			
-			me.thisTestDivTag.find("input,select").val("");
 			
 		}
 		else
@@ -1147,6 +1155,7 @@ function Counsellor( storageObj )
 		// Show 'Save' event button AND show "This test" form
 		me.saveEventBtnTag.show();
 		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
+		me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
 	};
 	
 	
@@ -1285,7 +1294,7 @@ function Counsellor( storageObj )
 		var report = $("<table class='table table-hover table-striped previousTestTb'></table>");
 		
 		
-		for( var i=1; i<events.length; i++ )
+		for( var i=0; i<events.length; i++ )
 		{
 			var event = events[i];
 			if( event.status == "ACTIVE" )
@@ -1323,14 +1332,14 @@ function Counsellor( storageObj )
 				{
 					var dataValue = dataValues[j];
 					var value = dataValue.value;
-					if( value === "true" ) {
+					if( value == "true" ) {
 						value = "Yes";
 					}
 					else if( value == "false" )
 					{
 						value = "No";
 					}
-					tbody.find("td[dataElement='" + dataValue.dataElement + "']").html( dataValue.value );
+					tbody.find("td[dataElement='" + dataValue.dataElement + "']").html( value );
 				}
 				
 				// STEP 2.4. Add event for Header row
