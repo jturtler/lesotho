@@ -391,7 +391,7 @@ function Counsellor( storageObj )
 			var text = inputTag.closest("tr").find("td:first").html();
 			
 			var fieldTag = $("<div class='form-group'></div>");
-			fieldTag.append("<label for='" + attrId + "' class='col-sm-2 control-label'>" + text + "</label>");
+			fieldTag.append("<label for='" + attrId + "' class='col-sm-2 control-label' style='font-weight:300'>" + text + "</label>");
 			fieldTag.append( "<div class='col-sm-10'>" + inputTag.closest("td").html() + "</div>" );
 			me.seachAddClientFormTag.append( fieldTag );
 		}
@@ -1170,12 +1170,16 @@ function Counsellor( storageObj )
 			me.selectOrgUnitWarningMsgTag.show();
 			Util.disableTag( me.saveClientBtnTag, true );
 			Util.disableTag( me.updateClientBtnTag, true );
+			Util.disableTag( me.saveEventBtnTag, true );
+			Util.disableTag( me.completedEventBtnTag, true );
 		}
 		else
 		{
 			me.selectOrgUnitWarningMsgTag.hide();
 			Util.disableTag( me.saveClientBtnTag, false );
 			Util.disableTag( me.updateClientBtnTag, false );
+			Util.disableTag( me.saveEventBtnTag, false );
+			Util.disableTag( me.completedEventBtnTag, false );
 		}
 	};
 	

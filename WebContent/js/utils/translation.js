@@ -150,25 +150,13 @@ function Translation( baseURL, storageObj )
 		return key;
 	};
 	
-	me.convertTranslationList = function( list )
-	{
-		var result = [];
-		for( var i in list )
-		{
-			result[list[i].term] = list[i].definition.form;
-		}
-		
-		return result;
-	};
-	
-	
 	me.getKeywordsFromStorage = function( exeFunc )
 	{ 
 		var storedLangkey = "lang_" + me.lang;
 		if( me.storageObj.getItem( storedLangkey ) !== "" )
 		{
 			var storedList = JSON.parse( me.storageObj.getItem( storedLangkey ) );
-			me.translatedKeyWords[me.lang] = storedList.list; // me.convertTranslationList( storedList.list );
+			me.translatedKeyWords[me.lang] = storedList.list;
 			
 			exeFunc();
 		}
@@ -192,7 +180,7 @@ function Translation( baseURL, storageObj )
 				,success: function( response ) 
 				{
 					me.storageObj.addItem( storedLangkey, JSON.stringify( response ) );
-					me.translatedKeyWords[me.lang] = response.list;// me.convertTranslationList( response.list );
+					me.translatedKeyWords[me.lang] = response.list;
 					
 					exeFunc();
 				}
@@ -298,15 +286,15 @@ function Translation( baseURL, storageObj )
 		 
 		if ( status == me._TRANSLATE_STATUS_LOADING )
 		{
-			me.translationStatusImg_loadingTag.show().attr( 'title', me.getTranslatedValueByKey( 'common_translation_msg_updatingTranslationKeywords' ) + ' ' + version );
+			me.translationStatusImg_loadingTag.show().attr( 'title', me.getTranslatedValueByKey( 'translation_msg_updatingTranslationKeywords' ) + ' ' + version );
 		}
 		else if ( status == me._TRANSLATE_STATUS_CHECKED )
 		{
-			me.translationStatusImg_checkedTag.show().attr( 'title', me.getTranslatedValueByKey( 'common_translation_msg_updatedTranslationKeywords' ) + ' ' + version );
+			me.translationStatusImg_checkedTag.show().attr( 'title', me.getTranslatedValueByKey( 'translation_msg_updatedTranslationKeywords' ) + ' ' + version );
 		}
 		else if ( status == me._TRANSLATE_STATUS_DOWNLOAD )
 		{
-			me.translationStatusImg_downloadTag.show().attr( 'title', me.getTranslatedValueByKey( 'common_translation_btn_updateKeyword' ) + ' ' + version );
+			me.translationStatusImg_downloadTag.show().attr( 'title', me.getTranslatedValueByKey( 'translation_btn_updateKeyword' ) + ' ' + version );
 		}
 	}
 

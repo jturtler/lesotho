@@ -1,3 +1,78 @@
+/* styles for browsers larger than 480px; */
+    
+    
+@media (min-width: 320px) {
+	.col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9 {
+	    float: left;
+	    width: 59%;
+	}
+	.form-horizontal .control-label {
+	    padding-top: 7px;
+	    margin-bottom: 0;
+	    text-align: right;
+	}	
+	.col-sm-2 {
+	    width: 40%;
+	    padding-left: 10px;
+	    padding-right: 0px;
+	}
+	.col-sm-10 {
+	    padding-left: 10px;
+	    padding-right: 15px;
+	}
+}
+
+@media (min-width: 480px) {
+	.col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9 {
+	    float: left;
+	    width: 68%;
+	}
+	.form-horizontal .control-label {
+	    padding-top: 7px;
+	    margin-bottom: 0;
+	    text-align: right;
+	}
+	.col-sm-2 {
+	    width: 30%;
+	    padding-left: 10px;
+	    padding-right: 0px;
+	}
+	.col-sm-10 {
+	    padding-left: 10px;
+	    padding-right: 15px;
+	}
+}
+
+@media (min-width: 600px) {
+	.col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9 {
+	    float: left;
+	    width: 72%;
+	}
+	.form-horizontal .control-label {
+	    padding-top: 7px;
+	    margin-bottom: 0;
+	    text-align: right;
+	}
+	.col-sm-2 {
+	    width: 26%;
+	}
+}
+
+@media (min-width: 768px) {
+	.col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9 {
+	    float: left;
+	    width: 84%;
+	}
+	.form-horizontal .control-label {
+	    padding-top: 7px;
+	    margin-bottom: 0;
+	    text-align: right;
+	}
+	.col-sm-2 {
+	    width: 16%;
+	}
+}
+
 body {
   padding-top: 50px;
 }
@@ -549,12 +624,7 @@ table.tablesorter thead tr .headerSortDown {
    
 /*-------------------------------*/
 /*            Form Page          */
-/*-------------------------------*/
-  
-label
-{
-	font-weight: 300 !IMPORTANT;
-}
+/*-------------------------------*
 
 .actionBtn
 {
