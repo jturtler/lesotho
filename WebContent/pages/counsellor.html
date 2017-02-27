@@ -42,17 +42,17 @@
 			<ul class="nav sidebar-nav">
 				<li class="sidebar-brand"><a data-toggle="offcanvasmenu"
 					style="cursor: pointer;">PI LS HTS</a></li>
-				<li><a id="todayCaseLink" href="#">Today Cases</a></li>
-				<li><a id="previousCaseLink" href="#">Previous Cases</a></li>
-				<li><a id="positiveCaseLink" href="#">Positive Cases</a></li>
-				<li><a id="consumablesLink" href="#">Consumables</a></li>
-				<li><a id="statsLink" href="#">Stats</a></li>
+				<li><a id="todayCaseLink" href="#" keyword="menu_todayCases">Today Cases</a></li>
+				<li><a id="previousCaseLink" href="#" keyword="menu_previousCases">Previous Cases</a></li>
+				<li><a id="positiveCaseLink" href="#" keyword="menu_positiveCases">Positive Cases</a></li>
+				<li><a id="consumablesLink" href="#" keyword="menu_consumables">Consumables</a></li>
+				<li><a id="statsLink" href="#" keyword="menu_statistics">Stats</a></li>
 				<li role="separator" class="divider"></li>
-				<li><a id="searchClientLink" href="#">Search/Create Client</a></li>
+				<li><a id="searchClientLink" href="#" keyword="menu_searchCreateClient">Search/Create Client</a></li>
 				<li role="separator" class="divider"></li>
-				<li><a id="settingsLink">Settings</a></li>
-				<li><a id="aboutLink">About</a></li>
-				<li><a onclick="window.location.href='..'">Log off</a></li>
+				<li><a id="settingsLink" keyword="menu_settings">Settings</a></li>
+				<li><a id="aboutLink" keyword="menu_about">About</a></li>
+				<li><a onclick="window.location.href='..'" keyword="menu_logOff">Log off</a></li>
 			</ul>
 		</nav>
 
@@ -69,7 +69,7 @@
             	</button>
 				<span id="headerText" style="left: 50px;">PI LS HTS</span>
 				<div class="headerRightSideControls">
-					Counsellor: <span name="userFullName"></span>
+					<span keyword="page_headerTitle_counsellor">Counsellor</span>: <span name="userFullName"></span>
 				</div>
 			</div>
 
@@ -89,7 +89,7 @@
 			
 				<!--  Warming "Ask" to select an orgunit -->
 				    
-				<div style="display:none;" class="alert alert-danger" id="selectOrgUnitWarningMsg">Please select an orgUnit in <a href="#" id="moveToSettingLink">Setting</a></div>
+				<div style="display:none;" class="alert alert-danger" id="selectOrgUnitWarningMsg"><span keyword="clientEntryForm_msg_select_orgUnit">Please select an orgUnit in</span><a href="#" id="moveToSettingLink" keyword="clientEntryForm_msg_settings">Setting</a></div>
 				
 				
 				
@@ -117,32 +117,32 @@
 				<!-- Search and Create Client FORM -->
 				
 				<div id="searchClientForm" style="display:none;" class="mainContent">
-		  			<h4 class="headerList">Search/Create client</h4>
+		  			<h4 class="headerList" keyword="searchClient_headerTitle">Search/Create client</h4>
 		  			
 		  			<form class="form-horizontal" id="seachAddClientForm"></form>
 					
 					<div style="text-align:center;margin-bottom:10px;">
-							<button class="btn btn-default actionBtn" id="searchClientBtn">Search/Create Client</button>
+						<button class="btn btn-default actionBtn" id="searchClientBtn" keyword="searchClient_btn_search">Search</button>
 	  				</div>
 		  				
 				</div>	
 				
 				<div id="searchResult" style="display:none;" class="mainContent">
 				
-					<h4 class="headerList">Matches for your search <span name="searchResultKey"></span></h4>
+					<h4 class="headerList"><span keyword="searchClient_result_msg_searchCriteria">Matches for your search</span> <span name="searchResultKey"></span></h4>
 					
 					<div class="scroll-div">
 						<table class='table table-hover table-striped listTable tablesorter' id="searchResultTb">
 							<thead>
 								<tr style='background-color:#cfe2f3;'>
-									<th>First Name</th>
-									<th>Surname</th>
-									<th>DoB</th>
-									<th>District o B</th>
-									<th>Twin</th>
-									<th>Adquisition</th>
-									<th>Last test NS</th>
-									<th>Last Contact</th>
+									<th keyword="searchClient_result_tableHeader_firstName">First Name</th>
+									<th keyword="searchClient_result_tableHeader_surName">Surname</th>
+									<th keyword="searchClient_result_tableHeader_dob">DoB</th>
+									<th keyword="searchClient_result_tableHeader_districtOfBirth">District o B</th>
+									<th keyword="searchClient_result_tableHeader_twin">Twin</th>
+									<th keyword="searchClient_result_tableHeader_adquisition">Adquisition</th>
+									<th keyword="searchClient_result_tableHeader_lastTestNS">Last test NS</th>
+									<th keyword="searchClient_result_tableHeader_lastContact">Last Contact</th>
 								</tr>
 							</thead>
 							<tbody></tbody>
@@ -150,24 +150,24 @@
 					</div>
 					
 					<div>
-						<p id="searchResultOptions">Select a client from from above or<p>
+						<p id="searchResultOptions" keyword="searchClient_result_optionTitle">Select a client from from above or<p>
 						<ul>
-							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="addNewClient"><span class="labelOpt"> Add new <span name="searchResultKey"></label></span></li>
-							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="backToSearchClientForm"><span class="labelOpt"> Edit Search criteria (go back to search screen)</label></span></li>
-							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="showTodayCase"><span class="labelOpt"> Cancel</label></span></li>
+							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="addNewClient"> <span class="labelOpt" keyword="searchClient_result_opt_addNew">Add new</span> <span name="searchResultKey"></span></label></li>
+							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="backToSearchClientForm"> <span class="labelOpt" keyword="searchClient_result_opt_editSearchCriteria">Edit Search criteria (go back to search screen)</span></label></li>
+							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="showTodayCase"> <span class="labelOpt" keyword="searchClient_result_opt_cancel">Cancel</span></label></li>
 						</ul>						
 						
-						<button class="btn btn-default actionBtn" id="searchResultNextBtn">Next</button>
+						<button class="btn btn-default actionBtn" id="searchResultNextBtn"keyword="searchClient_result_btn_next">Next</button>
 					</div>
 				</div>
 				
 								
 				<div id="addClientFormTab" style="display:none;" class="mainContent">
-		  			<h4 class="headerList">Add client</h4>
+		  			<h4 class="headerList" keyword="dataEntryForm_headerTitle_addClient">Add Client</h4>
 					<ul>
-			    		<li><a href="#clientAttributeDiv">Client Attributes</a></li>
-			    		<li><a href="#previousTestDiv">Previous Tests</a></li>
-			    		<li><a href="#thisTestDiv">This test</a></li>
+			    		<li><a href="#clientAttributeDiv" keyword="dataEntryForm_tab_clientAttributes_headerTitle">Client Attributes</a></li>
+			    		<li><a href="#previousTestDiv" keyword="dataEntryForm_tab_previousTests_headerTitle">Previous Tests</a></li>
+			    		<li><a href="#thisTestDiv" keyword="dataEntryForm_tab_thisTest_headerTitle">This Test</a></li>
 			  		</ul>
 			  		
 			  		
@@ -176,9 +176,9 @@
   						
  						<div class="form-group">
 							<span class="col-sm-2"></span>
-							<button class="btn btn-default actionBtn" id="saveClientBtn">Save</button>
-							<button class="btn btn-default actionBtn" id="showEventFormBtn">Add Event</button>
-							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn">Back</button>
+							<button class="btn btn-default actionBtn" id="saveClientBtn" keyword="dataEntryForm_tab_clientAttributes_btn_save">Save</button>
+							<button class="btn btn-default actionBtn" id="showEventFormBtn" keyword="dataEntryForm_tab_clientAttributes_btn_addEvent">Add Event</button>
+							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_clientAttributes_btn_back">Back</button>
 						</div>
 					
 					</div>
@@ -187,7 +187,7 @@
 				   		<div id="previousTests"></div>
  						<div class="form-group">
 							<span class="col-sm-2"></span>
-							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn">Back</button>
+							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_previousTests_btn_back">Back</button>
 						</div>
 				   	</div>
  
@@ -196,9 +196,9 @@
 			  			
  						<div class="form-group">
 							<span class="col-sm-2"></span>
-							<button class="btn btn-default actionBtn" id="saveEventBtn">Save</button>
-							<button class="btn btn-default actionBtn" id="completedEventBtn">Complete</button>
-							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn">Back</button>
+							<button class="btn btn-default actionBtn" id="saveEventBtn" keyword="dataEntryForm_tab_thisTest_btn_save">Save</button>
+							<button class="btn btn-default actionBtn" id="completedEventBtn" keyword="dataEntryForm_tab_thisTest_btn_complete">Complete</button>
+							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_thisTest_btn_back">Back</button>
 						</div>
 			  		</div>
    				
@@ -212,10 +212,10 @@
 
 				<div id="settingsDiv" style="display:none;" class="mainContent">
 					
-					<h4>Settings</h4>
+					<h4 keyword="settings_headerTitle">Settings</h4>
 					<table class="table">
 						<tr>
-							<td>Organisation Unit</td>
+							<td keyword="settings_orgUnit">Organisation Unit</td>
 							<td><select id="orgUnitList" class="form-control" ></select></td>
 						</tr>
 					</table>
@@ -228,7 +228,7 @@
 				<!--  About page -->
 
 				<div id="aboutDiv" style="display:none;" class="mainContent">
-					<h4>About</h4>
+					<h4 keyword="about_headerTitle">About</h4>
 					<table class="table">
 						<tr>
 							<td>Current user</td>

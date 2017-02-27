@@ -50,7 +50,7 @@ function Counsellor( storageObj )
 	me.divSessionExpireMsgTag =  $( "#divSessionExpireMsg" );
 	me.menuIcon = $("button.hamburger");
 	me.headerRightSideControlsTag = $("div.headerRightSideControls");
-	me.mainContentTags = ("div.mainContent");
+	me.mainContentTags = $("div.mainContent");
 	
 	me.attr_FirstName = "mW2l3T2zL0N";
 	me.attr_LastName = "mUxDHgywnn2";
