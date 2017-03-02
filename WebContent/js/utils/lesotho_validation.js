@@ -35,6 +35,7 @@ function Validation()
 			me.performValidationCheck( tag, 'minlength', divTag );
 			me.performValidationCheck( tag, 'maxlength', divTag );
 			me.performValidationCheck( tag, 'maxvalue', divTag );
+			me.performValidationCheck( tag, 'number', divTag );
 		}
 
 		var valid = ( tag.attr( 'valid' ) == 'true' );
@@ -59,6 +60,7 @@ function Validation()
 			else if ( type == 'minlength' ) valid = me.checkValueLen( tag, divTag, 'min', Number( validationAttr ) );
 			else if ( type == 'maxlength' ) valid = me.checkValueLen( tag, divTag, 'max', Number( validationAttr ) );
 			else if ( type == 'maxvalue' ) valid = me.checkValueRange( tag, divTag, 0, Number( validationAttr ) );
+			else if ( type == 'number' ) valid = me.checkValueNumber( tag, divTag );
 			else if ( type == 'phoneNumValidate' ) valid = me.checkPhoneNumberValue( tag, divTag );
 			
 			if ( !valid ) tag.attr( 'valid', false );
@@ -115,6 +117,20 @@ function Validation()
 		}
 		
 		return valid;		
+	};
+	
+	me.checkValueNumber = function( inputTag, divTag )
+	{
+		var valid = true;
+		var value = inputTag.val();
+		
+		if ( value && !( !isNaN(parseFloat(value)) && isFinite(value) ) )
+		{
+			divTag.append( me.getErrorSpanTag( 'common_validation_valueNumber' ) );
+			valid = false;
+		}
+		
+		return valid;	
 	};
 
 	me.checkPhoneNumberValue = function( inputTag, divTag )

@@ -283,6 +283,8 @@ function Counsellor( storageObj, translationObj )
 		// --------------------------------------------------------------------------
 		
 		me.setUp_validationCheck( me.addClientFormTag.find( 'input,select' ) );
+		me.setUp_validationCheck( me.thisTestDivTag.find( 'input,select' ) );
+		
 		
 	};
 	
@@ -373,6 +375,10 @@ function Counsellor( storageObj, translationObj )
 					}
 					inputTag += "</select>";
 				}
+				else if( attribute.valueType === "NUMBER" )
+				{
+					inputTag = "<input number='true' class='form-control' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
+				}
 				else if( attribute.valueType === "BOOLEAN" )
 				{
 					inputTag = "<select class='form-control' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
@@ -449,7 +455,7 @@ function Counsellor( storageObj, translationObj )
 				
 				// STEP 3.2. Generate the input/select tag based on the valueType of attribute
 				
-				var inputTag = "<input class='form-control' dataelement='" + de.id + "'>"
+				var inputTag = "<input class='form-control' dataelement='" + de.id + "'>";
 				if( de.optionSet !== undefined )
 				{
 					var options = de.optionSet.options;
@@ -468,6 +474,10 @@ function Counsellor( storageObj, translationObj )
 					inputTag += "<option value='true'>Yes</option>";
 					inputTag += "<option value='false'>No</option>";
 					inputTag += "</select>";
+				}
+				else if( de.valueType === "NUMBER")
+				{
+					inputTag = "<input number='true' class='form-control' dataelement='" + de.id + "'>"
 				}
 				rowTag.append("<td>" + inputTag + "</td>");
 				
