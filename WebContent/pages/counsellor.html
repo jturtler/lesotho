@@ -23,13 +23,13 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <link type="text/css" rel="stylesheet" media="screen" href="../css/style.css" />
-<script src="../js/utils/utils.js"></script>
-<script src="../js/utils/storage.js"></script>
-<script src="../js/utils/translation.js" type="text/javascript"></script>
-<script src="../js/utils/validation.js"></script>
-<script src="../js/utils/menu.js"></script>
-<script src="../js/utils/commons.js"></script>
-<script src="../js/app.js" type="text/javascript"></script>
+<script src="../js/utils/lesotho_utils.js"></script>
+<script src="../js/utils/lesotho_storage.js"></script>
+<script src="../js/utils/lesotho_translation.js" type="text/javascript"></script>
+<script src="../js/utils/lesotho_validation.js"></script>
+<script src="../js/utils/lesotho_menu.js"></script>
+<script src="../js/utils/lesotho_commons.js"></script>
+<script src="../js/lesotho_app.js" type="text/javascript"></script>
 <script src="../js/counsellor.js"></script>
 
 </head>
@@ -48,7 +48,7 @@
 				<li><a id="previousCaseLink" href="#" keyword="menu_previousCases">Previous Cases</a></li>
 				<li><a id="positiveCaseLink" href="#" keyword="menu_positiveCases">Positive Cases</a></li>
 				<li><a id="consumablesLink" href="#" keyword="menu_consumables">Consumables</a></li>
-				<li><a id="statsLink" href="#" keyword="menu_statistics">Stats</a></li>
+				<li><a id="statisticsLink" href="#" keyword="menu_statistics">Stats</a></li>
 				<li role="separator" class="divider"></li>
 				<li><a id="searchClientLink" href="#" keyword="menu_searchCreateClient">Search/Create Client</a></li>
 				<li role="separator" class="divider"></li>
@@ -87,11 +87,11 @@
 			<!--  END Message DIV  -->
 			
 			
-			<div style="padding:5px;">
+			<div>
 			
 				<!--  Warming "Ask" to select an orgunit -->
 				    
-				<div style="display:none;" class="alert alert-danger" id="selectOrgUnitWarningMsg"><span keyword="clientEntryForm_msg_select_orgUnit">Please select an orgUnit in</span> <a href="#" id="moveToSettingLink" keyword="clientEntryForm_msg_settings">Setting</a></div>
+				<div style="display:none;" class="alert alert-danger mainContent" id="selectOrgUnitWarningMsg"><span keyword="clientEntryForm_msg_select_orgUnit">Please select an orgUnit in</span> <a href="#" id="moveToSettingLink" keyword="clientEntryForm_msg_settings">Setting</a></div>
 				
 				
 				
@@ -121,12 +121,14 @@
 				<div id="searchClientForm" style="display:none;" class="mainContent">
 		  			<h4 class="headerList" keyword="searchClient_headerTitle">Search/Create client</h4>
 		  			
-		  			<form class="form-horizontal" id="seachAddClientForm"></form>
-					
-					<div style="text-align:center;margin-bottom:10px;">
-						<button class="btn btn-default actionBtn" id="searchClientBtn" keyword="searchClient_btn_search">Search</button>
+		  			<div class="shadow">
+			  			<form class="form-horizontal" id="seachAddClientForm" style="padding-top:20px;padding-right:10px;"></form>
+						
+						<div style="text-align:center;margin-bottom:10px;">
+							<button class="btn btn-default actionBtn" id="searchClientBtn" keyword="searchClient_btn_search">Search</button>
+		  				</div>
 	  				</div>
-		  				
+	  				
 				</div>	
 				
 				<div id="searchResult" style="display:none;" class="mainContent">
@@ -163,47 +165,49 @@
 					</div>
 				</div>
 				
-								
-				<div id="addClientFormTab" style="display:none;" class="mainContent">
-		  			<h4 class="headerList" keyword="dataEntryForm_headerTitle_addClient">Add Client</h4>
-					<ul>
-			    		<li><a href="#clientAttributeDiv" keyword="dataEntryForm_tab_clientAttributes_headerTitle">Client Attributes</a></li>
-			    		<li><a href="#previousTestDiv" keyword="dataEntryForm_tab_previousTests_headerTitle">Previous Tests</a></li>
-			    		<li><a href="#thisTestDiv" keyword="dataEntryForm_tab_thisTest_headerTitle">This Test</a></li>
-			  		</ul>
-			  		
-			  		
-  					<div id="clientAttributeDiv">
-  						<form class="form-horizontal" id="addClientForm" ></form>
-  						
- 						<div class="form-group">
-							<span class="col-sm-2"></span>
-							<button class="btn btn-default actionBtn" id="saveClientBtn" keyword="dataEntryForm_tab_clientAttributes_btn_save">Save</button>
-							<button class="btn btn-default actionBtn" id="showEventFormBtn" keyword="dataEntryForm_tab_clientAttributes_btn_addEvent">Add Event</button>
-							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_clientAttributes_btn_back">Back</button>
-						</div>
 					
-					</div>
-  
-				   	<div id="previousTestDiv">
-				   		<div id="previousTests"></div>
- 						<div class="form-group">
-							<span class="col-sm-2"></span>
-							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_previousTests_btn_back">Back</button>
+				<div id="addClientFormDiv" style="display:none;" class="mainContent">	
+					<h4 class="headerList">Add Client</h4>
+		  					
+					<div id="addClientFormTab">
+		  				
+						<ul>
+				    		<li><a href="#clientAttributeDiv" keyword="dataEntryForm_tab_clientAttributes_headerTitle">Client Attributes</a></li>
+				    		<li><a href="#previousTestDiv" keyword="dataEntryForm_tab_previousTests_headerTitle">Previous Tests</a></li>
+				    		<li><a href="#thisTestDiv" keyword="dataEntryForm_tab_thisTest_headerTitle">This Test</a></li>
+				  		</ul>
+				  		
+				  		
+	  					<div id="clientAttributeDiv">
+	  						<form class="form-horizontal" id="addClientForm" ></form>
+	  						
+	 						<div class="form-group">
+								<button class="btn btn-default actionBtn" id="saveClientBtn" keyword="dataEntryForm_tab_clientAttributes_btn_save">Save</button>
+								<button class="btn btn-default actionBtn" id="showEventFormBtn" keyword="dataEntryForm_tab_clientAttributes_btn_addEvent">Add Event</button>
+								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_clientAttributes_btn_back">Back</button>
+							</div>
+						
 						</div>
-				   	</div>
- 
-			      	<div id="thisTestDiv">
-			  			<form class="form-horizontal" id="addEventForm"></form>
-			  			
- 						<div class="form-group">
-							<span class="col-sm-2"></span>
-							<button class="btn btn-default actionBtn" id="saveEventBtn" keyword="dataEntryForm_tab_thisTest_btn_save">Save</button>
-							<button class="btn btn-default actionBtn" id="completedEventBtn" keyword="dataEntryForm_tab_thisTest_btn_complete">Complete</button>
-							<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_thisTest_btn_back">Back</button>
-						</div>
-			  		</div>
+	  
+					   	<div id="previousTestDiv">
+					   		<div id="previousTests"></div>
+	 						<div class="form-group">
+								<span class="col-sm-2"></span>
+								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_previousTests_btn_back">Back</button>
+							</div>
+					   	</div>
+	 
+				      	<div id="thisTestDiv">
+				  			<form class="form-horizontal" id="addEventForm"></form>
+				  			
+	 						<div class="form-group">
+								<button class="btn btn-default actionBtn" id="saveEventBtn" keyword="dataEntryForm_tab_thisTest_btn_save">Save</button>
+								<button class="btn btn-default actionBtn" id="completedEventBtn" keyword="dataEntryForm_tab_thisTest_btn_complete">Complete</button>
+								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_thisTest_btn_back">Back</button>
+							</div>
+				  		</div>
    				
+					</div>	
 					
 		  		</div>	
 				
@@ -226,6 +230,7 @@
 							<td>
 								<select id="languageSelector" class="form-control" >
 						        	<option value="en">English</option>
+		        					<option value="st">sesotho</option>
 						        </select>  
 						        
 						        <img id="translationStatusImg_checked" src="../images/checked.png" class="checkingImages" style="display: none;">
@@ -242,6 +247,28 @@
 				
 				<!-- END Settings page -->
 				
+				
+				<!-- Consumables -->
+				
+				<div id="consumablesDiv" class="mainContent" style="display:none">
+					<h4 class="headerList">Consumables</h4>
+				   
+				   	<div id="">[Not impletemented yet]</div>
+				</div>
+				
+				<!-- END Consumables -->
+				
+				
+				
+				<!-- Consumables -->
+				
+				<div id="statisticsDiv" class="mainContent" style="display:none">
+					<h4 class="headerList">Statistics</h4>
+				   
+				   	<div id="">[Not impletemented yet]</div>
+				</div>
+				
+				<!-- END Consumables -->
 				
 				
 				<!--  About page -->

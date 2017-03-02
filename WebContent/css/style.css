@@ -554,6 +554,17 @@ table.tablesorter thead tr .headerSortDown {
 /*        Previous Test Table     */
 /*-------------------------------*/
 
+.previousTestTb>tbody::after
+{
+	content: '';
+	display: block;
+	height: 10px;    
+}
+
+.previousTestTb>tbody:last-child::after{
+    display: block;
+	height: 0px; 
+}
 
 .previousTestTb th
 {
@@ -621,14 +632,10 @@ table.tablesorter thead tr .headerSortDown {
 {
     margin-top: 10px;
 }
-   
-/*-------------------------------*/
-/*            Form Page          */
-/*-------------------------------*
 
 .actionBtn
 {
-	width:150px;
+	width:100px;
 }
   
 .sessionExpire {
@@ -646,3 +653,20 @@ table.tablesorter thead tr .headerSortDown {
 	background-color: #FAFAFA;	
 }
 
+.mainContent
+{
+	padding-left:3px;
+	padding-bottom: 20px;
+    padding-right: 5px;
+}
+
+.table{
+	border-bottom: 1px solid #FAFAFA;
+	box-shadow: 10px 10px 15px rgba(0,0,0,0.05);
+}
+ 
+.shadow
+{
+	box-shadow: 10px 10px 15px rgba(0,0,0,0.05);
+	padding-bottom:20px;
+} 

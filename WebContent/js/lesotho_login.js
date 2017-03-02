@@ -1,9 +1,10 @@
 
-function LoginForm( storageObj )
+function LoginForm( storageObj, translationObj )
 {
 	var me = this;
 	
 	me.storageObj = storageObj;
+	me.translationObj = translationObj;
 	
 	me.userNameTag = $("#username");
 	me.passwordTag = $("#password");
@@ -30,7 +31,6 @@ function LoginForm( storageObj )
 			me.storageObj.addItem( me.storageObj.KEY_STORAGE_ORGUNIT, me.orgUnitListTag.val() );	
 		});
 		
-		// 
 		
 		$( '.idpass_populate' ).click( function()
 		{
@@ -63,36 +63,48 @@ function LoginForm( storageObj )
 	
 	me.login = function()
 	{
-		MsgManager.appBlock("Login ...");
 		
 		me.errorMessageTag.html("");
 		
-		$.ajax(
+		if( me.userNameTag.val() == "" || me.passwordTag.val() == "" )
 		{
-				type: "POST"
-				,url: "login"
-				,dataType: "json"
-				,headers: {
-			        'usr':me.userNameTag.val()
-			        ,'pwd':me.passwordTag.val()
-			    }
-	            ,contentType: "application/json;charset=utf-8"
-				,success: function( response ) 
+			var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_enterUserNameOrPassword" );
+			me.errorMessageTag.html( tranlatedText );
+		}
+		else
+		{
+			var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_logging" );
+			MsgManager.appBlock( tranlatedText + " ..." );
+		
+			$.ajax(
 				{
-					window.location.href = "pages/counsellor.html";
-				},
-				error: function(a,b,c)
-				{
-					me.errorMessageTag.html("Wrong username/password!");
-					MsgManager.appUnblock();
-				}
-		});
+						type: "POST"
+						,url: "login"
+						,dataType: "json"
+						,headers: {
+					        'usr': me.userNameTag.val()
+					        ,'pwd': me.passwordTag.val()
+					    }
+			            ,contentType: "application/json;charset=utf-8"
+						,success: function( response ) 
+						{
+							window.location.href = "pages/counsellor.html";
+						},
+						error: function(a,b,c)
+						{
+							var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_wrongUsernamePassword" );
+							me.errorMessageTag.html( tranlatedText + "!");
+							MsgManager.appUnblock();
+						}
+				});
+		}
 		
 	}
 	
 	me.loadOuList = function()
 	{
-		MsgManager.appBlock("Initializing ...");
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_initializing" );
+		MsgManager.appBlock( tranlatedText + " ...");
 		me.errorMessageTag.html("");
 		
 		$.ajax({

@@ -151,7 +151,7 @@ public final class Util
                 + responseMsg.toString() );
 
             // ex.printStackTrace();
-            responseMsg.append( "{ \"Msg\": \"DHIS reponse code: " + responseInfo.responseCode
+            responseMsg.append( "{ \"msg\": \"DHIS reponse code: " + responseInfo.responseCode
                 + ", No Message - Error occurred during DHIS response processing: " + responseMsg.toString() + "\" }" );
         }
 

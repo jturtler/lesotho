@@ -13,6 +13,8 @@ function Counsellor( storageObj, translationObj )
 	me.searchClientLinkTag = $("#searchClientLink");
 	me.aboutLinkTag = $("#aboutLink");
 	me.settingsLinkTag = $("#settingsLink");
+	me.consumablesLinkTag = $("#consumablesLink");
+	me.statisticsLinkTag = $("#statisticsLink");
 	
 	me.userFullNameTag = $("[name='userFullName']");
 	me.dhisServerTag = $("#dhisServer");
@@ -33,6 +35,7 @@ function Counsellor( storageObj, translationObj )
 	me.searchResultOptTag = $("[name='searchResultOpt']");
 	me.searchResultNextBtnTag = $("#searchResultNextBtn");
 	me.addClientFormTabTag = $("#addClientFormTab");
+	me.addClientFormDivTag = $("#addClientFormDiv");
 	me.clientAttributeDivTag = $("#clientAttributeDiv");
 	me.addClientFormTag = $("#addClientForm");
 	me.saveClientBtnTag = $("#saveClientBtn");
@@ -52,6 +55,9 @@ function Counsellor( storageObj, translationObj )
 	me.menuIcon = $("button.hamburger");
 	me.headerRightSideControlsTag = $("div.headerRightSideControls");
 	me.mainContentTags = $("div.mainContent");
+	me.consumablesDivTag = $("#consumablesDiv");
+	me.statisticsDivTag = $("#statisticsDiv");
+	
 	
 	me.attr_FirstName = "mW2l3T2zL0N";
 	me.attr_LastName = "mUxDHgywnn2";
@@ -91,7 +97,8 @@ function Counsellor( storageObj, translationObj )
 	{
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
-				MsgManager.appBlock( "Initializing ... ");
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_initializing" );
+				MsgManager.appBlock( tranlatedText + " ... " );
 				me.loadCurrentUserInfo();
 				me.loadMetadata();
 			} else {
@@ -153,6 +160,19 @@ function Counsellor( storageObj, translationObj )
 		me.moveToSettingLinkTag.click(function(){
 			me.resetPageDisplay();
 			me.settingsDivTag.show("fast");
+			$('.overlay').click();
+		});
+		
+		me.consumablesLinkTag.click(function(){
+			me.resetPageDisplay();
+			me.consumablesDivTag.show("fast");
+			$('.overlay').click();
+		});
+		
+		me.statisticsLinkTag .click(function(){
+			me.resetPageDisplay();
+			me.statisticsDivTag.show("fast");
+			$('.overlay').click();
 		});
 		
 		// ------------------------------------------------------------------
@@ -196,7 +216,8 @@ function Counsellor( storageObj, translationObj )
 				MsgManager.msgAreaHide();
 			}
 			else {
-				MsgManager.msgAreaShow( "Please enter value in at least one field in form.", "ERROR" );
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
+				MsgManager.msgAreaShow( tranlatedText, "ERROR" );
 			}
 		});
 		
@@ -204,8 +225,9 @@ function Counsellor( storageObj, translationObj )
 		// Orgunit selector in 'Settings'
 
 		me.orgUnitListTag.change(function(){
+			var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_orgUnitSaved" );
 			me.storageObj.addItem( me.storageObj.KEY_STORAGE_ORGUNIT, me.orgUnitListTag.val() );			
-			MsgManager.msgAreaShow("Organisation Unit is saved.", "SUCCESS");
+			MsgManager.msgAreaShow( tranlatedText, "SUCCESS");
 		});
 
 		// ------------------------------------------------------------------
@@ -223,7 +245,8 @@ function Counsellor( storageObj, translationObj )
 		});
 		
 		me.backToSearchClientResultBtnTag.click(function(){
-			me.addClientFormTabTag.hide();
+			me.addClientFormDivTag.hide();
+			me.selectOrgUnitWarningMsgTag.hide();
 			me.searchResultTbTag.show();
 			me.searchResultTag.show();
 		});
@@ -309,20 +332,13 @@ function Counsellor( storageObj, translationObj )
 		{
 			var group = me.attributeGroupList[i];
 			
-			// STEP 2. Add an empty row ( space ) between attribute-groups
-			
-			if( i !== 0 )
-			{
-				table.append( "<tr><td style='border:0px;'></td></tr>" );
-			}
-			
-			// STEP 3. Populate attribute-group name
+			// STEP 2. Populate attribute-group name
 			
 			rowTag = $("<tr></tr>");
 			rowTag.append("<th colspan='2' style='font-weight:bold'>" + group.name + "</th>");
 			table.append( rowTag );
 			
-			// STEP 4. Populate attributes in group
+			// STEP 3. Populate attributes in group
 			
 			var list = me.attributeGroupList[i].list;
 			for( var j in list)
@@ -330,7 +346,7 @@ function Counsellor( storageObj, translationObj )
 				var attribute = list[j];
 				rowTag = $("<tr></tr>");
 				
-				// STEP 4.1. Populate the name of attribute
+				// STEP 3.1. Populate the name of attribute
 				
 				if( !attribute.mandatory )
 				{
@@ -341,7 +357,7 @@ function Counsellor( storageObj, translationObj )
 					rowTag.append("<td>" + attribute.name + " <span class='required'>*</span></td>");
 				}
 				
-				// STEP 4.2. Generate the input/select tag based on the valueType of attribute
+				// STEP 3.2. Generate the input/select tag based on the valueType of attribute
 				
 				var inputTag = "<input class='form-control' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
 				if( attribute.optionSet !== undefined )
@@ -411,20 +427,14 @@ function Counsellor( storageObj, translationObj )
 		
 		for( var i in me.sectionList )
 		{
-			// STEP 2. Add an empty row ( space ) between sections
 			
-			if( i !== 0)
-			{
-				table.append( "<tr><td style='border:0px;'></td></tr>" );
-			}
-			
-			// STEP 3. Populate section name
+			// STEP 2. Populate section name
 			
 			var rowTag = $("<tr></tr>");
 			rowTag.append("<th colspan='2' style='font-weight:bold'>" + me.sectionList[i].displayName + "</th>");
 			table.append( rowTag );
 			
-			// STEP 4. Populate dataElements in section
+			// STEP 3. Populate dataElements in section
 			
 			var deList = me.sectionList[i].programStageDataElements;
 			for( var l in deList)
@@ -433,11 +443,11 @@ function Counsellor( storageObj, translationObj )
 				var de = deList[l].dataElement;
 				rowTag = $("<tr></tr>");
 				
-				// STEP 4.1. Populate the name of attribute
+				// STEP 3.1. Populate the name of attribute
 				
 				rowTag.append("<td>" + de.name + "</td>");
 				
-				// STEP 4.2. Generate the input/select tag based on the valueType of attribute
+				// STEP 3.2. Generate the input/select tag based on the valueType of attribute
 				
 				var inputTag = "<input class='form-control' dataelement='" + de.id + "'>"
 				if( de.optionSet !== undefined )
@@ -1021,7 +1031,6 @@ function Counsellor( storageObj, translationObj )
 								
 								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_editForm_headerTitle" );
 								
-								me.addClientFormTabTag.find(".headerList").html( tranlatedText );
 								me.showEventFormBtnTag.show();
 								Util.disableTag( me.completedEventBtnTag, true );
 								
@@ -1033,7 +1042,8 @@ function Counsellor( storageObj, translationObj )
 							}
 							,error: function(response)
 							{
-								console.log(response);
+								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
+								MsgManager.msgAreaShow( tranlatedText, "ERROR" );
 								MsgManager.appUnblock();
 							}
 						});
@@ -1096,6 +1106,12 @@ function Counsellor( storageObj, translationObj )
 							tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );
 							
 							MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );
+							MsgManager.appUnblock();
+						}
+						,error: function( response )
+						{
+							var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
+							MsgManager.msgAreaShow( tranlatedText, "ERROR" );
 							MsgManager.appUnblock();
 						}
 					});
@@ -1244,19 +1260,14 @@ function Counsellor( storageObj, translationObj )
 	
 	me.showAddClientForm = function()
 	{
+		me.resetPageDisplay();
 		me.showEventFormBtnTag.hide();
 		me.showOrgUnitWarningMsg();
-		me.contentListTag.hide();
-		me.updateClientBtnTag.hide();
-		me.searchClientFormTag.hide();
-		me.searchResultTbTag.hide();
-		me.searchResultTag.hide();
-		me.saveEventBtnTag.hide();
 		me.previousTestsTag.html("");
 
-		me.addClientFormTabTag.find(".headerList").html("Add Client");
+		me.addClientFormDivTag.find(".headerList").html("Add Client");
 		me.addEventFormTag.find("input,select").val("");
-		me.addClientFormTabTag.find( "span.errorMsg" ).remove();
+		me.addClientFormDivTag.find( "span.errorMsg" ).remove();
 		
 		me.seachAddClientFormTag.find("input[attribute],select[attribute]").each(function(){
 			var attrId = $(this).attr("attribute");
@@ -1268,7 +1279,7 @@ function Counsellor( storageObj, translationObj )
 		
 		me.hideTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
 		me.hideTabInClientForm( me.TAB_NAME_THIS_TEST );
-		me.addClientFormTabTag.show( "fast" );
+		me.addClientFormDivTag.show("fast");
 		
 	};
 	
@@ -1276,7 +1287,7 @@ function Counsellor( storageObj, translationObj )
 	{
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_editClient" );		
 
-		me.addClientFormTabTag.find(".headerList").html( tranlatedText );
+		me.addClientFormDivTag.find(".headerList").html( tranlatedText );
 		
 		me.showEventFormBtnTag.show();
 		me.showOrgUnitWarningMsg();	
@@ -1345,7 +1356,7 @@ function Counsellor( storageObj, translationObj )
 				
 				// STEP 2.1. Create header for one event
 				
-				tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_headerTitle" );				
+				tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );				
 				var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
 				headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTine( event.eventDate ) + "</th>");
 				
@@ -1356,12 +1367,6 @@ function Counsellor( storageObj, translationObj )
 				var tbody = me.createSectionEmtyTable( eventId );
 				tbody.prepend( headerTag );
 				report.append( tbody );
-
-				if( i !== 1)
-				{
-					tbody.append( "<tr><td style='border:0px;'></td></tr>" );
-				}
-				
 				
 				// STEP 2.3. Populate data in tbody
 				
@@ -1449,7 +1454,7 @@ function Counsellor( storageObj, translationObj )
 
 		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 		me.addClientFormTabTag.tabs("option", "selected", 0);
-		me.addClientFormTabTag.show("fast");
+		me.addClientFormDivTag.show("fast");
 		
 	};
 
@@ -1493,8 +1498,9 @@ function Counsellor( storageObj, translationObj )
 			var imgTag = $(this).find("img");
 			var eventId = $(this).attr("eventId");
 			var tbodyTag = report.find("tbody[eventId='" + eventId + "']");
+			var closed = imgTag.hasClass("arrowRightImg");
 			
-			// STEP 2. Hide all events
+			// STEP 2. Hide all event data, not hide headers
 			
 			report.find("tr:not([header])").hide();
 			
@@ -1505,10 +1511,18 @@ function Counsellor( storageObj, translationObj )
 			
 			// STEP 3. Open the selected event
 			
-			imgTag.removeClass('arrowRightImg');
-			imgTag.addClass('arrowDownImg');
-			imgTag.attr( "src", "../images/down.gif" );
-			tbodyTag.find("tr").show("fast");
+			if( closed )
+			{
+				imgTag.removeClass('arrowRightImg');
+				imgTag.addClass('arrowDownImg');
+				imgTag.attr( "src", "../images/down.gif" );
+				tbodyTag.find("tr").show("fast");
+			}
+			else
+			{
+				tbodyTag.find("tr:not([header])").hide("fast");
+			}
+			
 		});
 
 	};
@@ -1568,7 +1582,9 @@ function Counsellor( storageObj, translationObj )
 			}
 		});
 		
-		return ( searchCriteria.length > 0 ) ? "clients with " + searchCriteria.substring( 0, searchCriteria.length - 2 ) : "";
+		var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_searchCriteriaClientWith" );
+		
+		return ( searchCriteria.length > 0 ) ? translatedText + " " + searchCriteria.substring( 0, searchCriteria.length - 2 ) : "";
 	}
 	
 
