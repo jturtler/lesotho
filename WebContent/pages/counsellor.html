@@ -79,7 +79,7 @@
 
 			<!--  Message DIV  -->
 			
-			<div id="divMsgArea" style="display: none;">
+			<div id="divMsgArea" style="display: none;" class="mainContent">
 				<span id="spanMsgAreaClose"><img src="../images/hide.png" title="Close" id="btnMsgAreaClose"></span>
 				<span id="spanMsgAreaText"></span>
 			</div>
@@ -175,35 +175,30 @@
 				    		<li><a href="#clientAttributeDiv" keyword="dataEntryForm_tab_clientAttributes_headerTitle">Client Attributes</a></li>
 				    		<li><a href="#previousTestDiv" keyword="dataEntryForm_tab_previousTests_headerTitle">Previous Tests</a></li>
 				    		<li><a href="#thisTestDiv" keyword="dataEntryForm_tab_thisTest_headerTitle">This Test</a></li>
+				    		<li style="float:right;;cursor:pointer" id="backToSearchClientResultBtn"><img src="../images/back.png"><span keyword="dataEntryForm_tab_btn_back">Back</span></li>
 				  		</ul>
 				  		
 				  		
 	  					<div id="clientAttributeDiv">
 	  						<form class="form-horizontal" id="addClientForm" ></form>
 	  						
-	 						<div class="form-group">
+	 						<div class="form-group" style="text-align:center;">
 								<button class="btn btn-default actionBtn" id="saveClientBtn" keyword="dataEntryForm_tab_clientAttributes_btn_save">Save</button>
 								<button class="btn btn-default actionBtn" id="showEventFormBtn" keyword="dataEntryForm_tab_clientAttributes_btn_addEvent">Add Event</button>
-								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_clientAttributes_btn_back">Back</button>
 							</div>
 						
 						</div>
 	  
 					   	<div id="previousTestDiv">
 					   		<div id="previousTests"></div>
-	 						<div class="form-group">
-								<span class="col-sm-2"></span>
-								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_previousTests_btn_back">Back</button>
-							</div>
 					   	</div>
 	 
 				      	<div id="thisTestDiv">
 				  			<form class="form-horizontal" id="addEventForm"></form>
 				  			
-	 						<div class="form-group">
+	 						<div class="form-group" style="text-align:center;">
 								<button class="btn btn-default actionBtn" id="saveEventBtn" keyword="dataEntryForm_tab_thisTest_btn_save">Save</button>
 								<button class="btn btn-default actionBtn" id="completedEventBtn" keyword="dataEntryForm_tab_thisTest_btn_complete">Complete</button>
-								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_thisTest_btn_back">Back</button>
 							</div>
 				  		</div>
    				

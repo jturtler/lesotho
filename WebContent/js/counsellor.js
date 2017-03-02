@@ -31,7 +31,7 @@ function Counsellor( storageObj, translationObj )
 	me.searchResultOptionsTag = $("#searchResultOptions");
 	me.addNewClientBtnTag = $("#addNewClientBtn");
 	me.seachAddClientFormTag = $("#seachAddClientForm");
-	me.backToSearchClientResultBtnTag = $("[name='backToSearchClientResultBtn']");
+	me.backToSearchClientResultBtnTag = $("#backToSearchClientResultBtn");
 	me.searchResultOptTag = $("[name='searchResultOpt']");
 	me.searchResultNextBtnTag = $("#searchResultNextBtn");
 	me.addClientFormTabTag = $("#addClientFormTab");
@@ -246,6 +246,7 @@ function Counsellor( storageObj, translationObj )
 		
 		me.backToSearchClientResultBtnTag.click(function(){
 			me.addClientFormDivTag.hide();
+			MsgManager.msgAreaHide();
 			me.selectOrgUnitWarningMsgTag.hide();
 			me.searchResultTbTag.show();
 			me.searchResultTag.show();
@@ -261,7 +262,12 @@ function Counsellor( storageObj, translationObj )
 		});
 
 		me.completedEventBtnTag.click(function(){
-			me.addEventClickHandle();
+			var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_aksForCompletingEvent" );
+			var result = confirm(tranlatedText);
+			if(result)
+			{
+				me.addEventClickHandle();
+			}
 		});
 		
 		me.saveEventBtnTag.click(function(){
@@ -1298,6 +1304,7 @@ function Counsellor( storageObj, translationObj )
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_editClient" );		
 
 		me.addClientFormDivTag.find(".headerList").html( tranlatedText );
+		me.addClientFormDivTag.find( "span.errorMsg" ).remove();
 		
 		me.showEventFormBtnTag.show();
 		me.showOrgUnitWarningMsg();	
