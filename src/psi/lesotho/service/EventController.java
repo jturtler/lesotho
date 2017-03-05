@@ -306,7 +306,7 @@ public class EventController
         {
             eventData.put( "dataValues", new JSONArray() );
         }
-        System.out.println( "\n\n eventData : " + eventData );
+        System.out.println( "\n\n ***** \n eventData : " + eventData );
         return eventData;
     }
 

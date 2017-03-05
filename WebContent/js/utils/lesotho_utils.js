@@ -68,7 +68,8 @@ Util.getLastNDate = function( noDays )
 {
 	var date = new Date();
     date.setDate(date.getDate() - noDays);
-    return Util.formatDate_DisplayDateInWeek( date );
+    
+    return Util.formatDate_DisplayDateInWeek( Util.convertLocalTime(date) );
 };
 
 
@@ -93,9 +94,11 @@ Util.formatDate_DisplayDateInWeek = function( date )
  * **/
 Util.formatDate_DisplayDate = function( dateStr )
 {
-	var year = dateStr.substring(0,4);
-	var month = eval( dateStr.substring(5,7) ) - 1;
-	var dayInMonth = dateStr.substring(8,10);
+	var date = Util.convertUTCDateToLocalDate( dateStr );
+	
+	var year = date.getFullYear();
+	var month = date.getMonth();
+	var dayInMonth = date.getDate();
 	
 	return dayInMonth + " " + Util.MONTHS[month] + " " + year;
 };
@@ -106,12 +109,14 @@ Util.formatDate_DisplayDate = function( dateStr )
  * **/
 Util.formatDate_DisplayDateTine = function( dateStr )
 {
-	var year = dateStr.substring(0,4);
-	var month = eval( dateStr.substring(5,7) ) - 1;
-	var dayInMonth = dateStr.substring(8,10);
+	var date = Util.convertUTCDateToLocalDate( dateStr );
+	
+	var year = date.getFullYear();
+	var month = date.getMonth();
+	var dayInMonth = date.getDate();
 		
-	var hours = dateStr.substring(11, 13)
-	var minutes = dateStr.substring(14, 16);
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
 	
 	return dayInMonth + " " + Util.MONTHS[month] + " " + year + " " + hours + ":" + minutes;
 };
@@ -130,13 +135,15 @@ Util.formatDate_DbDate = function( dateStr )
 };
 
 /** 
- * dateStr : "2017 Jan 07T09:56:10.298"
- * Result : 2017-01-07
+ * dateStr : "2017-03-04 13:19:05.0"
+ * Result : "13:19" ( local time )
  * **/
 Util.formatTimeInDateTime = function( dateTimeStr )
 {
-	var hours = eval( dateTimeStr.substring(11, 13) );
-	var minutes = dateTimeStr.substring(14,16);
+	var date = Util.convertUTCDateToLocalDate( dateTimeStr );
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
+
 	var subfix = "";
 	
 	if( hours > 12 )
@@ -150,8 +157,36 @@ Util.formatTimeInDateTime = function( dateTimeStr )
 	}
 
 	hours = ( hours < 10 ) ? "0" + hours : "" + hours;
+	minutes = ( minutes < 10 ) ? "0" + minutes : "" + minutes;
+	
 	return hours + ":" + minutes + subfix;
 };
+
+Util.convertUTCDateToLocalDate = function( serverdate ) {
+	var date = new Date(serverdate);
+    var newDate = new Date( date.getTime() + date.getTimezoneOffset()*60*1000 );
+
+    var offset = date.getTimezoneOffset() / 60;
+    var hours = date.getHours();
+
+    newDate.setHours(hours - offset);
+
+    return newDate;   
+};
+
+Util.convertLocalTime = function( date )
+{
+	var year = date.getUTCFullYear();
+	var month = date.getUTCMonth();
+	var dateInMonth = date.getUTCDate();
+
+	var hours = date.getUTCHours();
+	var minutes = date.getUTCMinutes();
+	var seconds = date.getUTCSeconds()
+	
+	return new Date( year, month, dateInMonth, hours, minutes, seconds );
+};
+
 
 Util.datePicker = function( dateTag, dateFormat )
 {

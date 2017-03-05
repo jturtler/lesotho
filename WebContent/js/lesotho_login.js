@@ -5,11 +5,14 @@ function LoginForm( storageObj, translationObj )
 	
 	me.storageObj = storageObj;
 	me.translationObj = translationObj;
+	me.validationObj = new Validation( translationObj );
 	
 	me.userNameTag = $("#username");
 	me.passwordTag = $("#password");
 	me.errorMessageTag = $("#errorMessage");
 	me.orgUnitListTag =  $("#orgUnitList");
+	me.loginBtnTag =  $("#loginBtn");
+	me.loginFormTag = $("#loginForm");
 	
 	me.init = function()
 	{
@@ -43,12 +46,20 @@ function LoginForm( storageObj, translationObj )
 			setTimeout( function() 
 			{
 				me.userNameTag.val( "TES001" ).css( 'background-color', '' );
-				me.passwordTag.val( 'Test1234' ).css( 'background-color', '' );
+				me.passwordTag.val( '1234' ).css( 'background-color', '' );
 			}
 			, 300 );				
 		});	
 		
 
+		me.loginBtnTag.click(function(){
+			return me.login();
+		});
+		
+		me.loginFormTag.find("input,select").change( function() {
+			me.errorMessageTag.html("");
+			me.validationObj.checkValidations( $(this) );
+		});
 	},
 
 	
@@ -63,7 +74,6 @@ function LoginForm( storageObj, translationObj )
 	
 	me.login = function()
 	{
-		
 		me.errorMessageTag.html("");
 		
 		if( me.userNameTag.val() == "" || me.passwordTag.val() == "" )
@@ -73,32 +83,36 @@ function LoginForm( storageObj, translationObj )
 		}
 		else
 		{
-			var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_logging" );
-			MsgManager.appBlock( tranlatedText + " ..." );
-		
-			$.ajax(
-				{
-						type: "POST"
-						,url: "login"
-						,dataType: "json"
-						,headers: {
-					        'usr': me.userNameTag.val()
-					        ,'pwd': me.passwordTag.val()
-					    }
-			            ,contentType: "application/json;charset=utf-8"
-						,success: function( response ) 
-						{
-							window.location.href = "pages/counsellor.html";
-						},
-						error: function(a,b,c)
-						{
-							var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_wrongUsernamePassword" );
-							me.errorMessageTag.html( tranlatedText + "!");
-							MsgManager.appUnblock();
-						}
-				});
+			if( me.validationObj.checkFormEntryTagsData( me.loginFormTag ) )
+			{	
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_logging" );
+				MsgManager.appBlock( tranlatedText + " ..." );
+			
+				$.ajax(
+					{
+							type: "POST"
+							,url: "login"
+							,dataType: "json"
+							,headers: {
+						        'usr': me.userNameTag.val()
+						        ,'pwd': me.passwordTag.val()
+						    }
+				            ,contentType: "application/json;charset=utf-8"
+							,success: function( response ) 
+							{
+								window.location.href = "pages/counsellor.html";
+							},
+							error: function(a,b,c)
+							{
+								var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_wrongUsernamePassword" );
+								me.errorMessageTag.html( tranlatedText + "!");
+								MsgManager.appUnblock();
+							}
+					});
+			}
 		}
 		
+		return false;
 	}
 	
 	me.loadOuList = function()

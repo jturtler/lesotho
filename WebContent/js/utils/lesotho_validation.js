@@ -1,7 +1,8 @@
 
-function Validation()
+function Validation( translationObj )
 {
-	var me = this;	
+	var me = this;
+	me.translationObj = translationObj;
 	
 	// ================================
 	// == Tag Validations
@@ -27,14 +28,17 @@ function Validation()
 		// Validation Initial Setting Clear
 		tag.attr( 'valid', 'true' );
 		var divTag = tag.closest( "td" );
+		if( divTag.length == 0 ) divTag = tag.closest( "div.col-sm-10" );
 		divTag.find( "span.errorMsg" ).remove();
 		
 		if ( tag.is( ':visible' ) )
 		{		
 			me.performValidationCheck( tag, 'mandatory', divTag );
 			me.performValidationCheck( tag, 'minlength', divTag );
+			me.performValidationCheck( tag, 'exactlength', divTag );
 			me.performValidationCheck( tag, 'maxlength', divTag );
 			me.performValidationCheck( tag, 'maxvalue', divTag );
+			me.performValidationCheck( tag, 'minvalue', divTag );
 			me.performValidationCheck( tag, 'number', divTag );
 		}
 
@@ -59,6 +63,7 @@ function Validation()
 			if ( type == 'mandatory' ) valid = me.checkRequiredValue( tag, divTag );
 			else if ( type == 'minlength' ) valid = me.checkValueLen( tag, divTag, 'min', Number( validationAttr ) );
 			else if ( type == 'maxlength' ) valid = me.checkValueLen( tag, divTag, 'max', Number( validationAttr ) );
+			else if ( type == 'exactlength' ) valid = me.checkValueLen( tag, divTag, 'exactlength', Number( validationAttr ) );
 			else if ( type == 'maxvalue' ) valid = me.checkValueRange( tag, divTag, 0, Number( validationAttr ) );
 			else if ( type == 'number' ) valid = me.checkValueNumber( tag, divTag );
 			else if ( type == 'phoneNumValidate' ) valid = me.checkPhoneNumberValue( tag, divTag );
@@ -100,7 +105,15 @@ function Validation()
 			divTag.append( me.getErrorSpanTag( 'common_validation_maxLength' ) );
 			valid = false;
 		}
-
+		else if ( value && type == 'exactlength' && value.length != length )
+		{
+			divTag.append( me.getErrorSpanTag( 'common_validation_exactLength' ) );
+			divTag.append( me.getErrorSpanTag( length ) );
+			divTag.append( me.getErrorSpanTag( 'common_validation_exactCharacter' ) );
+			valid = false;
+		}
+		
+		
 		return valid;
 	};
 
@@ -160,8 +173,7 @@ function Validation()
 	
 	me.getErrorSpanTag = function( keyword )
 	{
-		// var text = me.translationObj.getTranslatedValueByKey( keyword );
-		var text = keyword;
+		var text = me.translationObj.getTranslatedValueByKey( keyword );
 		return  $( "<span class='errorMsg' keyword='" + keyword + "'>" + text + "</span>" );		
 	};
 	

@@ -175,7 +175,6 @@
 				    		<li><a href="#clientAttributeDiv" keyword="dataEntryForm_tab_clientAttributes_headerTitle">Client Attributes</a></li>
 				    		<li><a href="#previousTestDiv" keyword="dataEntryForm_tab_previousTests_headerTitle">Previous Tests</a></li>
 				    		<li><a href="#thisTestDiv" keyword="dataEntryForm_tab_thisTest_headerTitle">This Test</a></li>
-				    		<li style="float:right;;cursor:pointer" id="backToSearchClientResultBtn"><img src="../images/back.png"><span keyword="dataEntryForm_tab_btn_back">Back</span></li>
 				  		</ul>
 				  		
 				  		
@@ -184,13 +183,14 @@
 	  						
 	 						<div class="form-group" style="text-align:center;">
 								<button class="btn btn-default actionBtn" id="saveClientBtn" keyword="dataEntryForm_tab_clientAttributes_btn_save">Save</button>
-								<button class="btn btn-default actionBtn" id="showEventFormBtn" keyword="dataEntryForm_tab_clientAttributes_btn_addEvent">Add Event</button>
 							</div>
 						
 						</div>
 	  
 					   	<div id="previousTestDiv">
-					   		<div id="previousTests"></div>
+					   		<div id="previousTests">
+					   			<table class='table table-hover table-striped previousTestTb'></table>
+					   		</div>
 					   	</div>
 	 
 				      	<div id="thisTestDiv">
@@ -200,8 +200,12 @@
 								<button class="btn btn-default actionBtn" id="saveEventBtn" keyword="dataEntryForm_tab_thisTest_btn_save">Save</button>
 								<button class="btn btn-default actionBtn" id="completedEventBtn" keyword="dataEntryForm_tab_thisTest_btn_complete">Complete</button>
 							</div>
+							
 				  		</div>
    				
+   						<div class="form-group" style="text-align:center;">
+							<button class="btn btn-default actionBtn" id="backToSearchClientResultBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
+						</div>
 					</div>	
 					
 		  		</div>	
@@ -216,8 +220,18 @@
 					<h4 keyword="settings_headerTitle">Settings</h4>
 					<table class="table aboutTable">
 						<tr>
-							<td keyword="settings_rowHeader_orgUnit">Org Unit</td>
+							<td keyword="settings_rowHeader_orgUnit">Counsel for this session</td>
 							<td><select id="orgUnitList" class="form-control" ></select></td>
+						</tr>
+						
+						<tr>
+							<td keyword="settings_rowHeader_hideFieldHIVTestLoginAction">Hide Fields "HIV Test" logic action</td>
+							<td><select id="hideHIVTestLogicAction" class="form-control" >
+						        	<option value="">[Please select]</option>
+						        	<option value="true">Yes</option>
+		        					<option value="false">No</option>
+						        </select>  
+						    </td>
 						</tr>
 						
 						<tr>
@@ -234,9 +248,7 @@
 		    
 							</td>
 						</tr>
-					
-
-		      
+						
 					</table>
 				</div>
 				

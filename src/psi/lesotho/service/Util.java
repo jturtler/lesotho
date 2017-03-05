@@ -9,15 +9,19 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -60,6 +64,7 @@ public final class Util
     public static final String PROGRAM_ID = "KDgzpKX3h2S";
     public static final String STAGE_ID = "lVglvBnE3TY";
     public static final String USER_CATEGORY_ID = "qVl8p3w3fI5";
+    public static final String USER_CATEGORY_PIN_ATRIBUTE_ID = "mHspya7ddlb";
     
 
     public static final String KEY_TODAY_CASES = "todayCases";
@@ -182,9 +187,8 @@ public final class Util
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11" );
         con.setRequestProperty( "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" );
         con.setRequestProperty( "Accept-Language", "en-US,en;q=0.5" );
-
         con.setRequestProperty( "Content-Type", "application/json; charset=utf-8" );
-
+        
         String userpass = username + ":" + password;
         String basicAuth = "Basic " + new String( new Base64().encode( userpass.getBytes() ) );
         con.setRequestProperty( "Authorization", basicAuth );
@@ -230,7 +234,7 @@ public final class Util
 
         // 5. Other response info
         // TODO: 409 Message Throws IO Exception at here. Don't know why..
-        BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
+        BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
 
         String inputLine;
 
@@ -316,7 +320,7 @@ public final class Util
 
         // 5. Other response info
         // TODO: 409 Message Throws IO Exception at here. Don't know why..
-        BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
+        BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
 
         String inputLine;
 
@@ -347,33 +351,33 @@ public final class Util
     // Util Data
     // --------------------------------------------------------------------------------------------------------------
 
+    private static Date getCurrentDateObj()
+    {
+        ZonedDateTime now = ZonedDateTime.now( ZoneOffset.UTC );
+        Date date = new Date( now.getYear() - 1900, now.getMonthValue() - 1, now.getDayOfMonth(), now.getHour(), now.getMinute(), now.getSecond() );
+        return date;
+    }
+    
     public static String getCurrentDate()
     {
-        Date date = new Date();
-        return Util.formatDate( date );
+        return Util.formatDate( Util.getCurrentDateObj() );
     }
 
     public static String getCurrentDateTime()
     {
-        Date date = new Date();
-        return Util.formatDateTime( date );
+       return Util.formatDateTime( Util.getCurrentDateObj() );
     }
 
     public static String getXLastDate( int noDays )
     {
-        Calendar cal = Calendar.getInstance();
-        cal.add( Calendar.DATE, -noDays );
-        Date date = cal.getTime();
-
+        Date date = DateUtils.addDays( Util.getCurrentDateObj(), -noDays);        
         return formatDate( date );
     }
 
     public static String getXLastMonth( int noMonths )
     {
-        Calendar cal = Calendar.getInstance();
-        cal.add( Calendar.MONTH, -noMonths );
-        Date date = cal.getTime();
-
+        Date now = Util.getCurrentDateObj();
+        Date date = DateUtils.addMonths( now, -noMonths );
         return formatDate( date );
     }
 

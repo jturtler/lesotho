@@ -28,7 +28,7 @@ public class ClientController
         throws ServletException, IOException
     {
         try
-        {
+        {         
             // STEP 1. Get loginUsername from session
 
             HttpSession session = request.getSession( true );

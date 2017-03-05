@@ -40,7 +40,6 @@ function Counsellor( storageObj, translationObj )
 	me.addClientFormTag = $("#addClientForm");
 	me.saveClientBtnTag = $("#saveClientBtn");
 	me.saveEventBtnTag = $("#saveEventBtn");
-	me.showEventFormBtnTag = $("#showEventFormBtn");
 	me.completedEventBtnTag = $("#completedEventBtn");
 	me.addEventFormTag = $("#addEventForm");
 	me.previousTestsTag = $("#previousTests");
@@ -57,6 +56,7 @@ function Counsellor( storageObj, translationObj )
 	me.mainContentTags = $("div.mainContent");
 	me.consumablesDivTag = $("#consumablesDiv");
 	me.statisticsDivTag = $("#statisticsDiv");
+	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
 	
 	
 	me.attr_FirstName = "mW2l3T2zL0N";
@@ -64,11 +64,19 @@ function Counsellor( storageObj, translationObj )
 	me.attr_DoB = "wSp6Q7QDMsk";
 	me.attr_DistrictOB = "u57uh7lHwF8";
 	me.attr_Twin = "kEDRehdPMKG";
+	me.attr_ClientCUIC = "zRA08XEYiSF";
+	me.attr_BirthOrder ="vTPYC9BXPNn";
 	me.attr_Adquisition = "";
 	me.attr_Last_TestNS = "";
 	me.attr_LastContact = "";
 	
-	me.de_HIV_Result = "WrHacTnUwDz";
+
+	me.de_Testing_ResultTest1 = "choHDFxMCaU";
+	me.de_Testing_ResultTest2 = "KDnhSz51HKS";
+	me.de_Testing_ResultParallel1 = "rMh4ZGNzrh1";
+	me.de_Testing_ResultParallel2 = "Bqff4skvt4d";
+	me.de_Testing_ResultSDBioline = "M11JqgkJt2X";
+	me.de_FinalResult_HIVStatus = "UuKat0HFjWS";
 	
 	me.TAB_NAME_PREVIOUS_TEST = "previousTestDiv";
 	me.TAB_NAME_THIS_TEST = "thisTestDiv";
@@ -79,7 +87,7 @@ function Counsellor( storageObj, translationObj )
 	me.sectionList = [];
 	me.attributeGroupList = [];
 	
-	me.searchClientAttributeIds = ["mW2l3T2zL0N", "mUxDHgywnn2", "wSp6Q7QDMsk", "u57uh7lHwF8", "kEDRehdPMKG"];
+	me.searchClientAttributeIds = ["wSp6Q7QDMsk", "u57uh7lHwF8", "mW2l3T2zL0N", "mUxDHgywnn2", "vTPYC9BXPNn"];
 
 	// -------------------------------------------------------------------
 	// Init methods
@@ -88,7 +96,9 @@ function Counsellor( storageObj, translationObj )
 	me.init = function()
 	{		
 		MsgManager.initialSetup();		
-		me.validationObj = new Validation();
+		me.validationObj = new Validation( me.translationObj );
+		
+		me.hideHIVTestLogicActionTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_HIDE_HIV_TEST_LOGIC_ACTION_FIELDS ) );		
 		me.loadInitData();
 	};
 	
@@ -257,20 +267,23 @@ function Counsellor( storageObj, translationObj )
 			me.saveClient();
 		});
 		
-		me.showEventFormBtnTag.click(function(){
-			me.addEventClickHandle();
-		});
-
+		
 		me.completedEventBtnTag.click(function(){
 			var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_aksForCompletingEvent" );
 			var result = confirm(tranlatedText);
 			if(result)
 			{
-				me.addEventClickHandle();
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_creatingEvent" );
+				MsgManager.appBlock( tranlatedText + " ..." );
+				
+				me.addEventClickHandle(function(){
+					me.addClientFormTabTag.removeAttr( "eventId" );
+					me.addClientFormTabTag.removeAttr( "event" );
+				});
 			}
 		});
 		
-		me.saveEventBtnTag.click(function(){
+		me.saveEventBtnTag.click( function(){
 			var clientId = me.addClientFormTabTag.attr("clientId");
 			var eventId = me.addClientFormTabTag.attr("eventId");
 			var event = me.addClientFormTabTag.attr("event");
@@ -284,9 +297,37 @@ function Counsellor( storageObj, translationObj )
 			me.saveEvent(event, clientId, eventId );
 		});
 		
+		me.hideHIVTestLogicActionTag.change( function(){
+			me.storageObj.addItem( me.storageObj.KEY_STORAGE_HIDE_HIV_TEST_LOGIC_ACTION_FIELDS, me.hideHIVTestLogicActionTag.val() );
+
+			var translatedText = me.translationObj.getTranslatedValueByKey( "common_msg_settingsHideLogicActionFieldsSaved" );
+			MsgManager.msgAreaShow( translatedText, "SUCCESS" );
+		});
+		
 		// --------------------------------------------------------------------------
-		// Validation for fields in [Search Client], [Add/Update Form] form
+		// Events and Validation for fields in [Search Client], [Add/Update Form] form
 		// --------------------------------------------------------------------------
+		
+		me.seachAddClientFormTag.find("input,select").keyup(function(e){
+			if ( e.keyCode === 13 ) {
+				me.searchClients(e);
+			}
+		});
+		
+		me.addClientFormTag.find("input,select").change(function(e){
+			me.generateClientCUIC();
+			
+			// Add event for "Birth Order" , just accept value in range [0, 20]
+			var attrId = $(this).attr("attribute");
+			if( attrId === me.attr_BirthOrder )
+			{
+				$(this).attr( "maxvalue", 20 );
+			}
+		});
+		
+		me.thisTestDivTag.find("input,select").change(function(e){
+			me.setUp_clientEntryFormLogic( $(this) );			
+		});
 		
 		me.setUp_validationCheck( me.addClientFormTag.find( 'input,select' ) );
 		me.setUp_validationCheck( me.thisTestDivTag.find( 'input,select' ) );
@@ -308,6 +349,131 @@ function Counsellor( storageObj, translationObj )
 		
 		
 		me.registerClientBtnTag.css({top: height, left: width, position:'fixed'});
+	};
+	
+	me.setUp_clientEntryFormLogic = function( item )
+	{
+		if( eval( me.addClientFormTabTag.attr("addedLogic") ) )
+		{
+			var resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
+			var resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
+			var resultTestParallel1Tag = me.getDeField( me.de_Testing_ResultParallel1 );
+			var resultTestParallel2Tag = me.getDeField( me.de_Testing_ResultParallel2 );
+			var resultTestResultSDBiolineTag = me.getDeField( me.de_Testing_ResultSDBioline );
+			var resultFinalHIVStatusTag = me.getDeField( me.de_FinalResult_HIVStatus );
+			
+			var attrId = item.attr("dataelement");
+			
+			// If "Result Test 1" value is "Positive", enable "Result Test 2"
+			if( attrId === me.de_Testing_ResultTest1 )
+			{
+				if( resultTest1Tag.val() === "Positive" )
+				{
+					resultFinalHIVStatusTag.val( resultTest1Tag.val() );
+					
+					resultTest2Tag.val( "" );
+					resultTestParallel1Tag.val( "" );
+					resultTestParallel2Tag.val( "" );
+					resultTestResultSDBiolineTag.val( "" );
+					resultFinalHIVStatusTag.val( "" );
+					
+					Util.disableTag( resultTest2Tag, false );
+					Util.disableTag( resultTestParallel1Tag, true );
+					Util.disableTag( resultTestParallel2Tag, true );
+					Util.disableTag( resultTestResultSDBiolineTag, true );
+					
+					me.addMandatoryForField( resultTest2Tag );
+				}
+				else
+				{
+					resultTest2Tag.val( "" );
+					resultTestParallel1Tag.val( "" );
+					resultTestParallel2Tag.val( "" );
+					resultTestResultSDBiolineTag.val( "" );
+					resultFinalHIVStatusTag.val( resultTest1Tag.val() );
+					
+					Util.disableTag( resultTest2Tag, true );
+					Util.disableTag( resultTestParallel1Tag, true );
+					Util.disableTag( resultTestParallel2Tag, true );
+					Util.disableTag( resultTestResultSDBiolineTag, true );
+					
+					me.removeMandatoryForField( resultTest2Tag );
+					me.removeMandatoryForField( resultTestParallel1Tag );
+					me.removeMandatoryForField( resultTestParallel2Tag );
+					me.removeMandatoryForField( resultTestResultSDBiolineTag );
+				}
+			}
+			// If "Result Test 2" value is "Positive", enable "Result Parallel 2" 
+			else if( attrId === me.de_Testing_ResultTest2 )
+			{
+				if( resultTest2Tag.val() !== "Positive" )
+				{
+					resultTestParallel1Tag.val( "" );
+					resultTestParallel2Tag.val( "" );
+					resultTestResultSDBiolineTag.val( "" );
+					resultFinalHIVStatusTag.val( resultTest2Tag.val() );
+					
+					Util.disableTag( resultTestParallel1Tag, false );
+					Util.disableTag( resultTestParallel2Tag, false );
+					Util.disableTag( resultTestResultSDBiolineTag, true );
+					
+					me.addMandatoryForField( resultTestParallel1Tag );
+					me.addMandatoryForField( resultTestParallel2Tag );
+				}
+				else
+				{
+					resultTestParallel1Tag.val( "" );
+					resultTestParallel2Tag.val( "" );
+					resultTestResultSDBiolineTag.val( "" );
+					resultFinalHIVStatusTag.val( resultTest2Tag.val() );
+					
+					Util.disableTag( resultTestParallel1Tag, true );
+					Util.disableTag( resultTestParallel2Tag, true );
+					Util.disableTag( resultTestResultSDBiolineTag, true );
+					
+					
+					me.removeMandatoryForField( resultTestParallel1Tag );
+					me.removeMandatoryForField( resultTestParallel2Tag );
+					me.removeMandatoryForField( resultTestResultSDBiolineTag );
+				}
+			}
+			// If the value of "Parallel 1" and "Parallel 2" are the same, "FinalResult" has value as "Parallel"
+			// If not, enable "SD Bioline" field
+			else if( attrId === me.de_Testing_ResultParallel1 || attrId === me.de_Testing_ResultParallel2 )
+			{
+				
+				if( resultTestParallel1Tag.val() != "" && resultTestParallel2Tag.val() != "" )
+				{
+					if( resultTestParallel1Tag.val() != resultTestParallel2Tag.val() )
+					{
+						resultFinalHIVStatusTag.val( "" );
+						Util.disableTag( resultTestResultSDBiolineTag, false );
+						me.addMandatoryForField( resultTestResultSDBiolineTag );
+						
+					}
+					else
+					{
+						resultTestResultSDBiolineTag.val( "" );
+						resultFinalHIVStatusTag.val( resultTestParallel1Tag.val() );
+						
+						Util.disableTag( resultTestResultSDBiolineTag, true );
+						me.removeMandatoryForField( resultTestResultSDBiolineTag );
+					}
+				}
+				else
+				{
+					resultTestResultSDBiolineTag.val( "" );
+					resultFinalHIVStatusTag.val( "" );
+					Util.disableTag( resultTestResultSDBiolineTag, true );
+					me.removeMandatoryForField( resultTestResultSDBiolineTag );
+				}
+			}
+			// Fill "SD Bioline" value for "Final Result"
+			else if( attrId === me.de_Testing_ResultSDBioline )
+			{
+				resultFinalHIVStatusTag.val( resultTestResultSDBiolineTag.val() );
+			}
+		}		
 	};
 	
 
@@ -381,7 +547,7 @@ function Counsellor( storageObj, translationObj )
 					}
 					inputTag += "</select>";
 				}
-				else if( attribute.valueType === "NUMBER" )
+				else if( attribute.valueType === "NUMBER" || attribute.valueType === "INTEGER_ZERO_OR_POSITIVE" )
 				{
 					inputTag = "<input number='true' class='form-control' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
 				}
@@ -404,6 +570,10 @@ function Counsellor( storageObj, translationObj )
 			} // END Attribute List
 			
 		}// END Attribute Groups
+		
+		// Disable 'Client CUIC' field. The value of this attribute will be generated from another attribute value
+		
+		Util.disableTag( me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']"), true );
 		
 	};
 	
@@ -457,7 +627,7 @@ function Counsellor( storageObj, translationObj )
 				
 				// STEP 3.1. Populate the name of attribute
 				
-				rowTag.append("<td>" + de.name + "</td>");
+				rowTag.append("<td>" + de.formName + "</td>");
 				
 				// STEP 3.2. Generate the input/select tag based on the valueType of attribute
 				
@@ -496,8 +666,83 @@ function Counsellor( storageObj, translationObj )
 		
 		me.addEventFormTag.append( table );
 		
+		
+		// Disable some DEs in form. Will add login for these DE in 'change' event
+		
+		var resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
+		var resultTestParallel1Tag = me.getDeField( me.de_Testing_ResultParallel1 );
+		var resultTestParallel2Tag = me.getDeField( me.de_Testing_ResultParallel2 );
+		var resultTestResultSDBiolineTag = me.getDeField( me.de_Testing_ResultSDBioline );
+		var resultFinalHIVStatusTag = me.getDeField( me.de_FinalResult_HIVStatus );
+		
+		if( resultTest2Tag.length > 0 && resultTestParallel1Tag.length > 0 && resultTestParallel2Tag.length > 0 
+				&& resultTestResultSDBiolineTag.length > 0 && resultFinalHIVStatusTag.length > 0 )
+		{
+			 me.addClientFormTabTag.attr("addedLogic", true );
+
+			 // Add "mandatory" validation for "Test 1" field
+			 
+			 var resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
+			 me.addMandatoryForField( resultTest1Tag );
+			 
+			 // Reset client entry form
+			 
+			 me.resetClientEntryForm();
+		}
+		else
+		{
+			me.addClientFormTabTag.attr("addedLogic", false );
+		}
 	};
 	
+	me.resetClientEntryForm = function()
+	{
+		var resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
+		var resultTestParallel1Tag = me.getDeField( me.de_Testing_ResultParallel1 );
+		var resultTestParallel2Tag = me.getDeField( me.de_Testing_ResultParallel2 );
+		var resultTestResultSDBiolineTag = me.getDeField( me.de_Testing_ResultSDBioline );
+		var resultFinalHIVStatusTag = me.getDeField( me.de_FinalResult_HIVStatus );
+		
+		me.removeMandatoryForField( resultTest2Tag );
+		me.removeMandatoryForField( resultTestParallel1Tag );
+		me.removeMandatoryForField( resultTestParallel2Tag );
+		me.removeMandatoryForField( resultTestResultSDBiolineTag );
+		
+		Util.disableTag(resultTest2Tag, true);
+		Util.disableTag(resultTestParallel1Tag, true);
+		Util.disableTag(resultTestParallel2Tag, true);
+		Util.disableTag(resultTestResultSDBiolineTag, true);
+		Util.disableTag(resultFinalHIVStatusTag, true);
+	}
+	
+	me.addMandatoryForField = function( tag )
+	{
+		var inputRowTag = tag.closest("tr");
+		
+		me.removeMandatoryForField( tag );
+		tag.attr( "mandatory", true );
+		inputRowTag.find("td:first").append("<span class='required'> *</span>");
+		inputRowTag.show();
+	}
+	
+	me.removeMandatoryForField = function( tag )
+	{
+		var inputRowTag = tag.closest("tr");
+		
+		tag.removeAttr( "mandatory" );
+		inputRowTag.find("td:first").find("span.required").remove();
+		tag.closest("td").find("span.errorMsg").remove();
+		
+		// Show/Hide the logic action field 
+		if( eval( me.hideHIVTestLogicActionTag.val() ) )
+		{
+			inputRowTag.hide();
+		}
+		else
+		{
+			inputRowTag.show();
+		}
+	}
 	
 	// ----------------------------------------------------------------------------
 	// Initialize data for the HTML page
@@ -1046,15 +1291,22 @@ function Counsellor( storageObj, translationObj )
 								// STEP 4. Change the header of the form && and show the 'Add Event' button
 								
 								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_editForm_headerTitle" );
+								me.addClientFormDivTag.find(".headerList").html(tranlatedText);
 								
-								me.showEventFormBtnTag.show();
 								Util.disableTag( me.completedEventBtnTag, true );
 								
-								// STEP 5. Unblock form
-
-								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
-								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
-								MsgManager.appUnblock();
+								// STEP 5. Create an empty event
+								
+								me.addEventClickHandle(function(){
+									
+									// STEP 6. Unblock form
+									
+									tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
+									MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
+									MsgManager.appUnblock();
+								});
+								
+								
 							}
 							,error: function(response)
 							{
@@ -1083,67 +1335,67 @@ function Counsellor( storageObj, translationObj )
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
 				
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingEvent" );
-				
-				MsgManager.appBlock( tranlatedText + " ..." );
-				
-				var url = "../event/save?ouId=" + me.orgUnitListTag.val();
-				
-				if( clientId !== undefined )
+				if( me.validationObj.checkFormEntryTagsData(me.thisTestDivTag) )
 				{
-					url += "&clientId=" + clientId;
-				}
-				
-				if( eventId !== undefined )
-				{
-					url += "&eventId=" + eventId;
-				}
-				
-				jsonData.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag )
-				
-				$.ajax(
+					
+					var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingEvent" );
+					
+					MsgManager.appBlock( tranlatedText + " ..." );
+					
+					var url = "../event/save?ouId=" + me.orgUnitListTag.val();
+					
+					if( clientId !== undefined )
 					{
-						type: "POST"
-						,url: url
-						,dataType: "json"
-						,data: JSON.stringify( jsonData )
-			            ,contentType: "application/json;charset=utf-8"
-						,success: function( response ) 
+						url += "&clientId=" + clientId;
+					}
+					
+					if( eventId !== undefined )
+					{
+						url += "&eventId=" + eventId;
+					}
+					
+					jsonData.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag )
+					
+					$.ajax(
 						{
-							var eventId = response.event;
-							me.addClientFormTabTag.attr( "eventId", eventId );
-							me.addClientFormTabTag.attr( "event", JSON.stringify( response ) );
-
-							Util.disableTag( me.completedEventBtnTag, false );
-							
-							if( exeFunc !== undefined ) exeFunc();
-							
-							// STEP 4. Unblock form
-							tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );
-							
-							MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );
-							MsgManager.appUnblock();
-						}
-						,error: function( response )
-						{
-							var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
-							MsgManager.msgAreaShow( tranlatedText, "ERROR" );
-							MsgManager.appUnblock();
-						}
-					});
-			} else {
-				me.showExpireSessionMessage();					
+							type: "POST"
+							,url: url
+							,dataType: "json"
+							,data: JSON.stringify( jsonData )
+				            ,contentType: "application/json;charset=utf-8"
+							,success: function( response ) 
+							{
+								var eventId = response.event;
+								me.addClientFormTabTag.attr( "eventId", eventId );
+								me.addClientFormTabTag.attr( "event", JSON.stringify( response ) );
+	
+								Util.disableTag( me.completedEventBtnTag, false );
+								
+								if( exeFunc !== undefined ) exeFunc();
+								
+								// STEP 4. Unblock form
+								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );
+								
+								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );
+								MsgManager.appUnblock();
+							}
+							,error: function( response )
+							{
+								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
+								MsgManager.msgAreaShow( tranlatedText, "ERROR" );
+								MsgManager.appUnblock();
+							}
+						});
+				} else {
+					me.showExpireSessionMessage();					
+				}
 			}
 		});
 		
 	}
 	
-	me.addEventClickHandle = function()
+	me.addEventClickHandle = function( exeFunc )
 	{
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_creatingEvent" );
-	
-		MsgManager.appBlock( tranlatedText + " ..." );
-		
 		// STEP 1. Check if the form has any event which existed
 		
 		var eventId = me.addClientFormTabTag.attr( "eventId" );
@@ -1165,7 +1417,7 @@ function Counsellor( storageObj, translationObj )
 			// STEP 2.1. Create tbody to display data values of an event
 			
 			var tbody = me.createSectionEmtyTable( eventId );
-			tbody.append( "<tr><td style='border:0px;'></td></tr>" );
+			// tbody.append( "<tr><td style='border:0px;'></td></tr>" );
 			tbody.prepend( headerTag );
 			me.previousTestsTag.find("table").prepend( tbody );
 			
@@ -1204,6 +1456,8 @@ function Counsellor( storageObj, translationObj )
 				
 				// Empty fields from "This Test" tab
 				me.thisTestDivTag.find("input,select").val("");
+				
+				if( exeFunc !== undefined ) exeFunc();
 			} );
 			
 		}
@@ -1215,8 +1469,8 @@ function Counsellor( storageObj, translationObj )
 
 		// Show 'Save' event button AND show "This test" form
 		me.saveEventBtnTag.show();
-		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 		me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
+		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 	};
 	
 	
@@ -1277,11 +1531,17 @@ function Counsellor( storageObj, translationObj )
 	me.showAddClientForm = function()
 	{
 		me.resetPageDisplay();
-		me.showEventFormBtnTag.hide();
 		me.showOrgUnitWarningMsg();
-		me.previousTestsTag.html("");
+		me.addClientFormTabTag.removeAttr( "clientId" );
+		me.addClientFormTabTag.removeAttr( "client" );
+		me.addClientFormTabTag.removeAttr( "eventId" );
+		me.addClientFormTabTag.removeAttr( "event" );
+		me.previousTestsTag.find("table").html("");
+		me.resetClientEntryForm();
 
-		me.addClientFormDivTag.find(".headerList").html("Add Client");
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_addClient" );
+		me.addClientFormDivTag.find(".headerList").html(tranlatedText);
+		
 		me.addEventFormTag.find("input,select").val("");
 		me.addClientFormDivTag.find( "span.errorMsg" ).remove();
 		
@@ -1306,12 +1566,12 @@ function Counsellor( storageObj, translationObj )
 		me.addClientFormDivTag.find(".headerList").html( tranlatedText );
 		me.addClientFormDivTag.find( "span.errorMsg" ).remove();
 		
-		me.showEventFormBtnTag.show();
 		me.showOrgUnitWarningMsg();	
 		me.addClientFormTabTag.removeAttr( "clientId" );
 		me.addClientFormTabTag.removeAttr( "client" );
 		me.addClientFormTabTag.removeAttr( "eventId" );
 		me.addClientFormTabTag.removeAttr( "event" );
+		me.resetClientEntryForm();
 
 		me.contentListTag.hide();
 		me.searchResultTbTag.hide();
@@ -1344,7 +1604,6 @@ function Counsellor( storageObj, translationObj )
 			
 			me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']").val( value );
 		});
-
 		
 		// ---------------------------------------------------------------------------------------
 		// STEP 2. Populate Event data in "Previous Test" and find out the activeEvent if any
@@ -1353,9 +1612,9 @@ function Counsellor( storageObj, translationObj )
 		var activeEvent;
 		
 		var events = data.events.events;
-		me.previousTestsTag.html("");
+		var report = me.previousTestsTag.find("table")
+		report.html("");
 		me.addEventFormTag.find("input,select").val("");
-		var report = $("<table class='table table-hover table-striped previousTestTb'></table>");
 		
 		
 		for( var i=0; i<events.length; i++ )
@@ -1410,7 +1669,7 @@ function Counsellor( storageObj, translationObj )
 
 		// STEP 3. Show the first table in report if any
 
-		me.previousTestsTag.append( report );
+//		me.previousTestsTag.append( report );
 		if( report.find("tbody").length > 0 )
 		{
 			report.find('tbody:first tr[eventId]').click();
@@ -1493,7 +1752,7 @@ function Counsellor( storageObj, translationObj )
 			{
 				var de = deList[l].dataElement;
 				rowTag = $("<tr style='display:none;'></tr>");
-				rowTag.append("<td>" + de.name + "</td>");
+				rowTag.append("<td>" + de.formName + "</td>");
 				rowTag.append("<td dataElement='" + de.id +"'></td>");
 				tbody.append( rowTag );
 				
@@ -1605,6 +1864,39 @@ function Counsellor( storageObj, translationObj )
 	}
 	
 
+	me.getDeField = function( deId )
+	{
+		return me.thisTestDivTag.find("[dataelement='" + deId + "']");
+	};
+	
+	me.getAttrField = function( attrId )
+	{
+		return me.addClientFormTabTag.find("[attribute='" + attrId + "']");
+	};
+	
+	// Generate 'Client CUIC' value
+	
+	me.generateClientCUIC = function()
+	{
+		var clientCUIC = "";
+		
+		// Year(YY) Month(MM) DistrictOfBirth(DB) FirstName(2 Chars) LastName(2 Chars) BirthOrder(2 Chars)
+		
+		var dateOfBirth = me.addClientFormTabTag.find("[attribute='wSp6Q7QDMsk']").val();
+		var districtOfBirth = me.addClientFormTabTag.find("[attribute='u57uh7lHwF8']").val();
+		var firstName = me.addClientFormTabTag.find("[attribute='mW2l3T2zL0N']").val();
+		var lastName = me.addClientFormTabTag.find("[attribute='mUxDHgywnn2']").val();
+		var birthOrder = me.addClientFormTabTag.find("[attribute='vTPYC9BXPNn']").val();
+		
+		if( dateOfBirth != "" && districtOfBirth != "" &&  firstName != "" && lastName != "" && birthOrder != "" )
+		{
+			var birthOrder = ( eval(birthOrder) < 10 ) ? "0" + birthOrder : birthOrder;
+			clientCUIC = dateOfBirth.substring(9, 12) + Util.MONTH_INDEXES[dateOfBirth.substring(3, 6)] + firstName.substring(0, 2).toUpperCase() + lastName.substring(0, 2).toUpperCase() + birthOrder;
+		}
+		
+		me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']").val( clientCUIC );
+	};
+	
 	// Show/Hide a tab in Add/Update Client form
 	
 	me.hideTabInClientForm = function( tabName )

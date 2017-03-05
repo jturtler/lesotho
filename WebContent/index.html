@@ -24,6 +24,7 @@
 <script src="js/utils/lesotho_utils.js" type="text/javascript"></script>
 <script src="js/utils/lesotho_storage.js"></script>
 <script src="js/utils/lesotho_translation.js" type="text/javascript"></script>
+<script src="js/utils/lesotho_validation.js"></script>
 <script src="js/lesotho_login.js" type="text/javascript"></script>
 <script src="js/lesotho_app.js" type="text/javascript"></script>
 
@@ -53,21 +54,21 @@
 		  	<div class="panel-body" style="margin-right: 40px;">
 		  		<form class="form-horizontal">
 		  			<div class="form-group">
-				      <label class="col-sm-2 control-label" keyword="login_userName">User Name</label>
+				      <label class="col-sm-2 control-label" keyword="login_userName">Counsellor #</label>
 				      <div class="col-sm-10">
-				      	<input type="text" class="form-control loginInput" id="username">
+				      	<input type="text" class="form-control loginInput" id="username" exactlength="6" maxlength="6">
 				      </div>
 				    </div>
     
     				<div class="form-group">
-				      <label for="inputPassword" class="col-sm-2 control-label" keyword="login_password">Password</label>
+				      <label for="inputPassword" class="col-sm-2 control-label" keyword="login_password">PIN</label>
 				      <div class="col-sm-10">
-				        <input type="password" class="form-control loginInput" id="password">
+				        <input type="password" class="form-control loginInput" id="password" autocomplete="off" exactlength="4"  maxlength="4">
 				      </div>
 				    </div>
 				    
 				    <div class="form-group">
-				      <label for="inputPassword" class="col-sm-2 control-label" keyword="login_orgUnit">Organisation Unit</label>
+				      <label for="inputPassword" class="col-sm-2 control-label" keyword="login_orgUnit">Counsel for this session</label>
 				      <div class="col-sm-10">
 				        <select id="orgUnitList" class="form-control loginInput"></select>
 				      </div>
@@ -76,7 +77,7 @@
 				    <div class="form-group">
 				    	<label class="col-sm-2 control-label"></label>
 					    <div class="col-sm-10">
-					    	<button type="button" id="loginBtn" class="btn btn-default" keyword="login_btn_login">Login</button>
+					    	<button type="submit" id="loginBtn" class="btn btn-default" keyword="login_btn_login">Login</button>
 					    	<span class="idpass_populate" type="client" title="Populate sample client username/password">T</span>
 				    	</div>
 				    </div>
@@ -84,7 +85,7 @@
 				    <div class="form-group">
 				    	<label class="col-sm-2 control-label"></label>
 					    <div class="col-sm-10">
-					    	<span id="errorMessage"></span>
+					    	<span id="errorMessage" class="errorMessage"></span>
 				    	</div>
 				    </div>
 				    
@@ -102,11 +103,7 @@
 	$( document ).ready()
 	{
 		new lesothoApp( "", function( translationObj ){
-			var loginForm = new LoginForm( new Storage(), translationObj );
-			
-			$("#loginBtn").click(function(){
-				loginForm.login();
-			});
+			var loginForm = new LoginForm( new Storage(), translationObj );			
 		});
 		
 	}

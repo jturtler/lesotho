@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class MetaDataController
     extends HttpServlet
 {
@@ -92,7 +95,7 @@ public class MetaDataController
         try
         {
             String url = Util.LOCATION_DHIS_SERVER + "/api/programStages/" + Util.STAGE_ID
-                + ".json?fields=programStageSections[id,displayName,programStageDataElements[dataElement[id,name,valueType,optionSet[options[code,name]]]";
+                + ".json?fields=programStageSections[id,displayName,programStageDataElements[dataElement[id,formName,valueType,optionSet[options[code,name]]]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -137,13 +140,48 @@ public class MetaDataController
         return responseInfo;
     }
     
-
     private static ResponseInfo getOrgUnitList()
+    {
+        ResponseInfo responseInfo = MetaDataController.getOrgUnitListInL5();
+        if( responseInfo.responseCode == 200 )
+        {
+            JSONArray l5OuList =  responseInfo.data.getJSONArray( "organisationUnits" );
+            responseInfo = MetaDataController.getOrgUnitListInProgram();
+            if( responseInfo.responseCode == 200 )
+            {
+                JSONArray programOuList = responseInfo.data.getJSONArray( "organisationUnits" );
+                JSONArray ouList = new JSONArray();
+                
+                for( int i = 0; i< l5OuList.length(); i++ )
+                {
+                    JSONObject ou = l5OuList.getJSONObject( i );
+                    for( int j = 0; j< programOuList.length(); j++ )
+                    {
+                        String checkedId = programOuList.getJSONObject( j ).getString( "id" );
+                        if( ou.getString( "id" ).equals( checkedId ) )
+                        {
+                            ouList.put( ou );
+                        }
+                    }
+                }
+                
+                JSONObject result = new JSONObject();
+                result.put( "organisationUnits", ouList );
+                
+                responseInfo.data = result;
+                responseInfo.output = result.toString();
+            }
+        }
+        
+        return responseInfo;
+    }
+    
+    private static ResponseInfo getOrgUnitListInL5()
     {
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/organisationUnits/" + Util.ROOT_ORGTUNIT_LESOTHO + ".json?includeDescendants=true&fields=id,name,level&filter=level:eq:" + Util.REGISTER_ORGUNIT_LEVEL;
+            String url = Util.LOCATION_DHIS_SERVER + "/api/organisationUnits/" + Util.ROOT_ORGTUNIT_LESOTHO + ".json?includeDescendants=true&fields=id,name&filter=level:eq:" + Util.REGISTER_ORGUNIT_LEVEL;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -154,4 +192,20 @@ public class MetaDataController
         return responseInfo;
     }
     
+    private static ResponseInfo getOrgUnitListInProgram()
+    {
+        ResponseInfo responseInfo = null;
+        try
+        {
+            String url = Util.LOCATION_DHIS_SERVER + "/api/programs/" + Util.PROGRAM_ID + ".json?fields=organisationUnits[id]";
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+        }
+        catch ( Exception ex )
+        {
+            ex.printStackTrace();
+        }
+        
+        return responseInfo;
+    }
+   
 }

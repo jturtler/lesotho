@@ -30,8 +30,6 @@ public class LoginController
 
             // STEP 1. Get username/password from request
             
-            // JSONObject jsonData = Util.getJsonFromInputStream( request.getInputStream() );
-            
             String accessServerUsername = Util.ACCESS_SERVER_USERNAME;
             String accessServerPassword = Util.ACCESS_SERVER_PASSWORD;
 
@@ -44,6 +42,7 @@ public class LoginController
             ResponseInfo responseInfo = LoginController.processPostMsg( request, loginUsername, loginPassword, accessServerUsername, accessServerPassword );
             
             // STEP 3. Send back the messages
+            
             Util.respondMsgOut( responseInfo, response);  
         }
         catch ( IOException ex )
@@ -119,32 +118,60 @@ public class LoginController
         try
         {
            String requestUrl = Util.LOCATION_DHIS_SERVER
-                + "/api/categoryOptions.json?pagging=false&filter=categories.id:eq:" + Util.USER_CATEGORY_ID + "&fields=displayName&filter=code:eq:" + loginUsername + "&filter=attributeValues.value:eq:" + loginPassword;
+                + "/api/categoryOptions.json?pagging=false&filter=categories.id:eq:" + Util.USER_CATEGORY_ID + "&fields=displayName&filter=code:eq:" + loginUsername + "&fields=attributeValues[value,attribute[id]]";
 
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
-
             
             if ( responseInfo.responseCode == 200 )
             {
                 System.out.println("\n\n ");
                 JSONObject jsonData = new JSONObject( responseInfo.output );
                 
-                JSONArray categoryOptions = jsonData.getJSONArray( "categoryOptions" );
+                JSONArray categoryOptionList = jsonData.getJSONArray( "categoryOptions" );
                 
-                if( categoryOptions.length() > 0 )
+                if( categoryOptionList.length() > 0 )
                 {
-                    JSONObject responseJson = new JSONObject();
-                    responseJson.put( Util.KEY_FULLNAME, categoryOptions.getJSONObject( 0 ).getString( "displayName" ) );
-                    responseJson.put( Util.KEY_DHIS_SERVER, Util.LOCATION_DHIS_SERVER );
-                    responseJson.put( Util.KEY_LOGGED_SUCCESS, true );
+                    // Check password if it is valid
+                    
+                    JSONObject categoryOption = categoryOptionList.getJSONObject( 0 );
+                    JSONArray arrAttributes = categoryOption.getJSONArray( "attributeValues" );
+                    boolean valid = false;
+                    for( int i=0; i<arrAttributes.length(); i++ )
+                    {
+                        String attributeId = arrAttributes.getJSONObject( i ).getJSONObject( "attribute" ).getString( "id" );
+                        String pin = arrAttributes.getJSONObject( i ).getString( "value" );
+                        if( attributeId.equals( Util.USER_CATEGORY_PIN_ATRIBUTE_ID ) && pin.equals( loginPassword ) )
+                        {
+                            valid = true;
+                            break;
+                        }
+                    }
 
-                    responseInfo.outMessage = responseJson.toString();
+                    
+                    JSONObject responseJson = new JSONObject();
+                    
+                    if( valid )
+                    {
+                        responseJson.put( Util.KEY_FULLNAME, categoryOption.getString( "displayName" ) );
+                        responseJson.put( Util.KEY_DHIS_SERVER, Util.LOCATION_DHIS_SERVER );
+                        responseJson.put( Util.KEY_LOGGED_SUCCESS, true ); 
+                        
+                    }
+                    else 
+                    {
+                        responseJson.put( Util.KEY_LOGGED_SUCCESS, false );
+                        responseInfo.responseCode = 401;
+                    }
+
                     responseInfo.data = responseJson;
+                    responseInfo.outMessage = responseJson.toString();
+                    
                 }
                 else
                 {
                     JSONObject data = new JSONObject();
                     data.put( Util.KEY_LOGGED_SUCCESS, false );
+                    
                     responseInfo.data = data;
                     responseInfo.responseCode = 401;
                 }
