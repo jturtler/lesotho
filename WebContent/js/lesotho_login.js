@@ -52,7 +52,8 @@ function LoginForm( storageObj, translationObj )
 		});	
 		
 
-		me.loginBtnTag.click(function(){
+//		me.loginBtnTag.submit(function(){
+		me.loginFormTag.submit(function(){
 			return me.login();
 		});
 		

@@ -99,6 +99,7 @@ Util.formatDate_DisplayDate = function( dateStr )
 	var year = date.getFullYear();
 	var month = date.getMonth();
 	var dayInMonth = date.getDate();
+	dayInMonth = ( dayInMonth < 10 ) ? "0" + dayInMonth : dayInMonth;
 	
 	return dayInMonth + " " + Util.MONTHS[month] + " " + year;
 };
