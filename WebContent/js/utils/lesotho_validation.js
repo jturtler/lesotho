@@ -7,6 +7,14 @@ function Validation( translationObj )
 	// ================================
 	// == Tag Validations
 	
+	me.setUp_isNumberOnly_OlderBrowserSupport = function( formTag ) {
+
+		// Support for older browser number only keypress
+		formTag.find("[number='true']").keypress( function(e) {
+			return e.charCode >= 48 && e.charCode <= 57;
+		});		
+	};
+	
 	me.checkFormEntryTagsData = function( formTag )
 	{	
 		var allValid = true;

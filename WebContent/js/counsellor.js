@@ -316,17 +316,8 @@ function Counsellor( storageObj, translationObj )
 		});
 		
 		
-		
-		
 		me.addClientFormTag.find("input,select").change(function(e){
 			me.generateClientCUIC();
-			
-			// Add event for "Birth Order" , just accept value in range [0, 20]
-			var attrId = $(this).attr("attribute");
-			if( attrId === me.attr_BirthOrder )
-			{
-				$(this).attr( "maxvalue", 20 );
-			}
 		});
 		
 		me.thisTestDivTag.find("input,select").change(function(e){
@@ -574,6 +565,14 @@ function Counsellor( storageObj, translationObj )
 			
 		}// END Attribute Groups
 		
+		
+		// Add event for "Birth Order" , just accept value in range [0, 20]
+		var birthOrderTag = me.addClientFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
+		birthOrderTag.attr( "maxvalue", 20 );
+		birthOrderTag.attr( "maxlength", 2 );
+		me.validationObj.setUp_isNumberOnly_OlderBrowserSupport( me.addClientFormTag );
+		
+		
 		// Disable 'Client CUIC' field. The value of this attribute will be generated from another attribute value
 		
 		Util.disableTag( me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']"), true );
@@ -598,13 +597,9 @@ function Counsellor( storageObj, translationObj )
 			me.seachAddClientFormTag.append( fieldTag );
 		}
 		
-		// Add event for "Birth Order" , just accept value in range [0, 20]
-		var birthOrderTag = me.seachAddClientFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
-		birthOrderTag.attr( "maxvalue", 20 );
-		
 		// Remove all of mandatory attribute for all fields
 		me.seachAddClientFormTag.find("input,select").removeAttr("mandatory");
-		
+		me.validationObj.setUp_isNumberOnly_OlderBrowserSupport( me.seachAddClientFormTag );
 	};	
 
 	
