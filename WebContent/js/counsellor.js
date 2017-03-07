@@ -1253,10 +1253,6 @@ function Counsellor( storageObj, translationObj )
 				
 				if( me.validationObj.checkFormEntryTagsData(me.addClientFormTabTag) )
 				{
-					var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingClient" );
-					
-					MsgManager.appBlock( tranlatedText + " ..." );
-					
 					// STEP 1. Get client & event JSON data from attribute of the tab
 					
 					var attributeData = me.getArrayJsonData( "attribute", me.addClientFormTag );
@@ -1287,6 +1283,10 @@ function Counsellor( storageObj, translationObj )
 							,dataType: "json"
 							,data: JSON.stringify( clientData )
 				            ,contentType: "application/json;charset=utf-8"
+			            	,beforeSend: function( xhr ) {
+				        		var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingClient" );
+								MsgManager.appBlock( tranlatedText + " ..." );
+				            }
 							,success: function( response ) 
 							{
 								// STEP 3. Set the clientId as attribute for the form. 
@@ -1317,6 +1317,7 @@ function Counsellor( storageObj, translationObj )
 									tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
 									MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
 									MsgManager.appUnblock();
+									alert(tranlatedText);
 								});
 								
 								
@@ -1326,6 +1327,7 @@ function Counsellor( storageObj, translationObj )
 								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
 								MsgManager.msgAreaShow( tranlatedText, "ERROR" );
 								MsgManager.appUnblock();
+								alert(tranlatedText);
 							}
 						});
 				}
@@ -1350,11 +1352,6 @@ function Counsellor( storageObj, translationObj )
 				
 				if( me.validationObj.checkFormEntryTagsData(me.thisTestDivTag) )
 				{
-					
-					var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingEvent" );
-					
-					MsgManager.appBlock( tranlatedText + " ..." );
-					
 					var url = "../event/save?ouId=" + me.orgUnitListTag.val();
 					
 					if( clientId !== undefined )
@@ -1376,6 +1373,11 @@ function Counsellor( storageObj, translationObj )
 							,dataType: "json"
 							,data: JSON.stringify( jsonData )
 				            ,contentType: "application/json;charset=utf-8"
+				            ,beforeSend: function()
+				            {
+								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingEvent" );
+								MsgManager.appBlock( tranlatedText + " ..." );
+				            }
 							,success: function( response ) 
 							{
 								var eventId = response.event;
@@ -1394,12 +1396,14 @@ function Counsellor( storageObj, translationObj )
 								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );								
 								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );
 								MsgManager.appUnblock();
+								alert(tranlatedText);
 							}
 							,error: function( response )
 							{
 								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
 								MsgManager.msgAreaShow( tranlatedText, "ERROR" );
 								MsgManager.appUnblock();
+								alert(tranlatedText);
 							}
 						});
 				} 
@@ -1481,11 +1485,11 @@ function Counsellor( storageObj, translationObj )
 		else
 		{
 			MsgManager.appUnblock();
+			if( exeFunc !== undefined ) exeFunc();
 		}
 		
 
 		// Show 'Save' event button AND show "This test" form
-		me.saveEventBtnTag.show();
 		me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
 		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 	};
