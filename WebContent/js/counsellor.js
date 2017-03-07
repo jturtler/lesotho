@@ -1407,9 +1407,10 @@ function Counsellor( storageObj, translationObj )
 								MsgManager.appUnblock();
 							}
 						});
-				} else {
-					me.showExpireSessionMessage();					
-				}
+				} 
+			}
+			else {
+				me.showExpireSessionMessage();					
 			}
 		});
 		

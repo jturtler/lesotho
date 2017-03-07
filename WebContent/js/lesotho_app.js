@@ -6,7 +6,7 @@ function lesothoApp( baseUrl, exeFunc )
 	
 	me.init = function()
 	{
-		MsgManager.appBlock("Loading ...");
+		MsgManager.appBlock("Loading translation...");
 
 		var storageObj = new Storage();
 		var translationObj = new Translation( baseUrl, storageObj );
