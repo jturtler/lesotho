@@ -64,7 +64,7 @@ public final class Util
     public static final String PROGRAM_ID = "KDgzpKX3h2S";
     public static final String STAGE_ID = "lVglvBnE3TY";
     public static final String USER_CATEGORY_ID = "qVl8p3w3fI5";
-    public static final String USER_CATEGORY_PIN_ATRIBUTE_ID = "mHspya7ddlb";
+    public static final String USER_CATEGORY_PIN_ATRIBUTE_ID = "WgOzQa7KDTV";
     
 
     public static final String KEY_TODAY_CASES = "todayCases";

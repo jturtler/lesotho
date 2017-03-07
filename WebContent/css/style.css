@@ -636,7 +636,8 @@ table.tablesorter thead tr .headerSortDown {
 
 .actionBtn
 {
-	width:100px;
+	width:120px;
+	margin-right: 20px;
 }
   
 .sessionExpire {

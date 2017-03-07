@@ -112,7 +112,7 @@ public class MetaDataController
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributeGroups.json?filter=code:like:LSHTC&paging=false&fields=name,trackedEntityAttributes[id,name,valueType,optionSet[options[code,name]]";
+            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributeGroups.json?filter=code:like:LSHTC&paging=false&fields=name,trackedEntityAttributes[id,shortName,valueType,optionSet[options[code,name]]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )

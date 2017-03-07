@@ -126,6 +126,7 @@ function Validation( translationObj )
 		if ( value && ( valFrom > value || valTo < value ) )
 		{
 			divTag.append( me.getErrorSpanTag( 'common_validation_valueMax' ) );
+			divTag.append( me.getErrorSpanTag( value ) );
 			valid = false;
 		}
 		

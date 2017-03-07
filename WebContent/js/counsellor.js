@@ -31,7 +31,7 @@ function Counsellor( storageObj, translationObj )
 	me.searchResultOptionsTag = $("#searchResultOptions");
 	me.addNewClientBtnTag = $("#addNewClientBtn");
 	me.seachAddClientFormTag = $("#seachAddClientForm");
-	me.backToSearchClientResultBtnTag = $("#backToSearchClientResultBtn");
+	me.backToSearchClientResultBtnTag = $("[name=backToSearchClientResultBtn]");
 	me.searchResultOptTag = $("[name='searchResultOpt']");
 	me.searchResultNextBtnTag = $("#searchResultNextBtn");
 	me.addClientFormTabTag = $("#addClientFormTab");
@@ -220,18 +220,6 @@ function Counsellor( storageObj, translationObj )
 			}
 		});
 		
-		me.seachAddClientFormTag.find("input,select").change(function(){
-			
-			if( $(this).val() !== "" ){
-				MsgManager.msgAreaHide();
-			}
-			else {
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
-				MsgManager.msgAreaShow( tranlatedText, "ERROR" );
-			}
-		});
-		
-		
 		// Orgunit selector in 'Settings'
 
 		me.orgUnitListTag.change(function(){
@@ -314,6 +302,22 @@ function Counsellor( storageObj, translationObj )
 			}
 		});
 		
+		me.setUp_validationCheck( me.seachAddClientFormTag.find( 'input,select' ) );
+
+		me.seachAddClientFormTag.find("input,select").change(function(){
+			
+			if( $(this).val() !== "" ){
+				MsgManager.msgAreaHide();
+			}
+			else {
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
+				MsgManager.msgAreaShow( tranlatedText, "ERROR" );
+			}
+		});
+		
+		
+		
+		
 		me.addClientFormTag.find("input,select").change(function(e){
 			me.generateClientCUIC();
 			
@@ -328,7 +332,7 @@ function Counsellor( storageObj, translationObj )
 		me.thisTestDivTag.find("input,select").change(function(e){
 			me.setUp_clientEntryFormLogic( $(this) );			
 		});
-		
+
 		me.setUp_validationCheck( me.addClientFormTag.find( 'input,select' ) );
 		me.setUp_validationCheck( me.thisTestDivTag.find( 'input,select' ) );
 		
@@ -411,7 +415,7 @@ function Counsellor( storageObj, translationObj )
 					resultTestParallel1Tag.val( "" );
 					resultTestParallel2Tag.val( "" );
 					resultTestResultSDBiolineTag.val( "" );
-					resultFinalHIVStatusTag.val( resultTest2Tag.val() );
+					resultFinalHIVStatusTag.val( "" );
 					
 					Util.disableTag( resultTestParallel1Tag, false );
 					Util.disableTag( resultTestParallel2Tag, false );
@@ -524,11 +528,11 @@ function Counsellor( storageObj, translationObj )
 				
 				if( !attribute.mandatory )
 				{
-					rowTag.append("<td>" + attribute.name + "</td>");
+					rowTag.append("<td>" + attribute.shortName + "</td>");
 				}
 				else
 				{
-					rowTag.append("<td>" + attribute.name + " <span class='required'>*</span></td>");
+					rowTag.append("<td>" + attribute.shortName + " <span class='required'>*</span></td>");
 				}
 				
 				// STEP 3.2. Generate the input/select tag based on the valueType of attribute
@@ -555,7 +559,6 @@ function Counsellor( storageObj, translationObj )
 				{
 					inputTag = "<select class='form-control' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
 					inputTag += "<option value=''>[Please select]</option>";
-					inputTag += "<option value='true'>Yes</option>";
 					inputTag += "<option value='false'>No</option>";
 					inputTag += "</select>";
 				}
@@ -594,6 +597,13 @@ function Counsellor( storageObj, translationObj )
 			fieldTag.append( "<div class='col-sm-10'>" + inputTag.closest("td").html() + "</div>" );
 			me.seachAddClientFormTag.append( fieldTag );
 		}
+		
+		// Add event for "Birth Order" , just accept value in range [0, 20]
+		var birthOrderTag = me.seachAddClientFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
+		birthOrderTag.attr( "maxvalue", 20 );
+		
+		// Remove all of mandatory attribute for all fields
+		me.seachAddClientFormTag.find("input,select").removeAttr("mandatory");
 		
 	};	
 
@@ -1055,61 +1065,64 @@ function Counsellor( storageObj, translationObj )
 	{
 		event.preventDefault();
 		
-		Commons.checkSession( function( isInSession ) {
-			if ( isInSession ) {
-				var clientData = me.getArrayJsonData( "attribute",  me.searchClientFormTag );
-				var requestData = {
-						"attributes": clientData
-				};
-				
-				if( requestData.attributes.length > 0 )
-				{
-					MsgManager.appBlock( "Searching ..." );
-					me.searchResultTbTag.find("tbody").html("");
-					$.ajax(
-						{
-							type: "POST"
-							,url: "../client/search"
-							,dataType: "json"
-							,data: JSON.stringify( requestData )
-				            ,contentType: "application/json;charset=utf-8"
-							,success: function( response ) 
-							{
-								var searchCriteria = me.getSearchCriteria( me.searchClientFormTag );
-								me.searchResultKeyTag.html( searchCriteria );
-								
-								var clientList = response.trackedEntityInstances;
-								
-								if( clientList.length > 0 )
-								{
-									me.populateSearchClientData( clientList );
-									me.showSearchClientTableResult();
-								}
-								else
-								{
-									me.showSearchClientNoResult();
-								}
-								MsgManager.appUnblock();
-							}
-							,error: function(response)
-							{
-								alert(response);
-								console.log(response);
-							}
-						});
+		if( me.validationObj.checkFormEntryTagsData( me.searchClientFormTag ) )
+		{
+			
+			Commons.checkSession( function( isInSession ) {
+				if ( isInSession ) {
+					var clientData = me.getArrayJsonData( "attribute",  me.searchClientFormTag );
+					var requestData = {
+							"attributes": clientData
+					};
 					
+					if( requestData.attributes.length > 0 )
+					{
+						MsgManager.appBlock( "Searching ..." );
+						me.searchResultTbTag.find("tbody").html("");
+						$.ajax(
+							{
+								type: "POST"
+								,url: "../client/search"
+								,dataType: "json"
+								,data: JSON.stringify( requestData )
+					            ,contentType: "application/json;charset=utf-8"
+								,success: function( response ) 
+								{
+									var searchCriteria = me.getSearchCriteria( me.searchClientFormTag );
+									me.searchResultKeyTag.html( searchCriteria );
+									
+									var clientList = response.trackedEntityInstances;
+									
+									if( clientList.length > 0 )
+									{
+										me.populateSearchClientData( clientList );
+										me.showSearchClientTableResult();
+									}
+									else
+									{
+										me.showSearchClientNoResult();
+									}
+									MsgManager.appUnblock();
+								}
+								,error: function(response)
+								{
+									alert(response);
+									console.log(response);
+								}
+							});
+						
+					}
+					else if( requestData.attributes.length == 0 )
+					{
+						var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
+						
+						MsgManager.msgAreaShow( tranlatedText, "ERROR" );
+					}
+				} else {
+					me.showExpireSessionMessage();					
 				}
-				else if( requestData.attributes.length == 0 )
-				{
-					var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
-					
-					MsgManager.msgAreaShow( tranlatedText, "ERROR" );
-				}
-			} else {
-				me.showExpireSessionMessage();					
-			}
-		});
-		
+			});
+		}
 		
 	};
 	
@@ -1206,8 +1219,7 @@ function Counsellor( storageObj, translationObj )
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
 
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_loadingClientDetails" );
-				
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_loadingClientDetails" );				
 				MsgManager.appBlock( tranlatedText + " ..." );
 				
 				$.ajax(
@@ -1288,10 +1300,16 @@ function Counsellor( storageObj, translationObj )
 								me.addClientFormTabTag.attr( "clientId", clientId );
 								me.addClientFormTabTag.attr( "client", JSON.stringify( response ) );
 								
-								// STEP 4. Change the header of the form && and show the 'Add Event' button
+								// STEP 4. Change the header of the form && and enable the 'Create Event' button
 								
 								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_editForm_headerTitle" );
 								me.addClientFormDivTag.find(".headerList").html(tranlatedText);
+
+								tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editClient" );
+								me.saveClientBtnTag.html( tranlatedText );
+								
+								tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_createEvent" );
+								me.saveEventBtnTag.html( tranlatedText );
 								
 								Util.disableTag( me.completedEventBtnTag, true );
 								
@@ -1372,10 +1390,13 @@ function Counsellor( storageObj, translationObj )
 								Util.disableTag( me.completedEventBtnTag, false );
 								
 								if( exeFunc !== undefined ) exeFunc();
+
+								var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editEvent" );
+								me.saveEventBtnTag.html( tranlatedText );
+								
 								
 								// STEP 4. Unblock form
-								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );
-								
+								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );								
 								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );
 								MsgManager.appUnblock();
 							}
@@ -1539,31 +1560,49 @@ function Counsellor( storageObj, translationObj )
 		me.previousTestsTag.find("table").html("");
 		me.resetClientEntryForm();
 
+		// Change the Header title && 'Save' buton display name
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_addClient" );
 		me.addClientFormDivTag.find(".headerList").html(tranlatedText);
 		
+		tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_createClient" );
+		me.saveClientBtnTag.html( tranlatedText );
+		
+		// Reset values in the form
 		me.addEventFormTag.find("input,select").val("");
 		me.addClientFormDivTag.find( "span.errorMsg" ).remove();
 		
+		// Populate values from Search form to Add client form
 		me.seachAddClientFormTag.find("input[attribute],select[attribute]").each(function(){
 			var attrId = $(this).attr("attribute");
 			var value = $(this).val();
 			me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']").val( value );
 		});
 		
+		// Generate Client CUIC if any
+		me.generateClientCUIC();
+		
+		// Select the "Client Attributes" tab
 		me.addClientFormTabTag.tabs("option", "selected", 0);
 		
+		// Hide "Previous Test" and "This Test" Tabs
 		me.hideTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
 		me.hideTabInClientForm( me.TAB_NAME_THIS_TEST );
+		
+		// Show "Add Client" form
 		me.addClientFormDivTag.show("fast");
 		
 	};
 	
 	me.showUpdateClientForm = function( data )
 	{
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_editClient" );		
-
+		// Change the Header title && 'Save' buton display name
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_editClient" );
 		me.addClientFormDivTag.find(".headerList").html( tranlatedText );
+		
+		tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editClient" );
+		me.saveClientBtnTag.html( tranlatedText );
+		
+		
 		me.addClientFormDivTag.find( "span.errorMsg" ).remove();
 		
 		me.showOrgUnitWarningMsg();	
@@ -1891,7 +1930,7 @@ function Counsellor( storageObj, translationObj )
 		if( dateOfBirth != "" && districtOfBirth != "" &&  firstName != "" && lastName != "" && birthOrder != "" )
 		{
 			var birthOrder = ( eval(birthOrder) < 10 ) ? "0" + birthOrder : birthOrder;
-			clientCUIC = dateOfBirth.substring(9, 12) + Util.MONTH_INDEXES[dateOfBirth.substring(3, 6)] + firstName.substring(0, 2).toUpperCase() + lastName.substring(0, 2).toUpperCase() + birthOrder;
+			clientCUIC = dateOfBirth.substring(9, 12) + Util.MONTH_INDEXES[dateOfBirth.substring(3, 6)] + districtOfBirth.substring(0, 2).toUpperCase() + firstName.substring(0, 2).toUpperCase() + lastName.substring(0, 2).toUpperCase() + birthOrder;
 		}
 		
 		me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']").val( clientCUIC );

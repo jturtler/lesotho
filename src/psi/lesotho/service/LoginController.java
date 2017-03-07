@@ -140,6 +140,7 @@ public class LoginController
                     {
                         String attributeId = arrAttributes.getJSONObject( i ).getJSONObject( "attribute" ).getString( "id" );
                         String pin = arrAttributes.getJSONObject( i ).getString( "value" );
+                        
                         if( attributeId.equals( Util.USER_CATEGORY_PIN_ATRIBUTE_ID ) && pin.equals( loginPassword ) )
                         {
                             valid = true;
