@@ -77,7 +77,8 @@ function Counsellor( storageObj, translationObj )
 	me.de_Testing_ResultParallel2 = "Bqff4skvt4d";
 	me.de_Testing_ResultSDBioline = "M11JqgkJt2X";
 	me.de_FinalResult_HIVStatus = "UuKat0HFjWS";
-	
+
+	me.TAB_NAME_CLIENT_ATTRIBUTE = "clientAttributeDiv";
 	me.TAB_NAME_PREVIOUS_TEST = "previousTestDiv";
 	me.TAB_NAME_THIS_TEST = "thisTestDiv";
 	
@@ -257,6 +258,7 @@ function Counsellor( storageObj, translationObj )
 		
 		
 		me.completedEventBtnTag.click(function(){
+			me.saveEventBtnTag.attr("status", "complete");
 			var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_aksForCompletingEvent" );
 			var result = confirm(tranlatedText);
 			if(result)
@@ -306,12 +308,17 @@ function Counsellor( storageObj, translationObj )
 
 		me.seachAddClientFormTag.find("input,select").change(function(){
 			
-			if( $(this).val() !== "" ){
-				MsgManager.msgAreaHide();
-			}
-			else {
+			var clientData = me.getArrayJsonData( "attribute",  me.searchClientFormTag );
+			var requestData = { "attributes": clientData };
+			
+			if( requestData.attributes.length == 0 )
+			{
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
 				MsgManager.msgAreaShow( tranlatedText, "ERROR" );
+			}
+			else
+			{
+				MsgManager.msgAreaHide();
 			}
 		});
 		
@@ -542,7 +549,7 @@ function Counsellor( storageObj, translationObj )
 					}
 					inputTag += "</select>";
 				}
-				else if( attribute.valueType === "NUMBER" || attribute.valueType === "INTEGER_ZERO_OR_POSITIVE" )
+				else if( attribute.valueType === "NUMBER" || attribute.valueType === "INTEGER_ZERO_OR_POSITIVE" || attribute.valueType === "INTEGER" )
 				{
 					inputTag = "<input number='true' class='form-control' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
 				}
@@ -550,8 +557,13 @@ function Counsellor( storageObj, translationObj )
 				{
 					inputTag = "<select class='form-control' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
 					inputTag += "<option value=''>[Please select]</option>";
+					inputTag += "<option value='true'>Yes</option>";
 					inputTag += "<option value='false'>No</option>";
 					inputTag += "</select>";
+				}
+				else if( attribute.valueType === "TRUE_ONLY" )
+				{
+					inputTag = "<input type='checkbox' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
 				}
 				else if( attribute.valueType === "DATE" )
 				{
@@ -936,11 +948,11 @@ function Counsellor( storageObj, translationObj )
 							
 							// STEP 2. Generate headers
 							
-							// TODO : Need to translate header
 							var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
-							for( var i=0; i<headerList.length; i++ )
+							for( var i=1; i<headerList.length; i++ )
 							{
-								rowTag.append( "<th>" + headerList[i] + "</th>" );
+								var tranlatedText = me.translationObj.getTranslatedValueByKey( headerList[i] );
+								rowTag.append( "<th>" + tranlatedText + "</th>" );
 							}
 							
 							var theadTag = $("<thead></thead>");
@@ -983,10 +995,11 @@ function Counsellor( storageObj, translationObj )
 			var tbodyTag = $("<tbody></tbody>");
 			for( var i in list )
 			{
-				var event = list[i];	
-				var eventDate = event[0];
-				var fullName = event[1] + " " + event[2];
-				var deResult1 = event[3];
+				var event = list[i];
+				var clientId = event[0];
+				var eventDate = event[1];
+				var fullName = event[2] + " " + event[3];
+				var deResult1 = event[4];
 				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
 				if( isTime && eventDate !== "" )
@@ -998,13 +1011,14 @@ function Counsellor( storageObj, translationObj )
 					eventDate = Util.formatDate_DisplayDate( eventDate );
 				}
 			
-				
-				var rowTag = $("<tr></tr>");							
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
+				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "'></tr>");							
 				rowTag.append( "<td>" + eventDate + "</td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + deResult1 + "</td>" );
 				rowTag.append( "<td></td>" );
-				rowTag.append( "<td></td>" );
+				
+				me.addEventForRowInList(rowTag);
 				
 				tbodyTag.append( rowTag );
 			}
@@ -1012,7 +1026,7 @@ function Counsellor( storageObj, translationObj )
 			tableTag.append( tbodyTag );
 		}
 	}
-	
+		
 	me.populatePositiveCaseData = function( list, tableTag, isTime )
 	{
 		if( list.length > 0 )
@@ -1020,10 +1034,11 @@ function Counsellor( storageObj, translationObj )
 			var tbodyTag = $("<tbody></tbody>");
 			for( var i in list )
 			{
-				var event = list[i];	
-				var eventDate = event[0];
-				var fullName = event[1] + " " + event[2];
-				var deARTVal = event[3];
+				var event = list[i];
+				var clientId = event[0];	
+				var eventDate = event[1];
+				var fullName = event[2] + " " + event[3];
+				var deARTVal = event[4];
 				deARTVal = ( deARTVal !== "" ) ? "[None]" : deARTVal;
 				
 				
@@ -1036,20 +1051,35 @@ function Counsellor( storageObj, translationObj )
 				{
 					eventDate = Util.formatDate_DisplayDate( eventDate );
 				}
-			
 				
-				var rowTag = $("<tr></tr>");							
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "positiveCaseList_msg_clickToOpenEditForm" );
+				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "'></tr>");										
 				rowTag.append( "<td>" + eventDate + "</td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td></td>" );
 				rowTag.append( "<td></td>" );
-				rowTag.append( "<td></td>" );
+
+				me.addEventForRowInList(rowTag);
 				
 				tbodyTag.append( rowTag );
 			}
 			tableTag.append( tbodyTag );
 			
 		}
+	};
+
+	me.addEventForRowInList = function(rowTag)
+	{
+		rowTag.css("cursor", "pointer");
+		rowTag.click( function(){
+			me.backToSearchClientResultBtnTag.hide();
+			var clientId = rowTag.attr("clientId");
+			
+			me.loadClientDetails( clientId, function(){
+				me.resetPageDisplay();
+				me.addClientFormDivTag.show();
+			} );
+		});
 	};
 	
 	// -------------------------------------------------------------------
@@ -1062,7 +1092,6 @@ function Counsellor( storageObj, translationObj )
 		
 		if( me.validationObj.checkFormEntryTagsData( me.searchClientFormTag ) )
 		{
-			
 			Commons.checkSession( function( isInSession ) {
 				if ( isInSession ) {
 					var clientData = me.getArrayJsonData( "attribute",  me.searchClientFormTag );
@@ -1072,8 +1101,9 @@ function Counsellor( storageObj, translationObj )
 					
 					if( requestData.attributes.length > 0 )
 					{
-						MsgManager.appBlock( "Searching ..." );
 						me.searchResultTbTag.find("tbody").html("");
+						me.backToSearchClientResultBtnTag.show();
+						
 						$.ajax(
 							{
 								type: "POST"
@@ -1081,6 +1111,10 @@ function Counsellor( storageObj, translationObj )
 								,dataType: "json"
 								,data: JSON.stringify( requestData )
 					            ,contentType: "application/json;charset=utf-8"
+					            ,beforeSend: function( xhr ) {
+					        		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_msg_searching" );
+									MsgManager.appBlock( tranlatedText + " ..." );
+					            }
 								,success: function( response ) 
 								{
 									var searchCriteria = me.getSearchCriteria( me.searchClientFormTag );
@@ -1097,6 +1131,7 @@ function Counsellor( storageObj, translationObj )
 									{
 										me.showSearchClientNoResult();
 									}
+									
 									MsgManager.appUnblock();
 								}
 								,error: function(response)
@@ -1209,7 +1244,7 @@ function Counsellor( storageObj, translationObj )
 	
 	// Load Client details when a row in search result is clicked
 	
-	me.loadClientDetails = function( clientId ){
+	me.loadClientDetails = function( clientId, exeFunc ){
 
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
@@ -1226,6 +1261,7 @@ function Counsellor( storageObj, translationObj )
 						{
 							var eventJson = response.events;					
 							me.showUpdateClientForm( response );
+							if( exeFunc !== undefined ) exeFunc();
 							MsgManager.appUnblock();
 						}
 						,error: function(response)
@@ -1312,7 +1348,15 @@ function Counsellor( storageObj, translationObj )
 								
 								me.addEventClickHandle(function(){
 									
-									// STEP 6. Unblock form
+									// STEP 6. Active "Client Attribute" Tab if the "status" mode is "Edit Client"
+									
+									if( me.saveClientBtnTag.attr("status") == "update" )
+									{
+										me.showTabInClientForm( me.TAB_NAME_CLIENT_ATTRIBUTE );
+									}
+									me.saveClientBtnTag.attr("status", "update");
+									
+									// STEP 7. Unblock form
 									
 									tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
 									MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
@@ -1375,7 +1419,20 @@ function Counsellor( storageObj, translationObj )
 				            ,contentType: "application/json;charset=utf-8"
 				            ,beforeSend: function()
 				            {
-								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingEvent" );
+				            	var tranlatedText = "";
+				            	if( me.saveEventBtnTag.attr("status") == "update" )
+			            		{
+				            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_editingEvent" );
+			            		}
+				            	else if( me.saveEventBtnTag.attr("status") == "add" )
+			            		{
+				            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_creatingEvent" );
+			            		}
+				            	else if( me.saveEventBtnTag.attr("status") == "complete" )
+			            		{
+				            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_completingEvent" );
+			            		}
+
 								MsgManager.appBlock( tranlatedText + " ..." );
 				            }
 							,success: function( response ) 
@@ -1390,10 +1447,19 @@ function Counsellor( storageObj, translationObj )
 
 								var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editEvent" );
 								me.saveEventBtnTag.html( tranlatedText );
+								me.saveEventBtnTag.attr("status", "update");
 								
 								
 								// STEP 4. Unblock form
-								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );								
+								if( me.saveEventBtnTag.attr("status") == "complete" )
+			            		{
+				            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventCompleted" );
+			            		}
+								else
+								{
+									tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );		
+								}
+														
 								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );
 								MsgManager.appUnblock();
 								alert(tranlatedText);
@@ -1478,20 +1544,26 @@ function Counsellor( storageObj, translationObj )
 				// Empty fields from "This Test" tab
 				me.thisTestDivTag.find("input,select").val("");
 				
+
+				// Show 'Save' event button AND show "This test" form
+				me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
+				me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
+				
 				if( exeFunc !== undefined ) exeFunc();
 			} );
 			
 		}
 		else
 		{
+			// Show "Previous Test" and "This test" form
+			me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
+			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
+			
 			MsgManager.appUnblock();
 			if( exeFunc !== undefined ) exeFunc();
 		}
 		
 
-		// Show 'Save' event button AND show "This test" form
-		me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
-		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 	};
 	
 	
@@ -1558,6 +1630,8 @@ function Counsellor( storageObj, translationObj )
 		me.addClientFormTabTag.removeAttr( "eventId" );
 		me.addClientFormTabTag.removeAttr( "event" );
 		me.previousTestsTag.find("table").html("");
+		me.saveClientBtnTag.attr("status", "add" );
+		me.saveEventBtnTag.attr("status", "init" );
 		me.resetClientEntryForm();
 
 		// Change the Header title && 'Save' buton display name
@@ -1568,14 +1642,16 @@ function Counsellor( storageObj, translationObj )
 		me.saveClientBtnTag.html( tranlatedText );
 		
 		// Reset values in the form
-		me.addEventFormTag.find("input,select").val("");
+		me.addClientFormDivTag.find("input,select").val("");
+		me.addClientFormDivTag.find("input[type='checkbox']").prop("checked", false);
 		me.addClientFormDivTag.find( "span.errorMsg" ).remove();
 		
 		// Populate values from Search form to Add client form
 		me.seachAddClientFormTag.find("input[attribute],select[attribute]").each(function(){
 			var attrId = $(this).attr("attribute");
 			var value = $(this).val();
-			me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']").val( value );
+			var field = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']");
+			field.val( value );
 		});
 		
 		// Generate Client CUIC if any
@@ -1602,7 +1678,9 @@ function Counsellor( storageObj, translationObj )
 		tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editClient" );
 		me.saveClientBtnTag.html( tranlatedText );
 		
-		
+
+		me.addClientFormDivTag.find("input,select").val("");
+		me.addClientFormDivTag.find("input[type='checkbox']").prop("checked", false);
 		me.addClientFormDivTag.find( "span.errorMsg" ).remove();
 		
 		me.showOrgUnitWarningMsg();	
@@ -1610,6 +1688,7 @@ function Counsellor( storageObj, translationObj )
 		me.addClientFormTabTag.removeAttr( "client" );
 		me.addClientFormTabTag.removeAttr( "eventId" );
 		me.addClientFormTabTag.removeAttr( "event" );
+		me.saveClientBtnTag.attr("status", "update" );
 		me.resetClientEntryForm();
 
 		me.contentListTag.hide();
@@ -1641,7 +1720,15 @@ function Counsellor( storageObj, translationObj )
 				value = Util.formatDate_DisplayDate( value );
 			}
 			
-			me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']").val( value );
+			if( inputTag.attr("type") == "checkbox" )
+			{
+				inputTag.prop("checked", value );
+			}
+			else
+			{
+				inputTag.val( value );
+			}	
+				
 		});
 		
 		// ---------------------------------------------------------------------------------------
@@ -1708,7 +1795,6 @@ function Counsellor( storageObj, translationObj )
 
 		// STEP 3. Show the first table in report if any
 
-//		me.previousTestsTag.append( report );
 		if( report.find("tbody").length > 0 )
 		{
 			report.find('tbody:first tr[eventId]').click();
@@ -1731,6 +1817,7 @@ function Counsellor( storageObj, translationObj )
 			var eventId = activeEvent.event;
 			me.addClientFormTabTag.attr( "eventId", eventId );			
 			me.addClientFormTabTag.attr( "event", JSON.stringify( activeEvent ) );
+			me.saveEventBtnTag.attr("status", "update" );
 			
 			me.addEventFormTag.find("input,select").val("");
 			
@@ -1751,6 +1838,7 @@ function Counsellor( storageObj, translationObj )
 		else
 		{
 			Util.disableTag( me.completedEventBtnTag, true );
+			me.saveEventBtnTag.attr("status", "add" );
 		}
 
 		
@@ -1864,13 +1952,25 @@ function Counsellor( storageObj, translationObj )
 			var item = $(this);
 			var attrId = item.attr(key);
 			var value = item.val();
+			if( item.attr("type") == "checkbox" )
+			{
+				if( item.prop("checked") )
+				{
+					value = "true";
+				}
+				else
+				{
+					value = "";
+				}
+			}
+			
 			if( value !== "" )
 			{
 				if( item.attr("isDate") !== undefined && item.attr("isDate") == "true" )
 				{
 					value = Util.formatDate_DbDate( value );
 				}
-
+				
 				var data = {};
 				data[key] = attrId;
 				data["value"] = value;

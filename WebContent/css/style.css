@@ -73,10 +73,6 @@
 	}
 }
 
-body {
-  padding-top: 50px;
-}
-
 /** For Header **/
 
 
@@ -246,12 +242,18 @@ button
 body {
     position: relative;
     overflow-x: hidden;
+    padding-top: 50px;
 }
 body,
 html { height: 100%;}
 .nav .open > a, 
 .nav .open > a:hover, 
 .nav .open > a:focus {background-color: transparent;}
+
+.ui-widget{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !IMPORTANT;
+    font-size: 14px !IMPORTANT;
+}
 
 /*-------------------------------*/
 /*           Wrappers            */
