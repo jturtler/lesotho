@@ -549,6 +549,17 @@ function Counsellor( storageObj, translationObj )
 					}
 					inputTag += "</select>";
 				}
+				// Render a selector for "Birth Order" field
+				else if( attribute.id == me.attr_BirthOrder )
+				{
+					inputTag = "<select class='form-control' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
+					inputTag += "<option value=''>[Please select]</option>";
+					for( var i = 0; i <= 20 ; i ++ )
+					{
+						inputTag += "<option value='" + i + "'>" + i + "</option>";
+					}
+					inputTag += "</select>";
+				}
 				else if( attribute.valueType === "NUMBER" || attribute.valueType === "INTEGER_ZERO_OR_POSITIVE" || attribute.valueType === "INTEGER" )
 				{
 					inputTag = "<input number='true' class='form-control' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
@@ -577,12 +588,6 @@ function Counsellor( storageObj, translationObj )
 			
 		}// END Attribute Groups
 		
-		
-		// Add event for "Birth Order" , just accept value in range [0, 20]
-		var birthOrderTag = me.addClientFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
-		birthOrderTag.attr( "maxvalue", 20 );
-		birthOrderTag.attr( "maxlength", 2 );
-		me.validationObj.setUp_isNumberOnly_OlderBrowserSupport( me.addClientFormTag );
 		
 		
 		// Disable 'Client CUIC' field. The value of this attribute will be generated from another attribute value

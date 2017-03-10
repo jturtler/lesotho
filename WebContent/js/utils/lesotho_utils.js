@@ -164,7 +164,14 @@ Util.formatTimeInDateTime = function( dateTimeStr )
 };
 
 Util.convertUTCDateToLocalDate = function( serverdate ) {
-	var date = new Date(serverdate);
+	var year = serverdate.substring( 0, 4 );
+	var month = eval( serverdate.substring( 5,7 ) ) - 1;
+	var day = eval( serverdate.substring( 8, 10 ) );
+	var hour = serverdate.substring( 11, 13);
+	var minute = serverdate.substring( 14, 16 );
+	var second = serverdate.substring( 17, 19 );
+	
+	var date = new Date( year, month, day, hour, minute, second );
     var newDate = new Date( date.getTime() + date.getTimezoneOffset()*60*1000 );
 
     var offset = date.getTimezoneOffset() / 60;
