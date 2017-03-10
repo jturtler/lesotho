@@ -57,6 +57,7 @@ function Counsellor( storageObj, translationObj )
 	me.consumablesDivTag = $("#consumablesDiv");
 	me.statisticsDivTag = $("#statisticsDiv");
 	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
+	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']")
 	
 	
 	me.attr_FirstName = "mW2l3T2zL0N";
@@ -81,6 +82,11 @@ function Counsellor( storageObj, translationObj )
 	me.TAB_NAME_CLIENT_ATTRIBUTE = "clientAttributeDiv";
 	me.TAB_NAME_PREVIOUS_TEST = "previousTestDiv";
 	me.TAB_NAME_THIS_TEST = "thisTestDiv";
+	
+	me.currentList = "";
+	me.TODAY_LIST = "todayList";
+	me.PREVIOUS_LIST = "previousList";
+	me.POSITIVE_LIST = "positiveList";
 	
 	me.userInfoLoaded = false;
 	me.metadataLoaded = false;
@@ -249,6 +255,25 @@ function Counsellor( storageObj, translationObj )
 			me.selectOrgUnitWarningMsgTag.hide();
 			me.searchResultTbTag.show();
 			me.searchResultTag.show();
+		});
+		
+
+		me.backToCaseListBtnTag.click(function(){
+			if( me.currentList == me.TODAY_LIST )
+			{
+				me.registerClientBtnTag.show();
+				me.listTodayCases();
+			}
+			else if( me.currentList == me.PREVIOUS_LIST )
+			{
+				me.registerClientBtnTag.hide();
+				me.listPreviousCases();
+			}
+			else if( me.currentList == me.POSITIVE_LIST )
+			{
+				me.registerClientBtnTag.hide();
+				me.listPositiveCases();
+			}
 		});
 		
 		
@@ -894,6 +919,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.listTodayCases = function()
 	{
+		me.currentList = me.TODAY_LIST;
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "todayCases_headerTitle" );
 		
 		me.listDateTag.html( Util.getLastNDate(0) );
@@ -903,6 +929,7 @@ function Counsellor( storageObj, translationObj )
 		
 	me.listPreviousCases = function()
 	{
+		me.currentList = me.PREVIOUS_LIST;
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "previousCases_headerTitle" );
 	
 		me.listDateTag.html( "" );
@@ -912,6 +939,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.listPositiveCases = function()
 	{
+		me.currentList = me.POSITIVE_LIST;
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "positiveCases_headerTitle" );
 		
 		me.listDateTag.html( "" );
@@ -952,27 +980,13 @@ function Counsellor( storageObj, translationObj )
 							
 							me.headerListTag.html( headerText );						
 							
-							// STEP 2. Generate headers
-							
-							var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
-							for( var i=1; i<headerList.length; i++ )
-							{
-								var tranlatedText = me.translationObj.getTranslatedValueByKey( headerList[i] );
-								rowTag.append( "<th>" + tranlatedText + "</th>" );
-							}
-							
-							var theadTag = $("<thead></thead>");
-							theadTag.append(rowTag);
-							tableTag.append( theadTag );
-							
-
 							// STEP 3. Populate data
 
 							if( !isSpecialCase ){
-								me.populateAllCaseData( response.rows, tableTag, isTime );
+								me.populateAllCaseData( response.rows, tableTag, isTime, headerColor );
 							}
 							else {
-								me.populatePositiveCaseData( response.rows, tableTag, isTime );
+								me.populatePositiveCaseData( response.rows, tableTag, isTime, headerColor );
 							}
 
 							// STEP 4. Show table
@@ -994,8 +1008,28 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-	me.populateAllCaseData = function( list, tableTag, isTime )
+	me.populateAllCaseData = function( list, tableTag, isTime, headerColor )
 	{
+		var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
+		
+		if( me.currentList == me.PREVIOUS_LIST )
+		{
+			rowTag.append( "<th>Date</th>" );
+		}
+		else
+		{
+			rowTag.append( "<th>Time</th>" );
+		}
+		
+		rowTag.append( "<th>Name</th>" );
+		rowTag.append( "<th>Result</th>" );
+		rowTag.append( "<th>What else?</th>" );
+		
+		var theadTag = $("<thead></thead>");
+		theadTag.append(rowTag);
+		tableTag.append( theadTag );
+		
+		
 		if( list.length > 0 )
 		{
 			var tbodyTag = $("<tbody></tbody>");
@@ -1033,8 +1067,19 @@ function Counsellor( storageObj, translationObj )
 		}
 	}
 		
-	me.populatePositiveCaseData = function( list, tableTag, isTime )
+	me.populatePositiveCaseData = function( list, tableTag, isTime, headerColor )
 	{
+		var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
+		rowTag.append( "<th>Date</th>" );
+		rowTag.append( "<th>Name</th>" );
+		rowTag.append( "<th>What else?</th>" );
+		rowTag.append( "<th>???</th>" );
+		rowTag.append( "<th>Referral ART closed?</th>" );
+		
+		var theadTag = $("<thead></thead>");
+		theadTag.append(rowTag);
+		tableTag.append( theadTag );
+		
 		if( list.length > 0 )
 		{
 			var tbodyTag = $("<tbody></tbody>");
@@ -1064,6 +1109,7 @@ function Counsellor( storageObj, translationObj )
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td></td>" );
 				rowTag.append( "<td></td>" );
+				rowTag.append( "<td></td>" );
 
 				me.addEventForRowInList(rowTag);
 				
@@ -1079,6 +1125,7 @@ function Counsellor( storageObj, translationObj )
 		rowTag.css("cursor", "pointer");
 		rowTag.click( function(){
 			me.backToSearchClientResultBtnTag.hide();
+			me.backToCaseListBtnTag.show();
 			var clientId = rowTag.attr("clientId");
 			
 			me.loadClientDetails( clientId, function(){
@@ -1109,6 +1156,7 @@ function Counsellor( storageObj, translationObj )
 					{
 						me.searchResultTbTag.find("tbody").html("");
 						me.backToSearchClientResultBtnTag.show();
+						me.backToCaseListBtnTag.hide();
 						
 						$.ajax(
 							{
