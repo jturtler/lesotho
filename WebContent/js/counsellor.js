@@ -554,9 +554,10 @@ function Counsellor( storageObj, translationObj )
 				{
 					inputTag = "<select class='form-control' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
 					inputTag += "<option value=''>[Please select]</option>";
-					for( var i = 0; i <= 20 ; i ++ )
+					for( var i = 1; i <= 20 ; i ++ )
 					{
-						inputTag += "<option value='" + i + "'>" + i + "</option>";
+						var value = ( i < 10 ) ? "0" + i : i;
+						inputTag += "<option value='" + i + "'>" + value + "</option>";
 					}
 					inputTag += "</select>";
 				}
