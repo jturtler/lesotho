@@ -14,7 +14,7 @@ function Counsellor( storageObj, translationObj )
 	me.aboutLinkTag = $("#aboutLink");
 	me.settingsLinkTag = $("#settingsLink");
 	me.consumablesLinkTag = $("#consumablesLink");
-	me.statisticsLinkTag = $("#statisticsLink");
+	me.reportLinkTag = $("#reportLink");
 	
 	me.userFullNameTag = $("[name='userFullName']");
 	me.dhisServerTag = $("#dhisServer");
@@ -55,9 +55,17 @@ function Counsellor( storageObj, translationObj )
 	me.headerRightSideControlsTag = $("div.headerRightSideControls");
 	me.mainContentTags = $("div.mainContent");
 	me.consumablesDivTag = $("#consumablesDiv");
-	me.statisticsDivTag = $("#statisticsDiv");
 	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
-	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']")
+	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
+	me.reportCriteriaFormTag = $("#reportCriteriaForm");
+	me.reportRunBtnTag = $("#reportRunBtn");
+	me.reportClientResultTag = $("#reportClientResult");
+	me.eventReportTag = $("#eventReport");
+	me.reportClientResultBackBtnTag = $("#reportClientResultBackBtn");
+	me.reportParamDivTag = $("#reportParamDiv");
+	me.reportSearchKeyTag = $("#reportSearchKey");
+	me.reportParamBackBtnTag = $("#reportParamBackBtn");
+	me.searchResultHeaderTag = $("#searchResultHeader");
 	
 	
 	me.attr_FirstName = "mW2l3T2zL0N";
@@ -84,9 +92,19 @@ function Counsellor( storageObj, translationObj )
 	me.TAB_NAME_THIS_TEST = "thisTestDiv";
 	
 	me.currentList = "";
-	me.TODAY_LIST = "todayList";
-	me.PREVIOUS_LIST = "previousList";
-	me.POSITIVE_LIST = "positiveList";
+	me.PAGE_TODAY_LIST = "todayList";
+	me.PAGE_PREVIOUS_LIST = "previousList";
+	me.PAGE_POSITIVE_LIST = "positiveList";
+	me.PAGE_SEARCH_PARAM = "searchParam";
+	me.PAGE_SEARCH_CLIENT_RESULT = "searchClientResult";
+	me.PAGE_SEARCH_ADD_CLIENT = "searchAddClient";
+	me.PAGE_SEARCH_EDIT_CLIENT = "searchEditClient";
+	me.PAGE_COMSUMABLES = "Consumables";
+	me.PAGE_REPORT_PARAM = "reportParam";
+	me.PAGE_REPORT_CLIENT_RESULT = "reportClientResult";
+	me.PAGE_REPORT_EVENT_REPORT = "reportEventReport";
+	me.PAGE_SETTINGS = "settings";
+	me.PAGE_ABOUT = "about";
 	
 	me.userInfoLoaded = false;
 	me.metadataLoaded = false;
@@ -94,7 +112,8 @@ function Counsellor( storageObj, translationObj )
 	me.sectionList = [];
 	me.attributeGroupList = [];
 	
-	me.searchClientAttributeIds = ["wSp6Q7QDMsk", "u57uh7lHwF8", "mW2l3T2zL0N", "mUxDHgywnn2", "vTPYC9BXPNn"];
+	me.searchClientAttributeIds = [me.attr_DoB, me.attr_DistrictOB, me.attr_FirstName, me.attr_LastName, me.attr_BirthOrder];
+	me.reportCriteriaIds = [me.attr_ClientCUIC];
 
 	// -------------------------------------------------------------------
 	// Init methods
@@ -122,6 +141,143 @@ function Counsellor( storageObj, translationObj )
 				me.showExpireSessionMessage();					
 			}
 		});	
+	};
+	
+	me.loadPageWithParam = function()
+	{
+		MsgManager.appUnblock();
+		
+		var page = me.storageObj.getItem( "page" );
+		if( page ==  me.PAGE_TODAY_LIST )
+		{
+			me.listTodayCases();
+		}
+		else if( page ==  me.PAGE_PREVIOUS_LIST )
+		{
+			me.listPreviousCases();
+		}
+		else if( page ==  me.PAGE_POSITIVE_LIST )
+		{
+			me.listPositiveCases();
+		}
+		else if( page ==  me.PAGE_SEARCH_PARAM )
+		{
+			me.showSearchClientForm();
+		}
+		else if( page ==  me.PAGE_SEARCH_CLIENT_RESULT )
+		{
+			var clientSearch = JSON.parse( me.storageObj.getItem("param" ) ).attributes;
+			
+			// STEP 1. Populate data in "Search" form
+			
+			for( var i in clientSearch )
+			{
+				var attributeId = clientSearch[i].attribute;
+				var value = clientSearch[i].value;
+				
+				var inputTag = me.searchClientFormTag.find("[attribute='" + attributeId + "']");
+				if( inputTag.attr("isDate") == "true" )
+				{
+					value = Util.formatDate_LocalDisplayDate( value );
+				}
+				 
+				me.searchClientFormTag.find("[attribute='" + attributeId + "']").val(value);
+			}
+			
+			// STEP 2. Search clients by criteria
+			
+			me.runSearchClients();
+			
+			
+		}
+		else if( page ==  me.PAGE_SEARCH_ADD_CLIENT )
+		{
+			var clientSearch = JSON.parse( me.storageObj.getItem("param" ) ).attributes;
+			
+			// STEP 1. Populate data in "Search" form
+			
+			for( var i in clientSearch )
+			{
+				var attributeId = clientSearch[i].attribute;
+				var value = clientSearch[i].value;
+				
+				var inputTag = me.searchClientFormTag.find("[attribute='" + attributeId + "']");
+				if( inputTag.attr("isDate") == "true" )
+				{
+					value = Util.formatDate_LocalDisplayDate( value );
+				}
+				 
+				me.searchClientFormTag.find("[attribute='" + attributeId + "']").val(value);
+			}
+			
+			// STEP 2. Search clients by criteria
+			
+			me.runSearchClients( function(){
+
+				// STEP 3. Show "Add Client" form
+				me.showAddClientForm();
+			});
+			
+		}
+		else if( page ==  me.PAGE_SEARCH_EDIT_CLIENT )
+		{
+			var clientSearch = JSON.parse( me.storageObj.getItem("param" ) ).attributes;
+			
+			// STEP 1. Populate data in "Search" form
+			
+			for( var i in clientSearch )
+			{
+				var attributeId = clientSearch[i].attribute;
+				var value = jsonSearch[i].value;
+				me.searchClientFormTag.find("[attribute='" + attributeId + "']").val(value);
+			}
+			
+			// STEP 2. Search clients by criteria
+			
+			me.runSearchClients( function(){
+
+				var clientId = me.storageObj.getItem( "clientId" );
+				
+				// STEP 3. Show "Edit Client" form
+				loadClientDetails( clientId );
+				
+			});
+		}
+		else if( page ==  me.PAGE_COMSUMABLES )
+		{
+			me.consumablesDivTag.show("fast");
+		}
+		else if( page ==  me.PAGE_REPORT_PARAM )
+		{
+			me.reportParamDivTag.show("fast");
+		}
+		else if( page ==  me.PAGE_REPORT_CLIENT_RESULT )
+		{
+			var cuic = me.storageObj.getItem( "cuic" );
+			me.getClientsByCUIC( cuic );
+		}
+		else if( page ==  me.PAGE_REPORT_EVENT_REPORT )
+		{
+			var cuic = me.storageObj.getItem( "cuic" );
+			
+			// STEP 1. Search clients by CUIC
+			me.getClientsByCUIC( cuic, function(){
+				
+				// STEP 2. Load "Event report" by CUIC
+				var eventId = me.storageObj.getItem( "eventId" );
+				var linkTag = me.reportClientResultTag.find("table > tbody").find("a[eventId='" + eventId + "']");
+				linkTag.click();
+			} );
+			
+		}
+		else if( page ==  me.PAGE_SETTINGS )
+		{
+			me.settingsDivTag.show("fast");
+		}
+		else if( page ==  me.PAGE_ABOUT )
+		{
+			me.aboutDivTag.show("fast");
+		}
 	};
 	
 	// ----------------------------------------------------------------------------
@@ -163,12 +319,14 @@ function Counsellor( storageObj, translationObj )
 		});
 		
 		me.settingsLinkTag.click(function(){
+			me.storageObj.addItem("page", me.PAGE_SETTINGS);
 			me.resetPageDisplay();
 			me.settingsDivTag.show("fast");
 			$('.overlay').click();
 		});
 		
 		me.aboutLinkTag.click(function(){
+			me.storageObj.addItem("page", me.PAGE_ABOUT);
 			me.resetPageDisplay();
 			me.aboutDivTag.show("fast");
 			$('.overlay').click();
@@ -181,14 +339,16 @@ function Counsellor( storageObj, translationObj )
 		});
 		
 		me.consumablesLinkTag.click(function(){
+			me.storageObj.addItem("page", me.PAGE_COMSUMABLES);
 			me.resetPageDisplay();
 			me.consumablesDivTag.show("fast");
 			$('.overlay').click();
 		});
 		
-		me.statisticsLinkTag .click(function(){
+		me.reportLinkTag .click(function(){
+			me.storageObj.addItem("page", me.PAGE_REPORT_PARAM);
 			me.resetPageDisplay();
-			me.statisticsDivTag.show("fast");
+			me.reportParamDivTag.show("fast");
 			$('.overlay').click();
 		});
 		
@@ -213,7 +373,7 @@ function Counsellor( storageObj, translationObj )
 		});
 		
 		me.searchResultNextBtnTag.click(function(){
-			var optionVal = me.searchResultTag.find("input:radio:checked").val();
+			var optionVal = me.searchResultOptionsTag.find("input:radio:checked").val();
 			if( optionVal === "backToSearchClientForm" ) {
 				me.resetPageDisplay();
 				me.showSearchClientForm();
@@ -239,8 +399,9 @@ function Counsellor( storageObj, translationObj )
 		// Events for Buttons
 		// ------------------------------------------------------------------
 		
-		me.searchClientBtnTag.click(function(event){
-			me.searchClients(event);
+		me.searchClientBtnTag.click(function(e){
+			e.preventDefault();
+			me.runSearchClients();
 		});
 		
 		me.registerClientBtnTag.click(function(){
@@ -259,17 +420,17 @@ function Counsellor( storageObj, translationObj )
 		
 
 		me.backToCaseListBtnTag.click(function(){
-			if( me.currentList == me.TODAY_LIST )
+			if( me.currentList == me.PAGE_TODAY_LIST )
 			{
 				me.registerClientBtnTag.show();
 				me.listTodayCases();
 			}
-			else if( me.currentList == me.PREVIOUS_LIST )
+			else if( me.currentList == me.PAGE_PREVIOUS_LIST )
 			{
 				me.registerClientBtnTag.hide();
 				me.listPreviousCases();
 			}
-			else if( me.currentList == me.POSITIVE_LIST )
+			else if( me.currentList == me.PAGE_POSITIVE_LIST )
 			{
 				me.registerClientBtnTag.hide();
 				me.listPositiveCases();
@@ -319,13 +480,29 @@ function Counsellor( storageObj, translationObj )
 			MsgManager.msgAreaShow( translatedText, "SUCCESS" );
 		});
 		
+		me.reportRunBtnTag.click( function(){
+			var cuic = me.reportCriteriaFormTag.find("[attribute='" + me.attr_ClientCUIC + "']").val();
+			me.getClientsByCUIC( cuic );
+		});
+		
+		me.reportClientResultBackBtnTag.click( function(){
+			me.eventReportTag.hide();
+			me.reportClientResultTag.show("fast");
+		});
+		
+		me.reportParamBackBtnTag.click( function(){
+			me.reportClientResultTag.hide();
+			me.reportParamDivTag.show("fast");
+		});
+		
 		// --------------------------------------------------------------------------
 		// Events and Validation for fields in [Search Client], [Add/Update Form] form
 		// --------------------------------------------------------------------------
 		
 		me.seachAddClientFormTag.find("input,select").keyup(function(e){
 			if ( e.keyCode === 13 ) {
-				me.searchClients(e);
+				e.preventDefault();
+				me.runSearchClients();
 			}
 		});
 		
@@ -359,7 +536,11 @@ function Counsellor( storageObj, translationObj )
 		me.setUp_validationCheck( me.addClientFormTag.find( 'input,select' ) );
 		me.setUp_validationCheck( me.thisTestDivTag.find( 'input,select' ) );
 		
-		
+		me.reportCriteriaFormTag.find("[attribute='" + me.attr_ClientCUIC + "']").keyup( function(e){
+			if ( e.keyCode === 13 ) {
+				me.getClientsByCUIC();
+			}
+		});
 	};
 	
 	me.setUp_validationCheck = function( tags )
@@ -513,6 +694,7 @@ function Counsellor( storageObj, translationObj )
 		me.createAddClientForm();
 		me.createSearchClientForm();
 		me.createClientEntryForm();
+		me.createReportForm();
 		
 		// Remove the 'mandatory' SPAN from the Search table
 		me.seachAddClientFormTag.find("span.required").remove();
@@ -645,6 +827,24 @@ function Counsellor( storageObj, translationObj )
 		me.validationObj.setUp_isNumberOnly_OlderBrowserSupport( me.seachAddClientFormTag );
 	};	
 
+	me.createReportForm = function()
+	{
+		for( var i in me.reportCriteriaIds )
+		{
+			var attrId = me.reportCriteriaIds[i];
+			var inputTag = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']" );
+			var text = inputTag.closest("tr").find("td:first").html();
+			
+			var fieldTag = $("<div class='form-group'></div>");
+			fieldTag.append("<label for='" + attrId + "' class='col-sm-2 control-label' style='font-weight:300'>" + text + "</label>");
+			fieldTag.append( "<div class='col-sm-10'>" + inputTag.closest("td").html() + "</div>" );
+			me.reportCriteriaFormTag.append( fieldTag );
+		}
+		
+		me.reportCriteriaFormTag.find("input,select").each( function(){
+			Util.disableTag( $(this), false );
+		})
+	};
 	
 	// ----------------------------------------------------------------------------
 	// Create 'Event Entry Form'
@@ -909,7 +1109,16 @@ function Counsellor( storageObj, translationObj )
 			me.setUp_FloatButton();		
 			me.addClientFormTabTag.tabs();
 			
-			me.listTodayCases();
+			var page = me.storageObj.getItem( "page" );
+			if( page == "" )
+			{
+				me.listTodayCases();
+			}
+			else
+			{
+				me.loadPageWithParam();
+			}
+			
 		}
 	};
 	
@@ -919,9 +1128,10 @@ function Counsellor( storageObj, translationObj )
 	
 	me.listTodayCases = function()
 	{
-		me.currentList = me.TODAY_LIST;
-		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "todayCases_headerTitle" );
+		me.currentList = me.PAGE_TODAY_LIST;
+		me.storageObj.addItem("page", me.PAGE_TODAY_LIST);
 		
+		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "todayCases_headerTitle" );
 		me.listDateTag.html( Util.getLastNDate(0) );
 		var headerList = ["Time", "Name", "Result", "What else?", "Indexed?"];
 		me.listCases( "../event/todayCases", headerList, "#cfe2f3", tranlatedHeaderText + " - ", true, false, true );
@@ -929,9 +1139,10 @@ function Counsellor( storageObj, translationObj )
 		
 	me.listPreviousCases = function()
 	{
-		me.currentList = me.PREVIOUS_LIST;
+		me.currentList = me.PAGE_PREVIOUS_LIST;
+		me.storageObj.addItem("page", me.PAGE_PREVIOUS_LIST);
+		
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "previousCases_headerTitle" );
-	
 		me.listDateTag.html( "" );
 		var headerList = ["Date", "Name", "Result", "What else?", "Indexed?"];
 		me.listCases( "../event/previousCases", headerList, "#cfe2f3", tranlatedHeaderText, false, false, false );
@@ -939,9 +1150,10 @@ function Counsellor( storageObj, translationObj )
 	
 	me.listPositiveCases = function()
 	{
-		me.currentList = me.POSITIVE_LIST;
-		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "positiveCases_headerTitle" );
+		me.currentList = me.PAGE_POSITIVE_LIST;
+		me.storageObj.addItem("page", me.PAGE_POSITIVE_LIST);
 		
+		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "positiveCases_headerTitle" );
 		me.listDateTag.html( "" );
 		var headerList = ["Date", "Name", "What else?", "???", "Referral ART closed?"];
 		me.listCases( "../event/positiveCases", headerList, "#cfe2f3", tranlatedHeaderText, false, true, false );
@@ -1012,7 +1224,7 @@ function Counsellor( storageObj, translationObj )
 	{
 		var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
 		
-		if( me.currentList == me.PREVIOUS_LIST )
+		if( me.currentList == me.PAGE_PREVIOUS_LIST )
 		{
 			rowTag.append( "<th>Date</th>" );
 		}
@@ -1139,10 +1351,8 @@ function Counsellor( storageObj, translationObj )
 	// Search Client
 	// -------------------------------------------------------------------
 	
-	me.searchClients = function(event)
+	me.runSearchClients = function( exeFunc )
 	{
-		event.preventDefault();
-		
 		if( me.validationObj.checkFormEntryTagsData( me.searchClientFormTag ) )
 		{
 			Commons.checkSession( function( isInSession ) {
@@ -1158,42 +1368,22 @@ function Counsellor( storageObj, translationObj )
 						me.backToSearchClientResultBtnTag.show();
 						me.backToCaseListBtnTag.hide();
 						
-						$.ajax(
+						me.searchClients( requestData, event, function( clientList ){
+							var searchCriteria = me.getSearchCriteria( me.searchClientFormTag );
+							me.searchResultKeyTag.html( searchCriteria );
+							
+							if( clientList.length > 0 )
 							{
-								type: "POST"
-								,url: "../client/search"
-								,dataType: "json"
-								,data: JSON.stringify( requestData )
-					            ,contentType: "application/json;charset=utf-8"
-					            ,beforeSend: function( xhr ) {
-					        		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_msg_searching" );
-									MsgManager.appBlock( tranlatedText + " ..." );
-					            }
-								,success: function( response ) 
-								{
-									var searchCriteria = me.getSearchCriteria( me.searchClientFormTag );
-									me.searchResultKeyTag.html( searchCriteria );
-									
-									var clientList = response.trackedEntityInstances;
-									
-									if( clientList.length > 0 )
-									{
-										me.populateSearchClientData( clientList );
-										me.showSearchClientTableResult();
-									}
-									else
-									{
-										me.showSearchClientNoResult();
-									}
-									
-									MsgManager.appUnblock();
-								}
-								,error: function(response)
-								{
-									alert(response);
-									console.log(response);
-								}
-							});
+								me.populateSearchClientData( clientList );
+								me.showSearchClientTableResult();
+							}
+							else
+							{
+								me.showSearchClientNoResult();
+							}
+							
+							if( exeFunc !== undefined ) exeFunc();
+						} );
 						
 					}
 					else if( requestData.attributes.length == 0 )
@@ -1302,26 +1492,28 @@ function Counsellor( storageObj, translationObj )
 
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
-
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_loadingClientDetails" );				
-				MsgManager.appBlock( tranlatedText + " ..." );
-				
 				$.ajax(
 					{
 						type: "POST"
 						,url: "../client/details?clientId=" + clientId
 			            ,contentType: "application/json;charset=utf-8"
+			            ,beforeSend: function( xhr ) 
+			            {
+			            	var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_loadingClientDetails" );				
+							MsgManager.appBlock( tranlatedText + " ..." );
+			            }
 						,success: function( response ) 
-						{
-							var eventJson = response.events;					
+						{		
+							me.storageObj.addItem( "clientId", clientId );
 							me.showUpdateClientForm( response );
 							if( exeFunc !== undefined ) exeFunc();
-							MsgManager.appUnblock();
 						}
 						,error: function(response)
 						{
 							console.log(response);
 						}
+					}).always( function( data ) {
+						MsgManager.appUnblock();
 					});
 			} else {
 				me.showExpireSessionMessage();					
@@ -1330,6 +1522,35 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
+
+	me.searchClients = function( jsonQuery, event, exeFunc )
+	{
+		$.ajax(
+			{
+				type: "POST"
+				,url: "../client/search"
+				,dataType: "json"
+				,data: JSON.stringify( jsonQuery )
+	            ,contentType: "application/json;charset=utf-8"
+	            ,beforeSend: function( xhr ) {
+	        		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_msg_searching" );
+					MsgManager.appBlock( tranlatedText + " ..." );
+	            }
+				,success: function( response ) 
+				{
+					me.storageObj.addItem("page", me.PAGE_SEARCH_CLIENT_RESULT);
+					me.storageObj.addItem("param", JSON.stringify( jsonQuery ) );
+					exeFunc( response.trackedEntityInstances );
+				}
+				,error: function(response)
+				{
+					alert(response);
+					console.log(response);
+				}
+			}).always( function( data ) {
+				MsgManager.appUnblock();
+			});
+	};
 	
 	// -------------------------------------------------------------------
 	// Add/Update Client
@@ -1552,7 +1773,7 @@ function Counsellor( storageObj, translationObj )
 			
 			tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );			
 			var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
-			headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTine( event.eventDate ) + "</th>");
+			headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTime( event.eventDate ) + "</th>");
 			
 			
 			// STEP 2.1. Create tbody to display data values of an event
@@ -1620,6 +1841,220 @@ function Counsellor( storageObj, translationObj )
 
 	};
 	
+
+	
+	// -------------------------------------------------------------------
+	// Report
+	// -------------------------------------------------------------------
+	
+	me.getClientsByCUIC = function( cuic, exeFunc )
+	{
+		
+		$.ajax(
+		{
+			type: "POST"
+			,url: "../client/searchByCUIC?cuic=" + cuic
+			,dataType: "json"
+            ,contentType: "application/json;charset=utf-8"
+            ,beforeSend: function( xhr ) {
+            	var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_msg_searching" );
+				MsgManager.appBlock( tranlatedText + " ..." );
+				
+				me.reportClientResultTag.hide();
+				me.reportClientResultTag.find("table > tbody").html("");
+				me.eventReportTag.find("[attribute]").html(" ");
+				me.eventReportTag.hide();
+            }
+			,success: function( response ) 
+			{
+				me.storageObj.addItem( "cuic", cuic );
+				me.storageObj.addItem("page", me.PAGE_REPORT_CLIENT_RESULT);
+				
+				var rows = response.rows;
+				for( var i in rows )
+				{
+					var rowData = rows[i];
+					
+					var clientId = rowData[0];
+					var firstName = rowData[1];
+					var lastName = rowData[2];
+					var dateOfBirth = rowData[3];
+					var districtOfBirth = rowData[4];
+					var birthOrder = rowData[5];
+					var educationalLevel = rowData[6];
+					var keyPopulation = rowData[7];
+					var gender = rowData[8];
+					
+					var eventList = rowData[9].split(", ");
+					
+					
+					var clientJsonData = {
+						"firstName" : firstName
+						,"lastName" : lastName
+						,"dateOfBirth" : Util.convertUTCDateToLocalDate( dateOfBirth )
+						,"districtOfBirth" : districtOfBirth
+						,"birthOrder" : birthOrder
+						,"educationalLevel" : educationalLevel
+						,"keyPopulation" : keyPopulation
+						,"gender" : gender
+					};
+					
+					var fullname = firstName + " " + lastName;
+					
+					// Add "Full name" row
+					var rowTag = $("<tr></tr>");
+					rowTag.append("<td rowspan='" + eventList.length + "'>" + fullname + "</td>");
+					
+					// Add "Event list" rows
+					for( var j in eventList )
+					{
+						var eventData = eventList[j].split("*");
+						var eventUid = eventData[0];
+						var eventDate = Util.formatDate_DisplayDateTime( eventData[1] );
+						
+						// Create the event column
+						var linkTag = $( "<a client='" + JSON.stringify( clientJsonData ) + "' href='#' eventId='" + eventUid + "' >" + eventDate + "</a>" );
+					 	var eventColTag = $("<td style='text-align: left;'></td>");
+					 	eventColTag.append(linkTag);
+					 	
+					 	// Add "Click" event for link tag
+						me.addEventForReportRow( linkTag );
+						
+						if( j == 0 )
+						{
+							rowTag.append( eventColTag );
+							me.reportClientResultTag.find("table > tbody").append( rowTag );
+						}
+						else
+						{
+							var eventRowTag = $("<tr></tr>");
+							eventRowTag.append( eventColTag );
+							
+							me.reportClientResultTag.find("table > tbody").append( eventRowTag );	
+						}				
+					}
+										
+					// Set CUIC for title
+					me.reportSearchKeyTag.html( cuic );
+					
+					if( exeFunc !== undefined ) exeFunc();
+				}
+			}
+			,error: function(response)
+			{
+				console.log(response);
+			}
+		}).always( function( data ) {
+			me.reportParamDivTag.hide();
+			me.reportClientResultTag.show("fast");
+			MsgManager.appUnblock();
+		});
+	};
+	
+	me.addEventForReportRow = function( eventLinkTag )
+	{
+		eventLinkTag.click(function()
+		{
+			var eventId = eventLinkTag.attr("eventId");
+			me.loadAndPopulateEventData( eventId, function(){
+				//
+				me.storageObj.addItem( "eventId", eventId );
+				me.storageObj.addItem("page", me.PAGE_REPORT_EVENT_REPORT);
+				
+				// Populate client data
+				me.populateReportClientData( eventLinkTag );
+				
+				// Show the "Event report" form
+				me.eventReportTag.show("fast");
+			});
+		})
+	};
+	
+	me.loadAndPopulateEventData = function( eventId, exeFunc )
+	{		
+		$.ajax(
+		{
+			type: "POST"
+			,url: "../event/details?eventId=" + eventId  
+			,beforeSend: function( xhr ) {
+            	var tranlatedText = me.translationObj.getTranslatedValueByKey( "report_msg_loadingEvent" );
+				MsgManager.appBlock( tranlatedText + " ..." );
+            }
+			,success: function( response ) 
+			{
+				var dataValues = response.dataValues;
+				for( var i in dataValues )
+				{
+					var deId = dataValues[i].dataElement;
+					var value = dataValues[i].value;
+					
+					// Populate data into the form
+					
+					me.eventReportTag.find( "[dataelement='" + deId+ "'][value='" + value + "']").html( "X" );
+				}
+				
+				exeFunc();
+			}
+			,error: function(response)
+			{
+				console.log(response);
+			}
+		}).always( function( data ) {
+			me.reportClientResultTag.hide();
+			me.eventReportTag.show("fast");
+			MsgManager.appUnblock();
+		});
+	};
+	
+	me.populateReportClientData = function( eventLinkTag )
+	{
+		me.reportClientResultTag.hide();
+		me.eventReportTag.hide("fast");
+		var eventId = eventLinkTag.closest("tr").attr("eventId");
+		
+		// Add selected attribute for the rowTag
+		me.reportClientResultTag.find("table > tbody").find("tr").attr( "selected", false );
+		rowTag.attr( "selected", true );
+		
+		
+		// Populate client data in report
+		var client = JSON.parse( eventLinkTag.attr( "client" ) );
+		
+		me.eventReportTag.find("[attribute='u57uh7lHwF8'][value='" + client.districtOfBirth + "']").html("X");
+		me.eventReportTag.find("[attribute='vTPYC9BXPNn'][value='" + client.birthOrder + "']").html("X");
+		
+		
+		me.eventReportTag.find("[id='firstName']").html( client.firstName );
+		me.eventReportTag.find("[id='surName']").html( client.lastName );
+		
+
+		var dateOfBirth = client.dateOfBirth;
+		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='0']").html( dateOfBirth.charAt(8) );
+		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='1']").html( dateOfBirth.charAt(9) );
+		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='2']").html( dateOfBirth.charAt(5) );
+		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='3']").html( dateOfBirth.charAt(6) );
+		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='4']").html( dateOfBirth.charAt(2) );
+		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='5']").html( dateOfBirth.charAt(3) );
+		
+		
+		var cuic = me.reportCriteriaFormTag.find("[attribute='zRA08XEYiSF']").val();
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='0']").html( cuic.charAt(0) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='1']").html( cuic.charAt(1) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='2']").html( cuic.charAt(2) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='3']").html( cuic.charAt(3) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='4']").html( cuic.charAt(4) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='5']").html( cuic.charAt(5) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='6']").html( cuic.charAt(6) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='7']").html( cuic.charAt(7) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='8']").html( cuic.charAt(8) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='9']").html( cuic.charAt(9) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='10']").html( cuic.charAt(10) );
+		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='11']").html( cuic.charAt(11) );
+		
+		me.eventReportTag.find("[attribute='Bs4zxQQ3EyB'][value='" + client.educationalLevel + "']").html( "X" );
+		me.eventReportTag.find("[attribute='CCVO6BZMrnp'][value='" + client.gender + "']").html( "X" );
+		me.eventReportTag.find("[attribute='Y35TizULMzg'][value='" + client.keyPopulation + "']").html( "X" );
+	}
 	
 	// -------------------------------------------------------------------
 	// Show / Hide forms
@@ -1649,10 +2084,13 @@ function Counsellor( storageObj, translationObj )
 	{
 		me.contentListTag.html("");
 		me.mainContentTags.hide();
+//		me.mainContentTags.find("input,select").val("");
 	};
 	
 	me.showSearchClientForm = function()
 	{	
+		me.storageObj.addItem("page", me.PAGE_SEARCH_PARAM);
+		
 		me.searchResultTag.find("span.labelOpt").css("font-size","");		
 		me.searchClientFormTag.show("fast");
 	};
@@ -1669,7 +2107,7 @@ function Counsellor( storageObj, translationObj )
 		me.searchClientFormTag.hide();
 		
 		me.searchResultTbTag.css( "cursor", "pointer" );
-		me.searchResultOptionsTag.html("Select a client from from above or");
+		me.searchResultHeaderTag.html("Select a client from from above or");
 
 		me.searchResultTbTag.show();
 		me.searchResultTag.show("fast");
@@ -1677,6 +2115,8 @@ function Counsellor( storageObj, translationObj )
 	
 	me.showAddClientForm = function()
 	{
+		me.storageObj.addItem("page", me.PAGE_SEARCH_ADD_CLIENT);
+		
 		me.resetPageDisplay();
 		me.showOrgUnitWarningMsg();
 		me.addClientFormTabTag.removeAttr( "clientId" );
@@ -1685,7 +2125,7 @@ function Counsellor( storageObj, translationObj )
 		me.addClientFormTabTag.removeAttr( "event" );
 		me.previousTestsTag.find("table").html("");
 		me.saveClientBtnTag.attr("status", "add" );
-		me.saveEventBtnTag.attr("status", "init" );
+		me.saveEventBtnTag.attr("status", "add" );
 		me.resetClientEntryForm();
 
 		// Change the Header title && 'Save' buton display name
@@ -1725,6 +2165,8 @@ function Counsellor( storageObj, translationObj )
 	
 	me.showUpdateClientForm = function( data )
 	{
+		me.storageObj.addItem("page", me.PAGE_SEARCH_EDIT_CLIENT);
+		
 		// Change the Header title && 'Save' buton display name
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_editClient" );
 		me.addClientFormDivTag.find(".headerList").html( tranlatedText );
@@ -1814,7 +2256,7 @@ function Counsellor( storageObj, translationObj )
 				
 				tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );				
 				var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
-				headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTine( event.eventDate ) + "</th>");
+				headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTime( event.eventDate ) + "</th>");
 				
 				
 				// STEP 2.2. Create tbody to display data values of an event
@@ -1992,7 +2434,7 @@ function Counsellor( storageObj, translationObj )
 		me.searchResultTbTag.hide();
 		
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_noClientFound" );		
-		me.searchResultOptionsTag.html( tranlatedText );
+		me.searchResultHeaderTag.html( tranlatedText );
 		
 		me.searchResultTag.show("fast");
 	};
@@ -2079,7 +2521,7 @@ function Counsellor( storageObj, translationObj )
 		var districtOfBirth = me.addClientFormTabTag.find("[attribute='u57uh7lHwF8']").val();
 		var firstName = me.addClientFormTabTag.find("[attribute='mW2l3T2zL0N']").val();
 		var lastName = me.addClientFormTabTag.find("[attribute='mUxDHgywnn2']").val();
-		var birthOrder = me.addClientFormTabTag.find("[attribute='vTPYC9BXPNn']").val();
+		var birthOrder = me.addClientFormTabTag.find("[attribute='" + me.attr_BirthOrder + "']").val();
 		
 		if( dateOfBirth != "" && districtOfBirth != "" &&  firstName != "" && lastName != "" && birthOrder != "" )
 		{

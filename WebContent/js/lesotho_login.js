@@ -16,11 +16,19 @@ function LoginForm( storageObj, translationObj )
 	
 	me.init = function()
 	{
+		me.clearPageParamInStorage();
 		me.loadOuList();
 		me.clear();
 		me.setupEvents();
-	},
+	};
 	
+	me.clearPageParamInStorage = function()
+	{
+		me.storageObj.removeItem( "page" );
+		me.storageObj.removeItem( "cuic" );
+		me.storageObj.removeItem( "param" );
+		me.storageObj.removeItem( "clientId" );
+	};
 
 	// -------------------------------------------------------------------------------
 	// Set-up events

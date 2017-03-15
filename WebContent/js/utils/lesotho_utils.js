@@ -3,14 +3,6 @@ function Util() {}
 
 Util.CONTROL_VALUE = "WebApp v 0.3";
 
-Util.getURLParameterByName = function( url, name )
-{
-	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-		results = regex.exec(url);
-	return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-};
-
 Util.getInputTag = function( attributeId )
 {
 	return $("[attributeId='" + attributeId + "']");
@@ -56,8 +48,44 @@ Util.findItemFromList = function( listData, searchProperty, searchValue )
 };
 
 
+
 //-------------------------------------------------------------------
-//Date Utils
+// URL Utils
+//-------------------------------------------------------------------
+
+Util.getURLParameterByName = function( url, name )
+{
+	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+		results = regex.exec(url);
+	return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+};
+
+
+Util.addUrlParam = function( key, val )
+{
+	var search = document.location.search;
+	
+	var newParam = key + '=' + val,
+	params = '?' + newParam;
+
+	// If the "search" string exists, then build params from it
+	if (search) {
+		// Try to replace an existance instance
+		params = search.replace(new RegExp('([?&])' + key + '[^&]*'), '$1' + newParam);
+
+		// If nothing was replaced, then add the new param to the end
+		if (params === search) {
+			params += '&' + newParam;
+		}
+	}
+	
+	document.location.pathname + params;
+};
+
+
+//-------------------------------------------------------------------
+// Date Utils
 //-------------------------------------------------------------------
 
 Util.MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -89,7 +117,7 @@ Util.formatDate_DisplayDateInWeek = function( date )
 
 
 /** 
- * dateStr : 2017-01-02
+ * dateStr : 2017-01-02, convert date from UTC time to local time
  * Result : 02 Jan 2017
  * **/
 Util.formatDate_DisplayDate = function( dateStr )
@@ -104,11 +132,26 @@ Util.formatDate_DisplayDate = function( dateStr )
 	return dayInMonth + " " + Util.MONTHS[month] + " " + year;
 };
 
+
+/** 
+ * dateStr : 2017-01-02
+ * Result : 02 Jan 2017
+ * **/
+Util.formatDate_LocalDisplayDate = function( localDateStr )
+{
+	var year = localDateStr.substring( 0, 4 );
+	var month = eval( localDateStr.substring( 5,7 ) ) - 1;
+	var day = localDateStr.substring( 8, 10 );
+	
+	return day + " " + Util.MONTHS[month] + " " + year;
+};
+
+
 /** 
  * dateStr : "2017-02-07T09:56:10.298"
  * Result : 07 Feb 2017 09:56
  * **/
-Util.formatDate_DisplayDateTine = function( dateStr )
+Util.formatDate_DisplayDateTime = function( dateStr )
 {
 	var date = Util.convertUTCDateToLocalDate( dateStr );
 	

@@ -21,10 +21,9 @@ public class EventController
     private static final long serialVersionUID = -8009460801270486913L;
 
     private static String PARAM_USERNAME = "@PARAM_USERNAME";
-
     private static String PARAM_START_DATE = "@PARAM_START_DATE";
-
     private static String PARAM_END_DATE = "@PARAM_END_DATE";
+    private static String PARAM_EVENT_ID = "@PARAM_EVENT_ID";
 
     private static String URL_QUERY_CASES_BY_TIME = Util.LOCATION_DHIS_SERVER
         + "/api/sqlViews/IdFgIYoRINL/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
@@ -33,6 +32,11 @@ public class EventController
     private static String URL_QUERY_POSITIVE_CASES = Util.LOCATION_DHIS_SERVER
         + "/api/sqlViews/mayPuvHkJ7G/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
         + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.STAGE_ID;
+    
+
+    private static String URL_QUERY_EVENT_BY_ID = Util.LOCATION_DHIS_SERVER
+        + "/api/events/" + EventController.PARAM_EVENT_ID + ".json";
+
 
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
@@ -65,7 +69,6 @@ public class EventController
                 {
                     responseInfo = EventController.getPreviousCases( request, loginUsername );
                 }
-
                 // Load Previous case
                 else if ( key.equals( Util.KEY_POSITIVE_CASES ) )
                 {
@@ -89,6 +92,12 @@ public class EventController
                     {
                         responseInfo = EventController.updateEvent( eventId, receivedData, loginUsername );
                     }
+                } 
+                // Load event by ID
+                else if ( key.equals( Util.KEY_GET_EVENT_DETAILS ) )
+                {
+                    String eventId = request.getParameter( Util.PAMAM_EVENT_ID );
+                    responseInfo = EventController.getEventById( eventId );
                 }
             }
 
@@ -204,7 +213,7 @@ public class EventController
 
         return responseInfo;
     }
-
+    
     public static ResponseInfo createEvent( JSONObject eventData, String clientId, String ouId, String loginUsername )
         throws IOException, Exception
     {
@@ -289,6 +298,29 @@ public class EventController
 
         return responseInfo;
     }
+    
+    public static ResponseInfo getEventById( String eventId )
+        throws UnsupportedEncodingException, ServletException, IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+            String requestUrl = EventController.URL_QUERY_EVENT_BY_ID;
+            requestUrl = requestUrl.replace( EventController.PARAM_EVENT_ID, eventId );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+    }
+    
+    
+    
+    
 
     // CREATE JSON FOR THIS - add voucher Id, linking info.. etc..
     private static JSONObject composeJsonEvent( JSONObject eventData, String teiId, String orgUnitId,
