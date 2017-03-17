@@ -101,8 +101,13 @@ public class ClientController
                         
                         responseInfo.output = output.toString();
                     }
+                } 
+                // STEP 3.3. Search clients by CUIC
+                if ( key.equals( Util.KEY_SEARCH_CUIC ) )
+                {
+                    String cuic = request.getParameter( "cuic" );
+                    responseInfo = ClientController.searchClientsByUIC( cuic );
                 }
-
             }
 
             // STEP 4. Send back the messages
@@ -160,6 +165,7 @@ public class ClientController
         {
             receivedData.put( "trackedEntity", TRACKED_ENTITY );
             receivedData.put( "orgUnit", ouId );
+            
             String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, receivedData, null );
 
@@ -234,6 +240,38 @@ public class ClientController
         return responseInfo;
     }
 
+    private static ResponseInfo searchClientbyCUIC( String cuic )
+    {
+        ResponseInfo responseInfo = null;
+        try
+        {
+            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?ou=" + Util.ROOT_ORGTUNIT + "&ouMode=DESCENDANTS&filter=" + Util.CLIENT_ATTR_ID_CUIC + ":eq:" + cuic + "&program=" + Util.PROGRAM_ID;
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+        }
+        catch ( Exception ex )
+        {
+            ex.printStackTrace();
+        }
+
+        return responseInfo;
+    }
+    
+    private static ResponseInfo searchClientsByUIC( String cuic )
+    {
+        ResponseInfo responseInfo = null;
+        try
+        {
+            String url = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/HKIDYVsv1sr/data.json?var=cuic:" + cuic;
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+        }
+        catch ( Exception ex )
+        {
+            ex.printStackTrace();
+        }
+
+        return responseInfo;
+    }
+    
     // -----------------------------------------------------------------------------------------------------
     // Create JSON data
     // -----------------------------------------------------------------------------------------------------
