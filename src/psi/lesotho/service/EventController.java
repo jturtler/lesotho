@@ -261,9 +261,6 @@ public class EventController
 
             if ( responseInfo.responseCode == 200 )
             {
-                eventData.remove( "status" );
-                eventData.put( "status", "COMPLETED" );
-                
                 String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events/" + eventId;
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, eventData, null );
 
@@ -288,7 +285,7 @@ public class EventController
         try
         {
             String requestUrl = Util.LOCATION_DHIS_SERVER
-                + "/api/events.json?ouMode=ACCESSIBLE&skipPaging=true&trackedEntityInstance=" + clientId;
+                + "/api/events.json?ouMode=ACCESSIBLE&skipPaging=true&order=eventDate:DESC&trackedEntityInstance=" + clientId;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
         }
         catch ( Exception ex )

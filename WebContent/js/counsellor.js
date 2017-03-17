@@ -6,6 +6,7 @@ function Counsellor( storageObj, translationObj )
 	me.validationObj;
 	
 	me.dateFormat = "dd M yy";
+	me.dateTimeFormat = "YYYY-MM-DD HH:mm";
 	
 	me.todayCaseLinkTag = $("#todayCaseLink");
 	me.previousCaseLinkTag = $("#previousCaseLink");
@@ -101,8 +102,6 @@ function Counsellor( storageObj, translationObj )
 	me.PAGE_SEARCH_EDIT_CLIENT = "searchEditClient";
 	me.PAGE_COMSUMABLES = "Consumables";
 	me.PAGE_REPORT_PARAM = "reportParam";
-	me.PAGE_REPORT_CLIENT_RESULT = "reportClientResult";
-	me.PAGE_REPORT_EVENT_REPORT = "reportEventReport";
 	me.PAGE_SETTINGS = "settings";
 	me.PAGE_ABOUT = "about";
 	
@@ -150,15 +149,39 @@ function Counsellor( storageObj, translationObj )
 		var page = me.storageObj.getItem( "page" );
 		if( page ==  me.PAGE_TODAY_LIST )
 		{
-			me.listTodayCases();
+			me.listTodayCases(function(){
+				// RUN SUBPAGE
+
+				var subPage = me.storageObj.getItem( "subPage" );
+				if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
+				{
+					me.loadSearchSubPage( subPage );
+				}
+			});
 		}
 		else if( page ==  me.PAGE_PREVIOUS_LIST )
 		{
-			me.listPreviousCases();
+			me.listPreviousCases(function(){
+				// RUN SUBPAGE
+
+				var subPage = me.storageObj.getItem( "subPage" );
+				if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
+				{
+					me.loadSearchSubPage( subPage );
+				}
+			});
 		}
 		else if( page ==  me.PAGE_POSITIVE_LIST )
 		{
-			me.listPositiveCases();
+			me.listPositiveCases(function(){
+				// RUN SUBPAGE
+
+				var subPage = me.storageObj.getItem( "subPage" );
+				if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
+				{
+					me.loadSearchSubPage( subPage );
+				}
+			});
 		}
 		else if( page ==  me.PAGE_SEARCH_PARAM )
 		{
@@ -166,82 +189,7 @@ function Counsellor( storageObj, translationObj )
 		}
 		else if( page ==  me.PAGE_SEARCH_CLIENT_RESULT )
 		{
-			var clientSearch = JSON.parse( me.storageObj.getItem("param" ) ).attributes;
-			
-			// STEP 1. Populate data in "Search" form
-			
-			for( var i in clientSearch )
-			{
-				var attributeId = clientSearch[i].attribute;
-				var value = clientSearch[i].value;
-				
-				var inputTag = me.searchClientFormTag.find("[attribute='" + attributeId + "']");
-				if( inputTag.attr("isDate") == "true" )
-				{
-					value = Util.formatDate_LocalDisplayDate( value );
-				}
-				 
-				me.searchClientFormTag.find("[attribute='" + attributeId + "']").val(value);
-			}
-			
-			// STEP 2. Search clients by criteria
-			
-			me.runSearchClients();
-			
-			
-		}
-		else if( page ==  me.PAGE_SEARCH_ADD_CLIENT )
-		{
-			var clientSearch = JSON.parse( me.storageObj.getItem("param" ) ).attributes;
-			
-			// STEP 1. Populate data in "Search" form
-			
-			for( var i in clientSearch )
-			{
-				var attributeId = clientSearch[i].attribute;
-				var value = clientSearch[i].value;
-				
-				var inputTag = me.searchClientFormTag.find("[attribute='" + attributeId + "']");
-				if( inputTag.attr("isDate") == "true" )
-				{
-					value = Util.formatDate_LocalDisplayDate( value );
-				}
-				 
-				me.searchClientFormTag.find("[attribute='" + attributeId + "']").val(value);
-			}
-			
-			// STEP 2. Search clients by criteria
-			
-			me.runSearchClients( function(){
-
-				// STEP 3. Show "Add Client" form
-				me.showAddClientForm();
-			});
-			
-		}
-		else if( page ==  me.PAGE_SEARCH_EDIT_CLIENT )
-		{
-			var clientSearch = JSON.parse( me.storageObj.getItem("param" ) ).attributes;
-			
-			// STEP 1. Populate data in "Search" form
-			
-			for( var i in clientSearch )
-			{
-				var attributeId = clientSearch[i].attribute;
-				var value = jsonSearch[i].value;
-				me.searchClientFormTag.find("[attribute='" + attributeId + "']").val(value);
-			}
-			
-			// STEP 2. Search clients by criteria
-			
-			me.runSearchClients( function(){
-
-				var clientId = me.storageObj.getItem( "clientId" );
-				
-				// STEP 3. Show "Edit Client" form
-				loadClientDetails( clientId );
-				
-			});
+			me.loadSearchSubPage( me.storageObj.getItem( "subPage" ) );			
 		}
 		else if( page ==  me.PAGE_COMSUMABLES )
 		{
@@ -251,25 +199,6 @@ function Counsellor( storageObj, translationObj )
 		{
 			me.reportParamDivTag.show("fast");
 		}
-		else if( page ==  me.PAGE_REPORT_CLIENT_RESULT )
-		{
-			var cuic = me.storageObj.getItem( "cuic" );
-			me.getClientsByCUIC( cuic );
-		}
-		else if( page ==  me.PAGE_REPORT_EVENT_REPORT )
-		{
-			var cuic = me.storageObj.getItem( "cuic" );
-			
-			// STEP 1. Search clients by CUIC
-			me.getClientsByCUIC( cuic, function(){
-				
-				// STEP 2. Load "Event report" by CUIC
-				var eventId = me.storageObj.getItem( "eventId" );
-				var linkTag = me.reportClientResultTag.find("table > tbody").find("a[eventId='" + eventId + "']");
-				linkTag.click();
-			} );
-			
-		}
 		else if( page ==  me.PAGE_SETTINGS )
 		{
 			me.settingsDivTag.show("fast");
@@ -278,8 +207,59 @@ function Counsellor( storageObj, translationObj )
 		{
 			me.aboutDivTag.show("fast");
 		}
+		
 	};
 	
+	me.loadSearchSubPage = function( subPage )
+	{
+		if( me.storageObj.getItem("param" ) == "" )
+		{
+			var clientId = me.storageObj.getItem( "clientId" );
+			var eventId = me.storageObj.getItem( "eventId" );
+			
+			var rowTag = me.contentListTag.find("table").find("tr[clientId='" + clientId + "'][eventId='" + eventId + "']");
+			rowTag.click();
+		}
+		else
+		{
+			var clientSearch = JSON.parse( me.storageObj.getItem("param" ) ).attributes;
+			
+			// STEP 1. Populate data in "Search" form
+			
+			for( var i in clientSearch )
+			{
+				var attributeId = clientSearch[i].attribute;
+				var value = clientSearch[i].value;
+				var field = me.searchClientFormTag.find("[attribute='" + attributeId + "']");
+
+				if( field.attr("isDate") == "true" )
+				{
+					value = Util.formatDate_LocalDisplayDate( value );
+				}
+				field.val(value);
+			}
+			
+			// STEP 2. Search clients by criteria
+			
+			me.runSearchClients( function(){
+
+				if( subPage ==  me.PAGE_SEARCH_EDIT_CLIENT )
+				{
+					var clientId = me.storageObj.getItem( "clientId" );
+					var eventId = me.storageObj.getItem( "eventId" );
+					
+					// STEP 3.1. Show "Edit Client" form
+					me.loadClientDetails( clientId, eventId );
+				}
+				else if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT )
+				{
+					// STEP 3.2. Show "Add Client" form
+					me.showAddClientForm();
+				}
+				
+			});
+		}
+	}
 	// ----------------------------------------------------------------------------
 	// Set up Events
 	// ----------------------------------------------------------------------------
@@ -718,7 +698,7 @@ function Counsellor( storageObj, translationObj )
 			// STEP 2. Populate attribute-group name
 			
 			rowTag = $("<tr></tr>");
-			rowTag.append("<th colspan='2' style='font-weight:bold'>" + group.name + "</th>");
+			rowTag.append("<th colspan='2' style='font-weight:bold;'>" + group.name + "</th>");
 			table.append( rowTag );
 			
 			// STEP 3. Populate attributes in group
@@ -899,11 +879,55 @@ function Counsellor( storageObj, translationObj )
 					inputTag += "<option value='false'>No</option>";
 					inputTag += "</select>";
 				}
-				else if( de.valueType === "NUMBER")
+				else if( de.valueType === "TRUE_ONLY" )
 				{
-					inputTag = "<input number='true' class='form-control' dataelement='" + de.id + "'>"
+					inputTag = "<input type='checkbox' dataelement='" + de.id + "'>";
 				}
+				else if( de.valueType === "NUMBER" )
+				{
+					inputTag = "<input number='true' class='form-control' dataelement='" + de.id + "'>";
+				}
+				else if( de.valueType === "INTEGER" )
+				{
+					inputTag = "<input integer='true' class='form-control' dataelement='" + de.id + "'>";
+				}
+				else if( de.valueType === "INTEGER_POSITIVE" )
+				{
+					inputTag = "<input integerPositive='true' class='form-control' dataelement='" + de.id + "'>";
+				}
+				else if( de.valueType === "INTEGER_NEGATIVE")
+				{
+					inputTag = "<input integerNegative='true' class='form-control' dataelement='" + de.id + "'>";
+				}
+				else if( de.valueType === "INTEGER_ZERO_OR_POSITIVE"  )
+				{
+					inputTag = "<input integerZeroPositive='true' class='form-control' dataelement='" + de.id + "'>";
+				}
+				else if( de.valueType === "LONG_TEXT" )
+				{
+					inputTag = "<textarea class='form-control' dataelement='" + de.id + "'></textarea>";
+				}
+				else if( de.valueType === "LETTER" )
+				{
+					inputTag = "<input letter='true' class='form-control' dataelement='" + de.id + "'>";
+				}
+				else if( de.valueType === "DATE" )
+				{
+					inputTag = "<input isDate='true' class='form-control' dataelement='" + de.id + "'>";
+				}
+//				else if( de.valueType === "DATETIME" )
+//				{
+//					inputTag = "<input isDateTime='true' class='form-control' dataelement='" + de.id + "'>";
+//				}
+//				else if( de.valueType === "TIME" )
+//				{
+//					inputTag = "<input isTime='true' class='form-control' dataelement='" + de.id + "'>";
+//				}
+				
 				rowTag.append("<td>" + inputTag + "</td>");
+				
+				// Add "DATE" picker for "Date" field
+				Util.datePicker( rowTag.find("input[isDate='true']"), me.dateFormat );
 				
 				
 				table.append( rowTag );
@@ -1126,7 +1150,7 @@ function Counsellor( storageObj, translationObj )
 	// Load list of cases
 	// -------------------------------------------------------------------
 	
-	me.listTodayCases = function()
+	me.listTodayCases = function( exeFunc )
 	{
 		me.currentList = me.PAGE_TODAY_LIST;
 		me.storageObj.addItem("page", me.PAGE_TODAY_LIST);
@@ -1134,10 +1158,10 @@ function Counsellor( storageObj, translationObj )
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "todayCases_headerTitle" );
 		me.listDateTag.html( Util.getLastNDate(0) );
 		var headerList = ["Time", "Name", "Result", "What else?", "Indexed?"];
-		me.listCases( "../event/todayCases", headerList, "#cfe2f3", tranlatedHeaderText + " - ", true, false, true );
+		me.listCases( "../event/todayCases", headerList, "#cfe2f3", tranlatedHeaderText + " - ", true, false, true, exeFunc );
 	}
 		
-	me.listPreviousCases = function()
+	me.listPreviousCases = function( exeFunc )
 	{
 		me.currentList = me.PAGE_PREVIOUS_LIST;
 		me.storageObj.addItem("page", me.PAGE_PREVIOUS_LIST);
@@ -1145,10 +1169,10 @@ function Counsellor( storageObj, translationObj )
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "previousCases_headerTitle" );
 		me.listDateTag.html( "" );
 		var headerList = ["Date", "Name", "Result", "What else?", "Indexed?"];
-		me.listCases( "../event/previousCases", headerList, "#cfe2f3", tranlatedHeaderText, false, false, false );
+		me.listCases( "../event/previousCases", headerList, "#cfe2f3", tranlatedHeaderText, false, false, false, exeFunc );
 	}
 	
-	me.listPositiveCases = function()
+	me.listPositiveCases = function( exeFunc )
 	{
 		me.currentList = me.PAGE_POSITIVE_LIST;
 		me.storageObj.addItem("page", me.PAGE_POSITIVE_LIST);
@@ -1156,11 +1180,13 @@ function Counsellor( storageObj, translationObj )
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "positiveCases_headerTitle" );
 		me.listDateTag.html( "" );
 		var headerList = ["Date", "Name", "What else?", "???", "Referral ART closed?"];
-		me.listCases( "../event/positiveCases", headerList, "#cfe2f3", tranlatedHeaderText, false, true, false );
+		me.listCases( "../event/positiveCases", headerList, "#cfe2f3", tranlatedHeaderText, false, true, false, exeFunc );
 	}
 	
-	me.listCases = function( url, headerList, headerColor, headerText, isTime, isSpecialCase, showOrgUnitSelector )
+	me.listCases = function( url, headerList, headerColor, headerText, isTime, isSpecialCase, showOrgUnitSelector, exeFunc )
 	{
+		me.storageObj.removeItem("param" );
+		
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
 		
 		me.resetPageDisplay();
@@ -1200,6 +1226,8 @@ function Counsellor( storageObj, translationObj )
 							else {
 								me.populatePositiveCaseData( response.rows, tableTag, isTime, headerColor );
 							}
+							
+							if( exeFunc ) exeFunc();
 
 							// STEP 4. Show table
 							
@@ -1249,9 +1277,10 @@ function Counsellor( storageObj, translationObj )
 			{
 				var event = list[i];
 				var clientId = event[0];
-				var eventDate = event[1];
-				var fullName = event[2] + " " + event[3];
-				var deResult1 = event[4];
+				var eventId = event[1];
+				var eventDate = event[2];
+				var fullName = event[3] + " " + event[4];
+				var deResult1 = event[5];
 				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
 				if( isTime && eventDate !== "" )
@@ -1264,7 +1293,7 @@ function Counsellor( storageObj, translationObj )
 				}
 			
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
-				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "'></tr>");							
+				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
 				rowTag.append( "<td>" + eventDate + "</td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + deResult1 + "</td>" );
@@ -1298,10 +1327,11 @@ function Counsellor( storageObj, translationObj )
 			for( var i in list )
 			{
 				var event = list[i];
-				var clientId = event[0];	
-				var eventDate = event[1];
-				var fullName = event[2] + " " + event[3];
-				var deARTVal = event[4];
+				var clientId = event[0];
+				var eventId = event[1];	
+				var eventDate = event[2];
+				var fullName = event[3] + " " + event[4];
+				var deARTVal = event[5];
 				deARTVal = ( deARTVal !== "" ) ? "[None]" : deARTVal;
 				
 				
@@ -1316,7 +1346,7 @@ function Counsellor( storageObj, translationObj )
 				}
 				
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "positiveCaseList_msg_clickToOpenEditForm" );
-				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "'></tr>");										
+				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "'></tr>");										
 				rowTag.append( "<td>" + eventDate + "</td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td></td>" );
@@ -1339,8 +1369,9 @@ function Counsellor( storageObj, translationObj )
 			me.backToSearchClientResultBtnTag.hide();
 			me.backToCaseListBtnTag.show();
 			var clientId = rowTag.attr("clientId");
+			var eventId = rowTag.attr("eventId");
 			
-			me.loadClientDetails( clientId, function(){
+			me.loadClientDetails( clientId, eventId, function(){
 				me.resetPageDisplay();
 				me.addClientFormDivTag.show();
 			} );
@@ -1430,7 +1461,7 @@ function Counsellor( storageObj, translationObj )
 					dob = attrValue.value;
 					if( dob !== "" )
 					{
-						dob = Util.formatDate_DisplayDate(dob);
+						dob = Util.formatDate_LocalDisplayDate(dob);
 					}
 				}
 				else if( attrValue.attribute === me.attr_DistrictOB ){
@@ -1488,7 +1519,7 @@ function Counsellor( storageObj, translationObj )
 	
 	// Load Client details when a row in search result is clicked
 	
-	me.loadClientDetails = function( clientId, exeFunc ){
+	me.loadClientDetails = function( clientId, eventId, exeFunc ){
 
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
@@ -1505,7 +1536,8 @@ function Counsellor( storageObj, translationObj )
 						,success: function( response ) 
 						{		
 							me.storageObj.addItem( "clientId", clientId );
-							me.showUpdateClientForm( response );
+							me.storageObj.addItem( "eventId", eventId );
+							me.showUpdateClientForm( response, eventId );
 							if( exeFunc !== undefined ) exeFunc();
 						}
 						,error: function(response)
@@ -1621,24 +1653,39 @@ function Counsellor( storageObj, translationObj )
 								
 								// STEP 5. Create an empty event
 								
-								me.addEventClickHandle(function(){
-									
-									// STEP 6. Active "Client Attribute" Tab if the "status" mode is "Edit Client"
-									
-									if( me.saveClientBtnTag.attr("status") == "update" )
-									{
-										me.showTabInClientForm( me.TAB_NAME_CLIENT_ATTRIBUTE );
-									}
-									me.saveClientBtnTag.attr("status", "update");
-									
-									// STEP 7. Unblock form
-									
-									tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
-									MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
-									MsgManager.appUnblock();
-									alert(tranlatedText);
-								});
+//								me.addEventClickHandle(function(){
+//									
+//									// STEP 6. Active "Client Attribute" Tab if the "status" mode is "Edit Client"
+//									
+//									if( me.saveClientBtnTag.attr("status") == "update" )
+//									{
+//										me.showTabInClientForm( me.TAB_NAME_CLIENT_ATTRIBUTE );
+//									}
+//									me.saveClientBtnTag.attr("status", "update");
+//									
+//									// STEP 7. Unblock form
+//									
+//									tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
+//									MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
+//									MsgManager.appUnblock();
+//									alert(tranlatedText);
+//								});
+//								
 								
+								// STEP 5. Active "Client Attribute" Tab if the "status" mode is "Edit Client"
+								
+								if( me.saveClientBtnTag.attr("status") == "update" )
+								{
+									me.showTabInClientForm( me.TAB_NAME_CLIENT_ATTRIBUTE );
+								}
+								me.saveClientBtnTag.attr("status", "update");
+								
+								// STEP 6. Unblock form
+								
+								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
+								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
+								MsgManager.appUnblock();
+								alert(tranlatedText);
 								
 							}
 							,error: function(response)
@@ -1818,6 +1865,7 @@ function Counsellor( storageObj, translationObj )
 				
 				// Empty fields from "This Test" tab
 				me.thisTestDivTag.find("input,select").val("");
+				me.thisTestDivTag.find("input[type='checkbox']").prop("checked", false);
 				
 
 				// Show 'Save' event button AND show "This test" form
@@ -1840,221 +1888,6 @@ function Counsellor( storageObj, translationObj )
 		
 
 	};
-	
-
-	
-	// -------------------------------------------------------------------
-	// Report
-	// -------------------------------------------------------------------
-	
-	me.getClientsByCUIC = function( cuic, exeFunc )
-	{
-		
-		$.ajax(
-		{
-			type: "POST"
-			,url: "../client/searchByCUIC?cuic=" + cuic
-			,dataType: "json"
-            ,contentType: "application/json;charset=utf-8"
-            ,beforeSend: function( xhr ) {
-            	var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_msg_searching" );
-				MsgManager.appBlock( tranlatedText + " ..." );
-				
-				me.reportClientResultTag.hide();
-				me.reportClientResultTag.find("table > tbody").html("");
-				me.eventReportTag.find("[attribute]").html(" ");
-				me.eventReportTag.hide();
-            }
-			,success: function( response ) 
-			{
-				me.storageObj.addItem( "cuic", cuic );
-				me.storageObj.addItem("page", me.PAGE_REPORT_CLIENT_RESULT);
-				
-				var rows = response.rows;
-				for( var i in rows )
-				{
-					var rowData = rows[i];
-					
-					var clientId = rowData[0];
-					var firstName = rowData[1];
-					var lastName = rowData[2];
-					var dateOfBirth = rowData[3];
-					var districtOfBirth = rowData[4];
-					var birthOrder = rowData[5];
-					var educationalLevel = rowData[6];
-					var keyPopulation = rowData[7];
-					var gender = rowData[8];
-					
-					var eventList = rowData[9].split(", ");
-					
-					
-					var clientJsonData = {
-						"firstName" : firstName
-						,"lastName" : lastName
-						,"dateOfBirth" : Util.convertUTCDateToLocalDate( dateOfBirth )
-						,"districtOfBirth" : districtOfBirth
-						,"birthOrder" : birthOrder
-						,"educationalLevel" : educationalLevel
-						,"keyPopulation" : keyPopulation
-						,"gender" : gender
-					};
-					
-					var fullname = firstName + " " + lastName;
-					
-					// Add "Full name" row
-					var rowTag = $("<tr></tr>");
-					rowTag.append("<td rowspan='" + eventList.length + "'>" + fullname + "</td>");
-					
-					// Add "Event list" rows
-					for( var j in eventList )
-					{
-						var eventData = eventList[j].split("*");
-						var eventUid = eventData[0];
-						var eventDate = Util.formatDate_DisplayDateTime( eventData[1] );
-						
-						// Create the event column
-						var linkTag = $( "<a client='" + JSON.stringify( clientJsonData ) + "' href='#' eventId='" + eventUid + "' >" + eventDate + "</a>" );
-					 	var eventColTag = $("<td style='text-align: left;'></td>");
-					 	eventColTag.append(linkTag);
-					 	
-					 	// Add "Click" event for link tag
-						me.addEventForReportRow( linkTag );
-						
-						if( j == 0 )
-						{
-							rowTag.append( eventColTag );
-							me.reportClientResultTag.find("table > tbody").append( rowTag );
-						}
-						else
-						{
-							var eventRowTag = $("<tr></tr>");
-							eventRowTag.append( eventColTag );
-							
-							me.reportClientResultTag.find("table > tbody").append( eventRowTag );	
-						}				
-					}
-										
-					// Set CUIC for title
-					me.reportSearchKeyTag.html( cuic );
-					
-					if( exeFunc !== undefined ) exeFunc();
-				}
-			}
-			,error: function(response)
-			{
-				console.log(response);
-			}
-		}).always( function( data ) {
-			me.reportParamDivTag.hide();
-			me.reportClientResultTag.show("fast");
-			MsgManager.appUnblock();
-		});
-	};
-	
-	me.addEventForReportRow = function( eventLinkTag )
-	{
-		eventLinkTag.click(function()
-		{
-			var eventId = eventLinkTag.attr("eventId");
-			me.loadAndPopulateEventData( eventId, function(){
-				//
-				me.storageObj.addItem( "eventId", eventId );
-				me.storageObj.addItem("page", me.PAGE_REPORT_EVENT_REPORT);
-				
-				// Populate client data
-				me.populateReportClientData( eventLinkTag );
-				
-				// Show the "Event report" form
-				me.eventReportTag.show("fast");
-			});
-		})
-	};
-	
-	me.loadAndPopulateEventData = function( eventId, exeFunc )
-	{		
-		$.ajax(
-		{
-			type: "POST"
-			,url: "../event/details?eventId=" + eventId  
-			,beforeSend: function( xhr ) {
-            	var tranlatedText = me.translationObj.getTranslatedValueByKey( "report_msg_loadingEvent" );
-				MsgManager.appBlock( tranlatedText + " ..." );
-            }
-			,success: function( response ) 
-			{
-				var dataValues = response.dataValues;
-				for( var i in dataValues )
-				{
-					var deId = dataValues[i].dataElement;
-					var value = dataValues[i].value;
-					
-					// Populate data into the form
-					
-					me.eventReportTag.find( "[dataelement='" + deId+ "'][value='" + value + "']").html( "X" );
-				}
-				
-				exeFunc();
-			}
-			,error: function(response)
-			{
-				console.log(response);
-			}
-		}).always( function( data ) {
-			me.reportClientResultTag.hide();
-			me.eventReportTag.show("fast");
-			MsgManager.appUnblock();
-		});
-	};
-	
-	me.populateReportClientData = function( eventLinkTag )
-	{
-		me.reportClientResultTag.hide();
-		me.eventReportTag.hide("fast");
-		var eventId = eventLinkTag.closest("tr").attr("eventId");
-		
-		// Add selected attribute for the rowTag
-		me.reportClientResultTag.find("table > tbody").find("tr").attr( "selected", false );
-		rowTag.attr( "selected", true );
-		
-		
-		// Populate client data in report
-		var client = JSON.parse( eventLinkTag.attr( "client" ) );
-		
-		me.eventReportTag.find("[attribute='u57uh7lHwF8'][value='" + client.districtOfBirth + "']").html("X");
-		me.eventReportTag.find("[attribute='vTPYC9BXPNn'][value='" + client.birthOrder + "']").html("X");
-		
-		
-		me.eventReportTag.find("[id='firstName']").html( client.firstName );
-		me.eventReportTag.find("[id='surName']").html( client.lastName );
-		
-
-		var dateOfBirth = client.dateOfBirth;
-		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='0']").html( dateOfBirth.charAt(8) );
-		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='1']").html( dateOfBirth.charAt(9) );
-		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='2']").html( dateOfBirth.charAt(5) );
-		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='3']").html( dateOfBirth.charAt(6) );
-		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='4']").html( dateOfBirth.charAt(2) );
-		me.eventReportTag.find("[attribute='wSp6Q7QDMsk'][idx='5']").html( dateOfBirth.charAt(3) );
-		
-		
-		var cuic = me.reportCriteriaFormTag.find("[attribute='zRA08XEYiSF']").val();
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='0']").html( cuic.charAt(0) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='1']").html( cuic.charAt(1) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='2']").html( cuic.charAt(2) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='3']").html( cuic.charAt(3) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='4']").html( cuic.charAt(4) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='5']").html( cuic.charAt(5) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='6']").html( cuic.charAt(6) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='7']").html( cuic.charAt(7) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='8']").html( cuic.charAt(8) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='9']").html( cuic.charAt(9) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='10']").html( cuic.charAt(10) );
-		me.eventReportTag.find("[attribute='zRA08XEYiSF'][idx='11']").html( cuic.charAt(11) );
-		
-		me.eventReportTag.find("[attribute='Bs4zxQQ3EyB'][value='" + client.educationalLevel + "']").html( "X" );
-		me.eventReportTag.find("[attribute='CCVO6BZMrnp'][value='" + client.gender + "']").html( "X" );
-		me.eventReportTag.find("[attribute='Y35TizULMzg'][value='" + client.keyPopulation + "']").html( "X" );
-	}
 	
 	// -------------------------------------------------------------------
 	// Show / Hide forms
@@ -2115,7 +1948,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.showAddClientForm = function()
 	{
-		me.storageObj.addItem("page", me.PAGE_SEARCH_ADD_CLIENT);
+		me.storageObj.addItem("subPage", me.PAGE_SEARCH_ADD_CLIENT);
 		
 		me.resetPageDisplay();
 		me.showOrgUnitWarningMsg();
@@ -2145,6 +1978,7 @@ function Counsellor( storageObj, translationObj )
 			var attrId = $(this).attr("attribute");
 			var value = $(this).val();
 			var field = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']");
+			
 			field.val( value );
 		});
 		
@@ -2163,9 +1997,9 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-	me.showUpdateClientForm = function( data )
+	me.showUpdateClientForm = function( data, selectedEventId )
 	{
-		me.storageObj.addItem("page", me.PAGE_SEARCH_EDIT_CLIENT);
+		me.storageObj.addItem("subPage", me.PAGE_SEARCH_EDIT_CLIENT);
 		
 		// Change the Header title && 'Save' buton display name
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_editClient" );
@@ -2213,7 +2047,7 @@ function Counsellor( storageObj, translationObj )
 			var inputTag = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']");
 			if( inputTag.attr("isDate") === "true" && value != "" )
 			{
-				value = Util.formatDate_DisplayDate( value );
+				value = Util.formatDate_LocalDisplayDate( value );
 			}
 			
 			if( inputTag.attr("type") == "checkbox" )
@@ -2231,36 +2065,40 @@ function Counsellor( storageObj, translationObj )
 		// STEP 2. Populate Event data in "Previous Test" and find out the activeEvent if any
 		// ---------------------------------------------------------------------------------------
 		
-		var activeEvent;
+		var cuic = me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']").val();
 		
 		var events = data.events.events;
+		var activeEvent;
 		var report = me.previousTestsTag.find("table")
 		report.html("");
 		me.addEventFormTag.find("input,select").val("");
 		
-		
 		for( var i=0; i<events.length; i++ )
 		{
 			var event = events[i];
+			var dataValues = event.dataValues;
+			var eventId = event.event;
+			
 			if( event.status == "ACTIVE" )
 			{
 				activeEvent = event;
 			}
-			
 			else
 			{
-				var dataValues = event.dataValues;
-				var eventId = event.event;
-				
 				// STEP 2.1. Create header for one event
-				
+						
 				tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );				
 				var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
-				headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTime( event.eventDate ) + "</th>");
+
+				var clientDataStr = JSON.stringify( clientDetails );
+				var url = 'event.html?eventid=' + event.event;
+				var onclickEvent="window.open(\"" + url + "\",\"Event Report\",\"width=400,height=500\");"
+				headerTag.append("<th colspan='2'>"
+						+ "<img style='float:left' class='arrowRightImg showHide' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTime( event.eventDate ) 
+						+ " <a onclick='" + onclickEvent + "' href='#' ><img style='float:right;' src='../images/print.png'></a> </th>");
 				
 				
 				// STEP 2.2. Create tbody to display data values of an event
-	
 				
 				var tbody = me.createSectionEmtyTable( eventId );
 				tbody.prepend( headerTag );
@@ -2271,15 +2109,24 @@ function Counsellor( storageObj, translationObj )
 				for( var j in dataValues )
 				{
 					var dataValue = dataValues[j];
+					var deId = dataValue.dataElement;
 					var value = dataValue.value;
-					if( value == "true" ) {
-						value = "Yes";
-					}
-					else if( value == "false" )
+					
+					var inputTag = me.thisTestDivTag.find("input[dataElement='" + deId + "'],select[dataElement='" + deId + "']");
+					if( inputTag.prop("tagName") == "SELECT" )
 					{
-						value = "No";
+						value = inputTag.find("option[value='" + value + "']").text();
 					}
-					tbody.find("td[dataElement='" + dataValue.dataElement + "']").html( value );
+					else if( inputTag.attr("isDate") === "true" && value != "" )
+					{
+						value = Util.formatDate_LocalDisplayDate( value );
+					}
+					else if( inputTag.attr("type") == "checkbox" )
+					{
+						value = "Yes"
+					}
+					
+					tbody.find("td[dataElement='" + deId + "']").html( value );
 				}
 				
 				// STEP 2.4. Add event for Header row
@@ -2289,27 +2136,43 @@ function Counsellor( storageObj, translationObj )
 		}
 	
 
-		// STEP 3. Show the first table in report if any
-
+		// STEP 3. Check to display "Previous Test"
+		
 		if( report.find("tbody").length > 0 )
 		{
-			report.find('tbody:first tr[eventId]').click();
+			// Show selectedEvent in PreviousTest if any
+			if( selectedEventId !== undefined )
+			{
+				report.find('tbody tr[eventId="' + selectedEventId + '"]').find("img.showHide").click();
+			}
+			else
+			{
+				report.find('tbody:first tr[eventId]').find("img.showHide").click();
+			}
+			
 			me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
 		}
 		else
 		{
 			me.hideTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
 		}
-		
-		
-		
+				
 		// ---------------------------------------------------------------------------------------
 		// STEP 4. Populate activeEvent as attribute for the 'This test' form
 		// ---------------------------------------------------------------------------------------
+
+		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 		
 		if( activeEvent !== undefined )
-		{
-			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
+		{	
+			if( activeEvent.status == "ACTIVE" ) {
+				me.completedEventBtnTag.show();
+			}
+			else
+			{
+				me.completedEventBtnTag.hide();
+			}
+			
 			var eventId = activeEvent.event;
 			me.addClientFormTabTag.attr( "eventId", eventId );			
 			me.addClientFormTabTag.attr( "event", JSON.stringify( activeEvent ) );
@@ -2320,7 +2183,20 @@ function Counsellor( storageObj, translationObj )
 			for( var i in activeEvent.dataValues )
 			{
 				var dataValue = activeEvent.dataValues[i];
-				me.addEventFormTag.find("[dataElement='" + dataValue.dataElement + "']").val( dataValue.value );
+				var inputTag = me.addEventFormTag.find("[dataElement='" + dataValue.dataElement + "']");
+				if( inputTag.attr("type") == "checkbox" )
+				{
+					inputTag.prop("checked", dataValue.value );
+				}
+				else if( inputTag.attr("isDate") == "true" )
+				{
+					inputTag.prop("checked", dataValue.value );
+				}
+				else
+				{
+					inputTag.val( dataValue.value );
+				}
+				
 			}
 			
 			if( activeEvent.dataValues.length == 0 ){
@@ -2337,8 +2213,6 @@ function Counsellor( storageObj, translationObj )
 			me.saveEventBtnTag.attr("status", "add" );
 		}
 
-		
-
 		// ---------------------------------------------------------------------------------------
 		// STEP 4. Populate clientId as attribute for the form
 		// ---------------------------------------------------------------------------------------
@@ -2346,17 +2220,39 @@ function Counsellor( storageObj, translationObj )
 		var clientId = data.client.trackedEntityInstance;
 		me.addClientFormTabTag.attr( "clientId", clientId );
 		me.addClientFormTabTag.attr( "client", JSON.stringify( data.client ) );
+		
 
+		// ---------------------------------------------------------------------------------------
+		// STEP 5. Show "This Test" / "Previous Test" tab if there is a "seleted event id"
+		// ---------------------------------------------------------------------------------------
+		
+		
+		if( selectedEventId !== undefined  )
+		{
+			if( activeEvent !== undefined && activeEvent.event == selectedEventId )
+			{
+				me.addClientFormTabTag.tabs("option", "selected", 2);
+			}
+			else
+			{
+				me.addClientFormTabTag.tabs("option", "selected", 1);
+			}
+			
+		}
+		else
+		{
+			me.addClientFormTabTag.tabs("option", "selected", 0);
+		}
+		
+		
 		// ---------------------------------------------------------------------------------------
 		// STEP 5. Show form
 		// ---------------------------------------------------------------------------------------
-
-		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
-		me.addClientFormTabTag.tabs("option", "selected", 0);
+		
 		me.addClientFormDivTag.show("fast");
 		
 	};
-
+	
 	
 	// Create a tbody with sections of programs. This one is used for generating history of events of a client
 	
@@ -2367,7 +2263,7 @@ function Counsellor( storageObj, translationObj )
 		for( var i in me.sectionList )
 		{
 			rowTag = $("<tr style='display:none;'></tr>");
-			rowTag.append("<td colspan='2' style='font-weight:bold'>" + me.sectionList[i].displayName + "</td>");
+			rowTag.append("<td colspan='2' style='font-weight:bold;background-color:#dde2e6;'>" + me.sectionList[i].displayName + "</td>");
 			tbody.append( rowTag );
 			
 			var deList = me.sectionList[i].programStageDataElements;
@@ -2390,12 +2286,17 @@ function Counsellor( storageObj, translationObj )
 	
 	me.setUp_PreviousTestHeaderEvent = function( headerTag, report )
 	{
-		headerTag.click(function(){
+		// --------------------------------------------------------------
+		// Set up to Show/Hide event data in "Previous" TAB
+		// --------------------------------------------------------------
+		
+		var imgTag = headerTag.find("img.showHide");
+		
+		imgTag.click(function(){
 			
 			// STEP 1. Display table of selected header
 			
-			var imgTag = $(this).find("img");
-			var eventId = $(this).attr("eventId");
+			var eventId = headerTag.attr("eventId");
 			var tbodyTag = report.find("tbody[eventId='" + eventId + "']");
 			var closed = imgTag.hasClass("arrowRightImg");
 			
@@ -2404,17 +2305,17 @@ function Counsellor( storageObj, translationObj )
 			report.find("tr:not([header])").hide();
 			
 			var allHeaderTags = report.find("tbody tr[header]");
-			allHeaderTags.find("img").attr( "src", "../images/tab_right.png" );
-			imgTag.removeClass('arrowDownImg');
-			imgTag.addClass('arrowRightImg');
+			allHeaderTags.find("img.showHide").attr( "src", "../images/tab_right.png" );
+			allHeaderTags.find("img.showHide").addClass('arrowRightImg');
+			allHeaderTags.find("img.showHide").removeClass('arrowDownImg');
 			
 			// STEP 3. Open the selected event
 			
 			if( closed )
 			{
-				imgTag.removeClass('arrowRightImg');
-				imgTag.addClass('arrowDownImg');
 				imgTag.attr( "src", "../images/down.gif" );
+				imgTag.addClass('arrowDownImg');
+				imgTag.removeClass('arrowRightImg');
 				tbodyTag.find("tr").show("fast");
 			}
 			else
@@ -2425,6 +2326,13 @@ function Counsellor( storageObj, translationObj )
 		});
 
 	};
+	
+	// Set event for "Previous Test" row
+	
+	me.setupEvent_PreviousHeader = function( imgTag )
+	{
+		
+	}
 	
 	// Show the result after searching clients
 	

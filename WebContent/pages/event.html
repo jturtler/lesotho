@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1.0">
+<title>LS - Discovery & Design</title>
+
+<meta name="viewport" content="initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="TZ eReferrals">
+<meta name="apple-mobile-web-app-title" content="TZ eReferrals">
+<link rel="icon" href="../images/appIcon.jpg">
+<link rel="apple-touch-icon" href="../images/appIcon.jpg">
+<link rel="apple-touch-icon-precomposed" href="../images/appIcon.jpg" />
+
+<link rel="stylesheet" href="../css/jQuery/jquery-ui.css">
+
+<script src="../js/jQuery/jquery-1.11.1.min.js"></script>
+<script src="../js/jQuery/jquery-ui.min.js"></script>
+<script src="../js/jQuery/jquery.dateFormat-1.0.js"></script>
+<script src="../js/jQuery/jquery.blockUI.js" type="text/javascript"></script>
+<script src="../js/jQuery/jquery.tablesorter.min.js" type="text/javascript"></script>
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link type="text/css" rel="stylesheet" media="screen" href="../css/style.css" />
+
+<script src="../js/utils/lesotho_utils.js"></script>
+<script src="../js/utils/lesotho_storage.js"></script>
+<script src="../js/utils/lesotho_translation.js" type="text/javascript"></script>
+<script src="../js/utils/lesotho_validation.js"></script>
+<script src="../js/utils/lesotho_menu.js"></script>
+<script src="../js/utils/lesotho_commons.js"></script>
+<script src="../js/lesotho_app.js" type="text/javascript"></script>
+<script src="../js/eventReport.js"></script>
+
+</head>
+<body>
+	
+	<div id="eventReport" class="event-div">
+		<h3>Event report</h3>
+		
+		<div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td colspan="6" class="t1">COUNSELLOR CODE</th>
+						<td colspan="4" class="t1">DEMOGRAPHICS</th>
+					</tr>
+					<tr>
+						<td rowspan="2" class="inputType1"></td>
+						<td rowspan="2" class="inputType1"></td>
+						<td rowspan="2" class="inputType1"></td>
+						<td rowspan="2" class="inputType1"></td>
+						<td rowspan="2" class="inputType1"></td>
+						<td rowspan="2" class="inputType1"></td>
+						<td class="demographicsSubtitles t2">District</td>
+						<td></td>
+						<td class="demographicsSubtitles t2">Council</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td colspan="1" class="demographicsSubtitles t2">Village</td>
+						<td colspan="3"></td>
+					</tr>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td class="dateofBirth t2">Date of Birth</td>
+						<td class="inputType1" attribute='wSp6Q7QDMsk' idx="0"></td>
+						<td class="inputType1" attribute='wSp6Q7QDMsk' idx="1"></td>
+						<td class="inputType1" attribute='wSp6Q7QDMsk' idx="2"></td>
+						<td class="inputType1" attribute='wSp6Q7QDMsk' idx="3"></td>
+						<td class="inputType1" attribute='wSp6Q7QDMsk' idx="4"></td>
+						<td class="inputType1" attribute='wSp6Q7QDMsk' idx="5"></td>
+						<td rowspan="3" class="districtofBirth t2">District of Birth</td>
+						<td rowspan="3" class="fnt">
+						[<span attribute='u57uh7lHwF8' value="Berea" class="crossCheck"></span>]01. Berea 
+						[<span attribute='u57uh7lHwF8' value="Butha Buthe" class="crossCheck"></span>]02. Butha Buthe 
+						[<span attribute='u57uh7lHwF8' value="Leribe" class="crossCheck"></span>]03. Leribe 
+						[<span attribute='u57uh7lHwF8' value="Mafeteng" class="crossCheck"></span>]04. Mafeteng 
+						[<span attribute='u57uh7lHwF8' value="Maseru" class="crossCheck"></span>]05. Maseru 
+						[<span attribute='u57uh7lHwF8' value="Mohale&lsquo;s Hoek" class="crossCheck"></span>]06. Mohale&lsquo;s Hoek 
+						[<span attribute='u57uh7lHwF8' value="Mokhotlong" class="crossCheck"></span>]07. Mokhotlong
+						[<span attribute='u57uh7lHwF8' value="Qacha&lsquo;s Nek" class="crossCheck"></span>]08. Qacha&lsquo;s Nek 
+						[<span attribute='u57uh7lHwF8' value="Quthing" class="crossCheck"></span>]09. Quthing 
+						[<span attribute='u57uh7lHwF8' value="Thaba Tseka" class="crossCheck"></span>]10. Thaba Tseka 
+						[<span attribute='u57uh7lHwF8' value="South Africa" class="crossCheck"></span>]11. South Africa 
+						[<span attribute='u57uh7lHwF8' value="Abroad" class="crossCheck"></span>]12. Abroad</td>
+					</tr>
+					<tr>
+						<td colspan="1" class="gender t2">Gender</td>
+						<td colspan="3" class="fnt">[<span attribute="CCVO6BZMrnp" value="Male" class="crossCheck"></span>]Male<br></td>
+						<td colspan="3" class="fnt">[<span attribute="CCVO6BZMrnp" value="Female" class="crossCheck"></span>]Female<br></td>
+					</tr>
+					<tr>
+						<td class="firstName t2">First Name</td>
+						<td colspan="6" id="firstName"></td>
+					</tr>
+					<tr>
+						<td class="t2">Surname</td>
+						<td colspan="6" id="surName"></td>
+						<td class="t2">Birth Order</td>
+						<td class="fnt">
+						[<span attribute="vTPYC9BXPNn" value='1' class="crossCheck"></span>]01 
+						[<span attribute="vTPYC9BXPNn" value='2' class="crossCheck"></span>]02 
+						[<span attribute="vTPYC9BXPNn" value='3' class="crossCheck"></span>]03 
+						[<span attribute="vTPYC9BXPNn" value='4' class="crossCheck"></span>]04 
+						[<span attribute="vTPYC9BXPNn" value='5' class="crossCheck"></span>]05 
+						[<span attribute="kEDRehdPMKG" value='true' class="crossCheck"]></span>]00 if twin or triplet</td>
+					</tr>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td class="uic">CLIENT UIC</td>
+						<td attribute="zRA08XEYiSF" idx="0" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="1" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="2" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="3" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="4" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="5" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="6" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="7" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="8" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="9" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="10" class="inputType1"></td>
+						<td attribute="zRA08XEYiSF" idx="11" class="inputType1"></td>
+					</tr>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td colspan="10" class="t1">CLIENT INFORMATION</td>
+					</tr>
+					<tr>
+						<td class="educationallevelattained t2">Educational level attained</td>
+						<td colspan="6" class="fnt">
+						[<span attribute="Bs4zxQQ3EyB" value="LS_EDU0" class="crossCheck"></span>]None 
+						[<span attribute="Bs4zxQQ3EyB" value="LS_EDU1" class="crossCheck"></span>]Primary 
+						[<span attribute="Bs4zxQQ3EyB" value="LS_EDU2" class="crossCheck"></span>]Secondary 
+						[<span attribute="Bs4zxQQ3EyB" value="LS_EDU3" class="crossCheck"></span>]Tertiary</td>
+					</tr>
+					<tr>
+						<td class="t2" rowspan="3">Key Population</td>
+						<td colspan="6" class="fnt">
+							[<span attribute="Y35TizULMzg" value="Sex worker/ ex-sex worker" class="crossCheck"></span>]Sex worker/ ex-sex worker
+							[<span attribute="Y35TizULMzg" value="Miner/ ex-miner" class="crossCheck"></span>]Miner/ ex-miner
+						</td>
+					</tr>
+					<tr>
+						<td colspan="6" class="fnt">
+							[<span attribute="Y35TizULMzg" value="MSM" class="crossCheck"></span>]MSM
+							[<span attribute="Y35TizULMzg" value="Factory/ ex-factory worker" class="crossCheck"></span>]Factory/ ex-factory worker
+						</td>	
+					</tr>
+					<tr>
+						<td colspan="3" class="fnt">
+							[<span attribute="Y35TizULMzg" value="OVC ? double (17yrs or less) " class="crossCheck"></span>]OVC ? double (17yrs or less) 
+						</td>	
+					</tr>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tbody>
+						<tr>
+							<td colspan="9" class="t1">PREVIOUS HIV TEST BEFORE JOINING NS</td>
+						</tr>
+						<tr>
+							<td rowspan="2" class="testedHIVresult t2">Ever tested for HIV and received the result</td>
+							<td colspan="3" rowspan="2" class="testedHIVresultSon fnt">[]Yes</td>
+							<td colspan="3" rowspan="2" class="testedHIVresultSon fnt">[]No</td>
+							<td rowspan="4" class="rpreviousHIVtest t2">Result of previous HIV test</td>
+							<td class="rpreviousHIVtestSon fnt">[<span dataelement="UuKat0HFjWS" value="Negative" class="crossCheck"></span>]Negative</td>
+						</tr>
+						<tr>
+							<td class="rpreviousHIVtestSon fnt">[<span dataelement="UuKat0HFjWS" value="Positive" class="crossCheck"></span>]Positive</td>
+						</tr>
+						<tr>
+							<td rowspan="1" class="daterecentHIVtest t2">Date of most recent HIV test</td>
+							<td rowspan="1" class="inputType1" dataelement="mostRecentHIVTestDate" idx="0"></td>
+							<td rowspan="1" class="inputType1" dataelement="mostRecentHIVTestDate" idx="1"></td>
+							<td rowspan="1" class="inputType1" dataelement="mostRecentHIVTestDate" idx="2"></td>
+							<td rowspan="1" class="inputType1" dataelement="mostRecentHIVTestDate" idx="3"></td>
+							<td rowspan="1" class="inputType1" dataelement="mostRecentHIVTestDate" idx="4"></td>
+							<td rowspan="1" class="inputType1" dataelement="mostRecentHIVTestDate" idx="5"></td>
+							<td class="rpreviousHIVtestSon fnt">[<span dataelement="UuKat0HFjWS" value="Indeterminate" class="crossCheck"></span>]Indeterminate</td>
+						</tr>
+						
+					</tbody>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td colspan="13" class="t1">TODAY’S TEST</td>
+					</tr>
+					<tr>
+						<td class="dateofHIVtestTT t2">Date of HIV test</td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="cType t2">Client Type</td>
+						<td class="fnt">[]Individual []Couple</td>
+						<td class="age t2">Age (years)</td>
+						<td class="inputType1 fnt"></td>
+					</tr>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td rowspan="2" class="Tchannel t2">Testing channel</td>
+						<td class="ind fnt">[]Index<br/>[]VCT</td>
+						<td class="newStarM fnt">[]New Start/Mobile<br/>[]Home- based</td>
+						<td colspan="2" class="Cpartner t2">If Couple, partner</td>
+						<td class="inputType1 fntb">UIC</td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+						<td class="inputType1"></td>
+					</tr>
+					<tr>
+						<td colspan="2" class="Ochannel fnt">Other testing channel</td>
+						<td class="inputType1"></td>
+						<td class="employment t2">Employment status</td>
+						<td colspan="10" class="inputType1 fnt">[]Employed/Self-employed []Student []Unemployed</td>
+					</tr>
+					<tr>
+						<td rowspan="5" colspan="3" class="t2">What made you decide<br/>to get tested for HIV today</td>
+						<td colspan="6" class="fnt">[]Index</td>
+						<td colspan="6" class="fnt">[]Partner notification</td>
+					</tr>
+					<tr>
+						<td colspan="6" class="fnt">[]Self-motivated</td>
+						<td colspan="6" class="fnt">[]Other friends or relatives (not index testing)</td>
+					</tr>
+					<tr>
+						<td colspan="6" class="fnt">[]PSI field agent/New Start staff</td>
+						<td colspan="6" class="fnt">[]Radio/TV</td>
+					</tr>
+					<tr>
+						<td colspan="6" class="fnt">[]Other health worker</td>
+						<td colspan="6" class="fnt">[]Billboard/Poster</td>
+					</tr>
+					<tr>
+						<td colspan="6" class="fnt">[]Positive self-test</td>
+						<td colspan="6" class="fnt">[]Other:</td>
+					</tr>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td colspan="6" class="t1">NON-COMMUNICABLE DISEASES</td>
+					</tr>
+					<tr>
+						<td class="t3">Height (m)</td>
+						<td class="t3">Weight (kg)</td>
+						<td class="t3">BMI</td>
+						<td colspan="2" class="t3">Blood Pressure (mmHg)</td>
+						<td class="t3">Glucose</td>
+					</tr>
+					<tr>
+						<td class="inputType2"></td>
+						<td class="inputType2"></td>
+						<td class="inputType2"></td>
+						<td class="inputType2 fnt">S</td>
+						<td class="inputType2 fnt">D</td>
+						<td class="inputType2"></td>
+					</tr>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td colspan="7" class="t1">RISK ASSESSMENT</td>
+					</tr>
+					<tr>
+						<td class="Risk1 t2">Pregnant/breastfeeding (client or partner)</td>
+						<td class="Riskyn fnt">[]Yes</td>
+						<td class="Riskyn fnt">[]No</td>
+						<td class="STI t2">STI screening</td>
+						<td class="STIop1 fnt">[]Circumcised</td>
+						<td colspan="2" class="STIop2 fnt">[]Genital sores or discharge</td>
+					</tr>
+					<tr>
+						<td class="Risk1 t2">Does your partner know his/her HIV status?</td>
+						<td class="fnt">[]Yes</td>
+						<td class="fnt">[]No</td>
+						<td colspan="3" class="t2">Number of sexual partners in last 6 months</td>
+						<td class="inputType1"></td>
+					</tr>
+					<tr>
+						<td class="Risk1 t2">If yes, what’s your partner HIV status?</td>
+						<td colspan="6" class="fnt">[]HIV+ []HIV - []Does not want to disclose</td>
+					</tr>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td colspan="5" class="t1">HIV TEST</td>
+					</tr>
+					<tr>
+						<td class="hivtR1 t3">T1:result</td>
+						<td class="hivtR1 t3">T2:result</td>
+						<td class="hivtR1 t3">T3:Parallel 1/2</td>
+						<td class="hivtR1 t3">T3:Parallel 2/2</td>
+						<td class="hivtR1 t3">T4:SD bioline</td>
+					</tr>
+					<tr>
+						<td class="fnt">[<span dataelement="choHDFxMCaU" value="Negative"></span>]Negative</td>
+						<td class="fnt">[<span dataelement="KDnhSz51HKS" value="Negative"></span>]Negative</td>
+						<td class="fnt">[<span dataelement="rMh4ZGNzrh1" value="Negative"></span>]Negative</td>
+						<td class="fnt">[<span dataelement="Bqff4skvt4d" value="Negative"></span>]Negative</td>
+						<td class="fnt">[<span dataelement="M11JqgkJt2X" value="Negative"></span>]Negative</td>
+					</tr>
+					<tr>
+						<td class="fnt">[<span dataelement="choHDFxMCaU" value="Positive"></span>]Positive</td>
+						<td class="fnt">[<span dataelement="KDnhSz51HKS" value="Positive"></span>]Positive</td>
+						<td class="fnt">[<span dataelement="rMh4ZGNzrh1" value="Positive"></span>]Positive</td>
+						<td class="fnt">[<span dataelement="Bqff4skvt4d" value="Positive"></span>]Positive</td>
+						<td class="fnt">[<span dataelement="M11JqgkJt2X" value="Positive"></span>]Positive</td>
+					</tr>
+					<tr>
+						<td colspan="3" class="t3">Final Result</td>
+						<td class="t3">Test results given</td>
+						<td class="t3">Invalid tests</td>
+					</tr>
+					<tr>
+						<td colspan="3" class="fnt">
+						[<span dataelement="UuKat0HFjWS" value="Negative"></span>]Negative 
+						[<span dataelement="UuKat0HFjWS" value="Positive"></span>]Positive 
+						[<span dataelement="UuKat0HFjWS" value="Indeterminate"></span>]Indeterminate</td>
+						<td class="fnt">[]Yes []No</td>
+						<td class="fnt">[]Yes []No</td>
+					</tr>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td colspan="8" class="t1">REFERRALS & PRODUCT DISTRIBUTION</td>
+					</tr>
+					<tr>
+						<td class="t2">Referral was offered?</td>
+						<td class="fnt">[]Yes []No</td>
+						<td rowspan="2" class="t2">Referrals offered to</td>
+						<td class="fnt">[]STI diagnosis/treatment</td>
+						<td colspan="2" class="fnt">[]ART</td>
+						<td colspan="2" class="fnt">[]VMMC</td>
+					</tr>
+					<tr>
+						<td class="t2">TB screening conducted</td>
+						<td class="fnt">[]Yes []No</td>
+						<td class="fnt">[]TB diagnosis/treatment</td>
+						<td colspan="2" class="fnt">[]FP</td>
+						<td colspan="2" class="fnt">[]PreP (HIV-)</td>
+					</tr>
+					<tr>
+						<td class="t2">TB suspected</td>
+						<td class="fnt">[]Yes []No</td>
+						<td class="t2">Name of referral facility</td>
+						<td colspan="5"></td>
+					</tr>
+				</table>
+			</div>
+			<div style="text-align:center;">
+				<table>
+					<tr>
+						<td class="Pdistributed t2">Products distributed</td>
+						<td class="fnt">Female condoms</td>
+						<td class="inputType1"></td>
+						<td class="fnt">Male condoms</td>
+						<td class="inputType1"></td>
+						<td class="fnt">Lube</td>
+						<td class="inputType1"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	
+		<div class="form-group" style="text-align:center;padding-top:20px;padding-bottom:20px;">
+			<button class="btn btn-default actionBtn" keyword="statistics_eventReport_btn_back" id="reportClientResultBackBtn">Back</button>
+		</div>
+	</div>
+		
+	
+</body>
+
+
+<script>
+	
+	$( document ).ready()
+	{
+		new EventReport();
+	}
+	
+</script>
+
+</html>

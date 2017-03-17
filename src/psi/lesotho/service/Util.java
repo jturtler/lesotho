@@ -67,6 +67,9 @@ public final class Util
     public static final String USER_CATEGORY_PIN_ATRIBUTE_ID = "WgOzQa7KDTV";
     
 
+    public static final String CLIENT_ATTR_ID_CUIC = "zRA08XEYiSF";
+    
+
     public static final String KEY_TODAY_CASES = "todayCases";
     public static final String KEY_PREVIOUS_CASES = "previousCases";
     public static final String KEY_POSITIVE_CASES = "positiveCases";
@@ -75,7 +78,9 @@ public final class Util
     public static final String KEY_CLIENT_DETAILS = "details";
     public static final String KEY_METADATA_ALL = "all";
     public static final String KEY_METADATA_OULIST = "ouList";
-    public static final String KEY_SAVE_EVENT = "save";  
+    public static final String KEY_SAVE_EVENT = "save"; 
+    public static final String KEY_SEARCH_CUIC = "searchByCUIC";
+    public static final String KEY_GET_EVENT_DETAILS = "details";
     
 
     public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "98319";

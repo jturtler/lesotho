@@ -97,7 +97,7 @@ Util.getLastNDate = function( noDays )
 	var date = new Date();
     date.setDate(date.getDate() - noDays);
     
-    return Util.formatDate_DisplayDateInWeek( Util.convertLocalTime(date) );
+    return Util.formatDate_DisplayDateInWeek( Util.convertLocalTimeToUTM(date) );
 };
 
 
@@ -160,7 +160,10 @@ Util.formatDate_DisplayDateTime = function( dateStr )
 	var dayInMonth = date.getDate();
 		
 	var hours = date.getHours();
+	hours = ( hours < 10 ) ? "0" + hours : "" + hours;
+	
 	var minutes = date.getMinutes();
+	minutes = ( minutes < 10 ) ? "0" + minutes : "" + minutes;
 	
 	return dayInMonth + " " + Util.MONTHS[month] + " " + year + " " + hours + ":" + minutes;
 };
@@ -189,11 +192,14 @@ Util.formatTimeInDateTime = function( dateTimeStr )
 	var minutes = date.getMinutes();
 
 	var subfix = "";
-	
 	if( hours > 12 )
 	{
 		hours = ( hours - 12 );
-		subfix = "pm"
+		subfix = "pm";
+	}
+	else if( hours == 12 && minutes > 0 )
+	{
+		subfix = "pm";
 	}
 	else
 	{
@@ -203,7 +209,7 @@ Util.formatTimeInDateTime = function( dateTimeStr )
 	hours = ( hours < 10 ) ? "0" + hours : "" + hours;
 	minutes = ( minutes < 10 ) ? "0" + minutes : "" + minutes;
 	
-	return hours + ":" + minutes + subfix;
+	return hours + ":" + minutes + " " + subfix;
 };
 
 Util.convertUTCDateToLocalDate = function( serverdate ) {
@@ -213,31 +219,21 @@ Util.convertUTCDateToLocalDate = function( serverdate ) {
 	var hour = serverdate.substring( 11, 13);
 	var minute = serverdate.substring( 14, 16 );
 	var second = serverdate.substring( 17, 19 );
-	
 	var date = new Date( year, month, day, hour, minute, second );
-    var newDate = new Date( date.getTime() + date.getTimezoneOffset()*60*1000 );
-
-    var offset = date.getTimezoneOffset() / 60;
-    var hours = date.getHours();
-
-    newDate.setHours(hours - offset);
-
-    return newDate;   
-};
-
-Util.convertLocalTime = function( date )
-{
-	var year = date.getUTCFullYear();
-	var month = date.getUTCMonth();
-	var dateInMonth = date.getUTCDate();
-
-	var hours = date.getUTCHours();
-	var minutes = date.getUTCMinutes();
-	var seconds = date.getUTCSeconds()
 	
-	return new Date( year, month, dateInMonth, hours, minutes, seconds );
+	var newDate = new Date(date);
+    newDate.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return newDate;
 };
 
+
+Util.convertLocalTimeToUTM = function( localDate )
+{
+	var newDate = new Date(localDate);
+    newDate.setMinutes(localDate.getMinutes() + localDate.getTimezoneOffset());
+    return newDate;
+    
+}  
 
 Util.datePicker = function( dateTag, dateFormat )
 {
@@ -251,6 +247,14 @@ Util.datePicker = function( dateTag, dateFormat )
         yearRange: '-100:+100',
         maxDate: new Date(),
     	"showButtonPanel":  false
+	});
+};
+
+
+Util.dateTimePicker = function( dateTag, dateFormat )
+{
+	dateTag.appendDtpicker({
+		dateFormat: dateFormat
 	});
 };
 

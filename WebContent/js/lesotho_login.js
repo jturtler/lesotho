@@ -25,9 +25,11 @@ function LoginForm( storageObj, translationObj )
 	me.clearPageParamInStorage = function()
 	{
 		me.storageObj.removeItem( "page" );
+		me.storageObj.removeItem( "subPage" );
 		me.storageObj.removeItem( "cuic" );
 		me.storageObj.removeItem( "param" );
 		me.storageObj.removeItem( "clientId" );
+		me.storageObj.removeItem( "eventId" );
 	};
 
 	// -------------------------------------------------------------------------------
@@ -59,8 +61,7 @@ function LoginForm( storageObj, translationObj )
 			, 300 );				
 		});	
 		
-
-//		me.loginBtnTag.submit(function(){
+		
 		me.loginFormTag.submit(function(){
 			return me.login();
 		});

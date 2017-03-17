@@ -48,6 +48,7 @@ function Validation( translationObj )
 			me.performValidationCheck( tag, 'maxvalue', divTag );
 			me.performValidationCheck( tag, 'minvalue', divTag );
 			me.performValidationCheck( tag, 'number', divTag );
+			me.performValidationCheck( tag, 'letter', divTag );
 		}
 
 		var valid = ( tag.attr( 'valid' ) == 'true' );
@@ -74,6 +75,11 @@ function Validation( translationObj )
 			else if ( type == 'exactlength' ) valid = me.checkValueLen( tag, divTag, 'exactlength', Number( validationAttr ) );
 			else if ( type == 'maxvalue' ) valid = me.checkValueRange( tag, divTag, 0, Number( validationAttr ) );
 			else if ( type == 'number' ) valid = me.checkValueNumber( tag, divTag );
+			else if ( type == 'integer' ) valid = me.checkValueInteger( tag, divTag );
+			else if ( type == 'integerPositive' ) valid = me.checkValueIntegerPositive( tag, divTag );
+			else if ( type == 'integerZeroPositive' ) valid = me.checkValueIntegerZeroOrPositive( tag, divTag );
+			else if ( type == 'integerNegative' ) valid = me.checkValueIntegerNegative( tag, divTag );
+			else if ( type == 'letter' ) valid = me.checkValueLetter( tag, divTag );
 			else if ( type == 'phoneNumValidate' ) valid = me.checkPhoneNumberValue( tag, divTag );
 			
 			if ( !valid ) tag.attr( 'valid', false );
@@ -141,6 +147,54 @@ function Validation( translationObj )
 		return valid;		
 	};
 	
+	me.checkValueInteger = function( inputTag, divTag )
+	{
+		var value = inputTag.val();
+		var valid = isNaN(value) && parseInt(Number(value)) == value && !isNaN(parseInt(value, 10));
+		
+		if( !valid )
+		{
+			divTag.append( me.getErrorSpanTag( 'common_validation_valueInteger' ) );
+		}
+		return valid;	
+	};
+	
+	me.checkValueIntegerPositive = function( inputTag, divTag )
+	{
+		var value = inputTag.val();
+		var valid = ( isNaN(value) && parseInt(Number(value)) == value && !isNaN(parseInt(value, 10)) ) && value > 0 ;
+		
+		if( !valid )
+		{
+			divTag.append( me.getErrorSpanTag( 'common_validation_valueIntegerPositive' ) );
+		}
+		return valid;	
+	};
+
+	me.checkValueIntegerZeroOrPositive = function( inputTag, divTag )
+	{
+		var value = inputTag.val();
+		var valid = ( isNaN(value) && parseInt(Number(value)) == value && !isNaN(parseInt(value, 10)) ) && value >= 0 ;
+		
+		if( !valid )
+		{
+			divTag.append( me.getErrorSpanTag( 'common_validation_valueIntegerPositive' ) );
+		}
+		return valid;	
+	};
+
+	me.checkValueIntegerNegative = function( inputTag, divTag )
+	{
+		var value = inputTag.val();
+		var valid = ( isNaN(value) && parseInt(Number(value)) == value && !isNaN(parseInt(value, 10)) ) && value < 0 ;
+		
+		if( !valid )
+		{
+			divTag.append( me.getErrorSpanTag( 'common_validation_valueIntegerPositive' ) );
+		}
+		return valid;	
+	};
+	
 	me.checkValueNumber = function( inputTag, divTag )
 	{
 		var valid = true;
@@ -155,6 +209,21 @@ function Validation( translationObj )
 		return valid;	
 	};
 
+	me.checkValueLetter = function( inputTag, divTag )
+	{
+		var valid = true;
+		var value = inputTag.val();
+		
+		var letters = /^[A-Za-z]+$/;
+		if( !value.match(letters) )
+		{
+			divTag.append( me.getErrorSpanTag( 'common_validation_valueLetter' ) );
+			return false;
+		}
+		
+		return valid;	
+	};
+	
 	me.checkPhoneNumberValue = function( inputTag, divTag )
 	{
 		var valid = true;
