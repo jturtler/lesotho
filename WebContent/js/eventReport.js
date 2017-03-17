@@ -79,10 +79,10 @@ function EventReport()
 					{
 						me.eventReportTag.find("[id='surName']").html( value );
 					}
-					else if( attributeId == me.attr_DistrictOB )
-					{
-						me.eventReportTag.find("[attribute='" + attributeId + "']").html( value );
-					}
+//					else if( attributeId == me.attr_DistrictOB )
+//					{
+//						me.eventReportTag.find("[attribute='" + attributeId + "']").html( value );
+//					}
 					else if( attributeId == me.attr_dateOfBirth )
 					{
 						me.eventReportTag.find("[attribute='" + attributeId + "'][idx='0']").html( value.charAt(8) );
