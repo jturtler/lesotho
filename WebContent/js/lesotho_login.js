@@ -45,7 +45,7 @@ function LoginForm( storageObj, translationObj )
 		});
 		
 		
-		$( '.idpass_populate' ).click( function()
+		$( '.idpass_populate1' ).click( function()
 		{
 			var idpassTag = $( this );
 			
@@ -62,6 +62,23 @@ function LoginForm( storageObj, translationObj )
 		});	
 		
 		
+		$( '.idpass_populate2' ).click( function()
+		{
+			var idpassTag = $( this );
+			
+			// clear the data
+			me.userNameTag.val( '' ).css( 'background-color', '#EBF4FA' );
+			me.passwordTag.val( '' ).css( 'background-color', '#EBF4FA' );
+			
+			setTimeout( function() 
+			{
+				me.userNameTag.val( "TES002" ).css( 'background-color', '' );
+				me.passwordTag.val( '1234' ).css( 'background-color', '' );
+			}
+			, 300 );				
+		});	
+			
+	
 		me.loginFormTag.submit(function(){
 			return me.login();
 		});

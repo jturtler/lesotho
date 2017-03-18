@@ -58,14 +58,7 @@ function Counsellor( storageObj, translationObj )
 	me.consumablesDivTag = $("#consumablesDiv");
 	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
 	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
-	me.reportCriteriaFormTag = $("#reportCriteriaForm");
-	me.reportRunBtnTag = $("#reportRunBtn");
-	me.reportClientResultTag = $("#reportClientResult");
-	me.eventReportTag = $("#eventReport");
-	me.reportClientResultBackBtnTag = $("#reportClientResultBackBtn");
 	me.reportParamDivTag = $("#reportParamDiv");
-	me.reportSearchKeyTag = $("#reportSearchKey");
-	me.reportParamBackBtnTag = $("#reportParamBackBtn");
 	me.searchResultHeaderTag = $("#searchResultHeader");
 	
 	
@@ -112,7 +105,6 @@ function Counsellor( storageObj, translationObj )
 	me.attributeGroupList = [];
 	
 	me.searchClientAttributeIds = [me.attr_DoB, me.attr_DistrictOB, me.attr_FirstName, me.attr_LastName, me.attr_BirthOrder];
-	me.reportCriteriaIds = [me.attr_ClientCUIC];
 
 	// -------------------------------------------------------------------
 	// Init methods
@@ -460,20 +452,6 @@ function Counsellor( storageObj, translationObj )
 			MsgManager.msgAreaShow( translatedText, "SUCCESS" );
 		});
 		
-		me.reportRunBtnTag.click( function(){
-			var cuic = me.reportCriteriaFormTag.find("[attribute='" + me.attr_ClientCUIC + "']").val();
-			me.getClientsByCUIC( cuic );
-		});
-		
-		me.reportClientResultBackBtnTag.click( function(){
-			me.eventReportTag.hide();
-			me.reportClientResultTag.show("fast");
-		});
-		
-		me.reportParamBackBtnTag.click( function(){
-			me.reportClientResultTag.hide();
-			me.reportParamDivTag.show("fast");
-		});
 		
 		// --------------------------------------------------------------------------
 		// Events and Validation for fields in [Search Client], [Add/Update Form] form
@@ -516,11 +494,6 @@ function Counsellor( storageObj, translationObj )
 		me.setUp_validationCheck( me.addClientFormTag.find( 'input,select' ) );
 		me.setUp_validationCheck( me.thisTestDivTag.find( 'input,select' ) );
 		
-		me.reportCriteriaFormTag.find("[attribute='" + me.attr_ClientCUIC + "']").keyup( function(e){
-			if ( e.keyCode === 13 ) {
-				me.getClientsByCUIC();
-			}
-		});
 	};
 	
 	me.setUp_validationCheck = function( tags )
@@ -674,7 +647,6 @@ function Counsellor( storageObj, translationObj )
 		me.createAddClientForm();
 		me.createSearchClientForm();
 		me.createClientEntryForm();
-		me.createReportForm();
 		
 		// Remove the 'mandatory' SPAN from the Search table
 		me.seachAddClientFormTag.find("span.required").remove();
@@ -762,7 +734,7 @@ function Counsellor( storageObj, translationObj )
 				}
 				else if( attribute.valueType === "TRUE_ONLY" )
 				{
-					inputTag = "<input type='checkbox' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
+					inputTag = "<input type='checkbox' class='form-control checkBox' attribute='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>";
 				}
 				else if( attribute.valueType === "DATE" )
 				{
@@ -807,24 +779,6 @@ function Counsellor( storageObj, translationObj )
 		me.validationObj.setUp_isNumberOnly_OlderBrowserSupport( me.seachAddClientFormTag );
 	};	
 
-	me.createReportForm = function()
-	{
-		for( var i in me.reportCriteriaIds )
-		{
-			var attrId = me.reportCriteriaIds[i];
-			var inputTag = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']" );
-			var text = inputTag.closest("tr").find("td:first").html();
-			
-			var fieldTag = $("<div class='form-group'></div>");
-			fieldTag.append("<label for='" + attrId + "' class='col-sm-2 control-label' style='font-weight:300'>" + text + "</label>");
-			fieldTag.append( "<div class='col-sm-10'>" + inputTag.closest("td").html() + "</div>" );
-			me.reportCriteriaFormTag.append( fieldTag );
-		}
-		
-		me.reportCriteriaFormTag.find("input,select").each( function(){
-			Util.disableTag( $(this), false );
-		})
-	};
 	
 	// ----------------------------------------------------------------------------
 	// Create 'Event Entry Form'
@@ -881,7 +835,7 @@ function Counsellor( storageObj, translationObj )
 				}
 				else if( de.valueType === "TRUE_ONLY" )
 				{
-					inputTag = "<input type='checkbox' dataelement='" + de.id + "'>";
+					inputTag = "<input type='checkbox' class='form-control checkBox' dataelement='" + de.id + "'>";
 				}
 				else if( de.valueType === "NUMBER" )
 				{
@@ -915,14 +869,6 @@ function Counsellor( storageObj, translationObj )
 				{
 					inputTag = "<input isDate='true' class='form-control' dataelement='" + de.id + "'>";
 				}
-//				else if( de.valueType === "DATETIME" )
-//				{
-//					inputTag = "<input isDateTime='true' class='form-control' dataelement='" + de.id + "'>";
-//				}
-//				else if( de.valueType === "TIME" )
-//				{
-//					inputTag = "<input isTime='true' class='form-control' dataelement='" + de.id + "'>";
-//				}
 				
 				rowTag.append("<td>" + inputTag + "</td>");
 				
@@ -1651,26 +1597,6 @@ function Counsellor( storageObj, translationObj )
 								
 								Util.disableTag( me.completedEventBtnTag, true );
 								
-								// STEP 5. Create an empty event
-								
-//								me.addEventClickHandle(function(){
-//									
-//									// STEP 6. Active "Client Attribute" Tab if the "status" mode is "Edit Client"
-//									
-//									if( me.saveClientBtnTag.attr("status") == "update" )
-//									{
-//										me.showTabInClientForm( me.TAB_NAME_CLIENT_ATTRIBUTE );
-//									}
-//									me.saveClientBtnTag.attr("status", "update");
-//									
-//									// STEP 7. Unblock form
-//									
-//									tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
-//									MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
-//									MsgManager.appUnblock();
-//									alert(tranlatedText);
-//								});
-//								
 								
 								// STEP 5. Active "Client Attribute" Tab if the "status" mode is "Edit Client"
 								
@@ -1678,7 +1604,12 @@ function Counsellor( storageObj, translationObj )
 								{
 									me.showTabInClientForm( me.TAB_NAME_CLIENT_ATTRIBUTE );
 								}
+								else if( me.saveClientBtnTag.attr("status") == "add" )
+								{
+									me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
+								}
 								me.saveClientBtnTag.attr("status", "update");
+								
 								
 								// STEP 6. Unblock form
 								
@@ -1825,9 +1756,7 @@ function Counsellor( storageObj, translationObj )
 			
 			// STEP 2.1. Create tbody to display data values of an event
 			
-			var tbody = me.createSectionEmtyTable( eventId );
-			// tbody.append( "<tr><td style='border:0px;'></td></tr>" );
-			tbody.prepend( headerTag );
+			var tbody = me.createSectionEmtyTable( eventId, event.eventDate );
 			me.previousTestsTag.find("table").prepend( tbody );
 			
 			// STEP 2.2. Populate data in tbody
@@ -1836,16 +1765,24 @@ function Counsellor( storageObj, translationObj )
 			for( var j in dataValues )
 			{
 				var dataValue = dataValues[j];
+				var deId = dataValue.dataElement;
 				var value = dataValue.value;
-				if( value === "true" )
+				
+				var inputTag = me.thisTestDivTag.find("input[dataElement='" + deId + "'],select[dataElement='" + deId + "']");
+				if( inputTag.prop("tagName") == "SELECT" )
 				{
-					value = "Yes";
+					value = inputTag.find("option[value='" + value + "']").text();
 				}
-				else if( value === "false" )
+				else if( inputTag.attr("isDate") === "true" && value != "" )
 				{
-					value = "No";
+					value = Util.formatDate_LocalDisplayDate( value );
 				}
-				tbody.find("td[dataElement='" + dataValue.dataElement + "']").html( value );
+				else if( inputTag.attr("type") == "checkbox" )
+				{
+					value = "Yes"
+				}
+				
+				tbody.find("td[dataElement='" + deId + "']").html( value );
 			}
 			
 			// STEP 2.3. Add event for Header row
@@ -2069,7 +2006,7 @@ function Counsellor( storageObj, translationObj )
 		
 		var events = data.events.events;
 		var activeEvent;
-		var report = me.previousTestsTag.find("table")
+		var report = me.previousTestsTag.find("table");
 		report.html("");
 		me.addEventFormTag.find("input,select").val("");
 		
@@ -2085,23 +2022,10 @@ function Counsellor( storageObj, translationObj )
 			}
 			else
 			{
-				// STEP 2.1. Create header for one event
-						
-				tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );				
-				var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
-
-				var clientDataStr = JSON.stringify( clientDetails );
-				var url = 'event.html?eventid=' + event.event;
-				var onclickEvent="window.open(\"" + url + "\",\"Event Report\",\"width=400,height=500\");"
-				headerTag.append("<th colspan='2'>"
-						+ "<img style='float:left' class='arrowRightImg showHide' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTime( event.eventDate ) 
-						+ " <a onclick='" + onclickEvent + "' href='#' ><img style='float:right;' src='../images/print.png'></a> </th>");
-				
 				
 				// STEP 2.2. Create tbody to display data values of an event
 				
-				var tbody = me.createSectionEmtyTable( eventId );
-				tbody.prepend( headerTag );
+				var tbody = me.createSectionEmtyTable( eventId, event.eventDate );
 				report.append( tbody );
 				
 				// STEP 2.3. Populate data in tbody
@@ -2128,10 +2052,6 @@ function Counsellor( storageObj, translationObj )
 					
 					tbody.find("td[dataElement='" + deId + "']").html( value );
 				}
-				
-				// STEP 2.4. Add event for Header row
-				
-				me.setUp_PreviousTestHeaderEvent( headerTag, report );
 			}
 		}
 	
@@ -2256,9 +2176,24 @@ function Counsellor( storageObj, translationObj )
 	
 	// Create a tbody with sections of programs. This one is used for generating history of events of a client
 	
-	me.createSectionEmtyTable = function( eventId )
+	me.createSectionEmtyTable = function( eventId, eventDate )
 	{
 		var tbody = $("<tbody eventId='" + eventId + "'></tbody>");
+		
+		// STEP 1. Create header
+		
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );				
+		var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
+
+		var url = 'event.html?eventid=' + eventId;
+		var onclickEvent="window.open(\"" + url + "\",\"Event Report\",\"width=400,height=500\");"
+		headerTag.append("<th colspan='2'>"
+				+ "<img style='float:left' class='arrowRightImg showHide' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTime( eventDate ) 
+				+ " <a onclick='" + onclickEvent + "' href='#' ><img style='float:right;' src='../images/print.png'></a> </th>");
+		
+		tbody.append( headerTag );
+		
+		// STEP 2. Create row data
 		
 		for( var i in me.sectionList )
 		{
@@ -2278,6 +2213,11 @@ function Counsellor( storageObj, translationObj )
 			} // END DE List
 			
 		}// END Sections
+		
+
+		// STEP 3. Add event for Header row
+		
+		me.setUp_PreviousTestHeaderEvent( headerTag, me.previousTestsTag.find("table") );
 		
 		return tbody;
 	}
