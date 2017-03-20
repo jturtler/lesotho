@@ -59,6 +59,12 @@ public class MetaDataController
                                 if( responseInfo.responseCode == 200 )
                                 {
                                     outputData.append( ",\"ouList\":" + responseInfo.output );
+                                    
+                                    responseInfo = MetaDataController.getCatOptionCombos();
+                                    if( responseInfo.responseCode == 200 )
+                                    {
+                                        outputData.append( ",\"catOptions\":" + responseInfo.output );
+                                    }
                                 }
                             }
                            
@@ -95,7 +101,7 @@ public class MetaDataController
         try
         {
             String url = Util.LOCATION_DHIS_SERVER + "/api/programStages/" + Util.STAGE_ID
-                + ".json?fields=programStageSections[id,displayName,programStageDataElements[dataElement[id,formName,valueType,optionSet[options[code,name]]]";
+                + ".json?fields=programStageSections[id,displayName,programStageDataElements[compulsory,dataElement[id,formName,valueType,optionSet[options[code,name]]]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -205,6 +211,22 @@ public class MetaDataController
             ex.printStackTrace();
         }
         
+        return responseInfo;
+    }
+    
+    private static ResponseInfo getCatOptionCombos()
+    {
+        ResponseInfo responseInfo = null;
+        try
+        {
+            String url = Util.LOCATION_DHIS_SERVER + "/api/categoryCombos/feqjM0WJNfI.json?fields=categoryOptionCombos[id,name,categoryOptions[code,name]]";
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+        }
+        catch ( Exception ex )
+        {
+            ex.printStackTrace();
+        }
+
         return responseInfo;
     }
    

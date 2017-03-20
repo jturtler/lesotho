@@ -153,6 +153,7 @@ public class LoginController
                     
                     if( valid )
                     {
+                        responseJson.put( Util.KEY_LOGIN_USERNAME, loginUsername );
                         responseJson.put( Util.KEY_FULLNAME, categoryOption.getString( "displayName" ) );
                         responseJson.put( Util.KEY_DHIS_SERVER, Util.LOCATION_DHIS_SERVER );
                         responseJson.put( Util.KEY_LOGGED_SUCCESS, true ); 
