@@ -679,3 +679,11 @@ table.tablesorter thead tr .headerSortDown {
 {
 	height: 18px !IMPORTANT;
 }
+
+.testMsg
+{
+	padding-bottom: 10px;
+    font-style: italic;
+    color: gray;
+}
+
