@@ -29,7 +29,7 @@ import org.json.JSONObject;
 public final class Util
 {
 
-    //public static String LOCATION_DHIS_SERVER = "http://localhost:8080/dhis";
+//    public static String LOCATION_DHIS_SERVER = "http://localhost:8080/dhis";
     public static String LOCATION_DHIS_SERVER = "https://sandbox.psi-mis.org";
     //public static String LOCATION_DHIS_SERVER = "https://james.psi-mis.org";
     
@@ -79,7 +79,6 @@ public final class Util
     public static final String KEY_METADATA_ALL = "all";
     public static final String KEY_METADATA_OULIST = "ouList";
     public static final String KEY_SAVE_EVENT = "save"; 
-    public static final String KEY_SEARCH_CUIC = "searchByCUIC";
     public static final String KEY_GET_EVENT_DETAILS = "details";
     
 

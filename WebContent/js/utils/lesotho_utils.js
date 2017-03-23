@@ -83,6 +83,11 @@ Util.addUrlParam = function( key, val )
 	document.location.pathname + params;
 };
 
+Util.highlightWords = function( data, search )
+{
+	var searchExp = (search + '').replace(/([\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:])/g, "\\$1");	
+	return data.replace( new RegExp( "(" + searchExp + ")" , 'gi' ), "<b>$1</b>" );
+};
 
 //-------------------------------------------------------------------
 // Date Utils

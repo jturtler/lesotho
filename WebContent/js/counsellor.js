@@ -1576,13 +1576,15 @@ function Counsellor( storageObj, translationObj )
 						me.backToSearchClientResultBtnTag.show();
 						me.backToCaseListBtnTag.hide();
 						
-						me.searchClients( requestData, event, function( clientList ){
+						me.searchClients( requestData, event, function( searchResult ){
 							var searchCriteria = me.getSearchCriteria( me.searchClientFormTag );
 							me.searchResultKeyTag.html( searchCriteria );
 							
+							var clientList = searchResult.clientList;
 							if( clientList.length > 0 )
 							{
-								me.populateSearchClientData( clientList );
+								me.populateSearchClientData( searchResult );
+								me.highlightSearchMatches();
 								me.showSearchClientTableResult();
 							}
 							else
@@ -1609,20 +1611,28 @@ function Counsellor( storageObj, translationObj )
 	};
 	
 	
-	me.populateSearchClientData = function( clientList )
+	me.populateSearchClientData = function( searchResult )
 	{
+		var clientList = searchResult.clientList;
+		var latestEvents = {};
+		if( clientList.length > 0 )
+		{
+			latestEvents = JSON.parse ( "{" + searchResult.latestEvents[0] + "}" );
+		}
+		
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_rowTooltip" );
 		
 		for( var i in clientList )
 		{
+			var clientId = clientList[i].trackedEntityInstance;
 			var firstName = "";
 			var lastName = "";
 			var dob = "";
 			var district = "";
 			var birthOrder = "";
 			var adquisition = "";
-			var lastTestNS = "";
-			var lastContact = "";
+			var lastTestNS = latestEvents[clientId];
+			lastTestNS = ( lastTestNS != undefined ) ? Util.formatDate_DisplayDate( lastTestNS ) : "";
 			
 			var attrValues = clientList[i].attributes;
 			for( var j in attrValues )
@@ -1646,7 +1656,8 @@ function Counsellor( storageObj, translationObj )
 					birthOrder = attrValue.value;
 				}
 				else if( attrValue.attribute === me.attr_DistrictOB ){
-					district = attrValue.value;
+					district = me.addClientFormDivTag.find("[attribute='" + attrValue.attribute + "'][value='" + attrValue.value + "']").attr("text");
+					district = ( district == undefined ) ? "" : district;
 				}
 				else if( attrValue.attribute === me.attr_Adquisition ){
 					adquisition = attrValue.value;
@@ -1661,10 +1672,9 @@ function Counsellor( storageObj, translationObj )
 			rowTag.append( "<td>" + lastName + "</td>" );
 			rowTag.append( "<td>" + dob + "</td>" );
 			rowTag.append( "<td>" + district + "</td>" );
-			rowTag.append( "<td>" + twin + "</td>" );
-			rowTag.append( "<td>" + adquisition + "</td>" );
-			rowTag.append( "<td>" + lastTestNS + "</td>" );
-			rowTag.append( "<td>" + lastContact + "</td>" );
+			rowTag.append( "<td>" + birthOrder + "</td>" );
+			rowTag.append( "<td>" + Util.formatDate_DisplayDate( clientList[i].created ) + "</td>" ); // The create date is the enrollement date
+			rowTag.append( "<td>" + lastTestNS + "</td>" ); // 
 			
 			
 			// -------------------------------------------------------------------
@@ -1678,6 +1688,42 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
+	me.highlightSearchMatches = function()
+	{
+		me.searchClientFormTag.find("input,select").each( function(){
+			var value = $(this).val().toLowerCase();
+			var colIdx = 0;
+			if( value != "" )
+			{
+				var attributeId = $(this).attr( "attribute" );
+				
+				if( attributeId === me.attr_FirstName ){
+					colIdx = 1;
+				}
+				else if( attributeId === me.attr_LastName ){
+					colIdx = 2;
+				}
+				else if( attributeId === me.attr_DoB ){
+					colIdx = 3;
+				}
+				else if( attributeId === me.attr_BirthOrder ){
+					colIdx = 4;
+				}
+				else if( attributeId === me.attr_DistrictOB ){
+					colIdx = 5;
+				}
+				
+				me.searchResultTbTag.find('td:nth-child(' + colIdx + ')').each( function(){
+					var colTag = $(this);
+					if( colTag.html().toLowerCase().indexOf( value ) >= 0 )
+					{
+						var html = Util.highlightWords( colTag.html(), value );
+						colTag.html( html );
+					}
+				});
+			}
+		});
+	};
 	
 	// Add [Click] event for each row in search result
 	
@@ -1744,7 +1790,7 @@ function Counsellor( storageObj, translationObj )
 				{
 					me.storageObj.addItem("page", me.PAGE_SEARCH_CLIENT_RESULT);
 					me.storageObj.addItem("param", JSON.stringify( jsonQuery ) );
-					exeFunc( response.trackedEntityInstances );
+					exeFunc( response );
 				}
 				,error: function(response)
 				{

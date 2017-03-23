@@ -22,7 +22,7 @@ public class ClientController
     private static String TRACKED_ENTITY = "MCPQUTHX1Ze";
 
     private static String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?ou="
-        + Util.ROOT_ORGTUNIT + "&ouMode=DESCENDANTS&program=" + Util.PROGRAM_ID;
+        + Util.ROOT_ORGTUNIT + "&ouMode=DESCENDANTS&skipPaging=true&program=" + Util.PROGRAM_ID;
 
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
@@ -39,7 +39,6 @@ public class ClientController
             
             if ( request.getPathInfo() != null && request.getPathInfo().split( "/" ).length >= 2 )
             {
-
                 String[] queryPathList = request.getPathInfo().split( "/" );
                 String key = queryPathList[1];
 
@@ -48,6 +47,30 @@ public class ClientController
                 {
                     JSONObject receivedData = Util.getJsonFromInputStream( request.getInputStream() );
                     responseInfo = ClientController.searchClients( request, receivedData );
+                    
+                    String outputData = "";
+                    if ( responseInfo.responseCode == 200 )
+                    {
+                        JSONObject searchResult = new JSONObject( responseInfo.output );
+                        JSONArray clientList = searchResult.getJSONArray( "trackedEntityInstances" );
+                        String strClientList = "\"clientList\":" + clientList.toString();
+                        outputData = "{" + strClientList + "}";
+                            
+                        if( clientList.length() > 0 )
+                        {
+                            String clientIdList = ClientController.convertClientUidsToString( clientList );
+                            
+                            responseInfo = ClientController.searchLatestEventByClientIdList( clientIdList );
+                            if ( responseInfo.responseCode == 200 )
+                            {
+                                JSONObject eventList = new JSONObject( responseInfo.output );
+                                String strEventList = "\"latestEvents\":" + eventList.getJSONArray( "rows" ).getJSONArray( 0 );
+                                outputData = "{" + strClientList + "," + strEventList + "}";
+                                responseInfo.output = outputData;
+                            } 
+                        }
+                    }
+                    
                 }
                 // STEP 3.2. Get All events of an client
                 else if ( key.equals( Util.KEY_CLIENT_DETAILS ) )
@@ -102,12 +125,6 @@ public class ClientController
                         responseInfo.output = output.toString();
                     }
                 } 
-                // STEP 3.3. Search clients by CUIC
-                if ( key.equals( Util.KEY_SEARCH_CUIC ) )
-                {
-                    String cuic = request.getParameter( "cuic" );
-                    responseInfo = ClientController.searchClientsByUIC( cuic );
-                }
             }
 
             // STEP 4. Send back the messages
@@ -239,13 +256,13 @@ public class ClientController
 
         return responseInfo;
     }
-
-    private static ResponseInfo searchClientbyCUIC( String cuic )
+    
+    private static ResponseInfo searchLatestEventByClientIdList( String idList )
     {
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?ou=" + Util.ROOT_ORGTUNIT + "&ouMode=DESCENDANTS&filter=" + Util.CLIENT_ATTR_ID_CUIC + ":eq:" + cuic + "&program=" + Util.PROGRAM_ID;
+            String url = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/U2Z0fsmmz3T/data.json?var=stageId:" + Util.STAGE_ID + "&var=clientUidList:" + idList;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -256,21 +273,8 @@ public class ClientController
         return responseInfo;
     }
     
-    private static ResponseInfo searchClientsByUIC( String cuic )
-    {
-        ResponseInfo responseInfo = null;
-        try
-        {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/HKIDYVsv1sr/data.json?var=cuic:" + cuic;
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
-        }
-        catch ( Exception ex )
-        {
-            ex.printStackTrace();
-        }
-
-        return responseInfo;
-    }
+    
+    
     
     // -----------------------------------------------------------------------------------------------------
     // Create JSON data
@@ -288,6 +292,18 @@ public class ClientController
         jsonData.put( "incidentDate", today );
 
         return jsonData;
+    }
+    
+    private static String convertClientUidsToString( JSONArray clientList )
+    {
+        String clientIds = "";
+        for( int i=0; i<clientList.length(); i++ ) 
+        {
+            String clientId = clientList.getJSONObject( i ).getString( "trackedEntityInstance" );
+            clientIds += clientId + "-";
+        }
+        
+        return clientIds;
     }
 
 }
