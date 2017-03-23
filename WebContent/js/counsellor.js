@@ -21,51 +21,76 @@ function Counsellor( storageObj, translationObj )
 	me.consumablesLinkTag = $("#consumablesLink");
 	me.reportLinkTag = $("#reportLink");
 	
-	me.userFullNameTag = $("[name='userFullName']");
-	me.dhisServerTag = $("#dhisServer");
+	
+	// List cases
+	
 	me.clientListTag = $("#clientList");
 	me.headerListTag = $("#headerList");
 	me.contentListTag = $("#contentList");
 	me.listDateTag = $("#listDate");
 	me.registerClientBtnTag = $("#registerClientBtn");
+	
+	
+	// Search Form	
 	me.searchClientFormTag = $("#searchClientForm");
 	me.searchClientBtnTag = $("#searchClientBtn");
 	me.searchResultTag = $("#searchResult");
 	me.searchResultTbTag = $("#searchResultTb");
 	me.searchResultKeyTag = $("[name='searchResultKey']");
 	me.searchResultOptionsTag = $("#searchResultOptions");
-	me.addNewClientBtnTag = $("#addNewClientBtn");
 	me.seachAddClientFormTag = $("#seachAddClientForm");
 	me.backToSearchClientResultBtnTag = $("[name=backToSearchClientResultBtn]");
 	me.searchResultOptTag = $("[name='searchResultOpt']");
 	me.searchResultNextBtnTag = $("#searchResultNextBtn");
+	me.searchResultHeaderTag = $("#searchResultHeader");
+	
+	
+	// [Add/Update Client] form	
+	me.addNewClientBtnTag = $("#addNewClientBtn");
 	me.addClientFormTabTag = $("#addClientFormTab");
 	me.addClientFormDivTag = $("#addClientFormDiv");
 	me.clientAttributeDivTag = $("#clientAttributeDiv");
 	me.addClientFormTag = $("#addClientForm");
 	me.saveClientBtnTag = $("#saveClientBtn");
-	me.saveEventBtnTag = $("#saveEventBtn");
-	me.completedEventBtnTag = $("#completedEventBtn");
+	me.selectOrgUnitWarningMsgTag = $("#selectOrgUnitWarningMsg");
+	me.moveToSettingLinkTag = $("#moveToSettingLink");
+	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
+
+	
+	// [Data Entry] form
 	me.addEventFormTag = $("#addEventForm");
 	me.previousTestsTag = $("#previousTests");
 	me.thisTestDivTag = $("#thisTestDiv");
-	me.aboutDivTag = $("#aboutDiv");
+	me.saveEventBtnTag = $("#saveEventBtn");
+	me.completedEventBtnTag = $("#completedEventBtn");	
 	me.updateClientBtnTag = $("[name='updateClientBtn']");
-	me.orgUnitListTag =  $("#orgUnitList");
-	me.selectOrgUnitWarningMsgTag = $("#selectOrgUnitWarningMsg");
+	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
+	
+	// [Consumables]
+	me.consumablesDivTag = $("#consumablesDiv");
+	
+	// [Report]
+	me.reportParamDivTag = $("#reportParamDiv");
+	
+	
+	// [Settings]
 	me.settingsDivTag = $("#settingsDiv");
-	me.moveToSettingLinkTag = $("#moveToSettingLink");
+	
+
+	// About
+	me.userFullNameTag = $("[name='userFullName']");
+	me.dhisServerTag = $("#dhisServer");
+	me.aboutDivTag = $("#aboutDiv");
+	me.orgUnitListTag =  $("#orgUnitList");
+	
+	
+	// [Common]
 	me.divSessionExpireMsgTag =  $( "#divSessionExpireMsg" );
 	me.menuIcon = $("button.hamburger");
 	me.headerRightSideControlsTag = $("div.headerRightSideControls");
 	me.mainContentTags = $("div.mainContent");
-	me.consumablesDivTag = $("#consumablesDiv");
-	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
-	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
-	me.reportParamDivTag = $("#reportParamDiv");
-	me.searchResultHeaderTag = $("#searchResultHeader");
 	
-	
+	// [Attribute Ids]
 	me.attr_FirstName = "mW2l3T2zL0N";
 	me.attr_LastName = "mUxDHgywnn2";
 	me.attr_DoB = "wSp6Q7QDMsk";
@@ -76,14 +101,31 @@ function Counsellor( storageObj, translationObj )
 	me.attr_Last_TestNS = "";
 	me.attr_LastContact = "";
 	
-
+	// [Data Element Ids]
 	me.de_Testing_ResultTest1 = "choHDFxMCaU";
 	me.de_Testing_ResultTest2 = "KDnhSz51HKS";
 	me.de_Testing_ResultParallel1 = "rMh4ZGNzrh1";
 	me.de_Testing_ResultParallel2 = "Bqff4skvt4d";
 	me.de_Testing_ResultSDBioline = "M11JqgkJt2X";
 	me.de_FinalResult_HIVStatus = "UuKat0HFjWS";
+	
+	// Search INPUT fields
+	me.searchDoBTag;
+	me.searchDistrictOBTag;
+	me.searchLastNameTag;
+	me.searchFirstNameTag;
+	
+	// Data Element Logic fields
+	me.resultTest1Tag;
+	me.resultTest2Tag;
+	me.resultTestParallel1Tag;
+	me.resultTestParallel2Tag;
+	me.resultTestResultSDBiolineTag;
+	me.resultFinalHIVStatusTag;
+	
+	
 
+	// [Client Form] Tab name
 	me.TAB_NAME_CLIENT_ATTRIBUTE = "clientAttributeDiv";
 	me.TAB_NAME_PREVIOUS_TEST = "previousTestDiv";
 	me.TAB_NAME_THIS_TEST = "thisTestDiv";
@@ -146,119 +188,107 @@ function Counsellor( storageObj, translationObj )
 		MsgManager.appUnblock();
 		
 		var page = me.storageObj.getItem( "page" );
-		if( page ==  me.PAGE_TODAY_LIST )
+		if( page == me.PAGE_TODAY_LIST )
 		{
 			me.listTodayCases(function(){
-				// RUN SUBPAGE
-
-				var subPage = me.storageObj.getItem( "subPage" );
-				if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
-				{
-					me.loadSearchSubPage( subPage );
-				}
+				me.loadSearchSubPage();
 			});
 		}
-		else if( page ==  me.PAGE_PREVIOUS_LIST )
+		else if( page == me.PAGE_PREVIOUS_LIST )
 		{
 			me.listPreviousCases(function(){
-				// RUN SUBPAGE
-
-				var subPage = me.storageObj.getItem( "subPage" );
-				if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
-				{
-					me.loadSearchSubPage( subPage );
-				}
+				me.loadSearchSubPage();
 			});
 		}
-		else if( page ==  me.PAGE_POSITIVE_LIST )
+		else if( page == me.PAGE_POSITIVE_LIST )
 		{
 			me.listPositiveCases(function(){
-				// RUN SUBPAGE
-
-				var subPage = me.storageObj.getItem( "subPage" );
-				if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
-				{
-					me.loadSearchSubPage( subPage );
-				}
+				me.loadSearchSubPage();
 			});
 		}
-		else if( page ==  me.PAGE_SEARCH_PARAM )
+		else if( page == me.PAGE_SEARCH_PARAM )
 		{
 			me.showSearchClientForm();
 		}
-		else if( page ==  me.PAGE_SEARCH_CLIENT_RESULT )
+		else if( page == me.PAGE_SEARCH_CLIENT_RESULT )
 		{
-			me.loadSearchSubPage( me.storageObj.getItem( "subPage" ) );			
+			me.loadSearchSubPage();			
 		}
-		else if( page ==  me.PAGE_COMSUMABLES )
+		else if( page == me.PAGE_COMSUMABLES )
 		{
 			me.consumablesDivTag.show("fast");
 		}
-		else if( page ==  me.PAGE_REPORT_PARAM )
+		else if( page == me.PAGE_REPORT_PARAM )
 		{
 			me.reportParamDivTag.show("fast");
 		}
-		else if( page ==  me.PAGE_SETTINGS )
+		else if( page == me.PAGE_SETTINGS )
 		{
 			me.settingsDivTag.show("fast");
 		}
-		else if( page ==  me.PAGE_ABOUT )
+		else if( page == me.PAGE_ABOUT )
 		{
 			me.aboutDivTag.show("fast");
 		}
 		
 	};
 	
-	me.loadSearchSubPage = function( subPage )
+	me.loadSearchSubPage = function()
 	{
-		if( me.storageObj.getItem("param" ) == "" )
+		var subPage = me.storageObj.getItem( "subPage" );
+		if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
 		{
-			var clientId = me.storageObj.getItem( "clientId" );
-			var eventId = me.storageObj.getItem( "eventId" );
-			
-			var rowTag = me.contentListTag.find("table").find("tr[clientId='" + clientId + "'][eventId='" + eventId + "']");
-			rowTag.click();
-		}
-		else
-		{
-			var clientSearch = JSON.parse( me.storageObj.getItem("param" ) ).attributes;
-			
-			// STEP 1. Populate data in "Search" form
-			
-			for( var i in clientSearch )
+			// If [Client Form] was called from a list ( Today list, Previous list, Positive list ),
+			// look for the row in table list with the clientId and eventId to call [Click] event of the row
+			if( me.storageObj.getItem("param" ) == "" )
 			{
-				var attributeId = clientSearch[i].attribute;
-				var value = clientSearch[i].value;
-				var field = me.searchClientFormTag.find("[attribute='" + attributeId + "']");
-
-				if( field.attr("isDate") == "true" )
-				{
-					value = Util.formatDate_LocalDisplayDate( value );
-				}
-				field.val(value);
+				var clientId = me.storageObj.getItem( "clientId" );
+				var eventId = me.storageObj.getItem( "eventId" );
+				
+				var rowTag = me.contentListTag.find("table").find("tr[clientId='" + clientId + "'][eventId='" + eventId + "']");
+				rowTag.click();
 			}
-			
-			// STEP 2. Search clients by criteria
-			
-			me.runSearchClients( function(){
-
-				if( subPage ==  me.PAGE_SEARCH_EDIT_CLIENT )
+			else
+			{
+				var clientSearch = JSON.parse( me.storageObj.getItem("param" ) ).attributes;
+				
+				// STEP 1. Populate data in "Search" form
+				
+				for( var i in clientSearch )
 				{
-					var clientId = me.storageObj.getItem( "clientId" );
-					var eventId = me.storageObj.getItem( "eventId" );
-					
-					// STEP 3.1. Show "Edit Client" form
-					me.loadClientDetails( clientId, eventId );
-				}
-				else if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT )
-				{
-					// STEP 3.2. Show "Add Client" form
-					me.showAddClientForm();
+					var attributeId = clientSearch[i].attribute;
+					var value = clientSearch[i].value;
+					var field = me.searchClientFormTag.find("[attribute='" + attributeId + "']");
+	
+					if( field.attr("isDate") == "true" )
+					{
+						value = Util.formatDate_LocalDisplayDate( value );
+					}
+					field.val(value);
 				}
 				
-			});
+				// STEP 2. Search clients by criteria
+				
+				me.runSearchClients( function(){
+	
+					if( subPage ==  me.PAGE_SEARCH_EDIT_CLIENT )
+					{
+						var clientId = me.storageObj.getItem( "clientId" );
+						var eventId = me.storageObj.getItem( "eventId" );
+						
+						// STEP 3.1. Show "Edit Client" form
+						me.loadClientDetails( clientId, eventId );
+					}
+					else if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT )
+					{
+						// STEP 3.2. Show "Add Client" form
+						me.showAddClientForm();
+					}
+					
+				});
+			}
 		}
-	}
+	};
 	
 	
 	// ----------------------------------------------------------------------------
@@ -505,8 +535,7 @@ function Counsellor( storageObj, translationObj )
 	{
 		// Save an event
 		me.saveEventBtnTag.click( function(){
-			var clientId = me.addClientFormTabTag.attr("clientId");
-			var eventId = me.addClientFormTabTag.attr("eventId");
+			var client = JSON.parse( me.addClientFormTabTag.attr("client") );
 			var event = me.addClientFormTabTag.attr("event");
 			
 			if( event !== undefined ){
@@ -515,7 +544,7 @@ function Counsellor( storageObj, translationObj )
 			else{
 				event = {};
 			}
-			me.saveEvent(event, clientId, eventId );
+			me.saveEvent(event, client.trackedEntityInstance, event.event );
 		});
 				
 		// Complete an event
@@ -528,7 +557,7 @@ function Counsellor( storageObj, translationObj )
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_creatingEvent" );
 				MsgManager.appBlock( tranlatedText + " ..." );
 				
-				me.addEventClickHandle(function(){
+				me.completeEvent(function(){
 					me.addClientFormTabTag.removeAttr( "eventId" );
 					me.addClientFormTabTag.removeAttr( "event" );
 				});
@@ -557,6 +586,7 @@ function Counsellor( storageObj, translationObj )
 		});
 	};
 
+	
 	me.setUp_FloatButton = function()
 	{
 		var width = $(window).width() - 80;
@@ -566,124 +596,32 @@ function Counsellor( storageObj, translationObj )
 		me.registerClientBtnTag.css({top: height, left: width, position:'fixed'});
 	};
 	
+	
+	// ----------------------------------------------------------------------------
 	// Add logic for data elements in [Data Entry form]
+	// ----------------------------------------------------------------------------
 	
 	me.setUp_DataEntryFormLogic = function( item )
 	{
 		if( eval( me.addClientFormTabTag.attr("addedLogic") ) )
 		{
-			var resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
-			var resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
-			var resultTestParallel1Tag = me.getDeField( me.de_Testing_ResultParallel1 );
-			var resultTestParallel2Tag = me.getDeField( me.de_Testing_ResultParallel2 );
-			var resultTestResultSDBiolineTag = me.getDeField( me.de_Testing_ResultSDBioline );
-			var resultFinalHIVStatusTag = me.getDeField( me.de_FinalResult_HIVStatus );
-			
 			var attrId = item.attr("dataelement");
 			
 			// If "Result Test 1" value is "Positive", enable "Result Test 2"
 			if( attrId === me.de_Testing_ResultTest1 )
 			{
-				if( resultTest1Tag.val() === "Positive" )
-				{
-					resultFinalHIVStatusTag.val( resultTest1Tag.val() );
-					
-					resultTest2Tag.val( "" );
-					resultTestParallel1Tag.val( "" );
-					resultTestParallel2Tag.val( "" );
-					resultTestResultSDBiolineTag.val( "" );
-					resultFinalHIVStatusTag.val( "" );
-					
-					Util.disableTag( resultTest2Tag, false );
-					Util.disableTag( resultTestParallel1Tag, true );
-					Util.disableTag( resultTestParallel2Tag, true );
-					Util.disableTag( resultTestResultSDBiolineTag, true );
-					
-					me.addMandatoryForField( resultTest2Tag );
-				}
-				else
-				{
-					resultTest2Tag.val( "" );
-					resultTestParallel1Tag.val( "" );
-					resultTestParallel2Tag.val( "" );
-					resultTestResultSDBiolineTag.val( "" );
-					resultFinalHIVStatusTag.val( resultTest1Tag.val() );
-					
-					Util.disableTag( resultTest2Tag, true );
-					Util.disableTag( resultTestParallel1Tag, true );
-					Util.disableTag( resultTestParallel2Tag, true );
-					Util.disableTag( resultTestResultSDBiolineTag, true );
-					
-					me.removeMandatoryForField( resultTest2Tag );
-					me.removeMandatoryForField( resultTestParallel1Tag );
-					me.removeMandatoryForField( resultTestParallel2Tag );
-					me.removeMandatoryForField( resultTestResultSDBiolineTag );
-				}
+				me.setUp_DataElementResultTest1Logic();
 			}
 			// If "Result Test 2" value is "Positive", enable "Result Parallel 2" 
 			else if( attrId === me.de_Testing_ResultTest2 )
 			{
-				if( resultTest2Tag.val() !== "Positive" )
-				{
-					resultTestParallel1Tag.val( "" );
-					resultTestParallel2Tag.val( "" );
-					resultTestResultSDBiolineTag.val( "" );
-					resultFinalHIVStatusTag.val( "" );
-					
-					Util.disableTag( resultTestParallel1Tag, false );
-					Util.disableTag( resultTestParallel2Tag, false );
-					Util.disableTag( resultTestResultSDBiolineTag, true );
-					
-					me.addMandatoryForField( resultTestParallel1Tag );
-					me.addMandatoryForField( resultTestParallel2Tag );
-				}
-				else
-				{
-					resultTestParallel1Tag.val( "" );
-					resultTestParallel2Tag.val( "" );
-					resultTestResultSDBiolineTag.val( "" );
-					resultFinalHIVStatusTag.val( resultTest2Tag.val() );
-					
-					Util.disableTag( resultTestParallel1Tag, true );
-					Util.disableTag( resultTestParallel2Tag, true );
-					Util.disableTag( resultTestResultSDBiolineTag, true );
-					
-					
-					me.removeMandatoryForField( resultTestParallel1Tag );
-					me.removeMandatoryForField( resultTestParallel2Tag );
-					me.removeMandatoryForField( resultTestResultSDBiolineTag );
-				}
+				me.setUp_DataElementResultTest2Logic();
 			}
 			// If the value of "Parallel 1" and "Parallel 2" are the same, "FinalResult" has value as "Parallel"
 			// If not, enable "SD Bioline" field
 			else if( attrId === me.de_Testing_ResultParallel1 || attrId === me.de_Testing_ResultParallel2 )
 			{
-				
-				if( resultTestParallel1Tag.val() != "" && resultTestParallel2Tag.val() != "" )
-				{
-					if( resultTestParallel1Tag.val() != resultTestParallel2Tag.val() )
-					{
-						resultFinalHIVStatusTag.val( "" );
-						Util.disableTag( resultTestResultSDBiolineTag, false );
-						me.addMandatoryForField( resultTestResultSDBiolineTag );
-						
-					}
-					else
-					{
-						resultTestResultSDBiolineTag.val( "" );
-						resultFinalHIVStatusTag.val( resultTestParallel1Tag.val() );
-						
-						Util.disableTag( resultTestResultSDBiolineTag, true );
-						me.removeMandatoryForField( resultTestResultSDBiolineTag );
-					}
-				}
-				else
-				{
-					resultTestResultSDBiolineTag.val( "" );
-					resultFinalHIVStatusTag.val( "" );
-					Util.disableTag( resultTestResultSDBiolineTag, true );
-					me.removeMandatoryForField( resultTestResultSDBiolineTag );
-				}
+				me.setUp_DataElementResultParallelLogic();				
 			}
 			// Fill "SD Bioline" value for "Final Result"
 			else if( attrId === me.de_Testing_ResultSDBioline )
@@ -693,6 +631,107 @@ function Counsellor( storageObj, translationObj )
 		}		
 	};
 	
+	me.setUp_DataElementResultTest1Logic = function()
+	{
+		if( me.resultTest1Tag.val() === "Positive" )
+		{
+			me.resultFinalHIVStatusTag.val( resultTest1Tag.val() );
+			
+			me.resultTest2Tag.val( "" );
+			me.resultTestParallel1Tag.val( "" );
+			me.resultTestParallel2Tag.val( "" );
+			me.resultTestResultSDBiolineTag.val( "" );
+			me.resultFinalHIVStatusTag.val( "" );
+			
+			Util.disableTag( me.resultTest2Tag, false );
+			Util.disableTag( me.resultTestParallel1Tag, true );
+			Util.disableTag( me.resultTestParallel2Tag, true );
+			Util.disableTag( me.resultTestResultSDBiolineTag, true );
+			
+			me.addMandatoryForField( me.resultTest2Tag );
+		}
+		else
+		{
+			me.resultTest2Tag.val( "" );
+			me.resultTestParallel1Tag.val( "" );
+			me.resultTestParallel2Tag.val( "" );
+			me.resultTestResultSDBiolineTag.val( "" );
+			me.resultFinalHIVStatusTag.val( resultTest1Tag.val() );
+			
+			Util.disableTag( me.resultTest2Tag, true );
+			Util.disableTag( me.resultTestParallel1Tag, true );
+			Util.disableTag( me.resultTestParallel2Tag, true );
+			Util.disableTag( me.resultTestResultSDBiolineTag, true );
+			
+			me.removeMandatoryForField( me.resultTest2Tag );
+			me.removeMandatoryForField( me.resultTestParallel1Tag );
+			me.removeMandatoryForField( me.resultTestParallel2Tag );
+			me.removeMandatoryForField( me.resultTestResultSDBiolineTag );
+		}
+	};
+	
+	me.setUp_DataElementResultTest2Logic = function()
+	{
+		if( me.resultTest2Tag.val() !== "Positive" )
+		{
+			me.resultTestParallel1Tag.val( "" );
+			me.resultTestParallel2Tag.val( "" );
+			me.resultTestResultSDBiolineTag.val( "" );
+			me.resultFinalHIVStatusTag.val( "" );
+			
+			Util.disableTag( me.resultTestParallel1Tag, false );
+			Util.disableTag( me.resultTestParallel2Tag, false );
+			Util.disableTag( me.resultTestResultSDBiolineTag, true );
+			
+			me.addMandatoryForField( me.resultTestParallel1Tag );
+			me.addMandatoryForField( me.resultTestParallel2Tag );
+		}
+		else
+		{
+			me.resultTestParallel1Tag.val( "" );
+			me.resultTestParallel2Tag.val( "" );
+			me.resultTestResultSDBiolineTag.val( "" );
+			me.resultFinalHIVStatusTag.val( me.resultTest2Tag.val() );
+			
+			Util.disableTag( me.resultTestParallel1Tag, true );
+			Util.disableTag( me.resultTestParallel2Tag, true );
+			Util.disableTag( me.resultTestResultSDBiolineTag, true );
+			
+			
+			me.removeMandatoryForField( me.resultTestParallel1Tag );
+			me.removeMandatoryForField( me.resultTestParallel2Tag );
+			me.removeMandatoryForField( me.resultTestResultSDBiolineTag );
+		}
+	};
+	
+	me.setUp_DataElementResultParallelLogic = function()
+	{
+		if( me.resultTestParallel1Tag.val() != "" && me.resultTestParallel2Tag.val() != "" )
+		{
+			if( me.resultTestParallel1Tag.val() != me.resultTestParallel2Tag.val() )
+			{
+				me.resultFinalHIVStatusTag.val( "" );
+				Util.disableTag( me.resultTestResultSDBiolineTag, false );
+				me.addMandatoryForField( me.resultTestResultSDBiolineTag );
+				
+			}
+			else
+			{
+				me.resultTestResultSDBiolineTag.val( "" );
+				me.resultFinalHIVStatusTag.val( me.resultTestParallel1Tag.val() );
+				
+				Util.disableTag( me.resultTestResultSDBiolineTag, true );
+				me.removeMandatoryForField( me.resultTestResultSDBiolineTag );
+			}
+		}
+		else
+		{
+			me.resultTestResultSDBiolineTag.val( "" );
+			me.resultFinalHIVStatusTag.val( "" );
+			Util.disableTag( rme.esultTestResultSDBiolineTag, true );
+			me.removeMandatoryForField( me.resultTestResultSDBiolineTag );
+		}
+	};
 	
 	// ----------------------------------------------------------------------------
 	// Create Search Client form, Registration form and Entry form
@@ -761,7 +800,7 @@ function Counsellor( storageObj, translationObj )
 		}// END Attribute Groups
 		
 		
-		// Disable 'Client CUIC' field. The value of this attribute will be generated from another attribute value
+		// Disable [Client CUIC] field. The value of this attribute will be generated from another attribute values
 		
 		Util.disableTag( me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']"), true );
 		
@@ -778,9 +817,24 @@ function Counsellor( storageObj, translationObj )
 			var inputTag = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']" );
 			var text = inputTag.closest("tr").find("td:first").html();
 			
+			if( attrId == me.attr_DistrictOB )
+			{
+				var districtOBTag = $( "<select class='form-control' attribute='" + attrId + "'></select>" );
+				districtOBTag.append( "<option value=''>[Please select]</option>");
+				for( var i=0; i<inputTag.length; i++ )
+				{
+					var code = $( inputTag[i] ).val();
+					var name = $( inputTag[i] ).attr( "text" );
+					districtOBTag.append( "<option value='" + code + "'>" + name + "</option>");
+				}
+				
+				inputTag = districtOBTag;
+			}
+			
+			
 			var fieldTag = $("<div class='form-group'></div>");
 			fieldTag.append("<label for='" + attrId + "' class='col-sm-2 control-label' style='font-weight:300'>" + text + "</label>");
-			fieldTag.append( "<div class='col-sm-10'>" + inputTag.closest("td").html() + "</div>" );
+			fieldTag.append( "<div class='col-sm-10'>" + inputTag.prop('outerHTML') + "</div>" );
 			me.seachAddClientFormTag.append( fieldTag );
 		}
 		
@@ -798,10 +852,113 @@ function Counsellor( storageObj, translationObj )
 		// STEP 0. Create the header for active event
 		
 		var translatedByText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_thisTest_msg_eventCreatedByCounsellor" );	
-		me.addEventFormTag.append( "<div id='activeEventHeader'>" + translatedByText + " <span></span></div>" );
+		me.addEventFormTag.append( "<div id='activeEventHeader' class='testMsg'>" + translatedByText + " <span></span></div>" );
 		
 		// STEP 1. Create the table
 		
+		var table = me.generateDataEntryFormTable();
+		me.addEventFormTag.append( table );
+		
+		
+		// Disable some DEs in form. Will add login for these DE in 'change' event
+		
+		var resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
+		var resultTestParallel1Tag = me.getDeField( me.de_Testing_ResultParallel1 );
+		var resultTestParallel2Tag = me.getDeField( me.de_Testing_ResultParallel2 );
+		var resultTestResultSDBiolineTag = me.getDeField( me.de_Testing_ResultSDBioline );
+		var resultFinalHIVStatusTag = me.getDeField( me.de_FinalResult_HIVStatus );
+		
+		if( resultTest2Tag.length > 0 && resultTestParallel1Tag.length > 0 && resultTestParallel2Tag.length > 0 
+				&& resultTestResultSDBiolineTag.length > 0 && resultFinalHIVStatusTag.length > 0 )
+		{
+			 me.addClientFormTabTag.attr("addedLogic", true );
+
+			 // Add "mandatory" validation for "Test 1" field
+			 
+			 var resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
+			 me.addMandatoryForField( resultTest1Tag );
+		}
+		else
+		{
+			me.addClientFormTabTag.attr("addedLogic", false );
+		}
+	};
+
+	
+	me.addMandatoryForField = function( tag )
+	{
+		var inputRowTag = tag.closest("tr");
+		
+		me.removeMandatoryForField( tag );
+		tag.attr( "mandatory", true );
+		inputRowTag.find("td:first").append("<span class='required'> *</span>");
+		inputRowTag.show();
+	};
+	
+	
+	me.removeMandatoryForField = function( tag )
+	{
+		var inputRowTag = tag.closest("tr");
+		
+		tag.removeAttr( "mandatory" );
+		inputRowTag.find("td:first").find("span.required").remove();
+		tag.closest("td").find("span.errorMsg").remove();
+		
+		// Show/Hide the logic action field 
+		if( eval( me.hideHIVTestLogicActionTag.val() ) )
+		{
+			inputRowTag.hide();
+		}
+		else
+		{
+			inputRowTag.show();
+		}
+	};
+	
+	
+	// ----------------------------------------------------------------------------
+	// Generate [Add Client Form] with section
+	
+	me.generateAttributeGroupList = function( attrGroups, prgAttributes )
+	{
+		var attributeGroupList = [];
+		
+		for( var i in attrGroups )
+		{
+			attributeGroupList[i] = {};
+			attributeGroupList[i].name = attrGroups[i].name;
+			attributeGroupList[i].list = [];
+			
+			var attrGroupList = attrGroups[i].trackedEntityAttributes;
+			for( var j in attrGroupList )
+			{
+				for( var k in prgAttributes )
+				{
+					var prgAttribute = prgAttributes[k];
+					
+					// STEP 2.1. Check if attribute in the groups exists in program-attribute
+					
+					if( prgAttribute.trackedEntityAttribute.id === attrGroupList[j].id )
+					{
+						var attribute = attrGroupList[j];
+						attribute.mandatory = prgAttribute.mandatory;
+						
+						// STEP 2.2. Add the attribute in attribute list of result
+						
+						attributeGroupList[i].list.push(attribute);
+					}
+				}
+			}
+		}
+		
+		return attributeGroupList;
+	};
+	
+	// ----------------------------------------------------------------------------
+	// Generate [Data Entry Form] with section
+	
+	me.generateDataEntryFormTable = function()
+	{
 		var table = $("<table class='table table-hover table-striped previousTestTb'></table>");
 		
 		for( var i in me.sectionList )
@@ -850,171 +1007,9 @@ function Counsellor( storageObj, translationObj )
 			
 		}// END Sections
 		
-		me.addEventFormTag.append( table );
-		
-		
-		// Disable some DEs in form. Will add login for these DE in 'change' event
-		
-		var resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
-		var resultTestParallel1Tag = me.getDeField( me.de_Testing_ResultParallel1 );
-		var resultTestParallel2Tag = me.getDeField( me.de_Testing_ResultParallel2 );
-		var resultTestResultSDBiolineTag = me.getDeField( me.de_Testing_ResultSDBioline );
-		var resultFinalHIVStatusTag = me.getDeField( me.de_FinalResult_HIVStatus );
-		
-		if( resultTest2Tag.length > 0 && resultTestParallel1Tag.length > 0 && resultTestParallel2Tag.length > 0 
-				&& resultTestResultSDBiolineTag.length > 0 && resultFinalHIVStatusTag.length > 0 )
-		{
-			 me.addClientFormTabTag.attr("addedLogic", true );
-
-			 // Add "mandatory" validation for "Test 1" field
-			 
-			 var resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
-			 me.addMandatoryForField( resultTest1Tag );
-			 
-			 // Reset client entry form
-			 
-			 me.resetDataEntryForm();
-		}
-		else
-		{
-			me.addClientFormTabTag.attr("addedLogic", false );
-		}
-	};
-
-	me.addMandatoryForField = function( tag )
-	{
-		var inputRowTag = tag.closest("tr");
-		
-		me.removeMandatoryForField( tag );
-		tag.attr( "mandatory", true );
-		inputRowTag.find("td:first").append("<span class='required'> *</span>");
-		inputRowTag.show();
+		return table;
 	};
 	
-	me.removeMandatoryForField = function( tag )
-	{
-		var inputRowTag = tag.closest("tr");
-		
-		tag.removeAttr( "mandatory" );
-		inputRowTag.find("td:first").find("span.required").remove();
-		tag.closest("td").find("span.errorMsg").remove();
-		
-		// Show/Hide the logic action field 
-		if( eval( me.hideHIVTestLogicActionTag.val() ) )
-		{
-			inputRowTag.hide();
-		}
-		else
-		{
-			inputRowTag.show();
-		}
-	};
-	
-	
-	// ----------------------------------------------------------------------------
-	// Generate Input Tags
-	
-	me.generateInputTag = function( attribute, inputKey )
-	{
-		var inputTag = $( "<input class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >" );
-		
-		if( attribute.optionSet !== undefined )
-		{
-			inputTag = me.generateOptionInputTag( attribute, inputKey );
-		}
-		else if( attribute.valueType === "BOOLEAN" )
-		{
-			inputTag = me.generateBoolInputTag( attribute, inputKey );
-		}
-		else if( attribute.valueType === "TRUE_ONLY" )
-		{
-			inputTag = "<input type='checkbox' class='form-control checkBox'  " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
-		}
-		else if( attribute.valueType === "NUMBER" || attribute.valueType === "INTEGER" 
-			|| attribute.valueType === "INTEGER_POSITIVE" || attribute.valueType === "INTEGER_NEGATIVE" 
-			|| attribute.valueType === "INTEGER_ZERO_OR_POSITIVE" )
-		{
-			inputTag = me.generateNumberInputTag( attribute, inputKey );
-		}
-		else if( attribute.valueType === "LONG_TEXT" )
-		{
-			inputTag = "<textarea class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' ></textarea>";
-		}
-		else if( attribute.valueType === "LETTER" )
-		{
-			inputTag = "<input letter='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
-		}
-		else if( attribute.valueType === "DATE" )
-		{
-			inputTag = "<input isDate='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
-		}
-		
-		return inputTag;
-		
-	};
-	
-	me.generateOptionInputTag = function( attribute, inputKey )
-	{
-		var options = attribute.optionSet.options;
-		inputTag = $("<select class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>");
-		inputTag.append( "<option value=''>[Please select]</option>" );
-		for( var k in options )
-		{
-			var code = options[k].code;
-			var name = options[k].name;
-			inputTag.append( "<option value='" + code + "'>" + name + "</option>" );
-		}
-		
-		return inputTag;
-	};
-	
-	me.generateBirthOrderInputTag = function( attribute, inputKey )
-	{
-		inputTag = $( "<select class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>" );
-		inputTag.append( "<option value=''>[Please select]</option>" );
-		for( var i = 1; i <= 20 ; i ++ )
-		{
-			var value = ( i < 10 ) ? "0" + i : i;
-			inputTag.append( "<option value='" + i + "'>" + value + "</option>" );
-		}
-		
-		return inputTag;
-	};
-	
-	me.generateNumberInputTag = function( attribute, inputKey )
-	{
-		var inputTag;
-		
-		if( attribute.valueType === "INTEGER" )
-		{
-			inputTag = $( "<input integer='true' class='form-control' " + inputKey + "='" + attribute.id + "'>" );
-		}
-		else if( attribute.valueType === "INTEGER_POSITIVE" )
-		{
-			inputTag = $( "<input integerPositive='true' class='form-control' " + inputKey + "='" + attribute.id + "'>" );
-		}
-		else if( attribute.valueType === "INTEGER_NEGATIVE")
-		{
-			inputTag = $( "<input integerNegative='true' class='form-control' " + inputKey + "='" + attribute.id + "'>" );
-		}
-		else if( attribute.valueType === "INTEGER_ZERO_OR_POSITIVE"  )
-		{
-			inputTag = $( "<input integerZeroPositive='true' class='form-control' " + inputKey + "='" + attribute.id + "'>" );
-		}
-		
-		return inputTag;
-	};
-	
-	me.generateBoolInputTag = function( attribute, inputKey )
-	{
-		var inputTag = $( "<select class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>" );
-		inputTag.append( "<option value=''>[Please select]</option>" );
-		inputTag.append( "<option value='true'>Yes</option>" );
-		inputTag.append( "<option value='false'>No</option>" );
-		
-		return inputTag;
-	};
-		
 	me.resetDataEntryForm = function()
 	{
 		var resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
@@ -1036,19 +1031,174 @@ function Counsellor( storageObj, translationObj )
 		
 		
 		// Reset values in the form
-		me.addClientFormDivTag.find("input,select").val("");
-		me.addClientFormDivTag.find("input[type='checkbox']").prop("checked", false);
+		// Empty fields from "This Test" tab
+		me.thisTestDivTag.find("input[type='text'],select").val("");
+		me.thisTestDivTag.find("input[type='checkbox']").prop("checked", false);
+		me.thisTestDivTag.find("input[type='radio']").prop("checked", false);
 		me.addClientFormDivTag.find( "span.errorMsg" ).remove();
 
 		
 		// Remove the data before
 		me.showOrgUnitWarningMsg();	
 		me.previousTestsTag.find("table").html("");
-		me.addClientFormTabTag.removeAttr( "clientId" );
 		me.addClientFormTabTag.removeAttr( "client" );
-		me.addClientFormTabTag.removeAttr( "eventId" );
 		me.addClientFormTabTag.removeAttr( "event" );
+	};
+	
+	me.resetClientForm = function()
+	{
+		// Empty fields from "This Test" tab
+		me.clientAttributeDivTag.find("input[type='text'],select").val("");
+		me.clientAttributeDivTag.find("input[type='checkbox']").prop("checked", false);
+		me.clientAttributeDivTag.find("input[type='radio']").prop("checked", false);
 	}
+	
+	// ----------------------------------------------------------------------------
+	// Generate Input Tags
+	
+	me.generateInputTag = function( attribute, inputKey )
+	{
+		var inputTag = $( "<input type='text' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >" );
+		
+		if( attribute.id == me.attr_BirthOrder )
+		{
+			inputTag = me.generateBirthOrderInputTag( attribute, inputKey );
+		}
+		else if( attribute.id == me.attr_DistrictOB )
+		{
+			inputTag = me.generateDistrictOfBirthInputTag(attribute, inputKey);
+		}
+		else if( attribute.optionSet !== undefined )
+		{
+			inputTag = me.generateOptionInputTag( attribute, inputKey );
+		}
+		else if( attribute.valueType === "BOOLEAN" )
+		{
+			inputTag = me.generateBoolInputTag( attribute, inputKey );
+		}
+		else if( attribute.valueType === "TRUE_ONLY" )
+		{
+			inputTag = "<input type='checkbox' class='form-control checkBox'  " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
+		}
+		else if( attribute.valueType === "NUMBER" || attribute.valueType === "INTEGER" 
+			|| attribute.valueType === "INTEGER_POSITIVE" || attribute.valueType === "INTEGER_NEGATIVE" 
+			|| attribute.valueType === "INTEGER_ZERO_OR_POSITIVE" )
+		{
+			inputTag = me.generateNumberInputTag( attribute, inputKey );
+		}
+//		else if( attribute.valueType === "LONG_TEXT" )
+//		{
+//			inputTag = "<textarea class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' ></textarea>";
+//		}
+		else if( attribute.valueType === "LETTER" )
+		{
+			inputTag = "<input type='text' letter='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
+		}
+		else if( attribute.valueType === "DATE" )
+		{
+			inputTag = "<input type='text' isDate='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
+		}
+		
+		return inputTag;
+		
+	};
+	
+	me.generateBirthOrderInputTag = function( attribute, inputKey )
+	{
+		inputTag = $( "<select class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>" );
+		inputTag.append( "<option value=''>[Please select]</option>" );
+		for( var i = 0; i <= 10 ; i ++ )
+		{
+			var value = i;
+			if( i != 10 )
+			{
+				value = "0" + i;
+			}
+			
+			inputTag.append( "<option value='" + i + "'>" + value + "</option>" );
+		}
+		
+		return inputTag;
+	};
+	
+
+	me.generateDistrictOfBirthInputTag = function( attribute, inputKey )
+	{
+		var table = $("<div class='divTable'></div>");
+		var rowTag = $( "<div class='divRow'></div>" );
+		table.append( rowTag );
+		
+		var options = attribute.optionSet.options;
+		
+		for( var i=0; i<options.length; i++ )
+		{
+			var code = options[i].code;
+			var name = options[i].name;
+			
+			var inputTag = $( "<input text='" + name + "' type='radio' " + inputKey + "='" + attribute.id + "' name='districtOfBirth' class='radioBox' value='" + code + "' mandatory='" + attribute.mandatory + "'>" );
+			var colTag = $("<div class='divCell'></td>");
+			colTag.append( inputTag );
+			colTag.append( name );
+			rowTag.append( colTag );
+		}
+
+		return table;
+	};
+	
+	me.generateOptionInputTag = function( attribute, inputKey )
+	{
+		var options = attribute.optionSet.options;
+		inputTag = $("<select class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>");
+		inputTag.append( "<option value=''>[Please select]</option>" );
+		for( var k in options )
+		{
+			var code = options[k].code;
+			var name = options[k].name;
+			inputTag.append( "<option value='" + code + "'>" + name + "</option>" );
+		}
+		
+		return inputTag;
+	};
+	
+	me.generateNumberInputTag = function( attribute, inputKey )
+	{
+		var inputTag;
+		
+		var type = "";
+		if( attribute.valueType === "NUMBER" )
+		{
+			type = "number='true'";
+		}	
+		else if( attribute.valueType === "INTEGER" )
+		{
+			type = "integer='true'";
+		}
+		else if( attribute.valueType === "INTEGER_POSITIVE" )
+		{
+			type = "integerPositive='true'";
+		}
+		else if( attribute.valueType === "INTEGER_NEGATIVE")
+		{
+			type = "integerNegative='true'";
+		}
+		else if( attribute.valueType === "INTEGER_ZERO_OR_POSITIVE"  )
+		{
+			type = "integerZeroPositive='true'";
+		}
+		
+		return $( "<input type='text' " + type + " class='form-control' " + inputKey + "='" + attribute.id + "'>" );;
+	};
+	
+	me.generateBoolInputTag = function( attribute, inputKey )
+	{
+		var inputTag = $( "<select class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>" );
+		inputTag.append( "<option value=''>[Please select]</option>" );
+		inputTag.append( "<option value='true'>Yes</option>" );
+		inputTag.append( "<option value='false'>No</option>" );
+		
+		return inputTag;
+	};
+	
 	
 	// ----------------------------------------------------------------------------
 	// Initialize data for the HTML page
@@ -1095,39 +1245,13 @@ function Counsellor( storageObj, translationObj )
 				me.sectionList = jsonData.sections.programStageSections;
 				me.catOptionComboList = jsonData.catOptions.categoryOptionCombos;				
 				
+				
 				// STEP 2. Structure attGroups with attributes in memory
-				
-				me.attributeGroupList = [];
-				
+
 				var attrGroups = jsonData.attGroups.trackedEntityAttributeGroups;
 				var prgAttributes = jsonData.programAttributes.programTrackedEntityAttributes;
-				for( var i in attrGroups )
-				{
-					me.attributeGroupList[i] = {};
-					me.attributeGroupList[i].name = attrGroups[i].name;
-					me.attributeGroupList[i].list = [];
-					
-					var attrGroupList = attrGroups[i].trackedEntityAttributes;
-					for( var j in attrGroupList )
-					{
-						for( var k in prgAttributes )
-						{
-							var prgAttribute = prgAttributes[k];
-							
-							// STEP 2.1. Check if attribute in the groups exists in program-attribute
-							
-							if( prgAttribute.trackedEntityAttribute.id === attrGroupList[j].id )
-							{
-								var attribute = attrGroupList[j];
-								attribute.mandatory = prgAttribute.mandatory;
-								
-								// STEP 2.2. Add the attribute in attribute list of result
-								
-								me.attributeGroupList[i].list.push(attribute);
-							}
-						}
-					}
-				}
+				me.attributeGroupList = me.generateAttributeGroupList( attrGroups, prgAttributes );
+				
 				
 				// STEP 3. Populate orgunit list in 'Settings'
 				
@@ -1152,7 +1276,7 @@ function Counsellor( storageObj, translationObj )
 	};
 	
 	
-	// Set up data/events for components in HTML page
+	// Populate data and Setup events for components in HTML page
 	
 	me.checkAndLoadDataAfterInit = function()
 	{
@@ -1163,7 +1287,16 @@ function Counsellor( storageObj, translationObj )
 			me.searchDistrictOBTag = me.seachAddClientFormTag.find("[attribute='" + me.attr_DistrictOB + "']");
 			me.searchLastNameTag = me.seachAddClientFormTag.find("[attribute='" + me.attr_LastName + "']");
 			me.searchFirstNameTag = me.seachAddClientFormTag.find("[attribute='" + me.attr_FirstName + "']");
-			me.addDoBTag = me.addClientFormTag.find("[attribute='" + me.attr_DoB + "']");
+			me.searchBirthOrderTag = me.seachAddClientFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
+			
+
+			me.resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
+			me.resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
+			me.resultTestParallel1Tag = me.getDeField( me.de_Testing_ResultParallel1 );
+			me.resultTestParallel2Tag = me.getDeField( me.de_Testing_ResultParallel2 );
+			me.resultTestResultSDBiolineTag = me.getDeField( me.de_Testing_ResultSDBioline );
+			me.resultFinalHIVStatusTag = me.getDeField( me.de_FinalResult_HIVStatus );
+		
 			
 			me.setUp_Events();		
 			me.setUp_FloatButton();		
@@ -1189,7 +1322,10 @@ function Counsellor( storageObj, translationObj )
 	me.listTodayCases = function( exeFunc )
 	{
 		me.currentList = me.PAGE_TODAY_LIST;
-		me.storageObj.addItem("page", me.PAGE_TODAY_LIST);
+		me.storageObj.addItem( "page", me.PAGE_TODAY_LIST );
+		me.storageObj.addItem( "subPage", me.PAGE_SEARCH_ADD_CLIENT );
+		me.storageObj.addItem( "subPage", me.PAGE_SEARCH_EDIT_CLIENT );
+		
 		
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "todayCases_headerTitle" );
 		me.listDateTag.html( Util.getLastNDate(0) );
@@ -1201,6 +1337,8 @@ function Counsellor( storageObj, translationObj )
 	{
 		me.currentList = me.PAGE_PREVIOUS_LIST;
 		me.storageObj.addItem("page", me.PAGE_PREVIOUS_LIST);
+		me.storageObj.addItem( "subPage", me.PAGE_SEARCH_ADD_CLIENT );
+		me.storageObj.addItem( "subPage", me.PAGE_SEARCH_EDIT_CLIENT );
 		
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "previousCases_headerTitle" );
 		me.listDateTag.html( "" );
@@ -1212,6 +1350,8 @@ function Counsellor( storageObj, translationObj )
 	{
 		me.currentList = me.PAGE_POSITIVE_LIST;
 		me.storageObj.addItem("page", me.PAGE_POSITIVE_LIST);
+		me.storageObj.addItem( "subPage", me.PAGE_SEARCH_ADD_CLIENT );
+		me.storageObj.addItem( "subPage", me.PAGE_SEARCH_EDIT_CLIENT );
 		
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "positiveCases_headerTitle" );
 		me.listDateTag.html( "" );
@@ -1414,6 +1554,7 @@ function Counsellor( storageObj, translationObj )
 		});
 	};
 	
+	
 	// -------------------------------------------------------------------
 	// Search Client
 	// -------------------------------------------------------------------
@@ -1426,7 +1567,7 @@ function Counsellor( storageObj, translationObj )
 				if ( isInSession ) {
 					var clientData = me.getArrayJsonData( "attribute",  me.searchClientFormTag );
 					var requestData = {
-							"attributes": clientData
+						"attributes": clientData
 					};
 					
 					if( requestData.attributes.length > 0 )
@@ -1467,6 +1608,7 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
+	
 	me.populateSearchClientData = function( clientList )
 	{
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_rowTooltip" );
@@ -1477,7 +1619,7 @@ function Counsellor( storageObj, translationObj )
 			var lastName = "";
 			var dob = "";
 			var district = "";
-			var twin = "";
+			var birthOrder = "";
 			var adquisition = "";
 			var lastTestNS = "";
 			var lastContact = "";
@@ -1500,6 +1642,9 @@ function Counsellor( storageObj, translationObj )
 						dob = Util.formatDate_LocalDisplayDate(dob);
 					}
 				}
+				else if( attrValue.attribute === me.attr_BirthOrder ){
+					birthOrder = attrValue.value;
+				}
 				else if( attrValue.attribute === me.attr_DistrictOB ){
 					district = attrValue.value;
 				}
@@ -1508,9 +1653,6 @@ function Counsellor( storageObj, translationObj )
 				}
 				else if( attrValue.attribute === me.attr_Last_TestNS ){
 					lastTestNS = attrValue.value;
-				}
-				else if( attrValue.attribute === me.attr_LastContact ){
-					lastContact = attrValue.value;
 				}
 			}
 			
@@ -1526,7 +1668,7 @@ function Counsellor( storageObj, translationObj )
 			
 			
 			// -------------------------------------------------------------------
-			// Add Click-event for row
+			// Add [Click] event for row
 			// -------------------------------------------------------------------
 
 			me.addEventForSearchResultRow( rowTag );
@@ -1536,7 +1678,8 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-	// Add 'Click' event for each row in search result
+	
+	// Add [Click] event for each row in search result
 	
 	me.addEventForSearchResultRow = function( rowTag )
 	{
@@ -1546,7 +1689,7 @@ function Counsellor( storageObj, translationObj )
 	};
 	
 	
-	// Load Client details when a row in search result is clicked
+	// Load [Client details] when a row in search result is clicked
 	
 	me.loadClientDetails = function( clientId, eventId, exeFunc ){
 
@@ -1613,10 +1756,57 @@ function Counsellor( storageObj, translationObj )
 			});
 	};
 	
+	
 	// -------------------------------------------------------------------
 	// Add/Update Client
 	// -------------------------------------------------------------------
-
+	
+	// Get client JSON data from attribute of the tab
+	me.getClientJsonData = function()
+	{
+		var attributeData = me.getArrayJsonData( "attribute", me.addClientFormTag );
+		
+		var clientData = me.addClientFormTabTag.attr( "client" );
+		if( clientData !== undefined ) {
+			clientData = JSON.parse( clientData );
+			clientData.attributes = attributeData;			
+		}
+		else
+		{
+			clientData = { "attributes": attributeData };
+		}
+		
+		return clientData;
+	};
+	
+	me.getSaveClientURL = function()
+	{
+		// STEP 1. Get client & event JSON data from attribute of the tab
+		
+		var attributeData = me.getArrayJsonData( "attribute", me.addClientFormTag );
+		
+		var clientData = me.addClientFormTabTag.attr( "client" );
+		if( clientData !== undefined ) {
+			clientData = JSON.parse( clientData );
+			clientData.attributes = attributeData;			
+		}
+		else
+		{
+			clientData = { "attributes": attributeData };
+		}
+		
+		var url ="../client/save?ouId=" + me.orgUnitListTag.val();
+		
+		var client = me.addClientFormTabTag.attr("client");
+		if( client !== undefined )
+		{
+			client = JSON.parse( client );
+			url += "&clientId=" + client.trackedEntityInstance;
+		}
+		
+		return url;
+	};
+	
 	me.saveClient = function()
 	{
 		Commons.checkSession( function( isInSession ) {
@@ -1625,35 +1815,12 @@ function Counsellor( storageObj, translationObj )
 				
 				if( me.validationObj.checkFormEntryTagsData(me.addClientFormTabTag) )
 				{
-					// STEP 1. Get client & event JSON data from attribute of the tab
-					
-					var attributeData = me.getArrayJsonData( "attribute", me.addClientFormTag );
-					
-					var clientData = me.addClientFormTabTag.attr( "client" );
-					if( clientData !== undefined ) {
-						clientData = JSON.parse( clientData );
-						clientData.attributes = attributeData;			
-					}
-					else
-					{
-						clientData = { "attributes": attributeData };
-					}
-					
-					// STEP 2. Add client
-					var clientId = me.addClientFormTabTag.attr("clientId");
-					
-					var url ="../client/save?ouId=" + me.orgUnitListTag.val();
-					if( clientId !== undefined )
-					{
-						url += "&clientId=" + clientId;
-					}
-					
 					$.ajax(
 						{
 							type: "POST"
-							,url: url
+							,url: me.getSaveClientURL()
 							,dataType: "json"
-							,data: JSON.stringify( clientData )
+							,data: JSON.stringify( me.getClientJsonData() )
 				            ,contentType: "application/json;charset=utf-8"
 			            	,beforeSend: function( xhr ) {
 				        		var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingClient" );
@@ -1661,40 +1828,47 @@ function Counsellor( storageObj, translationObj )
 				            }
 							,success: function( response ) 
 							{
-								// STEP 3. Set the clientId as attribute for the form. 
+								// STEP 1. Set the client as attribute for the form. 
 								
-								var clientId = response.trackedEntityInstance;
-								me.addClientFormTabTag.attr( "clientId", clientId );
 								me.addClientFormTabTag.attr( "client", JSON.stringify( response ) );
 								
-								// STEP 4. Change the header of the form && and enable the 'Create Event' button
+								// STEP 2. Set the header of the [Client Form] Tab
 								
 								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_editForm_headerTitle" );
 								me.addClientFormDivTag.find(".headerList").html(tranlatedText);
 
+								// STEP 3. Set the value of the [Save Client] button
+								
 								tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editClient" );
 								me.saveClientBtnTag.html( tranlatedText );
+								
+								// STEP 4. Set the value of the [Save Event] button
 								
 								tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_createEvent" );
 								me.saveEventBtnTag.html( tranlatedText );
 								
+								// STEP 5. Disable [Complete Event] button
+								
 								Util.disableTag( me.completedEventBtnTag, true );
 								
-								
-								// STEP 5. Active "Client Attribute" Tab if the "status" mode is "Edit Client"
+								// STEP 6.1 Display [Client Attribute] Tab if the "status" mode is "Edit Client"
 								
 								if( me.saveClientBtnTag.attr("status") == "update" )
 								{
 									me.showTabInClientForm( me.TAB_NAME_CLIENT_ATTRIBUTE );
 								}
+								// STEP 6.1 Display [This Test] Tab if the "status" mode is "Add Client"
 								else if( me.saveClientBtnTag.attr("status") == "add" )
 								{
 									me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 								}
+								
+								// STEP 7. Set the status "Update" for [Client Form]
+								
 								me.saveClientBtnTag.attr("status", "update");
 								
 								
-								// STEP 6. Unblock form
+								// STEP 8. Unblock form
 								
 								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
 								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
@@ -1725,6 +1899,28 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
+	
+	// -------------------------------------------------------------------
+	// Add/Update Event
+	// -------------------------------------------------------------------
+	
+	me.getSaveEventURL = function( clientId, eventId )
+	{
+		var url = "../event/save?ouId=" + me.orgUnitListTag.val();
+		
+		if( clientId !== undefined )
+		{
+			url += "&clientId=" + clientId;
+		}
+		
+		if( eventId !== undefined )
+		{
+			url += "&eventId=" + eventId;
+		}
+		
+		return url;
+	};
+	
 	me.saveEvent = function( jsonData, clientId, eventId, exeFunc )
 	{
 		Commons.checkSession( function( isInSession ) {
@@ -1732,18 +1928,7 @@ function Counsellor( storageObj, translationObj )
 				
 				if( me.validationObj.checkFormEntryTagsData(me.thisTestDivTag) )
 				{
-					var url = "../event/save?ouId=" + me.orgUnitListTag.val();
-					
-					if( clientId !== undefined )
-					{
-						url += "&clientId=" + clientId;
-					}
-					
-					if( eventId !== undefined )
-					{
-						url += "&eventId=" + eventId;
-					}
-					
+					var url = me.getSaveEventURL( clientId, eventId );
 					jsonData.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag )
 					
 					$.ajax(
@@ -1817,96 +2002,55 @@ function Counsellor( storageObj, translationObj )
 		
 	}
 	
-	me.addEventClickHandle = function( exeFunc )
+	me.completeEvent = function( exeFunc )
 	{
-		// STEP 1. Check if the form has any event which existed
+		var event = JSON.parse( me.addClientFormTabTag.attr( "event" ) );
+		var eventId = event.event;
 		
-		var eventId = me.addClientFormTabTag.attr( "eventId" );
+		// -------------------------------------------------------------------
+		// STEP 2. Add the event data to "Previous test" tab
+		// -------------------------------------------------------------------
 		
-		// STEP 2. If there is existing event, Update the status of editing event and move the event to "Previous test" tab
-		if( eventId !== undefined )
-		{
-			var event = JSON.parse( me.addClientFormTabTag.attr( "event" ) );
+		tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );			
+		var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
+		headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTime( event.eventDate ) + "</th>");
+		
+		
+		// STEP 2.1. Create empty table for this event
+		
+		var tbody = me.createSectionEmtyTable( event );
+		me.previousTestsTag.find("table").prepend( tbody );
+		
+		// STEP 2.2. Populate data in tbody
+		
+		var dataValues = event.dataValues;
+		me.populateHistoryEventData( event.dataValues, tbody );
 			
-			// -------------------------------------------------------------------
-			// STEP 2. Add the event data to "Previous test" tab
-			// -------------------------------------------------------------------
+		// STEP 2.3. Add event for Header row
+		
+		me.setUp_PreviousTestHeaderEvent( headerTag, me.previousTestsTag.find("table") );
+		
+		
+		// -------------------------------------------------------------------
+		// STEP 3. Update status of event from "ACTIVE" to "COMPLETED"
+		// -------------------------------------------------------------------
+		
+		// Update status of event
+		
+		event.status = "COMPLETED";		
+		me.saveEvent( event, undefined, eventId, function(){
 			
-			tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );			
-			var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
-			headerTag.append("<th colspan='2' ><img style='float:left' class='arrowRightImg' src='../images/tab_right.png'> " + tranlatedText + " " + Util.formatDate_DisplayDateTime( event.eventDate ) + "</th>");
+			me.resetDataEntryForm();
 			
+			Util.disableTag( me.completedEventBtnTag, true );
 			
-			// STEP 2.1. Create tbody to display data values of an event
-			
-			var tbody = me.createSectionEmtyTable( eventId, event.eventDate );
-			me.previousTestsTag.find("table").prepend( tbody );
-			
-			// STEP 2.2. Populate data in tbody
-			
-			var dataValues = event.dataValues;
-			for( var j in dataValues )
-			{
-				var dataValue = dataValues[j];
-				var deId = dataValue.dataElement;
-				var value = dataValue.value;
-				
-				var inputTag = me.thisTestDivTag.find("input[dataElement='" + deId + "'],select[dataElement='" + deId + "']");
-				if( inputTag.prop("tagName") == "SELECT" )
-				{
-					value = inputTag.find("option[value='" + value + "']").text();
-				}
-				else if( inputTag.attr("isDate") === "true" && value != "" )
-				{
-					value = Util.formatDate_LocalDisplayDate( value );
-				}
-				else if( inputTag.attr("type") == "checkbox" )
-				{
-					value = "Yes"
-				}
-				
-				tbody.find("td[dataElement='" + deId + "']").html( value );
-			}
-			
-			// STEP 2.3. Add event for Header row
-			
-			me.setUp_PreviousTestHeaderEvent( headerTag, me.previousTestsTag.find("table") );
-			
-			
-			// -------------------------------------------------------------------
-			// STEP 3. Update status of event from "ACTIVE" to "COMPLETED"
-			// -------------------------------------------------------------------
-			
-			// Update status of event
-			
-			event.status = "COMPLETED";		
-			me.saveEvent( event, undefined, eventId, function(){
-				Util.disableTag( me.completedEventBtnTag, true );
-				
-				// Empty fields from "This Test" tab
-				me.thisTestDivTag.find("input,select").val("");
-				me.thisTestDivTag.find("input[type='checkbox']").prop("checked", false);
-				
-
-				// Show 'Save' event button AND show "This test" form
-				me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
-				me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
-				
-				if( exeFunc !== undefined ) exeFunc();
-			} );
-			
-		}
-		else
-		{
-			// Show "Previous Test" and "This test" form
+			// Show 'Save' event button AND show "This test" form
 			me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
 			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 			
-			MsgManager.appUnblock();
 			if( exeFunc !== undefined ) exeFunc();
-		}
-		
-
+		} );
+	
 	};
 	
 	// -------------------------------------------------------------------
@@ -1937,7 +2081,6 @@ function Counsellor( storageObj, translationObj )
 	{
 		me.contentListTag.html("");
 		me.mainContentTags.hide();
-//		me.mainContentTags.find("input,select").val("");
 	};
 	
 	me.showSearchClientForm = function()
@@ -1973,6 +2116,7 @@ function Counsellor( storageObj, translationObj )
 		me.resetPageDisplay();
 		me.saveClientBtnTag.attr("status", "add" );
 		me.saveEventBtnTag.attr("status", "add" );
+		me.resetClientForm();
 		me.resetDataEntryForm();
 
 		// Change the Header title && 'Save' buton display name
@@ -1988,7 +2132,14 @@ function Counsellor( storageObj, translationObj )
 			var value = $(this).val();
 			var field = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']");
 			
-			field.val( value );
+			if( field.attr("type") == "radio" || field.attr("type") == "checkbox" )
+			{
+				field.closest("td").find("[value='" + value + "']").prop("checked", true);
+			}
+			else
+			{
+				field.val( value );
+			}
 		});
 		
 		// Generate Client CUIC if any
@@ -2009,28 +2160,93 @@ function Counsellor( storageObj, translationObj )
 	me.showUpdateClientForm = function( data, selectedEventId )
 	{
 		me.storageObj.addItem("subPage", me.PAGE_SEARCH_EDIT_CLIENT);
-		
-		// Change the Header title && 'Save' buton display name
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_editClient" );
-		me.addClientFormDivTag.find(".headerList").html( tranlatedText );
-		
-		tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editClient" );
-		me.saveClientBtnTag.html( tranlatedText );
-		
-		me.saveClientBtnTag.attr("status", "update" );
-		me.resetDataEntryForm();
 
+		// Update the status of client
+		me.saveClientBtnTag.attr("status", "update" );
+
+		me.resetClientForm();
+		me.resetDataEntryForm();
 		me.contentListTag.hide();
 		me.searchResultTbTag.hide();
 		me.searchResultTag.hide();
-
 		me.searchClientFormTag.hide();
+		
+		
+		// Set the Header title
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_editClient" );
+		me.addClientFormDivTag.find(".headerList").html( tranlatedText );
+		
+		// Set 'Save' buton display name
+		tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editClient" );
+		me.saveClientBtnTag.html( tranlatedText );
+		
 	
+		// Populate Client data		
+		me.populateClientDataInForm( data.client );		
+		
+		// Get activeEvent and completedEvent list
+		
+		var events = data.events.events;
+		var activeEvent;
+		var completedEvents = [];
+		
+		for( var i=0; i<events.length; i++ )
+		{
+			var event = events[i];
+			var dataValues = event.dataValues;
+			var eventId = event.event;
+			
+			if( event.status == "ACTIVE" && activeEvent === undefined )
+			{
+				activeEvent = event;
+			}
+			else
+			{
+				completedEvents.push( event );
+			}
+		}
+			
+		// Set up data in "Previous Test" tab
+		me.setUp_DataInPreviousTestTab( completedEvents, selectedEventId );
+				
+		// Set up data in "This Test" tab
+
+		me.setUp_DataInThisTestTab();
+		
 		// ---------------------------------------------------------------------------------------
-		// STEP 1. Populate Client data
+		// STEP 5. Show "This Test" / "Previous Test" tab if there is a "seleted event id"
 		// ---------------------------------------------------------------------------------------
 		
-		var clientDetails = data.client.attributes;
+		if( selectedEventId !== undefined  )
+		{
+			if( activeEvent !== undefined && activeEvent.event == selectedEventId )
+			{
+				me.addClientFormTabTag.tabs("option", "selected", 2);
+			}
+			else
+			{
+				me.addClientFormTabTag.tabs("option", "selected", 1);
+			}
+		}
+		else
+		{
+			me.addClientFormTabTag.tabs("option", "selected", 0);
+		}
+		
+		
+		// ---------------------------------------------------------------------------------------
+		// STEP 5. Show form
+		// ---------------------------------------------------------------------------------------
+		
+		me.addClientFormDivTag.show("fast");
+		
+	};
+	
+	me.populateClientDataInForm = function( client )
+	{
+		me.addClientFormTabTag.attr( "client", JSON.stringify( client ) );
+		var clientDetails = client.attributes;
+		
 		me.addClientFormTag.find("input[attribute],select[attribute]").each(function(){
 			var attrId = $(this).attr("attribute");
 			var value = "";
@@ -2047,11 +2263,15 @@ function Counsellor( storageObj, translationObj )
 			if( inputTag.attr("isDate") === "true" && value != "" )
 			{
 				value = Util.formatDate_LocalDisplayDate( value );
+				inputTag.val( value );
 			}
-			
-			if( inputTag.attr("type") == "checkbox" )
+			else if( inputTag.attr("type") == "checkbox" )
 			{
 				inputTag.prop("checked", value );
+			}
+			else if( inputTag.attr("type") == "radio" )
+			{
+				inputTag.closest("td").find("[value='" + value + "']").prop("checked", true);
 			}
 			else
 			{
@@ -2059,68 +2279,61 @@ function Counsellor( storageObj, translationObj )
 			}	
 				
 		});
-		
-		
-		// ---------------------------------------------------------------------------------------
-		// STEP 2. Populate Event data in "Previous Test" and find out the activeEvent if any
-		// ---------------------------------------------------------------------------------------
-		
-		var cuic = me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']").val();
-		
-		var events = data.events.events;
-		var activeEvent;
-		var report = me.previousTestsTag.find("table");
-		report.html("");
-		me.addEventFormTag.find("input,select").val("");
-		
+	};
+	
+
+	// ---------------------------------------------------------------------------------------
+	// Setup data in "This Test" TAB
+	// ---------------------------------------------------------------------------------------
+	
+	me.setUp_DataInPreviousTestTab = function( events, selectedEventId )
+	{
 		for( var i=0; i<events.length; i++ )
 		{
 			var event = events[i];
-			var dataValues = event.dataValues;
-			var eventId = event.event;
 			
-			if( event.status == "ACTIVE" && activeEvent === undefined )
-			{
-				activeEvent = event;
-			}
-			else
-			{
-				
-				// STEP 2.2. Create tbody to display data values of an event
-				
-				var tbody = me.createSectionEmtyTable( event );
-				report.append( tbody );
-				
-				// STEP 2.3. Populate data in tbody
-				
-				for( var j in dataValues )
-				{
-					var dataValue = dataValues[j];
-					var deId = dataValue.dataElement;
-					var value = dataValue.value;
-					
-					var inputTag = me.thisTestDivTag.find("input[dataElement='" + deId + "'],select[dataElement='" + deId + "']");
-					if( inputTag.prop("tagName") == "SELECT" )
-					{
-						value = inputTag.find("option[value='" + value + "']").text();
-					}
-					else if( inputTag.attr("isDate") === "true" && value != "" )
-					{
-						value = Util.formatDate_LocalDisplayDate( value );
-					}
-					else if( inputTag.attr("type") == "checkbox" )
-					{
-						value = "Yes"
-					}
-					
-					tbody.find("td[dataElement='" + deId + "']").html( value );
-				}
-			}
+			// STEP 2.2. Create tbody to display data values of an event				
+			var tbody = me.createSectionEmtyTable( event );
+			me.previousTestsTag.find("table").append( tbody );
+			
+			// STEP 2.3. Populate data in tbody
+			me.populateHistoryEventData( event.dataValues, tbody );
 		}
-	
-
-		// STEP 3. Check to display "Previous Test"
 		
+		me.checkAndDisplayPreviousTestTab( selectedEventId );
+	};
+	
+	
+	me.populateHistoryEventData = function( dataValues, tag )
+	{
+		for( var j in dataValues )
+		{
+			var dataValue = dataValues[j];
+			var deId = dataValue.dataElement;
+			var value = dataValue.value;
+			
+			var inputTag = me.thisTestDivTag.find("input[dataElement='" + deId + "'],select[dataElement='" + deId + "']");
+			if( inputTag.prop("tagName") == "SELECT" )
+			{
+				value = inputTag.find("option[value='" + value + "']").text();
+			}
+			else if( inputTag.attr("isDate") === "true" && value != "" )
+			{
+				value = Util.formatDate_LocalDisplayDate( value );
+			}
+			else if( inputTag.attr("type") == "checkbox" )
+			{
+				value = "Yes";
+			}
+			
+			tag.find("td[dataElement='" + deId + "']").html( value );
+		}
+	};
+
+	
+	me.checkAndDisplayPreviousTestTab = function( selectedEventId )
+	{
+		report = me.previousTestsTag.find("table");
 		if( report.find("tbody").length > 0 )
 		{
 			// Show selectedEvent in PreviousTest if any
@@ -2139,43 +2352,23 @@ function Counsellor( storageObj, translationObj )
 		{
 			me.hideTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
 		}
-				
-		// ---------------------------------------------------------------------------------------
-		// STEP 4. Populate activeEvent as attribute for the 'This test' form
-		// ---------------------------------------------------------------------------------------
+	}
+	
 
+	// ---------------------------------------------------------------------------------------
+	// Setup data in "This Test" TAB
+	// ---------------------------------------------------------------------------------------
+	
+	me.setUp_DataInThisTestTab = function( activeEvent )
+	{	
 		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
+		
+		// Always show [Complete] button
+		me.completedEventBtnTag.show();
 		
 		if( activeEvent !== undefined )
 		{	
-			me.completedEventBtnTag.show();
-			
-			var eventId = activeEvent.event;
-			me.addClientFormTabTag.attr( "eventId", eventId );			
-			me.addClientFormTabTag.attr( "event", JSON.stringify( activeEvent ) );
-			me.saveEventBtnTag.attr("status", "update" );
-			
-			me.addEventFormTag.find("input,select").val("");
-			
-			for( var i in activeEvent.dataValues )
-			{
-				var dataValue = activeEvent.dataValues[i];
-				var inputTag = me.addEventFormTag.find("[dataElement='" + dataValue.dataElement + "']");
-				if( inputTag.attr("type") == "checkbox" )
-				{
-					inputTag.prop("checked", dataValue.value );
-				}
-				else if( inputTag.attr("isDate") == "true" )
-				{
-					inputTag.prop("checked", dataValue.value );
-				}
-				else
-				{
-					inputTag.val( dataValue.value );
-				}
-				
-			}
-			
+			// when a client is just created, an empty event will be created which is used for retrieving client in a certain list
 			if( activeEvent.dataValues.length == 0 ){
 				Util.disableTag( me.completedEventBtnTag, true );
 			}
@@ -2183,80 +2376,84 @@ function Counsellor( storageObj, translationObj )
 				Util.disableTag( me.completedEventBtnTag, false );
 			}
 			
-			// Check if the logged counsellor if this counsellor is the person who created the active event
-			// If logged counsellor is a person who create the active event, then allow to edit data event
+			// Set "UPDATE" status for [Save Event] button
+			me.saveEventBtnTag.attr("status", "update" );
 			
-			var searchLoggedCounsellor =  Util.findItemFromList( me.catOptionComboList, "id", activeEvent.attributeOptionCombo );
-			if( searchLoggedCounsellor !== undefined && me.loginUsername === searchLoggedCounsellor.categoryOptions[0].code )
-			{
-				me.addEventFormTag.find("input,select").each( function(){
-					Util.disableTag( $(this), false );
-				});
-			}
-			else
-			{
-				me.addEventFormTag.find("input,select").each( function(){
-					Util.disableTag( $(this), true );
-				});
-			}
-
-			me.activeEventHeaderTag.find("span").html( searchLoggedCounsellor.categoryOptions[0].name );
+			// Populate event data
+			me.populateActiveEventData( activeEvent );
+			
+			// Set up if Data Entry Form can be editable
+			me.setUp_IfDataEntryFormEditable( activeEvent.attributeOptionCombo );
 		}
 		else
 		{
 			Util.disableTag( me.completedEventBtnTag, true );
+			
+			// Set "ADD" status for [Save Event] button
 			me.saveEventBtnTag.attr("status", "add" );
 			
+			// Enable the form for entering data
 			me.addEventFormTag.find("input,select").each( function(){
 				Util.disableTag( $(this), false );
 			});
 			
 			me.activeEventHeaderTag.hide();
 		}
-
-		// ---------------------------------------------------------------------------------------
-		// STEP 4. Populate clientId as attribute for the form
-		// ---------------------------------------------------------------------------------------
-		
-		var clientId = data.client.trackedEntityInstance;
-		me.addClientFormTabTag.attr( "clientId", clientId );
-		me.addClientFormTabTag.attr( "client", JSON.stringify( data.client ) );
-		
-
-		// ---------------------------------------------------------------------------------------
-		// STEP 5. Show "This Test" / "Previous Test" tab if there is a "seleted event id"
-		// ---------------------------------------------------------------------------------------
-		
-		
-		if( selectedEventId !== undefined  )
+	};
+	
+	
+	// Check if the logged counsellor if this counsellor is the person who created the active event
+	// If logged counsellor is a person who create the active event, then allow to edit data event
+	
+	me.setUp_IfDataEntryFormEditable = function( attributeOptionCombo )
+	{
+		var searchLoggedCounsellor =  Util.findItemFromList( me.catOptionComboList, "id", attributeOptionCombo );
+		if( searchLoggedCounsellor !== undefined && me.loginUsername === searchLoggedCounsellor.categoryOptions[0].code )
 		{
-			if( activeEvent !== undefined && activeEvent.event == selectedEventId )
-			{
-				me.addClientFormTabTag.tabs("option", "selected", 2);
-			}
-			else
-			{
-				me.addClientFormTabTag.tabs("option", "selected", 1);
-			}
-			
+			me.addEventFormTag.find("input,select").each( function(){
+				Util.disableTag( $(this), false );
+			});
 		}
 		else
 		{
-			me.addClientFormTabTag.tabs("option", "selected", 0);
+			me.addEventFormTag.find("input,select").each( function(){
+				Util.disableTag( $(this), true );
+			});
 		}
 		
+		me.activeEventHeaderTag.find("span").html( searchLoggedCounsellor.categoryOptions[0].name );
+	}
+
+	me.populateActiveEventData = function( event )
+	{
+		me.addClientFormTabTag.attr( "event", JSON.stringify( activeEvent ) );
 		
-		// ---------------------------------------------------------------------------------------
-		// STEP 5. Show form
-		// ---------------------------------------------------------------------------------------
-		
-		me.addClientFormDivTag.show("fast");
-		
+		var dataValues = event.dataValues;
+		for( var i in dataValues )
+		{
+			var dataValue = dataValues[i];
+			var value = dataValue.value;
+			
+			var inputTag = me.addEventFormTag.find("[dataElement='" + dataValue.dataElement + "']");
+			if( inputTag.attr("type") == "checkbox" )
+			{
+				inputTag.prop("checked", dataValue.value );
+			}
+			else 
+			{
+				if( inputTag.attr("isDate") == "true" )
+				{
+					value = Util.formatDate_LocalDisplayDate( value );
+				}
+				
+				inputTag.val( value );
+			}			
+		}
 	};
 	
 	
 	// Create a tbody with sections of programs. This one is used for generating history of events of a client
-	
+		
 	me.createSectionEmtyTable = function( event )
 	{
 		var eventId = event.event;
@@ -2309,6 +2506,7 @@ function Counsellor( storageObj, translationObj )
 		
 		return tbody;
 	}
+	
 	
 	// Show / Hide an event in history of a client
 	
@@ -2395,6 +2593,13 @@ function Counsellor( storageObj, translationObj )
 					value = "";
 				}
 			}
+			else if( item.attr("type") == "radio" )
+			{
+				if( !item.prop("checked") )
+				{
+					value = "";
+				}
+			}
 			
 			if( value !== "" )
 			{
@@ -2414,25 +2619,81 @@ function Counsellor( storageObj, translationObj )
 		return jsonData;
 	};
 	
-	// Generate a message based on Client search criteria
 	
+	// Generate a message based on Client search criteria
+	// Matches for [Med Rod who were born at Measer in 10 Jan 2014 with 1 child]
+	// Matches for [clients who were born at Measer in 10 Jan 2014 with 1 child]
 	me.getSearchCriteria = function( formTag )
 	{
 		var searchCriteria = "";
+				
+		var firstName = me.searchFirstNameTag.val();
+		var lastName = me.searchLastNameTag.val();
+		var districtOfBirth = me.searchDistrictOBTag.find("option:selected").text();
+		var dob = me.searchDoBTag.val();
+		var birthOrder = me.searchBirthOrderTag.val();
 		
-		formTag.find("input,select").each( function(){
-			var item = $(this);
-			if( item.val() != "" )
-			{
-				var text = $(this).closest("div.form-group").find("label").html();
-				searchCriteria += "'" + text + "' as '" + item.val() + "', ";
+		if( firstName != "" ) {
+			searchCriteria += firstName + " ";
+		}
+		
+		if( lastName != "" ) {
+			searchCriteria += lastName + " ";
+		}
+		
+		if( districtOfBirth != "" ) {
+			if( searchCriteria == "" ) {
+				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_clients" );
+				searchCriteria = translatedText + " ";
 			}
-		});
+			
+			var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_whoWereBornAt" );
+			searchCriteria += translatedText + " " + districtOfBirth + " ";
+		}
 		
-		var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_searchCriteriaClientWith" );
+		if( dob != "" )
+		{
+			if( searchCriteria == "" ) {
+				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_clients" );
+				searchCriteria = translatedText + " " +  me.translationObj.getTranslatedValueByKey( "searchResult_msg_whoWereBorn" );
+			}
+			
+			var translatedText =  me.translationObj.getTranslatedValueByKey( "searchResult_msg_on" );
+			searchCriteria += translatedText + " " + dob + " ";
+		}
 		
-		return ( searchCriteria.length > 0 ) ? translatedText + " " + searchCriteria.substring( 0, searchCriteria.length - 2 ) : "";
-	}
+
+		if( birthOrder != "" )
+		{
+			if( searchCriteria == "" ) {
+				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_clientsWhoHave" );
+				searchCriteria += translatedText + " ";
+			}
+			
+			birthOrder = eval( birthOrder );
+			if( birthOrder == 0 )
+			{
+				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_withoutChildren" );
+				searchCriteria += translatedText;
+			}
+			else 
+			{
+				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_with" );
+				searchCriteria += translatedText + " " + birthOrder + " ";
+				if( birthOrder == 1 )
+				{
+					searchCriteria += me.translationObj.getTranslatedValueByKey( "searchResult_msg_child" );
+				}
+				else
+				{
+					searchCriteria += me.translationObj.getTranslatedValueByKey( "searchResult_msg_children" );
+				}
+			}
+		}
+		
+		var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_searchCriteria" );		
+		return translatedText + " " + searchCriteria;
+	};
 	
 
 	me.getDeField = function( deId )
@@ -2454,7 +2715,7 @@ function Counsellor( storageObj, translationObj )
 		// Year(YY) Month(MM) DistrictOfBirth(DB) FirstName(2 Chars) LastName(2 Chars) BirthOrder(2 Chars)
 		
 		var dateOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DoB + "']").val();
-		var districtOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DistrictOB + "']").val();
+		var districtOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DistrictOB + "']:checked").val();
 		var firstName = me.addClientFormTabTag.find("[attribute='" + me.attr_FirstName + "']").val();
 		var lastName = me.addClientFormTabTag.find("[attribute='" + me.attr_LastName + "']").val();
 		var birthOrder = me.addClientFormTabTag.find("[attribute='" + me.attr_BirthOrder + "']").val();
