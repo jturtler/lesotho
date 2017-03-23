@@ -83,10 +83,16 @@ public final class Util
     public static final String KEY_GET_EVENT_DETAILS = "details";
     
 
-    public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "98319";
-    public static String KEY_TRANSLATION_VERSION_PROJECT_ID = "95765";
+//    public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "98319"; // On Rodolfo account
+//    public static String KEY_TRANSLATION_VERSION_PROJECT_ID = "95765"; // On Rodolfo account
+    public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "102649"; // Tran account
+    public static String KEY_TRANSLATION_VERSION_PROJECT_ID = "102655"; // Tran account
+    
     public static String KEY_TRANSLATION_LIST = "keywordList";
     public static String KEY_TRANSLATION_VERSION = "version";
+    
+    
+    
 
     // --------------------------------------------------------------------------------------------------------------
     // HTTPS GET/POST/PUT request

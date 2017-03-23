@@ -95,7 +95,15 @@ function Validation( translationObj )
 		var valid = true;
 		var value = inputTag.val();
 
-		if( value === "" && inputTag.attr('mandatory') === 'true' )
+		if( inputTag.type === "checkbox" || inputTag.type === "radio" )
+		{
+			if ( inputTag.closest("td").find("input:checked") == 0 );
+			{
+				divTag.append( me.getErrorSpanTag( 'Enter data in this field' ) );
+				valid = false;
+			}
+		}
+		else if( value === "" && inputTag.attr('mandatory') === 'true' )
 		{
 			divTag.append( me.getErrorSpanTag( 'Enter data in this field' ) );
 			valid = false;

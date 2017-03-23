@@ -141,10 +141,13 @@ function Translation( baseURL, storageObj )
 	
 	me.getTranslatedValueByKey = function( key )
 	{
-		var value = me.translatedKeyWords[me.lang][key];
-		if( value !== undefined )
+		if( me.translatedKeyWords[me.lang] !== undefined )
 		{
-			return value;
+			var value = me.translatedKeyWords[me.lang][key];
+			if( value !== undefined )
+			{
+				return value;
+			}
 		}
 
 		return key;

@@ -578,6 +578,7 @@ table.tablesorter thead tr .headerSortDown {
 .previousTestTb td
 {
     border: 1px solid #d6d2d2;
+    width: 200px;
 }
 
 .previousTestTb img
@@ -680,10 +681,38 @@ table.tablesorter thead tr .headerSortDown {
 	height: 18px !IMPORTANT;
 }
 
+.radioBox
+{
+	height: 18px !IMPORTANT;
+	width: 20px !IMPORTANT;    
+	margin-left: 10px !IMPORTANT;
+}
+
 .testMsg
 {
 	padding-bottom: 10px;
     font-style: italic;
     color: gray;
 }
+
+.divTable
+{
+     display:  table;
+     width:auto;
+     border-spacing:5px;
+}
+
+.divRow
+{
+   display:table-row;
+   width:auto;
+}
+
+.divCell
+{
+    float:left;/*fix for  buggy browsers*/
+    display:table-column;
+    width:150px;
+}
+
 
