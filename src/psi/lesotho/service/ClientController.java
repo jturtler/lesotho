@@ -3,6 +3,8 @@ package psi.lesotho.service;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,10 +22,9 @@ public class ClientController
     private static final long serialVersionUID = -8009460801270486913L;
 
     private static String TRACKED_ENTITY = "MCPQUTHX1Ze";
-
-    private static String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?ou="
-        + Util.ROOT_ORGTUNIT + "&ouMode=DESCENDANTS&skipPaging=true&program=" + Util.PROGRAM_ID;
-
+    
+    private static ArrayList<String> searchVariables = new ArrayList<>(Arrays.asList( "mW2l3T2zL0N", "mUxDHgywnn2", "wSp6Q7QDMsk", "u57uh7lHwF8", "vTPYC9BXPNn" ));
+    
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
@@ -47,30 +48,6 @@ public class ClientController
                 {
                     JSONObject receivedData = Util.getJsonFromInputStream( request.getInputStream() );
                     responseInfo = ClientController.searchClients( request, receivedData );
-                    
-                    String outputData = "";
-                    if ( responseInfo.responseCode == 200 )
-                    {
-                        JSONObject searchResult = new JSONObject( responseInfo.output );
-                        JSONArray clientList = searchResult.getJSONArray( "trackedEntityInstances" );
-                        String strClientList = "\"clientList\":" + clientList.toString();
-                        outputData = "{" + strClientList + "}";
-                            
-                        if( clientList.length() > 0 )
-                        {
-                            String clientIdList = ClientController.convertClientUidsToString( clientList );
-                            
-                            responseInfo = ClientController.searchLatestEventByClientIdList( clientIdList );
-                            if ( responseInfo.responseCode == 200 )
-                            {
-                                JSONObject eventList = new JSONObject( responseInfo.output );
-                                String strEventList = "\"latestEvents\":" + eventList.getJSONArray( "rows" ).getJSONArray( 0 );
-                                outputData = "{" + strClientList + "," + strEventList + "}";
-                                responseInfo.output = outputData;
-                            } 
-                        }
-                    }
-                    
                 }
                 // STEP 3.2. Get All events of an client
                 else if ( key.equals( Util.KEY_CLIENT_DETAILS ) )
@@ -152,22 +129,13 @@ public class ClientController
         ResponseInfo responseInfo = null;
         try
         {
-            String requestUrl = ClientController.URL_QUERY_SEARCH_CLIENTS;
-            JSONArray attrList = jsonData.getJSONArray( "attributes" );
-
-            for ( int i = 0; i < attrList.length(); i++ )
-            {
-                JSONObject attribute = attrList.getJSONObject( i );
-                String value = URLEncoder.encode( attribute.getString( "value" ) );
-                requestUrl += "&filter=" + attribute.getString( "attribute" ) + ":LIKE:" + value;
-            }
-
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
-
+            String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
+            String url = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/zPJW0n6mymH/data.json?" + condition;
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
         {
-            System.out.println( "Exception: " + ex.toString() );
+            ex.printStackTrace();
         }
 
         return responseInfo;
@@ -257,24 +225,6 @@ public class ClientController
         return responseInfo;
     }
     
-    private static ResponseInfo searchLatestEventByClientIdList( String idList )
-    {
-        ResponseInfo responseInfo = null;
-        try
-        {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/U2Z0fsmmz3T/data.json?var=stageId:" + Util.STAGE_ID + "&var=clientUidList:" + idList;
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
-        }
-        catch ( Exception ex )
-        {
-            ex.printStackTrace();
-        }
-
-        return responseInfo;
-    }
-    
-    
-    
     
     // -----------------------------------------------------------------------------------------------------
     // Create JSON data
@@ -294,16 +244,29 @@ public class ClientController
         return jsonData;
     }
     
-    private static String convertClientUidsToString( JSONArray clientList )
+    private static String createSearchClientCondition( JSONArray attributeList )
     {
-        String clientIds = "";
-        for( int i=0; i<clientList.length(); i++ ) 
+        ArrayList<String> searchVariableCopy = (ArrayList<String>)ClientController.searchVariables.clone();
+        
+        String condition = "";
+        for( int i=0; i<attributeList.length(); i++ ) 
         {
-            String clientId = clientList.getJSONObject( i ).getString( "trackedEntityInstance" );
-            clientIds += clientId + "-";
+            String attributeId = attributeList.getJSONObject( i ).getString( "attribute" );
+            String value = attributeList.getJSONObject( i ).getString( "value" );
+            condition += "var=" + attributeId + ":" + value + "&";
+            
+            if ( searchVariableCopy.indexOf( attributeId ) >= 0 )
+            {
+                searchVariableCopy.remove( attributeId );
+            }
         }
         
-        return clientIds;
+        for( int i=0; i<searchVariableCopy.size(); i++ )
+        {
+            condition += "var=" + searchVariableCopy.get( i ) + ":%20&";
+        }
+        
+        return condition;
     }
 
 }

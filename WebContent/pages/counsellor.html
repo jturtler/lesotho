@@ -136,7 +136,7 @@
 				
 				<div id="searchResult" style="display:none;" class="mainContent">
 				
-					<h4 class="headerList"><span keyword="searchResult_msg_searchCriteria">Matches for your search</span> <span name="searchResultKey"></span></h4>
+					<h4 class="headerList"><span keyword="searchResult_msg_searchCriteria">Matches for</span> <span id="searchMatchResultKey"></span></h4>
 					
 					<div class="scroll-div">
 						<table class='table table-hover table-striped listTable tablesorter' id="searchResultTb">
@@ -156,14 +156,10 @@
 					</div>
 					
 					<div id="searchResultOptions" >
-						<p id="searchResultHeader" keyword="searchClient_result_optionTitle">Select a client from from above or<p>
-						<ul>
-							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="addNewClient"> <span class="labelOpt" keyword="searchClient_result_opt_addNew">Add new</span> <span class="labelOpt" name="searchResultKey"></span></label></li>
-							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="backToSearchClientForm"> <span class="labelOpt" keyword="searchClient_result_opt_editSearchCriteria">Edit Search criteria (go back to search screen)</span></label></li>
-							<li style="list-style-type:none;"><label><input type="radio" name="searchResultOpt" value="showTodayCase"> <span class="labelOpt" keyword="searchClient_result_opt_cancel">Cancel</span></label></li>
-						</ul>						
-						
-						<button class="btn btn-default actionBtn" id="searchResultNextBtn"keyword="searchClient_result_btn_next">Next</button>
+						<p><span id="searchResultHeader" keyword="searchClient_result_optionTitle">Select a client from from above or</span> <span id="searchResultKey"></span><p> 
+						<button id="showAddNewClientForm" keyword="searchClient_result_opt_add" class="btn btn-default actionBtn">Add</button>
+						<button id="backToSearchClientForm" keyword="searchClient_result_opt_back" class="btn btn-default actionBtn">Back</button>
+						<button id="showTodayCase" keyword="searchClient_result_opt_cancel" class="btn btn-default actionBtn">Cancel</button>
 					</div>
 				</div>
 				

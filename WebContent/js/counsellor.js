@@ -36,13 +36,15 @@ function Counsellor( storageObj, translationObj )
 	me.searchClientBtnTag = $("#searchClientBtn");
 	me.searchResultTag = $("#searchResult");
 	me.searchResultTbTag = $("#searchResultTb");
-	me.searchResultKeyTag = $("[name='searchResultKey']");
+	me.searchResultKeyTag = $("#searchResultKey");
+	me.searchMatchResultKeyTag = $("#searchMatchResultKey");
 	me.searchResultOptionsTag = $("#searchResultOptions");
 	me.seachAddClientFormTag = $("#seachAddClientForm");
 	me.backToSearchClientResultBtnTag = $("[name=backToSearchClientResultBtn]");
-	me.searchResultOptTag = $("[name='searchResultOpt']");
-	me.searchResultNextBtnTag = $("#searchResultNextBtn");
 	me.searchResultHeaderTag = $("#searchResultHeader");
+	me.showAddNewClientFormTag = $("#showAddNewClientForm");
+	me.backToSearchClientFormTag = $("#backToSearchClientForm");
+	me.showTodayCaseTag = $("#showTodayCase");
 	
 	
 	// [Add/Update Client] form	
@@ -404,31 +406,22 @@ function Counsellor( storageObj, translationObj )
 			Util.datePicker($(this), me.dateFormat );
 		});
 		
-		// Search OPTION radios
-		
-		me.searchResultOptTag.change( function(){
-			me.searchResultTag.find("span.labelOpt").css("font-size","");
-			
-			var optionTag = me.searchResultTag.find("input:radio:checked");
-			optionTag.closest("li").find("span.labelOpt").css("font-size","18px");
+		// Search Result buttons
+				
+		me.showAddNewClientFormTag.click( function(){
+			me.showAddClientForm();
+		});
+
+		me.backToSearchClientFormTag.click( function(){
+			me.resetPageDisplay();
+			me.showSearchClientForm();
 		});
 		
-		me.searchResultNextBtnTag.click(function(){
-			var optionVal = me.searchResultOptionsTag.find("input:radio:checked").val();
-			if( optionVal === "backToSearchClientForm" ) {
-				me.resetPageDisplay();
-				me.showSearchClientForm();
-			}
-			else if( optionVal === "addNewClient" ) {
-				me.showAddClientForm();
-			}
-			else if( optionVal === "showTodayCase" ) {
-				me.registerClientBtnTag.show();
-				me.listTodayCases();
-			}
+		me.showTodayCaseTag.click( function(){
+			me.registerClientBtnTag.show();
+			me.listTodayCases();
 		});
-		
-		
+				
 		// Call [Search clients] function
 		
 		me.searchClientBtnTag.click(function(e){
@@ -448,7 +441,7 @@ function Counsellor( storageObj, translationObj )
 		
 		me.seachAddClientFormTag.find("input,select").change(function(){
 			
-			var clientData = me.getArrayJsonData( "attribute",  me.searchClientFormTag );
+			var clientData = me.getArrayJsonData( "attribute", me.searchClientFormTag );
 			var requestData = { "attributes": clientData };
 			
 			if( requestData.attributes.length == 0 )
@@ -1578,9 +1571,12 @@ function Counsellor( storageObj, translationObj )
 						
 						me.searchClients( requestData, event, function( searchResult ){
 							var searchCriteria = me.getSearchCriteria( me.searchClientFormTag );
-							me.searchResultKeyTag.html( searchCriteria );
+							me.searchMatchResultKeyTag.html( searchCriteria );
 							
-							var clientList = searchResult.clientList;
+							var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_add" );
+							me.searchResultKeyTag.html( tranlatedText + " " + searchCriteria );
+							
+							var clientList = searchResult.rows;
 							if( clientList.length > 0 )
 							{
 								me.populateSearchClientData( searchResult );
@@ -1613,68 +1609,32 @@ function Counsellor( storageObj, translationObj )
 	
 	me.populateSearchClientData = function( searchResult )
 	{
-		var clientList = searchResult.clientList;
-		var latestEvents = {};
-		if( clientList.length > 0 )
-		{
-			latestEvents = JSON.parse ( "{" + searchResult.latestEvents[0] + "}" );
-		}
-		
+		var clientList = searchResult.rows;		
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_rowTooltip" );
 		
 		for( var i in clientList )
 		{
-			var clientId = clientList[i].trackedEntityInstance;
-			var firstName = "";
-			var lastName = "";
-			var dob = "";
-			var district = "";
-			var birthOrder = "";
-			var adquisition = "";
-			var lastTestNS = latestEvents[clientId];
-			lastTestNS = ( lastTestNS != undefined ) ? Util.formatDate_DisplayDate( lastTestNS ) : "";
+			var client = clientList[i];
+			var clientId = client[0];
+			var firstName = client[1].trim();
+			var lastName = client[2].trim();
+			var dob = client[3].trim();
+			dob = ( dob != "" ) ? Util.formatDate_LocalDisplayDate( dob ) : "";
+			var district = client[4].trim();
+			var birthOrder = client[5].trim();
+			var adquisition = client[6].trim();
+			adquisition = ( adquisition != "" ) ? Util.formatDate_DisplayDate( adquisition ) : "";
+			var lastTestNS = client[7].trim();
+			lastTestNS = ( lastTestNS != "" ) ? Util.formatDate_DisplayDate( lastTestNS ) : "";
 			
-			var attrValues = clientList[i].attributes;
-			for( var j in attrValues )
-			{
-				var attrValue = attrValues[j];
-				
-				if( attrValue.attribute === me.attr_FirstName ){
-					firstName = attrValue.value;
-				}
-				else if( attrValue.attribute === me.attr_LastName ){
-					lastName = attrValue.value;
-				}
-				else if( attrValue.attribute === me.attr_DoB ){
-					dob = attrValue.value;
-					if( dob !== "" )
-					{
-						dob = Util.formatDate_LocalDisplayDate(dob);
-					}
-				}
-				else if( attrValue.attribute === me.attr_BirthOrder ){
-					birthOrder = attrValue.value;
-				}
-				else if( attrValue.attribute === me.attr_DistrictOB ){
-					district = me.addClientFormDivTag.find("[attribute='" + attrValue.attribute + "'][value='" + attrValue.value + "']").attr("text");
-					district = ( district == undefined ) ? "" : district;
-				}
-				else if( attrValue.attribute === me.attr_Adquisition ){
-					adquisition = attrValue.value;
-				}
-				else if( attrValue.attribute === me.attr_Last_TestNS ){
-					lastTestNS = attrValue.value;
-				}
-			}
-			
-			var rowTag = $("<tr title='" + tranlatedText + "' clientId='" + clientList[i].trackedEntityInstance + "'></tr>");
+			var rowTag = $("<tr title='" + tranlatedText + "' clientId='" + clientId + "'></tr>");
 			rowTag.append( "<td>" + firstName + "</td>" );
 			rowTag.append( "<td>" + lastName + "</td>" );
 			rowTag.append( "<td>" + dob + "</td>" );
 			rowTag.append( "<td>" + district + "</td>" );
 			rowTag.append( "<td>" + birthOrder + "</td>" );
-			rowTag.append( "<td>" + Util.formatDate_DisplayDate( clientList[i].created ) + "</td>" ); // The create date is the enrollement date
-			rowTag.append( "<td>" + lastTestNS + "</td>" ); // 
+			rowTag.append( "<td>" + adquisition + "</td>" ); // The create date is the enrollement date
+			rowTag.append( "<td>" + lastTestNS + "</td>" ); // The latest event date
 			
 			
 			// -------------------------------------------------------------------
@@ -2621,7 +2581,7 @@ function Counsellor( storageObj, translationObj )
 	
 	// Generate JSON data in client form / event form
 	
-	me.getArrayJsonData = function( key, formTag )
+	me.getArrayJsonData = function( key, formTag, isGetEmptyValue )
 	{
 		var jsonData = [];
 		formTag.find("input,select").each(function(){
@@ -2649,7 +2609,7 @@ function Counsellor( storageObj, translationObj )
 			
 			if( value !== "" )
 			{
-				if( item.attr("isDate") !== undefined && item.attr("isDate") == "true" )
+				if( item.attr("isDate") !== undefined && item.attr("isDate") == "true" && value != "" )
 				{
 					value = Util.formatDate_DbDate( value );
 				}
@@ -2675,7 +2635,7 @@ function Counsellor( storageObj, translationObj )
 				
 		var firstName = me.searchFirstNameTag.val();
 		var lastName = me.searchLastNameTag.val();
-		var districtOfBirth = me.searchDistrictOBTag.find("option:selected").text();
+		var districtOfBirth = me.searchDistrictOBTag.find("option:selected").val();
 		var dob = me.searchDoBTag.val();
 		var birthOrder = me.searchBirthOrderTag.val();
 		
@@ -2688,6 +2648,7 @@ function Counsellor( storageObj, translationObj )
 		}
 		
 		if( districtOfBirth != "" ) {
+			districtOfBirth = me.searchDistrictOBTag.find("option:selected").text();
 			if( searchCriteria == "" ) {
 				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_clients" );
 				searchCriteria = translatedText + " ";
@@ -2701,10 +2662,10 @@ function Counsellor( storageObj, translationObj )
 		{
 			if( searchCriteria == "" ) {
 				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_clients" );
-				searchCriteria = translatedText + " " +  me.translationObj.getTranslatedValueByKey( "searchResult_msg_whoWereBorn" );
+				searchCriteria = translatedText + " " +  me.translationObj.getTranslatedValueByKey( "searchResult_msg_whoWereBorn" ) + " ";
 			}
 			
-			var translatedText =  me.translationObj.getTranslatedValueByKey( "searchResult_msg_on" );
+			var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_on" );
 			searchCriteria += translatedText + " " + dob + " ";
 		}
 		
@@ -2737,8 +2698,7 @@ function Counsellor( storageObj, translationObj )
 			}
 		}
 		
-		var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_searchCriteria" );		
-		return translatedText + " " + searchCriteria;
+		return searchCriteria;
 	};
 	
 
