@@ -219,7 +219,7 @@ public class MetaDataController
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/categoryCombos/feqjM0WJNfI.json?fields=categoryOptionCombos[id,name,categoryOptions[code,name]]";
+            String url = Util.LOCATION_DHIS_SERVER + "/api/categories/qVl8p3w3fI5.json?fields=categoryOptions[id,name,code]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )

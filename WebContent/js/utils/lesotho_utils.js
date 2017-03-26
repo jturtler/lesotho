@@ -162,8 +162,10 @@ Util.formatDate_DisplayDateTime = function( dateStr )
 	
 	var year = date.getFullYear();
 	var month = date.getMonth();
+	
 	var dayInMonth = date.getDate();
-		
+	dayInMonth = ( dayInMonth < 10 ) ? "0" + dayInMonth : dayInMonth;
+	
 	var hours = date.getHours();
 	hours = ( hours < 10 ) ? "0" + hours : "" + hours;
 	
@@ -228,6 +230,7 @@ Util.convertUTCDateToLocalDate = function( serverdate ) {
 	
 	var newDate = new Date(date);
     newDate.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    
     return newDate;
 };
 
@@ -237,7 +240,6 @@ Util.convertLocalTimeToUTM = function( localDate )
 	var newDate = new Date(localDate);
     newDate.setMinutes(localDate.getMinutes() + localDate.getTimezoneOffset());
     return newDate;
-    
 }  
 
 Util.datePicker = function( dateTag, dateFormat )

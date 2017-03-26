@@ -89,14 +89,9 @@ public class ClientController
 
                         if ( responseInfo.responseCode == 200 )
                         {
-                            // STEP 5. Enroll Client
+                            // Enroll client
                             clientId = responseInfo.referenceId;
                             responseInfo = ClientController.enrollClient( clientId, ouId );
-                           
-                            if ( responseInfo.responseCode == 200 )
-                            {
-                                responseInfo = EventController.createEvent( new JSONObject(), clientId, ouId, loginUsername );
-                            }
                         }
                         
                         responseInfo.output = output.toString();
