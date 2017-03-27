@@ -2429,29 +2429,33 @@ function Counsellor( storageObj, translationObj )
 			var attributeOptionCombo = activeEvent.attributeCategoryOptions;
 			
 			var searchLoggedCounsellor = Util.findItemFromList( me.catOptionComboList, "id", attributeOptionCombo );
-			
+								
 			if( searchLoggedCounsellor !== undefined )
 			{
 				catOptionName = searchLoggedCounsellor.name;
-			}
-					
-			if( searchLoggedCounsellor !== undefined && me.loginUsername === searchLoggedCounsellor.code )
-			{
-				me.addEventFormTag.find("input,select").each( function(){
-					Util.disableTag( $(this), false );
-				});
 				
-				me.saveEventBtnTag.show();
-				me.completedEventBtnTag.show();
+				if( me.loginUsername === searchLoggedCounsellor.code )
+				{
+					me.addEventFormTag.find("input,select").each( function(){
+						Util.disableTag( $(this), false );
+					});
+					
+					me.saveEventBtnTag.show();
+					me.completedEventBtnTag.show();
+				}
+				else
+				{
+					me.addEventFormTag.find("input,select").each( function(){
+						Util.disableTag( $(this), true );
+					});
+					
+					me.saveEventBtnTag.hide();
+					me.completedEventBtnTag.hide();
+				}
 			}
 			else
 			{
-				me.addEventFormTag.find("input,select").each( function(){
-					Util.disableTag( $(this), true );
-				});
-				
-				me.saveEventBtnTag.hide();
-				me.completedEventBtnTag.hide();
+				catOptionName = attributeOptionCombo;
 			}
 		}
 		else
@@ -2762,6 +2766,9 @@ function Counsellor( storageObj, translationObj )
 		
 		var dateOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DoB + "']").val();
 		var districtOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DistrictOB + "']:checked").val();
+		if( districtOfBirth == undefined ){
+			districtOfBirth = "";
+		}
 		var firstName = me.addClientFormTabTag.find("[attribute='" + me.attr_FirstName + "']").val();
 		var lastName = me.addClientFormTabTag.find("[attribute='" + me.attr_LastName + "']").val();
 		var birthOrder = me.addClientFormTabTag.find("[attribute='" + me.attr_BirthOrder + "']").val();

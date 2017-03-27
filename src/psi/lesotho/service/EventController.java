@@ -230,7 +230,7 @@ public class EventController
                 String catOptionComboId = catOptionComboList.getJSONObject( 0 ).getString( "id" );
 
                 JSONObject eventJson = EventController.composeJsonEvent( eventData, clientId, ouId, catOptionComboId );
-
+                
                 String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events";
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, eventJson, null );
 
