@@ -2065,7 +2065,8 @@ function Counsellor( storageObj, translationObj )
 		me.searchClientFormTag.hide();
 		
 		me.searchResultTbTag.css( "cursor", "pointer" );
-		me.searchResultHeaderTag.html("Select a client from from above or");
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_optionTitle" );
+		me.searchResultHeaderTag.html( tranlatedText );
 
 		me.searchResultTbTag.show();
 		me.searchResultTag.show("fast");
