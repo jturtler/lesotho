@@ -86,7 +86,7 @@ Util.addUrlParam = function( key, val )
 Util.highlightWords = function( data, search )
 {
 	var searchExp = (search + '').replace(/([\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:])/g, "\\$1");	
-	return data.replace( new RegExp( "(" + searchExp + ")" , 'gi' ), "<b>$1</b>" );
+	return data.replace( new RegExp( "(" + searchExp + ")" , 'gi' ), "<span style=\"background-color:yellow\">$1</span>" );
 };
 
 //-------------------------------------------------------------------

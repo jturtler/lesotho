@@ -813,21 +813,6 @@ function Counsellor( storageObj, translationObj )
 			var inputTag = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']" );
 			var text = inputTag.closest("tr").find("td:first").html();
 			
-			if( attrId == me.attr_DistrictOB )
-			{
-				var districtOBTag = $( "<select class='form-control' attribute='" + attrId + "'></select>" );
-				districtOBTag.append( "<option value=''>[Please select]</option>");
-				for( var i=0; i<inputTag.length; i++ )
-				{
-					var code = $( inputTag[i] ).val();
-					var name = $( inputTag[i] ).attr( "text" );
-					districtOBTag.append( "<option value='" + code + "'>" + name + "</option>");
-				}
-				
-				inputTag = districtOBTag;
-			}
-			
-			
 			var fieldTag = $("<div class='form-group'></div>");
 			fieldTag.append("<label for='" + attrId + "' class='col-sm-2 control-label' style='font-weight:300'>" + text + "</label>");
 			fieldTag.append( "<div class='col-sm-10'>" + inputTag.prop('outerHTML') + "</div>" );
@@ -847,8 +832,8 @@ function Counsellor( storageObj, translationObj )
 	{
 		// STEP 0. Create the header for active event
 		
-		var translatedByText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_thisTest_msg_eventCreatedByCounsellor" );	
-		me.addEventFormTag.append( "<div id='activeEventHeader' class='testMsg'>" + translatedByText + " <span></span></div>" );
+		var translatedByText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_thisTest_msg_eventCreatedByOtherCounsellor" );	
+		me.addEventFormTag.append( "<div id='activeEventHeader' class='testMsg'>" + translatedByText + " (<span></span>)</div>" );
 		
 		// STEP 1. Create the table
 		
@@ -1073,10 +1058,6 @@ function Counsellor( storageObj, translationObj )
 		{
 			inputTag = me.generateBirthOrderInputTag( attribute, inputKey );
 		}
-		else if( attribute.id == me.attr_DistrictOB )
-		{
-			inputTag = me.generateDistrictOfBirthInputTag(attribute, inputKey);
-		}
 		else if( attribute.optionSet !== undefined )
 		{
 			inputTag = me.generateOptionInputTag( attribute, inputKey );
@@ -1128,30 +1109,6 @@ function Counsellor( storageObj, translationObj )
 		}
 		
 		return inputTag;
-	};
-	
-
-	me.generateDistrictOfBirthInputTag = function( attribute, inputKey )
-	{
-		var table = $("<div class='divTable'></div>");
-		var rowTag = $( "<div class='divRow'></div>" );
-		table.append( rowTag );
-		
-		var options = attribute.optionSet.options;
-		
-		for( var i=0; i<options.length; i++ )
-		{
-			var code = options[i].code;
-			var name = options[i].name;
-			
-			var inputTag = $( "<input text='" + name + "' type='radio' " + inputKey + "='" + attribute.id + "' name='districtOfBirth' class='radioBox' value='" + code + "' mandatory='" + attribute.mandatory + "'>" );
-			var colTag = $("<div class='divCell'></td>");
-			colTag.append( inputTag );
-			colTag.append( name );
-			rowTag.append( colTag );
-		}
-
-		return table;
 	};
 	
 	me.generateOptionInputTag = function( attribute, inputKey )
@@ -1981,7 +1938,7 @@ function Counsellor( storageObj, translationObj )
 				            }
 							,success: function( response ) 
 							{
-								me.activeEventHeaderTag.show();
+//								me.activeEventHeaderTag.show();
 								
 								me.addClientFormTabTag.attr( "event", JSON.stringify( response ) );
 	
@@ -2373,7 +2330,7 @@ function Counsellor( storageObj, translationObj )
 		
 		if( activeEvent !== undefined )
 		{	
-			me.activeEventHeaderTag.show();
+//			me.activeEventHeaderTag.show();
 			
 			// when a client is just created, an empty event will be created which is used for retrieving client in a certain list
 			if( activeEvent.dataValues.length == 0 ){
@@ -2422,6 +2379,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.setUp_IfDataEntryFormEditable = function( activeEvent )
 	{
+//		me.activeEventHeaderTag.hide();
 		var catOptionName = me.userFullNameTag.html();
 		
 		if( activeEvent !== undefined )
@@ -2439,7 +2397,6 @@ function Counsellor( storageObj, translationObj )
 					me.addEventFormTag.find("input,select").each( function(){
 						Util.disableTag( $(this), false );
 					});
-					
 					me.saveEventBtnTag.show();
 					me.completedEventBtnTag.show();
 				}
@@ -2448,7 +2405,7 @@ function Counsellor( storageObj, translationObj )
 					me.addEventFormTag.find("input,select").each( function(){
 						Util.disableTag( $(this), true );
 					});
-					
+					me.activeEventHeaderTag.show();
 					me.saveEventBtnTag.hide();
 					me.completedEventBtnTag.hide();
 				}
@@ -2508,7 +2465,8 @@ function Counsellor( storageObj, translationObj )
 		
 		// STEP 1. Create header
 		
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );	
+		var counsellorText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_Counsellor" );
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );
 		var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
 
 		var url = 'event.html?eventid=' + eventId;
@@ -2516,7 +2474,7 @@ function Counsellor( storageObj, translationObj )
 		headerTag.append("<th colspan='2'>"
 				+ "<img style='float:left' class='arrowRightImg showHide' src='../images/tab_right.png'> " 
 				+ tranlatedText + " " + Util.formatDate_DisplayDateTime( eventDate )
-				+ " <span style='float:right;'>" +  counsellor + " <a onclick='" + onclickEvent + "' href='#' > <img src='../images/print.png'></a></span></th>");
+				+ " <span style='float:right;'><span class='eventCounsollerName'>" + counsellorText + ": " +  counsellor + "</span><a onclick='" + onclickEvent + "' href='#' > <img src='../images/print.png'></a></span></th>");
 		
 		tbody.append( headerTag );
 		
@@ -2765,10 +2723,7 @@ function Counsellor( storageObj, translationObj )
 		// Year(YY) Month(MM) DistrictOfBirth(DB) FirstName(2 Chars) LastName(2 Chars) BirthOrder(2 Chars)
 		
 		var dateOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DoB + "']").val();
-		var districtOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DistrictOB + "']:checked").val();
-		if( districtOfBirth == undefined ){
-			districtOfBirth = "";
-		}
+		var districtOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DistrictOB + "']").val();
 		var firstName = me.addClientFormTabTag.find("[attribute='" + me.attr_FirstName + "']").val();
 		var lastName = me.addClientFormTabTag.find("[attribute='" + me.attr_LastName + "']").val();
 		var birthOrder = me.addClientFormTabTag.find("[attribute='" + me.attr_BirthOrder + "']").val();
