@@ -75,6 +75,7 @@
 				<span id="headerText" style="left: 50px;">PI LS HTS</span>
 				<div class="headerRightSideControls">
 					<span keyword="page_headerTitle_counsellor">Counsellor</span>: <span name="userFullName"></span>
+					<span class='saperate'> | </span> <span id="headerOrgUnit"></span> <a href="#" id="headerSettingsLink" style="display:none;padding-left:5px;"><img src="../images/settings.png"></a>
 				</div>
 			</div>
 
@@ -198,7 +199,9 @@
 					   	</div>
 	 
 				      	<div id="thisTestDiv">
-				  			<form class="form-horizontal" id="addEventForm"></form>
+				  			<form class="form-horizontal" id="addEventForm">
+				  				<table class='table table-hover table-striped previousTestTb'></table>
+				  			</form>
 				  			
 	 						<div class="form-group" style="text-align:center;">
 								<button class="btn btn-default actionBtn" id="saveEventBtn">Save</button>
@@ -223,8 +226,15 @@
 					<h4 keyword="settings_headerTitle">Settings</h4>
 					<table class="table aboutTable">
 						<tr>
+							<td keyword="settings_rowHeader_district">District</td>
+							<td><select id="districtList" class="form-control"></select></td>
+						</tr>
+						<tr>
 							<td keyword="settings_rowHeader_orgUnit">Counsel for this session</td>
-							<td><select id="orgUnitList" class="form-control" ></select></td>
+							<td>
+								<select id="orgUnitList" class="form-control" ></select>
+				        		<img id="loadingOuListImg" src="../images/ajax-loader-bar.gif" style="display:none;">
+							</td>
 						</tr>
 						
 						<tr>
@@ -306,10 +316,15 @@
 
 				<!-- END About page -->
 
+				
 			</div>
 
 			<!-- /#page-content-wrapper -->
 
+			<br>
+			<div id="footer" style="display:none;">
+				<div id="footerRightSideControls"></div>
+			</div>
 
 		</div>
 		

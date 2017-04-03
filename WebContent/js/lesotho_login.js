@@ -9,15 +9,19 @@ function LoginForm( storageObj, translationObj )
 	
 	me.userNameTag = $("#username");
 	me.passwordTag = $("#password");
-	me.errorMessageTag = $("#errorMessage");
+	
+	me.districtListTag =  $("#districtList");
 	me.orgUnitListTag =  $("#orgUnitList");
+	me.loadingOuListImgTag = $("#loadingOuListImg");
+
+	me.errorMessageTag = $("#errorMessage");
 	me.loginBtnTag =  $("#loginBtn");
 	me.loginFormTag = $("#loginForm");
 	
 	me.init = function()
 	{
 		me.clearPageParamInStorage();
-		me.loadOuList();
+		me.loadDistrict();
 		me.clear();
 		me.setupEvents();
 	};
@@ -40,6 +44,15 @@ function LoginForm( storageObj, translationObj )
 	{
 		// Orgunit selector in 'Settings'
 
+		me.districtListTag.change(function(){
+			me.storageObj.addItem( me.storageObj.KEY_STORAGE_DISTRICT, me.districtListTag.val() );
+			me.storageObj.removeItem( me.storageObj.KEY_STORAGE_ORGUNIT );
+			if( me.districtListTag.val() != "" )
+			{
+				me.loadOrgUnitList();
+			}
+		});
+		
 		me.orgUnitListTag.change(function(){
 			me.storageObj.addItem( me.storageObj.KEY_STORAGE_ORGUNIT, me.orgUnitListTag.val() );	
 		});
@@ -117,24 +130,24 @@ function LoginForm( storageObj, translationObj )
 			
 				$.ajax(
 					{
-							type: "POST"
-							,url: "login"
-							,dataType: "json"
-							,headers: {
-						        'usr': me.userNameTag.val()
-						        ,'pwd': me.passwordTag.val()
-						    }
-				            ,contentType: "application/json;charset=utf-8"
-							,success: function( response ) 
-							{
-								window.location.href = "pages/counsellor.html";
-							},
-							error: function(a,b,c)
-							{
-								var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_wrongUsernamePassword" );
-								me.errorMessageTag.html( tranlatedText + "!");
-								MsgManager.appUnblock();
-							}
+						type: "POST"
+						,url: "login"
+						,dataType: "json"
+						,headers: {
+					        'usr': me.userNameTag.val()
+					        ,'pwd': me.passwordTag.val()
+					    }
+			            ,contentType: "application/json;charset=utf-8"
+						,success: function( response ) 
+						{
+							window.location.href = "pages/counsellor.html";
+						},
+						error: function(a,b,c)
+						{
+							var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_wrongUsernamePassword" );
+							me.errorMessageTag.html( tranlatedText + "!");
+							MsgManager.appUnblock();
+						}
 					});
 			}
 		}
@@ -142,34 +155,76 @@ function LoginForm( storageObj, translationObj )
 		return false;
 	}
 	
-	me.loadOuList = function()
+	me.loadDistrict = function()
 	{
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_initializing" );
-		MsgManager.appBlock( tranlatedText + " ...");
-		me.errorMessageTag.html("");
-		
 		$.ajax({
 			type: "POST"
-			,url: "metaData/ouList"
+			,url: "metaData/districtList"
 			,dataType: "json"
             ,contentType: "application/json;charset=utf-8"
+            ,beforeSend: function( xhr ) 
+            {
+            	var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_initializing" );
+        		MsgManager.appBlock( tranlatedText + " ...");
+        		me.errorMessageTag.html("");
+            }
 			,success: function( jsonData ) 
 			{
-				me.orgUnitListTag.append("<option value=''>[Please select]</option>");
+				me.districtListTag.append("<option value=''>[Please select]</option>");
 				for( var i in jsonData.organisationUnits )
 				{
 					var orgUnit = jsonData.organisationUnits[i];
-					me.orgUnitListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
+					me.districtListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
 				}
 
-				me.orgUnitListTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_ORGUNIT ) );
-				
-
-				MsgManager.appUnblock();
+				me.districtListTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_DISTRICT ) );
+				me.loadOrgUnitList();
 			}
+			
 		});
 		
-	}
+	};
+	
+	me.loadOrgUnitList = function()
+	{
+		var district = me.districtListTag.val();
+		
+		if( district !== "" )
+		{
+			$.ajax({
+				type: "POST"
+				,url: "metaData/ouList?districtId=" + district
+				,dataType: "json"
+	            ,contentType: "application/json;charset=utf-8" 
+	            ,beforeSend: function( xhr ) 
+	            {
+	            	me.orgUnitListTag.find("option").remove();
+	            	me.loadingOuListImgTag.show();
+	            }
+				,success: function( jsonData ) 
+				{
+					me.orgUnitListTag.append("<option value=''>[Please select]</option>");
+					for( var i in jsonData.organisationUnits )
+					{
+						var orgUnit = jsonData.organisationUnits[i];
+						me.orgUnitListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
+					}
+	
+					me.orgUnitListTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_ORGUNIT ) );
+					
+				}
+			}).always( function( data ) {
+				me.loadingOuListImgTag.hide();
+				MsgManager.appUnblock();
+			});
+		}
+		else
+		{
+			MsgManager.appUnblock();
+		}
+		
+	};
+	
 	
 	// -------------------------------------------------------------------------------------------------
 	// Init

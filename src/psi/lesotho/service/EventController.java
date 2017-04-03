@@ -315,9 +315,6 @@ public class EventController
         return responseInfo;
     }
     
-    
-    
-    
 
     // CREATE JSON FOR THIS - add voucher Id, linking info.. etc..
     private static JSONObject composeJsonEvent( JSONObject eventData, String teiId, String orgUnitId,
@@ -335,6 +332,7 @@ public class EventController
         {
             eventData.put( "dataValues", new JSONArray() );
         }
+        
         System.out.println( "\n\n ***** \n eventData : " + eventData );
         return eventData;
     }

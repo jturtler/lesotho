@@ -52,6 +52,7 @@ public final class Util
     public static String PAMAM_ORGUNIT_ID = "ouId";
     public static String PAMAM_CLIENT_ID = "clientId";
     public static String PAMAM_EVENT_ID = "eventId";
+    public static String PAMAM_DISTRICT_ID = "districtId";
     
     
     public static String ACCESS_SERVER_USERNAME = "tranc";
@@ -59,8 +60,8 @@ public final class Util
     
     
     public static final String ROOT_ORGTUNIT = "FvUGp8I75zV";    
-    public static final String ROOT_ORGTUNIT_LESOTHO = "vJNI6blhosr";  
-    public static final String REGISTER_ORGUNIT_LEVEL = "5";
+    public static final String ROOT_ORGTUNIT_LESOTHO = "vJNI6blhosr"; 
+    public static final String REGISTER_DISTRICT_LEVEL = "4";
     public static final String PROGRAM_ID = "KDgzpKX3h2S";
     public static final String STAGE_ID = "lVglvBnE3TY";
     public static final String USER_CATEGORY_ID = "qVl8p3w3fI5";
@@ -77,6 +78,7 @@ public final class Util
     public static final String KEY_SAVE_CLIENT = "save";    
     public static final String KEY_CLIENT_DETAILS = "details";
     public static final String KEY_METADATA_ALL = "all";
+    public static final String KEY_METADATA_DISTRICTLIST = "districtList";
     public static final String KEY_METADATA_OULIST = "ouList";
     public static final String KEY_SAVE_EVENT = "save"; 
     public static final String KEY_GET_EVENT_DETAILS = "details";

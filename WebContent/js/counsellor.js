@@ -22,6 +22,12 @@ function Counsellor( storageObj, translationObj )
 	me.reportLinkTag = $("#reportLink");
 	
 	
+	// [APP Header]
+	me.headerOrgUnitTag = $("#headerOrgUnit");
+	me.headerSettingsLinkTag = $("#headerSettingsLink");
+	me.footerTag = $("#footer");
+	me.footerRightSideControlsTag = $("#footerRightSideControls");
+	
 	// List cases
 	
 	me.clientListTag = $("#clientList");
@@ -68,8 +74,10 @@ function Counsellor( storageObj, translationObj )
 	me.updateClientBtnTag = $("[name='updateClientBtn']");
 	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
 	
+	
 	// [Consumables]
 	me.consumablesDivTag = $("#consumablesDiv");
+	
 	
 	// [Report]
 	me.reportParamDivTag = $("#reportParamDiv");
@@ -77,13 +85,15 @@ function Counsellor( storageObj, translationObj )
 	
 	// [Settings]
 	me.settingsDivTag = $("#settingsDiv");
-	
+	me.districtListTag =  $("#districtList");
+	me.orgUnitListTag =  $("#orgUnitList");
+	me.loadingOuListImgTag = $("#loadingOuListImg");
 
-	// About
+	
+	// [About]
 	me.userFullNameTag = $("[name='userFullName']");
 	me.dhisServerTag = $("#dhisServer");
 	me.aboutDivTag = $("#aboutDiv");
-	me.orgUnitListTag =  $("#orgUnitList");
 	
 	
 	// [Common]
@@ -147,6 +157,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.userInfoLoaded = false;
 	me.metadataLoaded = false;
+	me.orgUnitListLoaded = false;
 	
 	me.sectionList = [];
 	me.attributeGroupList = [];
@@ -309,13 +320,35 @@ function Counsellor( storageObj, translationObj )
 
 		me.setUp_Events_DataEntryForm();
 		
+		
+		// ------------------------------------------------------------------
+		// App Header event
+		// ------------------------------------------------------------------
+		
+		me.headerSettingsLinkTag.click(function(){
+			me.storageObj.addItem("page", me.PAGE_SETTINGS);
+			me.resetPageDisplay();
+			me.settingsDivTag.show("fast");
+		});
+		
 		// ------------------------------------------------------------------
 		// Settings form
 		// ------------------------------------------------------------------
 		
+		me.districtListTag.change(function(){
+			me.storageObj.addItem( me.storageObj.KEY_STORAGE_DISTRICT, me.districtListTag.val() );			
+			me.storageObj.removeItem( me.storageObj.KEY_STORAGE_ORGUNIT );
+			if( me.districtListTag.val() != "" )
+			{
+				me.loadOrgUnitList();
+			}
+		});
+		
+		
 		me.orgUnitListTag.change(function(){
 			var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_orgUnitSaved" );
-			me.storageObj.addItem( me.storageObj.KEY_STORAGE_ORGUNIT, me.orgUnitListTag.val() );			
+			me.storageObj.addItem( me.storageObj.KEY_STORAGE_ORGUNIT, me.orgUnitListTag.val() );	
+			me.populateOrgUnitNameInHeader();
 			MsgManager.msgAreaShow( tranlatedText, "SUCCESS");
 		});
 		
@@ -537,7 +570,7 @@ function Counsellor( storageObj, translationObj )
 			else{
 				event = {};
 			}
-			me.saveEvent(event, client.trackedEntityInstance, event.event, function(){
+			me.execSaveEvent(event, client.trackedEntityInstance, event.event, function(){
 				tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editEvent" );
 				me.saveEventBtnTag.html( tranlatedText );
 			} );
@@ -759,9 +792,16 @@ function Counsellor( storageObj, translationObj )
 			
 			// STEP 2. Populate attribute-group name
 			
-			rowTag = $("<tr></tr>");
-			rowTag.append("<th colspan='2' style='font-weight:bold;'>" + group.name + "</th>");
-			table.append( rowTag );
+			var tbody = $("<tbody groupId='" + group.id + "'></tbody>");
+			
+			// Create header with group name
+			var headerTag = $("<tr header='true'></tr>");
+			headerTag.append("<th colspan='2'><img style='float:left' class='arrowDownImg showHide' src='../images/down.gif'> " + group.name + "</th>" );
+			tbody.append( headerTag );		
+			
+			// Add event for header to collapse the fields inside
+			me.setUp_AddClientFormHeaderEvent( headerTag, table );
+			
 			
 			// STEP 3. Populate attributes in group
 			
@@ -769,7 +809,7 @@ function Counsellor( storageObj, translationObj )
 			for( var j in list)
 			{
 				var attribute = list[j];
-				rowTag = $("<tr></tr>");
+				var rowTag = $("<tr></tr>");
 				
 				// STEP 3.1. Populate the name of attribute
 				
@@ -789,19 +829,19 @@ function Counsellor( storageObj, translationObj )
 				var inputColTag = $("<td></td>");
 				inputColTag.append( inputTag );
 				rowTag.append( inputColTag );
-				table.append( rowTag );
+				tbody.append( rowTag );
 				
 			} // END Attribute List
+			
+			table.append( tbody );
+			
 			
 		}// END Attribute Groups
 		
 		
-		// Disable [Client CUIC] field. The value of this attribute will be generated from another attribute values
-		
-		Util.disableTag( me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']"), true );
-		
+		// Add logic for [Add Client form]
+		me.setUp_AddClientFormLogic();
 	};
-	
 	
 	// Create [Add Client] form with attribute-groups and program-attributes from server
 	
@@ -822,23 +862,24 @@ function Counsellor( storageObj, translationObj )
 		// Remove all of mandatory attribute for all fields
 		me.seachAddClientFormTag.find("input,select").removeAttr("mandatory");
 		me.validationObj.setUp_isNumberOnly_OlderBrowserSupport( me.seachAddClientFormTag );
+		
+		var dobTag = me.seachAddClientFormTag.find( "input[attribute='" + me.attr_DoB + "']" );
+		me.addDeleteBtnForDoBField( dobTag );
 	};	
 
-	// Create [Data Entry form]
 	
-	// Create 'Event Entry Form'
+	// Create [Data Entry form]
 	
 	me.createDataEntryForm = function()
 	{
 		// STEP 0. Create the header for active event
 		
-		var translatedByText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_thisTest_msg_eventCreatedByOtherCounsellor" );	
-		me.addEventFormTag.append( "<div id='activeEventHeader' class='testMsg'>" + translatedByText + " (<span></span>)</div>" );
+		var translatedByText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_thisTest_msg_createdBy" );	
+		me.addEventFormTag.prepend( "<div id='activeEventHeader' class='testMsg'>" + translatedByText + " '<span></span>'</div>" );
 		
 		// STEP 1. Create the table
 		
-		var table = me.generateDataEntryFormTable();
-		me.addEventFormTag.append( table );
+		me.generateDataEntryFormTable();
 		
 		
 		// Disable some DEs in form. Will add login for these DE in 'change' event
@@ -869,6 +910,82 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 
+
+	// ----------------------------------------------------------------------------
+	// Add logic in [Add Client] Form
+	// ----------------------------------------------------------------------------
+	
+	me.setUp_AddClientFormHeaderEvent = function( headerTag, tableTag )
+	{
+		// --------------------------------------------------------------
+		// Set up to Show/Hide event data in "Previous" TAB
+		// --------------------------------------------------------------
+		
+		
+		headerTag.click(function(){
+
+			var imgTag = $(this).find("img.showHide");
+			
+			// STEP 1. Display table of selected header
+			
+			var groupId = $(this).closest('tbody[groupId]').attr("groupId");
+			var tbodyTag = tableTag.find("tbody[groupId='" + groupId + "']");
+			var closed = imgTag.hasClass("arrowRightImg");
+			
+			// STEP 2. Show/Hide the selected event
+			
+			if( closed )
+			{
+				imgTag.attr( "src", "../images/down.gif" );
+				imgTag.addClass('arrowDownImg');
+				imgTag.removeClass('arrowRightImg');
+				tbodyTag.find("tr:not([header])").show("fast");
+			}
+			else
+			{
+				imgTag.attr( "src", "../images/tab_right.png" );
+				imgTag.removeClass('arrowDownImg');
+				imgTag.addClass('arrowRightImg');
+				tbodyTag.find("tr:not([header])").hide("fast");
+			}
+		});
+
+	};
+	
+	me.setUp_AddClientFormLogic = function()
+	{
+		// Disable [Client CUIC] field. The value of this attribute will be generated from another attribute values		
+		Util.disableTag( me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']"), true );
+		
+		// Add [Delete] button for [Date Of Birth] field
+		var dobTag = me.addClientFormTag.find( "input[attribute='" + me.attr_DoB + "']" );
+		me.addDeleteBtnForDoBField( dobTag );
+		
+		// Add [Min-Len] for [First name] and [Last name]
+		me.addClientFormTag.find( "input[attribute='" + me.attr_FirstName + "']" ).attr( "minlength", 2 );
+		me.addClientFormTag.find( "input[attribute='" + me.attr_LastName + "']" ).attr( "minlength", 2 );		
+	};
+
+	// Add [Delete] button for [Date Of Birth] field
+	
+	me.addDeleteBtnForDoBField = function( dobTag )
+	{
+		var deleteImg = $( '<div class="input-group-btn"><button class="btn btn-default" style="height:34px;"><i class="glyphicon glyphicon-remove"></i></button></div>' );
+		dobTag.closest( "div.col-sm-10" ).append( deleteImg );
+		dobTag.closest( "div.col-sm-10" ).addClass( "input-button-group" );
+		dobTag.attr( "readonly", true );
+		
+		// Add event to remove DoB tag
+		deleteImg.click( function(e){
+			e.preventDefault();
+			dobTag.val("");
+		});
+	};
+	
+	
+	// ----------------------------------------------------------------------------
+	// Add logic in [Data Entry form]
+	
 	
 	me.addMandatoryForField = function( tag )
 	{
@@ -900,6 +1017,44 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 	
+
+	me.setUp_DataEntryFormHeaderEvent = function( headerTag, tableTag )
+	{
+		// --------------------------------------------------------------
+		// Set up to Show/Hide event data in "Previous" TAB
+		// --------------------------------------------------------------
+		
+		
+		headerTag.click(function(){
+
+			var imgTag = $(this).find("img.showHide");
+			
+			// STEP 1. Display table of selected header
+			
+			var sectionId = $(this).closest('tbody[sectionId]').attr("sectionId");
+			var tbodyTag = tableTag.find("tbody[sectionId='" + sectionId + "']");
+			var closed = imgTag.hasClass("arrowRightImg");
+			
+			// STEP 2. Show/Hide the selected event
+			
+			if( closed )
+			{
+				imgTag.attr( "src", "../images/down.gif" );
+				imgTag.addClass('arrowDownImg');
+				imgTag.removeClass('arrowRightImg');
+				tbodyTag.find("tr:not([header])").show("fast");
+			}
+			else
+			{
+				imgTag.attr( "src", "../images/tab_right.png" );
+				imgTag.removeClass('arrowDownImg');
+				imgTag.addClass('arrowRightImg');
+				tbodyTag.find("tr:not([header])").hide("fast");
+			}
+		});
+
+	};
+	
 	
 	// ----------------------------------------------------------------------------
 	// Generate [Add Client Form] with section
@@ -912,6 +1067,7 @@ function Counsellor( storageObj, translationObj )
 		{
 			attributeGroupList[i] = {};
 			attributeGroupList[i].name = attrGroups[i].name;
+			attributeGroupList[i].id = attrGroups[i].id;
 			attributeGroupList[i].list = [];
 			
 			var attrGroupList = attrGroups[i].trackedEntityAttributes;
@@ -944,15 +1100,22 @@ function Counsellor( storageObj, translationObj )
 	
 	me.generateDataEntryFormTable = function()
 	{
-		var table = $("<table class='table table-hover table-striped previousTestTb'></table>");
+		var table = me.addEventFormTag.find("table");
 		
 		for( var i in me.sectionList )
 		{
 			// STEP 2. Populate section name
 			
-			var rowTag = $("<tr></tr>");
-			rowTag.append("<th colspan='2' style='font-weight:bold'>" + me.sectionList[i].displayName + "</th>");
-			table.append( rowTag );
+			var tbody = $("<tbody sectionId='" + me.sectionList[i].id + "'></tbody>");
+			
+			// Add event for header to collapse the fields inside
+			
+			var headerTag = $("<tr header='true' style='cursor:pointer;'></tr>");
+			headerTag.append("<th colspan='2'><img style='float:left' class='arrowDownImg showHide' src='../images/down.gif'> " + me.sectionList[i].displayName + "</th>" );
+			tbody.append( headerTag );
+			
+			me.setUp_DataEntryFormHeaderEvent( headerTag, table );
+			
 			
 			// STEP 3. Populate dataElements in section
 			
@@ -986,13 +1149,14 @@ function Counsellor( storageObj, translationObj )
 				// Add "DATE" picker for "Date" field
 				Util.datePicker( rowTag.find("input[isDate='true']"), me.dateFormat );
 				
-				table.append( rowTag );
+				tbody.append( rowTag );
 				
 			} // END DE List
 			
+			table.append( tbody );
+			
 		}// END Sections
 		
-		return table;
 	};
 	
 	me.resetDataEntryForm = function()
@@ -1221,15 +1385,15 @@ function Counsellor( storageObj, translationObj )
 				
 				// STEP 3. Populate orgunit list in 'Settings'
 				
-				me.orgUnitListTag.append("<option value=''>[Please select]</option>");
-				for( var i in jsonData.ouList.organisationUnits )
+				me.districtListTag.append("<option value=''>[Please select]</option>");
+				for( var i in jsonData.districts.organisationUnits )
 				{
-					var orgUnit = jsonData.ouList.organisationUnits[i];
-					me.orgUnitListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
+					var orgUnit = jsonData.districts.organisationUnits[i];
+					me.districtListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
 				}
 
-				me.orgUnitListTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_ORGUNIT ) );
-				
+				me.districtListTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_DISTRICT ) );
+				me.loadOrgUnitList();
 				
 				me.metadataLoaded = true;
 				me.checkAndLoadDataAfterInit();
@@ -1241,12 +1405,70 @@ function Counsellor( storageObj, translationObj )
 		});
 	};
 	
+	me.loadOrgUnitList = function()
+	{
+		var district = me.districtListTag.val();
+		
+		if( district !== "" )
+		{
+			$.ajax({
+				type: "POST"
+				,url: "../metaData/ouList?districtId=" + district
+				,dataType: "json"
+	            ,contentType: "application/json;charset=utf-8" 
+	            ,beforeSend: function( xhr ) 
+	            {
+	            	me.orgUnitListTag.find("option").remove();
+	            	me.loadingOuListImgTag.show();
+	            }
+				,success: function( jsonData ) 
+				{
+					me.orgUnitListTag.append("<option value=''>[Please select]</option>");
+					for( var i in jsonData.organisationUnits )
+					{
+						var orgUnit = jsonData.organisationUnits[i];
+						me.orgUnitListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
+					}
+	
+					me.orgUnitListTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_ORGUNIT ) );
+					me.populateOrgUnitNameInHeader();
+					
+					me.orgUnitListLoaded = true;
+					me.checkAndLoadDataAfterInit();
+				}
+			}).always( function( data ) {
+				me.loadingOuListImgTag.hide();
+				MsgManager.appUnblock();
+			});
+		}
+		else
+		{
+			me.orgUnitListLoaded = true;
+			me.checkAndLoadDataAfterInit();
+		}
+		
+	};
+	
+	me.populateOrgUnitNameInHeader = function()
+	{
+		var ouId = me.orgUnitListTag.val();
+		if( ouId == "" )
+		{
+			me.headerOrgUnitTag.html( "" );
+			me.headerSettingsLinkTag.hide();
+		}
+		else
+		{
+			me.headerOrgUnitTag.html( me.orgUnitListTag.find("option:selected").text() );
+			me.headerSettingsLinkTag.show();
+		}
+	};
 	
 	// Populate data and Setup events for components in HTML page
 	
 	me.checkAndLoadDataAfterInit = function()
 	{
-		if( me.userInfoLoaded && me.metadataLoaded )
+		if( me.userInfoLoaded && me.metadataLoaded && me.orgUnitListLoaded )
 		{
 			me.createClientForm();
 			me.searchDoBTag = me.seachAddClientFormTag.find("[attribute='" + me.attr_DoB + "']");
@@ -1254,6 +1476,12 @@ function Counsellor( storageObj, translationObj )
 			me.searchLastNameTag = me.seachAddClientFormTag.find("[attribute='" + me.attr_LastName + "']");
 			me.searchFirstNameTag = me.seachAddClientFormTag.find("[attribute='" + me.attr_FirstName + "']");
 			me.searchBirthOrderTag = me.seachAddClientFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
+			
+			me.clientDoBTag = me.addClientFormTag.find("[attribute='" + me.attr_DoB + "']");
+			me.clientDistrictOBTag = me.addClientFormTag.find("[attribute='" + me.attr_DistrictOB + "']");
+			me.clientLastNameTag = me.addClientFormTag.find("[attribute='" + me.attr_LastName + "']");
+			me.clientFirstNameTag = me.addClientFormTag.find("[attribute='" + me.attr_FirstName + "']");
+			me.clientBirthOrderTag = me.addClientFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
 			
 
 			me.resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
@@ -1294,7 +1522,7 @@ function Counsellor( storageObj, translationObj )
 		
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "todayCases_headerTitle" );
 		me.listDateTag.html( Util.getLastNDate(0) );
-		var headerList = ["Time", "Name", "Result", "What else?", "Indexed?"];
+		var headerList = ["Time", "Name", "Result", "Org Unit"];
 		me.listCases( "../event/todayCases", headerList, "#cfe2f3", tranlatedHeaderText + " - ", true, false, true, exeFunc );
 	}
 		
@@ -1306,7 +1534,7 @@ function Counsellor( storageObj, translationObj )
 		
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "previousCases_headerTitle" );
 		me.listDateTag.html( "" );
-		var headerList = ["Date", "Name", "Result", "What else?", "Indexed?"];
+		var headerList = ["Date", "Name", "Result", "Org Unit"];
 		me.listCases( "../event/previousCases", headerList, "#cfe2f3", tranlatedHeaderText, false, false, false, exeFunc );
 	}
 	
@@ -1318,7 +1546,7 @@ function Counsellor( storageObj, translationObj )
 		
 		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "positiveCases_headerTitle" );
 		me.listDateTag.html( "" );
-		var headerList = ["Date", "Name", "What else?", "???", "Referral ART closed?"];
+		var headerList = ["Date", "Name", "Org Unit", "Referral ART closed?"];
 		me.listCases( "../event/positiveCases", headerList, "#cfe2f3", tranlatedHeaderText, false, true, false, exeFunc );
 	}
 	
@@ -1329,6 +1557,8 @@ function Counsellor( storageObj, translationObj )
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
 		
 		me.resetPageDisplay();
+		me.footerTag.show();
+		
 		MsgManager.appBlock( tranlatedText + " ..." );
 		
 		// STEP 0. Show the 'Add' button which can move to 'Search/Create Client' function
@@ -1366,9 +1596,18 @@ function Counsellor( storageObj, translationObj )
 								me.populatePositiveCaseData( response.rows, tableTag, isTime, headerColor );
 							}
 							
+							me.populateFoolterInfo();
+							
+							// STEP 4. Sort Table
+							
+							if( tableTag.find("tbody tr").length > 0 )
+							{
+								tableTag.tablesorter();
+							}
+							
 							if( exeFunc ) exeFunc();
 
-							// STEP 4. Show table
+							// STEP 5. Show table
 							
 							MsgManager.appUnblock();
 							me.contentListTag.show();
@@ -1402,7 +1641,7 @@ function Counsellor( storageObj, translationObj )
 		
 		rowTag.append( "<th>Name</th>" );
 		rowTag.append( "<th>Result</th>" );
-		rowTag.append( "<th>What else?</th>" );
+		rowTag.append( "<th>Org Unit</th>" );
 		
 		var theadTag = $("<thead></thead>");
 		theadTag.append(rowTag);
@@ -1420,6 +1659,7 @@ function Counsellor( storageObj, translationObj )
 				var eventDate = event[2];
 				var fullName = event[3] + " " + event[4];
 				var deResult1 = event[5];
+				var ouName = event[6];
 				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
 				if( isTime && eventDate !== "" )
@@ -1436,7 +1676,7 @@ function Counsellor( storageObj, translationObj )
 				rowTag.append( "<td>" + eventDate + "</td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + deResult1 + "</td>" );
-				rowTag.append( "<td></td>" );
+				rowTag.append( "<td>" + ouName + "</td>" );
 				
 				me.addEventForRowInList(rowTag);
 				
@@ -1452,8 +1692,8 @@ function Counsellor( storageObj, translationObj )
 		var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
 		rowTag.append( "<th>Date</th>" );
 		rowTag.append( "<th>Name</th>" );
-		rowTag.append( "<th>What else?</th>" );
-		rowTag.append( "<th>???</th>" );
+		rowTag.append( "<th>Org Unit</th>" );
+		rowTag.append( "<th>Number of Test</th>" );
 		rowTag.append( "<th>Referral ART closed?</th>" );
 		
 		var theadTag = $("<thead></thead>");
@@ -1472,7 +1712,8 @@ function Counsellor( storageObj, translationObj )
 				var fullName = event[3] + " " + event[4];
 				var deARTVal = event[5];
 				deARTVal = ( deARTVal !== "" ) ? "[None]" : deARTVal;
-				
+				var ouName = event[6];
+				var numberOfTest = event[7];
 				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
 				if( isTime && eventDate !== "" )
@@ -1488,9 +1729,8 @@ function Counsellor( storageObj, translationObj )
 				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "'></tr>");										
 				rowTag.append( "<td>" + eventDate + "</td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
-				rowTag.append( "<td></td>" );
-				rowTag.append( "<td></td>" );
-				rowTag.append( "<td></td>" );
+				rowTag.append( "<td>" + ouName + "</td>" );
+				rowTag.append( "<td>" + numberOfTest + "</td>" );
 
 				me.addEventForRowInList(rowTag);
 				
@@ -1501,6 +1741,28 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 
+	me.populateFoolterInfo = function()
+	{
+		var noCases = me.contentListTag.find("table tbody tr").length;
+		
+		var translatedText = "";
+		if( me.currentList == me.PAGE_TODAY_LIST )
+		{
+			translatedText = me.translationObj.getTranslatedValueByKey( "todayCases_footer_msg_totalCases" );
+		}
+		else if( me.currentList == me.PAGE_PREVIOUS_LIST )
+		{
+			translatedText = me.translationObj.getTranslatedValueByKey( "previousCases_footer_msg_totalCases" );
+		}
+		else if( me.currentList == me.PAGE_POSITIVE_LIST )
+		{
+			translatedText = me.translationObj.getTranslatedValueByKey( "positiveCases_footer_msg_totalCases" );
+		}
+		
+		var translatedCase = me.translationObj.getTranslatedValueByKey( "common_footer_msg_cases" );
+		me.footerRightSideControlsTag.html( translatedText + ": " + noCases + " " + translatedCase );
+	};
+	
 	me.addEventForRowInList = function(rowTag)
 	{
 		rowTag.css("cursor", "pointer");
@@ -1814,8 +2076,7 @@ function Counsellor( storageObj, translationObj )
 								
 								// STEP 2. Set the header of the [Client Form] Tab
 								
-								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_editForm_headerTitle" );
-								me.addClientFormDivTag.find(".headerList").html(tranlatedText);
+								me.generateAddClientFormHeader();
 
 								// STEP 3. Set the value of the [Save Client] button
 								
@@ -1879,6 +2140,43 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
+	me.generateAddClientFormHeader = function()
+	{
+		var headerText = "";
+		
+		var firstName = me.clientFirstNameTag.val();
+		var lastName = me.clientLastNameTag.val();
+		var districtOfBirth = me.clientDistrictOBTag.val();
+		var dob = me.clientDoBTag.val();
+		var birthOrder = me.clientBirthOrderTag.val();
+		
+		if( firstName != "" || lastName != "" ) {
+			headerText += $.trim( firstName + " " + lastName ) + ", ";
+		}
+		
+		if( districtOfBirth != "" && districtOfBirth !== null ) {
+			districtOfBirth = me.clientDistrictOBTag.find("option:selected").text();
+			districtOfBirth = $.trim( districtOfBirth.split(".")[1] );
+			headerText += districtOfBirth + ", ";
+		}
+		
+		if( dob != "" )
+		{
+			headerText += dob + ", ";
+		}
+		
+
+		if( birthOrder != "" && birthOrder !== null )
+		{
+			birthOrder = eval( birthOrder );
+			birthOrder = ( birthOrder < 10 ) ? "0" + birthOrder : birthOrder;
+			headerText += birthOrder + ", ";
+		}
+		
+		headerText = headerText.substring( 0, headerText.length - 2 );
+		
+		me.addClientFormDivTag.find(".headerList").html(headerText);
+	};
 	
 	// -------------------------------------------------------------------
 	// Add/Update Event
@@ -1901,6 +2199,25 @@ function Counsellor( storageObj, translationObj )
 		return url;
 	};
 	
+	me.execSaveEvent = function( jsonData, clientId, eventId, exeFunc )
+	{
+		if( me.saveEventBtnTag.attr("status") == "add" )
+		{
+			me.getGPSCoordinates( function( lat, lng ){
+				jsonData.coordinate = {
+					"latitude" : lat
+					,"longitude" : lng
+				}
+				
+				me.saveEvent( jsonData, clientId, eventId, exeFunc );
+			} ) 
+		}
+		else
+		{
+			me.saveEvent( jsonData, clientId, eventId, exeFunc );	
+		}
+	};
+	
 	me.saveEvent = function( jsonData, clientId, eventId, exeFunc )
 	{
 		Commons.checkSession( function( isInSession ) {
@@ -1909,7 +2226,7 @@ function Counsellor( storageObj, translationObj )
 				if( me.validationObj.checkFormEntryTagsData(me.thisTestDivTag) )
 				{
 					var url = me.getSaveEventURL( clientId, eventId );
-					jsonData.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag )
+					jsonData.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag );
 					
 					$.ajax(
 						{
@@ -1938,32 +2255,32 @@ function Counsellor( storageObj, translationObj )
 				            }
 							,success: function( response ) 
 							{
-//								me.activeEventHeaderTag.show();
+								me.activeEventHeaderTag.show();
 								
 								me.addClientFormTabTag.attr( "event", JSON.stringify( response ) );
 	
 								Util.disableTag( me.completedEventBtnTag, false );
-								
-								if( exeFunc !== undefined ) exeFunc();
 
-								var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editEvent" );
-								me.saveEventBtnTag.html( tranlatedText );
-								me.saveEventBtnTag.attr("status", "update");
-								
-								
 								// STEP 4. Unblock form
+								var translateMsg = "";
 								if( me.saveEventBtnTag.attr("status") == "complete" )
 			            		{
-				            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventCompleted" );
+									translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventCompleted" );
 			            		}
 								else
 								{
-									tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );		
+									translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );		
 								}
-														
-								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );
+								
+								var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editEvent" );
+								me.saveEventBtnTag.html( tranlatedText );
+								me.saveEventBtnTag.attr("status", "update");
+
+								if( exeFunc !== undefined ) exeFunc();
+								
+								MsgManager.msgAreaShow( translateMsg, "SUCCESS" );
 								MsgManager.appUnblock();
-								alert(tranlatedText);
+								alert( translateMsg );
 							}
 							,error: function( response )
 							{
@@ -1980,7 +2297,35 @@ function Counsellor( storageObj, translationObj )
 			}
 		});
 		
+	};
+	
+
+	me.getGPSCoordinates = function( exeFunc ) 
+	{
+		if (navigator.geolocation) {
+		    var location_timeout = setTimeout( 10000 );
+
+		    navigator.geolocation.getCurrentPosition(function(position) {
+		        clearTimeout(location_timeout);
+
+		        var lat = position.coords.latitude;
+		        var lng = position.coords.longitude;
+
+		        exeFunc( lat, lng );
+		    }, function(error) {
+		        clearTimeout(location_timeout);
+		        exeFunc( "", "" );
+		    });
+		} else {
+			 exeFunc( "", "" );
+		}
+		 
 	}
+
+	function showPosition(position) {
+	   
+	}
+	
 	
 	me.completeEvent = function( exeFunc )
 	{
@@ -1991,7 +2336,7 @@ function Counsellor( storageObj, translationObj )
 		// Update status of event
 		
 		event.status = "COMPLETED";		
-		me.saveEvent( event, undefined, eventId, function(){
+		me.execSaveEvent( event, undefined, eventId, function(){
 
 			// Create empty table and populate data for this event
 			
@@ -2003,14 +2348,17 @@ function Counsellor( storageObj, translationObj )
 			
 			Util.disableTag( me.completedEventBtnTag, true );
 
-			var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_createEvent" );
-			me.saveEventBtnTag.html( tranlatedText );
-			
 			// Show 'Save' event button AND show "This test" form
 			me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
 			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
+
+			var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_createEvent" );
+			me.saveEventBtnTag.html( tranlatedText );
+			me.saveEventBtnTag.attr("status", "add");
 			
 			if( exeFunc !== undefined ) exeFunc();
+			
+			
 		} );
 	
 	};
@@ -2043,6 +2391,7 @@ function Counsellor( storageObj, translationObj )
 	{
 		me.contentListTag.html("");
 		me.mainContentTags.hide();
+		me.footerTag.hide();
 	};
 	
 	me.showSearchClientForm = function()
@@ -2147,6 +2496,9 @@ function Counsellor( storageObj, translationObj )
 	
 		// Populate Client data		
 		me.populateClientDataInForm( data.client );		
+		
+		// Create header for client form
+		me.generateAddClientFormHeader();
 		
 		// Get activeEvent and completedEvent list
 		
@@ -2331,7 +2683,7 @@ function Counsellor( storageObj, translationObj )
 		
 		if( activeEvent !== undefined )
 		{	
-//			me.activeEventHeaderTag.show();
+			me.activeEventHeaderTag.show();
 			
 			// when a client is just created, an empty event will be created which is used for retrieving client in a certain list
 			if( activeEvent.dataValues.length == 0 ){
@@ -2380,11 +2732,11 @@ function Counsellor( storageObj, translationObj )
 	
 	me.setUp_IfDataEntryFormEditable = function( activeEvent )
 	{
-//		me.activeEventHeaderTag.hide();
 		var catOptionName = me.userFullNameTag.html();
 		
 		if( activeEvent !== undefined )
 		{
+			me.activeEventHeaderTag.show();
 			var attributeOptionCombo = activeEvent.attributeCategoryOptions;
 			
 			var searchLoggedCounsellor = Util.findItemFromList( me.catOptionComboList, "id", attributeOptionCombo );
@@ -2400,15 +2752,17 @@ function Counsellor( storageObj, translationObj )
 					});
 					me.saveEventBtnTag.show();
 					me.completedEventBtnTag.show();
+					me.activeEventHeaderTag.css( "color","gray" );
 				}
 				else
 				{
 					me.addEventFormTag.find("input,select").each( function(){
 						Util.disableTag( $(this), true );
 					});
-					me.activeEventHeaderTag.show();
 					me.saveEventBtnTag.hide();
 					me.completedEventBtnTag.hide();
+					
+					me.activeEventHeaderTag.css( "color","tomato" );
 				}
 			}
 			else
@@ -2418,6 +2772,7 @@ function Counsellor( storageObj, translationObj )
 		}
 		else
 		{
+			me.activeEventHeaderTag.hide();
 			me.saveEventBtnTag.show();
 			me.completedEventBtnTag.show();
 			Util.disableTag( me.completedEventBtnTag, true );
@@ -2461,21 +2816,23 @@ function Counsellor( storageObj, translationObj )
 		var eventId = event.event;
 		var eventDate = event.eventDate;
 		var counsellor = me.findCounsellorByEventCatOptComboId( event.attributeCategoryOptions );
+		var testResult = me.getEventResult( event );
 		
 		var tbody = $("<tbody eventId='" + eventId + "'></tbody>");
 		
 		// STEP 1. Create header
 		
-		var counsellorText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_Counsellor" );
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_previousTests_msg_headerTitle" );
 		var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;'></tr>");
 
 		var url = 'event.html?eventid=' + eventId;
 		var onclickEvent="window.open(\"" + url + "\",\"Event Report\",\"width=400,height=500\");"
 		headerTag.append("<th colspan='2'>"
 				+ "<img style='float:left' class='arrowRightImg showHide' src='../images/tab_right.png'> " 
-				+ tranlatedText + " " + Util.formatDate_DisplayDateTime( eventDate )
-				+ " <span style='float:right;'><span class='eventCounsollerName'>" + counsellorText + ": " +  counsellor + "</span><a onclick='" + onclickEvent + "' href='#' > <img src='../images/print.png'></a></span></th>");
+				+ Util.formatDate_DisplayDateTime( eventDate ) 
+				+ "<span class='saperate'> | </span>" + event.orgUnitName 
+				+ "<span class='saperate'> | </span>" + counsellor 
+				+ "<span class='saperate'> | </span>" + testResult 
+				+ " <span style='float:right;'><a onclick='" + onclickEvent + "' href='#' > <img src='../images/print.png'></a></span></th>");
 		
 		tbody.append( headerTag );
 		
@@ -2510,6 +2867,21 @@ function Counsellor( storageObj, translationObj )
 		
 		return tbody;
 	}
+	
+	me.getEventResult = function( event )
+	{
+		var result = "";
+		for( var i in event.dataValues )
+		{
+			var dataValue = event.dataValues[i];
+			if( dataValue.dataElement == me.de_FinalResult_HIVStatus )
+			{
+				result = dataValue.value;
+			}
+		}
+		
+		return result;
+	};
 	
 	me.findCounsellorByEventCatOptComboId = function( eventCatOptComboId )
 	{
@@ -2630,8 +3002,7 @@ function Counsellor( storageObj, translationObj )
 	
 	
 	// Generate a message based on Client search criteria
-	// Matches for [Med Rod who were born at Measer in 10 Jan 2014 with 1 child]
-	// Matches for [clients who were born at Measer in 10 Jan 2014 with 1 child]
+	// Matches for [Med Rod, Measer, 10 Jan 2014, 01]
 	me.getSearchCriteria = function( formTag )
 	{
 		var searchCriteria = "";
@@ -2642,66 +3013,32 @@ function Counsellor( storageObj, translationObj )
 		var dob = me.searchDoBTag.val();
 		var birthOrder = me.searchBirthOrderTag.val();
 		
-		if( firstName != "" ) {
-			searchCriteria += firstName + " ";
+		if( firstName != "" || lastName != "" ) {
+			searchCriteria += $.trim( firstName + " " + lastName ) + ", ";
 		}
 		
-		if( lastName != "" ) {
-			searchCriteria += lastName + " ";
-		}
 		
 		if( districtOfBirth != "" ) {
 			districtOfBirth = me.searchDistrictOBTag.find("option:selected").text();
-			if( searchCriteria == "" ) {
-				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_clients" );
-				searchCriteria = translatedText + " ";
-			}
-			
-			var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_whoWereBornAt" );
-			searchCriteria += translatedText + " " + districtOfBirth + " ";
+			districtOfBirth = $.trim( districtOfBirth.split(".")[1] );
+			headerText += districtOfBirth + ", ";
 		}
+		
 		
 		if( dob != "" )
 		{
-			if( searchCriteria == "" ) {
-				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_clients" );
-				searchCriteria = translatedText + " " +  me.translationObj.getTranslatedValueByKey( "searchResult_msg_whoWereBorn" ) + " ";
-			}
-			
-			var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_on" );
-			searchCriteria += translatedText + " " + dob + " ";
+			searchCriteria += dob + ", ";
 		}
 		
 
 		if( birthOrder != "" )
 		{
-			if( searchCriteria == "" ) {
-				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_clientsWhoHave" );
-				searchCriteria += translatedText + " ";
-			}
-			
 			birthOrder = eval( birthOrder );
-			if( birthOrder == 0 )
-			{
-				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_withoutChildren" );
-				searchCriteria += translatedText;
-			}
-			else 
-			{
-				var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_with" );
-				searchCriteria += translatedText + " " + birthOrder + " ";
-				if( birthOrder == 1 )
-				{
-					searchCriteria += me.translationObj.getTranslatedValueByKey( "searchResult_msg_child" );
-				}
-				else
-				{
-					searchCriteria += me.translationObj.getTranslatedValueByKey( "searchResult_msg_children" );
-				}
-			}
+			birthOrder = ( birthOrder < 10 ) ? "0" + birthOrder : birthOrder;
+			searchCriteria += birthOrder + ", ";
 		}
 		
-		return searchCriteria;
+		return searchCriteria.substring( 0, searchCriteria.length - 2 );
 	};
 	
 

@@ -2,6 +2,7 @@
 function Storage()
 {
 	var me = this;
+	me.KEY_STORAGE_DISTRICT = "lesotho_district";
 	me.KEY_STORAGE_ORGUNIT = "lesotho_orgunit";
 	me.KEY_STORAGE_HIDE_HIV_TEST_LOGIC_ACTION_FIELDS = "lesotho_HIVTestLogicActionFields";
 	

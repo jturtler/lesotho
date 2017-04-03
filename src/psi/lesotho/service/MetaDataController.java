@@ -55,10 +55,10 @@ public class MetaDataController
                             {
                                 outputData.append( ",\"sections\":" + responseInfo.output );
                                 
-                                responseInfo = MetaDataController.getOrgUnitList();
+                                responseInfo = MetaDataController.getOrgUnitListInL4();
                                 if( responseInfo.responseCode == 200 )
                                 {
-                                    outputData.append( ",\"ouList\":" + responseInfo.output );
+                                    outputData.append( ",\"districts\":" + responseInfo.output );
                                     
                                     responseInfo = MetaDataController.getCatOptionCombos();
                                     if( responseInfo.responseCode == 200 )
@@ -73,10 +73,16 @@ public class MetaDataController
                     
                     responseInfo.output = "{" + outputData.toString() + "}";
                 }
+                // Load district List only
+                else if ( key.equals( Util.KEY_METADATA_DISTRICTLIST ) )
+                {
+                     responseInfo = MetaDataController.getOrgUnitListInL4();
+                }
                 // Load orgUnit List only
                 else if ( key.equals( Util.KEY_METADATA_OULIST ) )
                 {
-                    responseInfo = MetaDataController.getOrgUnitList();
+                    String districtId = request.getParameter( Util.PAMAM_DISTRICT_ID );
+                    responseInfo = MetaDataController.getOrgUnitList( districtId );
                 }
             }
 
@@ -118,7 +124,7 @@ public class MetaDataController
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributeGroups.json?filter=code:like:LSHTC&paging=false&fields=name,trackedEntityAttributes[id,shortName,valueType,optionSet[options[code,name]]";
+            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributeGroups.json?filter=code:like:LSHTC&paging=false&fields=id,name,trackedEntityAttributes[id,shortName,valueType,optionSet[options[code,name]]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -146,12 +152,12 @@ public class MetaDataController
         return responseInfo;
     }
     
-    private static ResponseInfo getOrgUnitList()
+    private static ResponseInfo getOrgUnitList( String districtId )
     {
-        ResponseInfo responseInfo = MetaDataController.getOrgUnitListInL5();
+        ResponseInfo responseInfo = MetaDataController.getOrgUnitListInL5( districtId );
         if( responseInfo.responseCode == 200 )
         {
-            JSONArray l5OuList =  responseInfo.data.getJSONArray( "organisationUnits" );
+            JSONArray l5OuList =  responseInfo.data.getJSONArray( "children" );
             responseInfo = MetaDataController.getOrgUnitListInProgram();
             if( responseInfo.responseCode == 200 )
             {
@@ -182,12 +188,12 @@ public class MetaDataController
         return responseInfo;
     }
     
-    private static ResponseInfo getOrgUnitListInL5()
+    private static ResponseInfo getOrgUnitListInL5( String districtId )
     {
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/organisationUnits/" + Util.ROOT_ORGTUNIT_LESOTHO + ".json?includeDescendants=true&fields=id,name&filter=level:eq:" + Util.REGISTER_ORGUNIT_LEVEL;
+            String url = Util.LOCATION_DHIS_SERVER + "/api/organisationUnits/" + districtId + ".json?fields=children[id,name]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -197,6 +203,24 @@ public class MetaDataController
         
         return responseInfo;
     }
+    
+
+    private static ResponseInfo getOrgUnitListInL4()
+    {
+        ResponseInfo responseInfo = null;
+        try
+        {
+            String url = Util.LOCATION_DHIS_SERVER + "/api/organisationUnits/" + Util.ROOT_ORGTUNIT_LESOTHO + ".json?includeDescendants=true&fields=id,name&filter=level:eq:" + Util.REGISTER_DISTRICT_LEVEL;
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+        }
+        catch ( Exception ex )
+        {
+            ex.printStackTrace();
+        }
+        
+        return responseInfo;
+    }
+    
     
     private static ResponseInfo getOrgUnitListInProgram()
     {
