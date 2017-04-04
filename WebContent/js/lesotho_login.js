@@ -51,6 +51,11 @@ function LoginForm( storageObj, translationObj )
 			{
 				me.loadOrgUnitList();
 			}
+			else
+			{
+				me.orgUnitListTag.find("option").remove();
+				me.storageObj.removeItem( me.storageObj.KEY_STORAGE_ORGUNIT );
+			}
 		});
 		
 		me.orgUnitListTag.change(function(){

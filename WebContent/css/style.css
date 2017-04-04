@@ -141,11 +141,8 @@
 }
 
 #footerRightSideControls {
-    height: 20px;
-    position: fixed;
-    z-index: 11;
-    bottom: 10px;
-    right: 4px;
+    float: right;
+    font-style: italic;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -767,3 +764,27 @@ table.tablesorter thead tr .headerSortDown {
 	padding-left: 5px;
     padding-right: 5px;
 }
+
+/**
+* Clear data in date field
+**/
+
+.clearable{
+  background: #fff url(data:image/gif;base64,R0lGODlhBwAHAIAAAP///5KSkiH5BAAAAAAALAAAAAAHAAcAAAIMTICmsGrIXnLxuDMLADs=) no-repeat right -10px center;
+}
+.clearable.x  { background-position: right 15px center; }
+.clearable.onX{ cursor: pointer; }
+.clearable::-ms-clear {display: none; width:0; height:0;}
+
+
+
+
+
+
+
+
+
+
+
+
+

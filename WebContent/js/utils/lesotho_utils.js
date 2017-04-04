@@ -252,9 +252,9 @@ Util.datePicker = function( dateTag, dateFormat )
 		createButton: false,
 		constrainInput: true,
         yearRange: '-100:+100',
-        maxDate: new Date(),
-    	"showButtonPanel":  false
+        maxDate: new Date()
 	});
+		  
 };
 
 

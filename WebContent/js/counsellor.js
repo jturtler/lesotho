@@ -1,7 +1,13 @@
+
+// ---------------------------------------------------------------------------------------- 
+// CLEARABLE INPUT
+// ----------------------------------------------------------------------------------------
+
 /**
  * @param storageObj
  * @param translationObj
  */
+
 function Counsellor( storageObj, translationObj )
 {
 	var me = this;
@@ -25,7 +31,6 @@ function Counsellor( storageObj, translationObj )
 	// [APP Header]
 	me.headerOrgUnitTag = $("#headerOrgUnit");
 	me.headerSettingsLinkTag = $("#headerSettingsLink");
-	me.footerTag = $("#footer");
 	me.footerRightSideControlsTag = $("#footerRightSideControls");
 	
 	// List cases
@@ -336,14 +341,20 @@ function Counsellor( storageObj, translationObj )
 		// ------------------------------------------------------------------
 		
 		me.districtListTag.change(function(){
-			me.storageObj.addItem( me.storageObj.KEY_STORAGE_DISTRICT, me.districtListTag.val() );			
+			me.storageObj.addItem( me.storageObj.KEY_STORAGE_DISTRICT, me.districtListTag.val() );
 			me.storageObj.removeItem( me.storageObj.KEY_STORAGE_ORGUNIT );
 			if( me.districtListTag.val() != "" )
 			{
 				me.loadOrgUnitList();
 			}
+			else
+			{
+				me.orgUnitListTag.find("option").remove();
+				me.storageObj.removeItem( me.storageObj.KEY_STORAGE_ORGUNIT );
+			}
+			
+			me.populateOrgUnitNameInHeader();
 		});
-		
 		
 		me.orgUnitListTag.change(function(){
 			var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_orgUnitSaved" );
@@ -619,7 +630,7 @@ function Counsellor( storageObj, translationObj )
 	me.setUp_FloatButton = function()
 	{
 		var width = $(window).width() - 80;
-		var height = $(window).height() - 80;
+		var height = $(window).height() - 120;
 		
 		
 		me.registerClientBtnTag.css({top: height, left: width, position:'fixed'});
@@ -772,6 +783,7 @@ function Counsellor( storageObj, translationObj )
 		me.createSearchClientForm();
 		me.createDataEntryForm();
 		
+		
 		// Remove the 'mandatory' SPAN from the Search table
 		me.seachAddClientFormTag.find("span.required").remove();
 	};
@@ -865,8 +877,14 @@ function Counsellor( storageObj, translationObj )
 		
 		var dobTag = me.seachAddClientFormTag.find( "input[attribute='" + me.attr_DoB + "']" );
 		me.addDeleteBtnForDoBField( dobTag );
+			  
 	};	
 
+	me.tog = function(v)
+	{
+		return v?'addClass':'removeClass';
+	}; 
+	
 	
 	// Create [Data Entry form]
 	
@@ -969,17 +987,21 @@ function Counsellor( storageObj, translationObj )
 	// Add [Delete] button for [Date Of Birth] field
 	
 	me.addDeleteBtnForDoBField = function( dobTag )
-	{
-		var deleteImg = $( '<div class="input-group-btn"><button class="btn btn-default" style="height:34px;"><i class="glyphicon glyphicon-remove"></i></button></div>' );
-		dobTag.closest( "div.col-sm-10" ).append( deleteImg );
-		dobTag.closest( "div.col-sm-10" ).addClass( "input-button-group" );
-		dobTag.attr( "readonly", true );
-		
-		// Add event to remove DoB tag
-		deleteImg.click( function(e){
-			e.preventDefault();
-			dobTag.val("");
-		});
+	{	
+		dobTag.addClass( "clearable x onX" );
+		dobTag.attr("readonly", true);
+	    dobTag.mousemove( function( e ){
+		    $(this)[me.tog(this.offsetWidth-25 < e.clientX-this.getBoundingClientRect().left)]('onX');   
+	    });
+	    
+	    dobTag.click( function( ev ){
+	    	if( $(this).hasClass("onX"))
+			{
+	    		ev.preventDefault();
+			    $(this).removeClass("onX").val('').change();
+			}
+	    	
+	    });
 	};
 	
 	
@@ -1452,15 +1474,16 @@ function Counsellor( storageObj, translationObj )
 	me.populateOrgUnitNameInHeader = function()
 	{
 		var ouId = me.orgUnitListTag.val();
-		if( ouId == "" )
+		if( ouId == "" || ouId === null )
 		{
-			me.headerOrgUnitTag.html( "" );
-			me.headerSettingsLinkTag.hide();
+			var translatedText = me.translationObj.getTranslatedValueByKey( "app_headerNoOrguit" );
+			me.headerOrgUnitTag.html( "[" + translatedText + "]" );
+			me.headerOrgUnitTag.css( "color", "red" );
 		}
 		else
 		{
 			me.headerOrgUnitTag.html( me.orgUnitListTag.find("option:selected").text() );
-			me.headerSettingsLinkTag.show();
+			me.headerOrgUnitTag.css( "color", "" );
 		}
 	};
 	
@@ -1557,7 +1580,6 @@ function Counsellor( storageObj, translationObj )
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
 		
 		me.resetPageDisplay();
-		me.footerTag.show();
 		
 		MsgManager.appBlock( tranlatedText + " ..." );
 		
@@ -1731,6 +1753,7 @@ function Counsellor( storageObj, translationObj )
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
 				rowTag.append( "<td>" + numberOfTest + "</td>" );
+				rowTag.append( "<td></td>" );
 
 				me.addEventForRowInList(rowTag);
 				
@@ -1760,7 +1783,7 @@ function Counsellor( storageObj, translationObj )
 		}
 		
 		var translatedCase = me.translationObj.getTranslatedValueByKey( "common_footer_msg_cases" );
-		me.footerRightSideControlsTag.html( translatedText + ": " + noCases + " " + translatedCase );
+		me.footerRightSideControlsTag.html( "*** " + translatedText + ": " + noCases + " " + translatedCase );
 	};
 	
 	me.addEventForRowInList = function(rowTag)
@@ -1772,8 +1795,8 @@ function Counsellor( storageObj, translationObj )
 			var clientId = rowTag.attr("clientId");
 			var eventId = rowTag.attr("eventId");
 			
+			me.resetPageDisplay();
 			me.loadClientDetails( clientId, eventId, function(){
-				me.resetPageDisplay();
 				me.addClientFormDivTag.show();
 			} );
 		});
@@ -2148,7 +2171,6 @@ function Counsellor( storageObj, translationObj )
 		var lastName = me.clientLastNameTag.val();
 		var districtOfBirth = me.clientDistrictOBTag.val();
 		var dob = me.clientDoBTag.val();
-		var birthOrder = me.clientBirthOrderTag.val();
 		
 		if( firstName != "" || lastName != "" ) {
 			headerText += $.trim( firstName + " " + lastName ) + ", ";
@@ -2156,7 +2178,6 @@ function Counsellor( storageObj, translationObj )
 		
 		if( districtOfBirth != "" && districtOfBirth !== null ) {
 			districtOfBirth = me.clientDistrictOBTag.find("option:selected").text();
-			districtOfBirth = $.trim( districtOfBirth.split(".")[1] );
 			headerText += districtOfBirth + ", ";
 		}
 		
@@ -2165,17 +2186,9 @@ function Counsellor( storageObj, translationObj )
 			headerText += dob + ", ";
 		}
 		
-
-		if( birthOrder != "" && birthOrder !== null )
-		{
-			birthOrder = eval( birthOrder );
-			birthOrder = ( birthOrder < 10 ) ? "0" + birthOrder : birthOrder;
-			headerText += birthOrder + ", ";
-		}
-		
 		headerText = headerText.substring( 0, headerText.length - 2 );
 		
-		me.addClientFormDivTag.find(".headerList").html(headerText);
+		me.addClientFormDivTag.find(".headerList").html( headerText );
 	};
 	
 	// -------------------------------------------------------------------
@@ -2369,7 +2382,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.showOrgUnitWarningMsg = function()
 	{
-		if( me.orgUnitListTag.val() === "" )
+		if( me.orgUnitListTag.val() === "" || me.orgUnitListTag.val() === null )
 		{
 			me.selectOrgUnitWarningMsgTag.show();
 			Util.disableTag( me.saveClientBtnTag, true );
@@ -2390,8 +2403,8 @@ function Counsellor( storageObj, translationObj )
 	me.resetPageDisplay = function()
 	{
 		me.contentListTag.html("");
+		me.footerRightSideControlsTag.html("");
 		me.mainContentTags.hide();
-		me.footerTag.hide();
 	};
 	
 	me.showSearchClientForm = function()
@@ -2485,15 +2498,10 @@ function Counsellor( storageObj, translationObj )
 		me.searchClientFormTag.hide();
 		
 		
-		// Set the Header title
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_editClient" );
-		me.addClientFormDivTag.find(".headerList").html( tranlatedText );
-		
 		// Set 'Save' buton display name
 		tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editClient" );
 		me.saveClientBtnTag.html( tranlatedText );
-		
-	
+			
 		// Populate Client data		
 		me.populateClientDataInForm( data.client );		
 		
@@ -3014,20 +3022,26 @@ function Counsellor( storageObj, translationObj )
 		var birthOrder = me.searchBirthOrderTag.val();
 		
 		if( firstName != "" || lastName != "" ) {
-			searchCriteria += $.trim( firstName + " " + lastName ) + ", ";
+			searchCriteria += $.trim( firstName + " " + lastName ) + " ";
+		}
+		else
+		{
+			var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_client" );
+			searchCriteria += translatedText;
 		}
 		
 		
 		if( districtOfBirth != "" ) {
+			var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_bornAt" );
 			districtOfBirth = me.searchDistrictOBTag.find("option:selected").text();
-			districtOfBirth = $.trim( districtOfBirth.split(".")[1] );
-			headerText += districtOfBirth + ", ";
+			searchCriteria +=  " " + translatedText + " " + districtOfBirth + " ";
 		}
 		
 		
 		if( dob != "" )
 		{
-			searchCriteria += dob + ", ";
+			var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_on" );
+			searchCriteria += translatedText + " " + dob + " ";
 		}
 		
 
@@ -3035,7 +3049,7 @@ function Counsellor( storageObj, translationObj )
 		{
 			birthOrder = eval( birthOrder );
 			birthOrder = ( birthOrder < 10 ) ? "0" + birthOrder : birthOrder;
-			searchCriteria += birthOrder + ", ";
+			searchCriteria += ", " + birthOrder + ", ";
 		}
 		
 		return searchCriteria.substring( 0, searchCriteria.length - 2 );
