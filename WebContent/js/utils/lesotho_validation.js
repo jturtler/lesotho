@@ -103,7 +103,7 @@ function Validation( translationObj )
 				valid = false;
 			}
 		}
-		else if( value === "" && inputTag.attr('mandatory') === 'true' )
+		else if( (  value === "" || value === null ) && inputTag.attr('mandatory') === 'true' )
 		{
 			divTag.append( me.getErrorSpanTag( 'Enter data in this field' ) );
 			valid = false;

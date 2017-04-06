@@ -1240,11 +1240,7 @@ function Counsellor( storageObj, translationObj )
 	{
 		var inputTag = $( "<input type='text' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >" );
 		
-		if( attribute.id == me.attr_BirthOrder )
-		{
-			inputTag = me.generateBirthOrderInputTag( attribute, inputKey );
-		}
-		else if( attribute.optionSet !== undefined )
+		if( attribute.optionSet !== undefined )
 		{
 			inputTag = me.generateOptionInputTag( attribute, inputKey );
 		}
@@ -1279,23 +1275,6 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-	me.generateBirthOrderInputTag = function( attribute, inputKey )
-	{
-		inputTag = $( "<select class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>" );
-		inputTag.append( "<option value=''>[Please select]</option>" );
-		for( var i = 0; i <= 10 ; i ++ )
-		{
-			var value = i;
-			if( i != 10 )
-			{
-				value = "0" + i;
-			}
-			
-			inputTag.append( "<option value='" + i + "'>" + value + "</option>" );
-		}
-		
-		return inputTag;
-	};
 	
 	me.generateOptionInputTag = function( attribute, inputKey )
 	{
@@ -1925,10 +1904,10 @@ function Counsellor( storageObj, translationObj )
 				else if( attributeId === me.attr_DoB ){
 					colIdx = 3;
 				}
-				else if( attributeId === me.attr_BirthOrder ){
+				else if( attributeId === me.attr_DistrictOB ){
 					colIdx = 4;
 				}
-				else if( attributeId === me.attr_DistrictOB ){
+				else if( attributeId === me.attr_BirthOrder ){
 					colIdx = 5;
 				}
 				
@@ -3047,9 +3026,7 @@ function Counsellor( storageObj, translationObj )
 
 		if( birthOrder != "" )
 		{
-			birthOrder = eval( birthOrder );
-			birthOrder = ( birthOrder < 10 ) ? "0" + birthOrder : birthOrder;
-			searchCriteria += ", " + birthOrder + ", ";
+			searchCriteria += " [" + birthOrder + "]  ";
 		}
 		
 		return searchCriteria.substring( 0, searchCriteria.length - 2 );

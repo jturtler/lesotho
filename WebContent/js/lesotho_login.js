@@ -14,6 +14,7 @@ function LoginForm( storageObj, translationObj )
 	me.orgUnitListTag =  $("#orgUnitList");
 	me.loadingOuListImgTag = $("#loadingOuListImg");
 
+	me.appVersionInfoTag = $("#appVersionInfo");
 	me.errorMessageTag = $("#errorMessage");
 	me.loginBtnTag =  $("#loginBtn");
 	me.loginFormTag = $("#loginForm");
@@ -24,6 +25,7 @@ function LoginForm( storageObj, translationObj )
 		me.loadDistrict();
 		me.clear();
 		me.setupEvents();
+		me.setupVersion( me.appVersionInfoTag );
 	};
 	
 	me.clearPageParamInStorage = function()
@@ -107,6 +109,11 @@ function LoginForm( storageObj, translationObj )
 		});
 	},
 
+
+	me.setupVersion = function( appVersionInfoTag )
+	{
+		appVersionInfoTag.text( Commons.VERSION );
+	};	
 	
 	// -------------------------------------------------------------------------------
 	// Ajax
@@ -119,42 +126,32 @@ function LoginForm( storageObj, translationObj )
 	
 	me.login = function()
 	{
-		me.errorMessageTag.html("");
+		if( me.validationObj.checkFormEntryTagsData( me.loginFormTag ) )
+		{	
+			var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_logging" );
+			MsgManager.appBlock( tranlatedText + " ..." );
 		
-		if( me.userNameTag.val() == "" || me.passwordTag.val() == "" )
-		{
-			var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_enterUserNameOrPassword" );
-			me.errorMessageTag.html( tranlatedText );
-		}
-		else
-		{
-			if( me.validationObj.checkFormEntryTagsData( me.loginFormTag ) )
-			{	
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_logging" );
-				MsgManager.appBlock( tranlatedText + " ..." );
-			
-				$.ajax(
+			$.ajax(
+				{
+					type: "POST"
+					,url: "login"
+					,dataType: "json"
+					,headers: {
+				        'usr': me.userNameTag.val()
+				        ,'pwd': me.passwordTag.val()
+				    }
+		            ,contentType: "application/json;charset=utf-8"
+					,success: function( response ) 
 					{
-						type: "POST"
-						,url: "login"
-						,dataType: "json"
-						,headers: {
-					        'usr': me.userNameTag.val()
-					        ,'pwd': me.passwordTag.val()
-					    }
-			            ,contentType: "application/json;charset=utf-8"
-						,success: function( response ) 
-						{
-							window.location.href = "pages/counsellor.html";
-						},
-						error: function(a,b,c)
-						{
-							var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_wrongUsernamePassword" );
-							me.errorMessageTag.html( tranlatedText + "!");
-							MsgManager.appUnblock();
-						}
-					});
-			}
+						window.location.href = "pages/counsellor.html";
+					},
+					error: function(a,b,c)
+					{
+						var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_wrongUsernamePassword" );
+						me.errorMessageTag.html( tranlatedText + "!");
+						MsgManager.appUnblock();
+					}
+				});
 		}
 		
 		return false;
