@@ -112,7 +112,7 @@ function LoginForm( storageObj, translationObj )
 
 	me.setupVersion = function( appVersionInfoTag )
 	{
-		appVersionInfoTag.text( Commons.VERSION );
+		appVersionInfoTag.text( Commons.VERSION + ", " + Commons.VERSION_DATE );
 	};	
 	
 	// -------------------------------------------------------------------------------

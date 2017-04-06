@@ -82,6 +82,7 @@ public final class Util
     public static final String KEY_METADATA_OULIST = "ouList";
     public static final String KEY_SAVE_EVENT = "save"; 
     public static final String KEY_GET_EVENT_DETAILS = "details";
+    public static final String KEY_GET_REPORT = "report";
     
 
 //    public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "98319"; // On Rodolfo account

@@ -31,15 +31,29 @@ function Counsellor( storageObj, translationObj )
 	// [APP Header]
 	me.headerOrgUnitTag = $("#headerOrgUnit");
 	me.headerSettingsLinkTag = $("#headerSettingsLink");
-	me.footerRightSideControlsTag = $("#footerRightSideControls");
 	
-	// List cases
 	
-	me.clientListTag = $("#clientList");
-	me.headerListTag = $("#headerList");
-	me.contentListTag = $("#contentList");
+	// Today cases
+	me.todayCaseListTag = $("#todayCaseList");
+	me.todayCaseTblTag = $("#todayCaseTbl");
 	me.listDateTag = $("#listDate");
 	me.registerClientBtnTag = $("#registerClientBtn");
+	me.todayCaseFooterTag = $("#todayCaseFooter");
+	me.todayCaseNumberTag = $("#todayCaseNumber");
+	
+	
+	// Previous cases
+	me.previousCaseListTag = $("#previousCaseList");
+	me.previousCaseTblTag = $("#previousCaseTbl");
+	me.previousCaseFooterTag = $("#previousCaseFooter");
+	me.previousCaseNumberTag = $("#previousCaseNumber");
+	
+	
+	// Positive cases
+	me.positiveCaseListTag = $("#positiveCaseList");
+	me.positiveCaseTblTag = $("#positiveCaseTbl");
+	me.positiveCaseFooterTag = $("#positiveCaseFooter");
+	me.positiveCaseNumberTag = $("#positiveCaseNumber");
 	
 	
 	// Search Form	
@@ -99,13 +113,16 @@ function Counsellor( storageObj, translationObj )
 	me.userFullNameTag = $("[name='userFullName']");
 	me.dhisServerTag = $("#dhisServer");
 	me.aboutDivTag = $("#aboutDiv");
-	
+	me.versionTag = $("#version");
+	me.versionTag = $("#version");
+	me.versionDateTag = $("#versionDate");
 	
 	// [Common]
 	me.divSessionExpireMsgTag =  $( "#divSessionExpireMsg" );
 	me.menuIcon = $("button.hamburger");
 	me.headerRightSideControlsTag = $("div.headerRightSideControls");
 	me.mainContentTags = $("div.mainContent");
+	
 	
 	// [Attribute Ids]
 	me.attr_FirstName = "mW2l3T2zL0N";
@@ -118,6 +135,7 @@ function Counsellor( storageObj, translationObj )
 	me.attr_Last_TestNS = "";
 	me.attr_LastContact = "";
 	
+	
 	// [Data Element Ids]
 	me.de_Testing_ResultTest1 = "choHDFxMCaU";
 	me.de_Testing_ResultTest2 = "KDnhSz51HKS";
@@ -126,11 +144,19 @@ function Counsellor( storageObj, translationObj )
 	me.de_Testing_ResultSDBioline = "M11JqgkJt2X";
 	me.de_FinalResult_HIVStatus = "UuKat0HFjWS";
 	
+	
+	//[Report]
+	me.de_Tested = "I2oytRXksKN";
+	me.de_Target = "rcVLQsClLUa";
+	me.de_achieved = "sNS1PQ1YNXA";
+	
+	
 	// Search INPUT fields
 	me.searchDoBTag;
 	me.searchDistrictOBTag;
 	me.searchLastNameTag;
 	me.searchFirstNameTag;
+	
 	
 	// Data Element Logic fields
 	me.resultTest1Tag;
@@ -140,12 +166,12 @@ function Counsellor( storageObj, translationObj )
 	me.resultTestResultSDBiolineTag;
 	me.resultFinalHIVStatusTag;
 	
-	
 
 	// [Client Form] Tab name
 	me.TAB_NAME_CLIENT_ATTRIBUTE = "clientAttributeDiv";
 	me.TAB_NAME_PREVIOUS_TEST = "previousTestDiv";
 	me.TAB_NAME_THIS_TEST = "thisTestDiv";
+	
 	
 	me.currentList = "";
 	me.PAGE_TODAY_LIST = "todayList";
@@ -160,15 +186,19 @@ function Counsellor( storageObj, translationObj )
 	me.PAGE_SETTINGS = "settings";
 	me.PAGE_ABOUT = "about";
 	
+	
 	me.userInfoLoaded = false;
 	me.metadataLoaded = false;
 	me.orgUnitListLoaded = false;
 	
+	
 	me.sectionList = [];
 	me.attributeGroupList = [];
 	
+	
 	me.searchClientAttributeIds = [me.attr_DoB, me.attr_DistrictOB, me.attr_FirstName, me.attr_LastName, me.attr_BirthOrder];
 
+	
 	// -------------------------------------------------------------------
 	// Init methods
 	// -------------------------------------------------------------------
@@ -178,6 +208,7 @@ function Counsellor( storageObj, translationObj )
 		MsgManager.initialSetup();		
 		me.validationObj = new Validation( me.translationObj );
 		
+		me.setupVersion();
 		me.hideHIVTestLogicActionTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_HIDE_HIV_TEST_LOGIC_ACTION_FIELDS ) );		
 		me.loadInitData();
 	};
@@ -186,6 +217,13 @@ function Counsellor( storageObj, translationObj )
 	// ----------------------------------------------------------------------------
 	// Load init data
 	// ----------------------------------------------------------------------------
+	
+	me.setupVersion = function()
+	{
+		me.versionTag.text( Commons.VERSION );
+		me.versionDateTag.text( Commons.VERSION_DATE );
+	};	
+	
 	
 	me.loadInitData = function()
 	{
@@ -209,19 +247,19 @@ function Counsellor( storageObj, translationObj )
 		if( page == me.PAGE_TODAY_LIST )
 		{
 			me.listTodayCases(function(){
-				me.loadSearchSubPage();
+				me.loadSearchSubPage( me.todayCaseTblTag );
 			});
 		}
 		else if( page == me.PAGE_PREVIOUS_LIST )
 		{
 			me.listPreviousCases(function(){
-				me.loadSearchSubPage();
+				me.loadSearchSubPage( me.previousCaseTblTag );
 			});
 		}
 		else if( page == me.PAGE_POSITIVE_LIST )
 		{
 			me.listPositiveCases(function(){
-				me.loadSearchSubPage();
+				me.loadSearchSubPage( me.positiveCaseTblTag );
 			});
 		}
 		else if( page == me.PAGE_SEARCH_PARAM )
@@ -230,7 +268,7 @@ function Counsellor( storageObj, translationObj )
 		}
 		else if( page == me.PAGE_SEARCH_CLIENT_RESULT )
 		{
-			me.loadSearchSubPage();			
+			me.loadSearchSubPage( me.searchResultTbTag );			
 		}
 		else if( page == me.PAGE_COMSUMABLES )
 		{
@@ -251,7 +289,7 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-	me.loadSearchSubPage = function()
+	me.loadSearchSubPage = function( tableTag )
 	{
 		var subPage = me.storageObj.getItem( "subPage" );
 		if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
@@ -263,7 +301,7 @@ function Counsellor( storageObj, translationObj )
 				var clientId = me.storageObj.getItem( "clientId" );
 				var eventId = me.storageObj.getItem( "eventId" );
 				
-				var rowTag = me.contentListTag.find("table").find("tr[clientId='" + clientId + "'][eventId='" + eventId + "']");
+				var rowTag = tableTag.find("table").find("tr[clientId='" + clientId + "'][eventId='" + eventId + "']");
 				rowTag.click();
 			}
 			else
@@ -310,6 +348,26 @@ function Counsellor( storageObj, translationObj )
 	
 	
 	// ----------------------------------------------------------------------------
+	// Check if any Org Unit is selected. If no any Org Unit is selected, 
+	// the show dialog to ask user go to Settings to select an orgunit
+	// ----------------------------------------------------------------------------
+	
+	me.checkOrgunitSetting = function( exeFunc )
+	{
+		var orgUnit = me.orgUnitListTag.val();
+		if( orgUnit == "" || orgUnit === null )
+		{
+			var translatedText = me.translationObj.getTranslatedValueByKey( "settings_msg_selectOrgUnit" );
+			MsgManager.showDialogForm( translatedText );
+		}
+		else
+		{
+			exeFunc();
+		}
+		
+	}
+	
+	// ----------------------------------------------------------------------------
 	// Set up Events
 	// ----------------------------------------------------------------------------
 	
@@ -345,7 +403,7 @@ function Counsellor( storageObj, translationObj )
 			me.storageObj.removeItem( me.storageObj.KEY_STORAGE_ORGUNIT );
 			if( me.districtListTag.val() != "" )
 			{
-				me.loadOrgUnitList();
+				me.orgUnitSelectorChange();
 			}
 			else
 			{
@@ -370,29 +428,42 @@ function Counsellor( storageObj, translationObj )
 	
 	me.setUp_Events_Menus = function()
 	{
-		me.todayCaseLinkTag.click(function(){
-			me.registerClientBtnTag.show();
-			me.listTodayCases();
+		me.todayCaseLinkTag.click(function(e){
+			console.log("todayCaseLinkTag");
 			$('.overlay').click();
+			
+			me.checkOrgunitSetting( function(){
+				me.registerClientBtnTag.show();
+				me.listTodayCases();
+			});
 		});
 		
 		me.previousCaseLinkTag.click(function(){
-			me.registerClientBtnTag.hide();
-			me.listPreviousCases();
 			$('.overlay').click();
+			
+			me.checkOrgunitSetting( function(){
+				me.registerClientBtnTag.hide();
+				me.listPreviousCases();
+			});
 		});
 		
 		me.positiveCaseLinkTag.click(function(){
-			me.registerClientBtnTag.hide();
-			me.listPositiveCases();
 			$('.overlay').click();
+			
+			me.checkOrgunitSetting( function(){
+				me.registerClientBtnTag.hide();
+				me.listPositiveCases();
+			});
 		});
 		
 		me.searchClientLinkTag.click(function(){
-			me.resetPageDisplay();
-			me.resetSearchClientForm();
-			me.showSearchClientForm();
 			$('.overlay').click();
+			
+			me.checkOrgunitSetting( function(){
+				me.resetPageDisplay();
+				me.resetSearchClientForm();
+				me.showSearchClientForm();
+			});
 		});
 		
 		me.settingsLinkTag.click(function(){
@@ -403,10 +474,13 @@ function Counsellor( storageObj, translationObj )
 		});
 		
 		me.aboutLinkTag.click(function(){
-			me.storageObj.addItem("page", me.PAGE_ABOUT);
-			me.resetPageDisplay();
-			me.aboutDivTag.show("fast");
 			$('.overlay').click();
+			
+			me.checkOrgunitSetting( function(){
+				me.storageObj.addItem("page", me.PAGE_ABOUT);
+				me.resetPageDisplay();
+				me.aboutDivTag.show("fast");
+			});
 		});
 		
 		me.moveToSettingLinkTag.click(function(){
@@ -416,17 +490,23 @@ function Counsellor( storageObj, translationObj )
 		});
 		
 		me.consumablesLinkTag.click(function(){
-			me.storageObj.addItem("page", me.PAGE_COMSUMABLES);
-			me.resetPageDisplay();
-			me.consumablesDivTag.show("fast");
 			$('.overlay').click();
+			
+			me.checkOrgunitSetting( function(){
+				me.storageObj.addItem("page", me.PAGE_COMSUMABLES);
+				me.resetPageDisplay();
+				me.consumablesDivTag.show("fast");
+			});
 		});
 		
 		me.reportLinkTag .click(function(){
-			me.storageObj.addItem("page", me.PAGE_REPORT_PARAM);
-			me.resetPageDisplay();
-			me.reportParamDivTag.show("fast");
 			$('.overlay').click();
+			
+			me.checkOrgunitSetting( function(){
+				me.storageObj.addItem("page", me.PAGE_REPORT_PARAM);
+				me.resetPageDisplay();
+				me.reportParamDivTag.show("fast");
+			});
 		});
 		
 	};
@@ -1408,45 +1488,54 @@ function Counsellor( storageObj, translationObj )
 	
 	me.loadOrgUnitList = function()
 	{
+		me.populateOrgUnitList( function(){
+			me.orgUnitListLoaded = true;
+			me.checkAndLoadDataAfterInit();
+		});
+	};
+	
+	me.orgUnitSelectorChange = function()
+	{
 		var district = me.districtListTag.val();
 		
 		if( district !== "" )
 		{
-			$.ajax({
-				type: "POST"
-				,url: "../metaData/ouList?districtId=" + district
-				,dataType: "json"
-	            ,contentType: "application/json;charset=utf-8" 
-	            ,beforeSend: function( xhr ) 
-	            {
-	            	me.orgUnitListTag.find("option").remove();
-	            	me.loadingOuListImgTag.show();
-	            }
-				,success: function( jsonData ) 
-				{
-					me.orgUnitListTag.append("<option value=''>[Please select]</option>");
-					for( var i in jsonData.organisationUnits )
-					{
-						var orgUnit = jsonData.organisationUnits[i];
-						me.orgUnitListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
-					}
+			me.populateOrgUnitList();
+		}
+		
+	};
 	
-					me.orgUnitListTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_ORGUNIT ) );
-					me.populateOrgUnitNameInHeader();
-					
-					me.orgUnitListLoaded = true;
-					me.checkAndLoadDataAfterInit();
+	me.populateOrgUnitList = function( exeFunc )
+	{
+		var district = me.districtListTag.val();
+		$.ajax({
+			type: "POST"
+			,url: "../metaData/ouList?districtId=" + district
+			,dataType: "json"
+            ,contentType: "application/json;charset=utf-8" 
+            ,beforeSend: function( xhr ) 
+            {
+            	me.orgUnitListTag.find("option").remove();
+            	me.loadingOuListImgTag.show();
+            }
+			,success: function( jsonData ) 
+			{
+				me.orgUnitListTag.append("<option value=''>[Please select]</option>");
+				for( var i in jsonData.organisationUnits )
+				{
+					var orgUnit = jsonData.organisationUnits[i];
+					me.orgUnitListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
 				}
-			}).always( function( data ) {
-				me.loadingOuListImgTag.hide();
-				MsgManager.appUnblock();
-			});
-		}
-		else
-		{
-			me.orgUnitListLoaded = true;
-			me.checkAndLoadDataAfterInit();
-		}
+
+				me.orgUnitListTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_ORGUNIT ) );
+				me.populateOrgUnitNameInHeader();
+				
+				if( exeFunc ) exeFunc();
+			}
+		}).always( function( data ) {
+			me.loadingOuListImgTag.hide();
+			MsgManager.appUnblock();
+		});
 		
 	};
 	
@@ -1506,8 +1595,7 @@ function Counsellor( storageObj, translationObj )
 			else
 			{
 				me.loadPageWithParam();
-			}
-			
+			}	
 		}
 	};
 	
@@ -1519,13 +1607,19 @@ function Counsellor( storageObj, translationObj )
 	{
 		me.currentList = me.PAGE_TODAY_LIST;
 		me.storageObj.addItem( "page", me.PAGE_TODAY_LIST );
-		me.storageObj.removeItem( "subPage" );
+		me.storageObj.removeItem( "subPage" );		
 		
-		
-		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "todayCases_headerTitle" );
 		me.listDateTag.html( Util.getLastNDate(0) );
-		var headerList = ["Time", "Name", "Result", "Org Unit"];
-		me.listCases( "../event/todayCases", headerList, "#cfe2f3", tranlatedHeaderText + " - ", true, false, true, exeFunc );
+		me.listCases( "../event/todayCases", function( list ){
+			me.populateTodayCaseData( list );
+			if( exeFunc !== undefined ) exeFunc();
+			
+
+			// Show table			
+			MsgManager.appUnblock();
+			me.todayCaseTblTag.show();
+			me.todayCaseListTag.show("fast");
+		} );
 	}
 		
 	me.listPreviousCases = function( exeFunc )
@@ -1534,10 +1628,16 @@ function Counsellor( storageObj, translationObj )
 		me.storageObj.addItem("page", me.PAGE_PREVIOUS_LIST);
 		me.storageObj.removeItem( "subPage" );
 		
-		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "previousCases_headerTitle" );
-		me.listDateTag.html( "" );
-		var headerList = ["Date", "Name", "Result", "Org Unit"];
-		me.listCases( "../event/previousCases", headerList, "#cfe2f3", tranlatedHeaderText, false, false, false, exeFunc );
+		me.listCases( "../event/previousCases", function( list ){
+			me.populatePreviousCaseData( list )
+			
+			if( exeFunc !== undefined ) exeFunc();
+
+			// Show table	
+			MsgManager.appUnblock();
+			me.previousCaseTblTag.show();
+			me.previousCaseListTag.show("fast");
+		} );
 	}
 	
 	me.listPositiveCases = function( exeFunc )
@@ -1546,13 +1646,19 @@ function Counsellor( storageObj, translationObj )
 		me.storageObj.addItem("page", me.PAGE_POSITIVE_LIST);
 		me.storageObj.removeItem( "subPage" );
 		
-		var tranlatedHeaderText = me.translationObj.getTranslatedValueByKey( "positiveCases_headerTitle" );
-		me.listDateTag.html( "" );
-		var headerList = ["Date", "Name", "Org Unit", "Referral ART closed?"];
-		me.listCases( "../event/positiveCases", headerList, "#cfe2f3", tranlatedHeaderText, false, true, false, exeFunc );
+		me.listCases( "../event/positiveCases", function( list ){
+			me.populatePositiveCaseData( list );
+			
+			if( exeFunc !== undefined ) exeFunc();
+			
+			// Show table	
+			MsgManager.appUnblock();
+			me.positiveCaseTblTag.show();
+			me.positiveCaseListTag.show("fast");
+		} );
 	}
 	
-	me.listCases = function( url, headerList, headerColor, headerText, isTime, isSpecialCase, showOrgUnitSelector, exeFunc )
+	me.listCases = function( url, exeFunc )
 	{
 		me.storageObj.removeItem("param" );
 		
@@ -1561,13 +1667,6 @@ function Counsellor( storageObj, translationObj )
 		me.resetPageDisplay();
 		
 		MsgManager.appBlock( tranlatedText + " ..." );
-		
-		// STEP 0. Show the 'Add' button which can move to 'Search/Create Client' function
-		
-		if( showOrgUnitSelector ) 
-		{
-			me.registerClientBtnTag.show();
-		}
 		
 		Commons.checkSession( function( isInSession ) 
 		{
@@ -1581,38 +1680,7 @@ function Counsellor( storageObj, translationObj )
 			            ,contentType: "application/json;charset=utf-8"
 						,success: function( response ) 
 						{
-							var tableTag = $("<table class='table table-hover table-striped listTable tablesorter'></table>");
-							me.contentListTag.append(tableTag);
-							
-							// STEP 1. Display div header
-							
-							me.headerListTag.html( headerText );						
-							
-							// STEP 3. Populate data
-
-							if( !isSpecialCase ){
-								me.populateAllCaseData( response.rows, tableTag, isTime, headerColor );
-							}
-							else {
-								me.populatePositiveCaseData( response.rows, tableTag, isTime, headerColor );
-							}
-							
-							me.populateFoolterInfo();
-							
-							// STEP 4. Sort Table
-							
-							if( tableTag.find("tbody tr").length > 0 )
-							{
-								tableTag.tablesorter();
-							}
-							
-							if( exeFunc ) exeFunc();
-
-							// STEP 5. Show table
-							
-							MsgManager.appUnblock();
-							me.contentListTag.show();
-							me.clientListTag.show("fast");
+							exeFunc( response.rows );
 						}
 						,error: function(response)
 						{
@@ -1627,31 +1695,13 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-	me.populateAllCaseData = function( list, tableTag, isTime, headerColor )
-	{
-		var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
-		
-		if( me.currentList == me.PAGE_PREVIOUS_LIST )
-		{
-			rowTag.append( "<th>Date</th>" );
-		}
-		else
-		{
-			rowTag.append( "<th>Time</th>" );
-		}
-		
-		rowTag.append( "<th>Name</th>" );
-		rowTag.append( "<th>Result</th>" );
-		rowTag.append( "<th>Org Unit</th>" );
-		
-		var theadTag = $("<thead></thead>");
-		theadTag.append(rowTag);
-		tableTag.append( theadTag );
-		
+	me.populateTodayCaseData = function( list )
+	{		
+		var tbodyTag = me.todayCaseTblTag.find("tbody");
+		tbodyTag.find("tr").remove();
 		
 		if( list.length > 0 )
 		{
-			var tbodyTag = $("<tbody></tbody>");
 			for( var i in list )
 			{
 				var event = list[i];
@@ -1663,18 +1713,15 @@ function Counsellor( storageObj, translationObj )
 				var ouName = event[6];
 				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
-				if( isTime && eventDate !== "" )
+				var eventDateStr = eventDate;
+				if( eventDate !== "" )
 				{
-					eventDate = Util.formatTimeInDateTime( eventDate );
-				}
-				else if( !isTime && eventDate !== "" )
-				{
-					eventDate = Util.formatDate_DisplayDate( eventDate );
+					eventDateStr = Util.formatTimeInDateTime( eventDate );
 				}
 			
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
 				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
-				rowTag.append( "<td>" + eventDate + "</td>" );
+				rowTag.append( "<td><span style='display:none;'>" + eventDate + "</span>" + eventDateStr + "</td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + deResult1 + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
@@ -1684,26 +1731,68 @@ function Counsellor( storageObj, translationObj )
 				tbodyTag.append( rowTag );
 			}
 			
-			tableTag.append( tbodyTag );
 		}
+		
+		// Sortable		
+		me.sortTable( me.todayCaseTblTag );
+		
+		me.todayCaseNumberTag.html( me.todayCaseTblTag.find("tbody tr").length );
 	}
-		
-	me.populatePositiveCaseData = function( list, tableTag, isTime, headerColor )
-	{
-		var rowTag = $("<tr style='background-color:" + headerColor + "'></tr>" );	
-		rowTag.append( "<th>Date</th>" );
-		rowTag.append( "<th>Name</th>" );
-		rowTag.append( "<th>Org Unit</th>" );
-		rowTag.append( "<th>Number of Test</th>" );
-		rowTag.append( "<th>Referral ART closed?</th>" );
-		
-		var theadTag = $("<thead></thead>");
-		theadTag.append(rowTag);
-		tableTag.append( theadTag );
+
+	me.populatePreviousCaseData = function( list )
+	{	
+		var tbodyTag = me.previousCaseTblTag.find("tbody");
+		tbodyTag.find("tr").remove();
 		
 		if( list.length > 0 )
 		{
-			var tbodyTag = $("<tbody></tbody>");
+			
+			for( var i in list )
+			{
+				var event = list[i];
+				var clientId = event[0];
+				var eventId = event[1];
+				var eventDate = event[2];
+				var fullName = event[3] + " " + event[4];
+				var deResult1 = event[5];
+				var ouName = event[6];
+				var noTest = event[7];
+				
+				eventDate = ( eventDate !== undefined ) ? eventDate : "";
+				var eventDateStr = eventDate;
+				if( eventDate !== "" )
+				{
+					eventDateStr = Util.formatDate_DisplayDate( eventDate );
+				}
+			
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
+				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
+				rowTag.append( "<td><span style='display:none;'>" + eventDate + "</span>" + eventDateStr + "</td>" );
+				rowTag.append( "<td>" + fullName + "</td>" );
+				rowTag.append( "<td>" + deResult1 + "</td>" );
+				rowTag.append( "<td>" + ouName + "</td>" );
+				rowTag.append( "<td>" + noTest + "</td>" );
+				
+				me.addEventForRowInList(rowTag);
+				
+				tbodyTag.append( rowTag );
+			}
+			
+		}
+		
+		// Sortable
+		me.sortTable( me.previousCaseTblTag );
+		
+		me.previousCaseNumberTag.html( me.previousCaseTblTag.find("tbody tr").length );
+	}
+	
+	me.populatePositiveCaseData = function( list )
+	{
+		var tbodyTag = me.positiveCaseTblTag.find("tbody");
+		tbodyTag.find("tr").remove();
+		
+		if( list.length > 0 )
+		{
 			for( var i in list )
 			{
 				var event = list[i];
@@ -1717,18 +1806,15 @@ function Counsellor( storageObj, translationObj )
 				var numberOfTest = event[7];
 				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
-				if( isTime && eventDate !== "" )
+				var eventDateStr = eventDate;
+				if( eventDate !== "" )
 				{
-					eventDate = Util.formatTimeInDateTime( eventDate );
-				}
-				else if( !isTime && eventDate !== "" )
-				{
-					eventDate = Util.formatDate_DisplayDate( eventDate );
+					eventDateStr = Util.formatDate_DisplayDate( eventDate );
 				}
 				
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "positiveCaseList_msg_clickToOpenEditForm" );
 				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "'></tr>");										
-				rowTag.append( "<td>" + eventDate + "</td>" );
+				rowTag.append( "<td><span style='display:none;'>" + eventDate + "</span><span>" + eventDateStr + "</span></td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
 				rowTag.append( "<td>" + numberOfTest + "</td>" );
@@ -1738,32 +1824,31 @@ function Counsellor( storageObj, translationObj )
 				
 				tbodyTag.append( rowTag );
 			}
-			tableTag.append( tbodyTag );
 			
 		}
+		
+		// Sortable
+
+		me.sortTable( me.positiveCaseTblTag );
+		
+		me.positiveCaseNumberTag.html( me.positiveCaseTblTag.find("tbody tr").length );
 	};
 
-	me.populateFoolterInfo = function()
+	me.sortTable = function( tableTag )
 	{
-		var noCases = me.contentListTag.find("table tbody tr").length;
-		
-		var translatedText = "";
-		if( me.currentList == me.PAGE_TODAY_LIST )
+		// Sortable
+		var sorted = eval( tableTag.attr("sorted") );
+		if( tableTag.find("tbody tr").length > 0  )
 		{
-			translatedText = me.translationObj.getTranslatedValueByKey( "todayCases_footer_msg_totalCases" );
-		}
-		else if( me.currentList == me.PAGE_PREVIOUS_LIST )
-		{
-			translatedText = me.translationObj.getTranslatedValueByKey( "previousCases_footer_msg_totalCases" );
-		}
-		else if( me.currentList == me.PAGE_POSITIVE_LIST )
-		{
-			translatedText = me.translationObj.getTranslatedValueByKey( "positiveCases_footer_msg_totalCases" );
+			var sortingList = { 'sortList': [[0,1]] };
+				
+			( sorted ) ? tableTag.trigger( "updateAll", [ sortingList, function() {} ] ) : tableTag.tablesorter( sortingList );
+			
 		}
 		
-		var translatedCase = me.translationObj.getTranslatedValueByKey( "common_footer_msg_cases" );
-		me.footerRightSideControlsTag.html( "*** " + translatedText + ": " + noCases + " " + translatedCase );
+		tableTag.attr( "sorted", "true" );
 	};
+	
 	
 	me.addEventForRowInList = function(rowTag)
 	{
@@ -2291,7 +2376,6 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-
 	me.getGPSCoordinates = function( exeFunc ) 
 	{
 		if (navigator.geolocation) {
@@ -2316,9 +2400,8 @@ function Counsellor( storageObj, translationObj )
 
 	function showPosition(position) {
 	   
-	}
-	
-	
+	};
+		
 	me.completeEvent = function( exeFunc )
 	{
 		var event = JSON.parse( me.addClientFormTabTag.attr( "event" ) );
@@ -2355,6 +2438,7 @@ function Counsellor( storageObj, translationObj )
 	
 	};
 	
+	
 	// -------------------------------------------------------------------
 	// Show / Hide forms
 	// -------------------------------------------------------------------
@@ -2381,8 +2465,6 @@ function Counsellor( storageObj, translationObj )
 	
 	me.resetPageDisplay = function()
 	{
-		me.contentListTag.html("");
-		me.footerRightSideControlsTag.html("");
 		me.mainContentTags.hide();
 	};
 	
@@ -2471,7 +2553,6 @@ function Counsellor( storageObj, translationObj )
 
 		me.resetClientForm();
 		me.resetDataEntryForm();
-		me.contentListTag.hide();
 		me.searchResultTbTag.hide();
 		me.searchResultTag.hide();
 		me.searchClientFormTag.hide();

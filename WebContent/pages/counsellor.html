@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="initial-scale=1.0">
-<title>LS - Discovery & Design</title>
+<title>New Start LS</title>
 
 <meta name="viewport" content="initial-scale=1.0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -19,11 +19,12 @@
 <script src="../js/jQuery/jquery-ui.min.js"></script>
 <script src="../js/jQuery/jquery.dateFormat-1.0.js"></script>
 <script src="../js/jQuery/jquery.blockUI.js" type="text/javascript"></script>
-<script src="../js/jQuery/jquery.tablesorter.min.js" type="text/javascript"></script>
+<script src="../js/jQuery/jquery.tablesorter.js" type="text/javascript"></script>
 
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="../css/jQuery/tablesorter/style.css" />
 <link type="text/css" rel="stylesheet" media="screen" href="../css/style.css" />
 
 <script src="../js/utils/lesotho_utils.js"></script>
@@ -105,16 +106,80 @@
 			
 			
 			
-				<!-- List Cases -->				
+				<!-- Today Cases -->				
 				
-				<div id="clientList" style="display: none;" class="mainContent">
+				
+				<div id="todayCaseList" style="display: none;" class="mainContent">
 				 	
-					<h4 class="headerList"><span id="headerList"></span><span id="listDate"></span></h4>
+					<h4 class="headerList"><span id="headerList" keyword="todayCases_headerTitle"></span> - <span id="listDate"></span></h4>
 				    
-					<div id="contentList"></div>
+					<table id="todayCaseTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
+						<thead>
+							<tr style="background-color:#cfe2f3">
+								<th keyword="todayCases_tableHeader_time">Time</th>
+								<th keyword="todayCases_tableHeader_name">Name</th>
+								<th keyword="todayCases_tableHeader_result">Result</th>
+								<th keyword="todayCases_tableHeader_orgUnit">Org Unit</th>
+							</tr>
+						</thead>
+						
+						<tbody></tbody>
+					</table>
+					
+					
 					<button id="registerClientBtn" class="btn btn-lg glyphicon glyphicon-plus addButton" title="Search/Create client"></button>
 					
-					<div id="footerRightSideControls"></div>
+					<div id="todayCaseFooter" class="footerRightSideControls">*** <span keyword="todayCases_footer_msg_totalCases">Total Cases for today</span>: <span id="todayCaseNumber"></span> <span keyword="common_footer_msg_cases">cases</span></div>
+					
+				</div>
+				
+				
+				<!-- Previous List Cases -->
+				
+				<div id="previousCaseList" style="display:none;" class="mainContent">
+				 	
+					<h4 class="headerList"><span id="headerList" keyword="previousCases_headerTitle"></span></h4>
+				    
+					<table id="previousCaseTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
+						<thead>
+							<tr style="background-color:#cfe2f3">
+								<th keyword="previousCases_tableHeader_date">Date</th>
+								<th keyword="previousCases_tableHeader_name">Name</th>
+								<th keyword="previousCases_tableHeader_result">Result</th>
+								<th keyword="previousCases_tableHeader_orgUnit">Org Unit</th>
+								<th keyword="previousCases_tableHeader_numberOfTest">Number of Test</th>
+							</tr>
+						</thead>
+						
+						<tbody></tbody>
+					</table>
+					
+					<div id="previousCaseFooter" class="footerRightSideControls">*** <span keyword="previousCase_footer_msg_totalCases">Total Cases for previous</span>: <span id="previousCaseNumber"></span> <span keyword="common_footer_msg_cases">cases</span></div>
+					
+				</div>
+				
+				
+				<!-- Positive List Cases -->
+				
+				<div id="positiveCaseList" style="display:none;" class="mainContent">
+				 	
+					<h4 class="headerList"><span id="headerList" keyword="positiveCases_headerTitle"></span></h4>
+				    
+					<table id="positiveCaseTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
+						<thead>
+							<tr style="background-color:#cfe2f3">
+								<th keyword="positiveCases_tableHeader_date">Date</th>
+								<th keyword="positiveCases_tableHeader_name">Name</th>
+								<th keyword="positiveCases_tableHeader_orgUnit">Org Unit</th>
+								<th keyword="positiveCases_tableHeader_numberOfTest">Number of Test</th>
+								<th keyword="positiveCases_tableHeader_referralARTClosed">Referral ART closed</th>
+							</tr>
+						</thead>
+						
+						<tbody></tbody>
+					</table>
+					
+					<div id="positiveCaseFooter" class="footerRightSideControls">*** <span keyword="positiveCases_footer_msg_totalCases">Total Cases for positive</span>: <span id="positiveCaseNumber"></span> <span keyword="common_footer_msg_cases">cases</span></div>
 					
 				</div>
 
@@ -287,8 +352,33 @@
 				
 				<div id="reportParamDiv" class="mainContent" style="display:none">
 					<h4 class="headerList">Statistics</h4>
-				   	
-			   		<div id="">[Not impletemented yet]</div>
+				   	<table id="reportTbl" sorted="false" class='table table-hover table-striped listTable'>
+						<thead>
+							<tr style="background-color:#cfe2f3">
+								<th keyword="report_tableHeader_yesterday">Yesterday</th>
+								<th keyword="report_tableHeader_thisWeek">This Week</th>
+								<th keyword="report_tableHeader_last4weeks">Last 4 weeks</th>
+							</tr>
+						</thead>
+						
+						<tbody>
+							<tr>
+								<td keyword="report_rowTitle_tested">Tested</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td keyword="report_rowTitle_target">Target</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td keyword="report_rowTitle_achieved">% achieved</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 					
 				<!-- END Report -->
@@ -305,9 +395,10 @@
 						</tr>
 						<tr>
 							<td keyword="about_rowHeader_version">Version</td>
-							<td><a
+							<td>
+								<a
 								href="https://docs.google.com/document/d/1sI_0HVrUjnRdGP1IJtJtwN1veqFgxML26tBVXDSci4Y"
-								target="_blank" style="font-size:12px;">v 0.010</a>  Mar 28, 2017</td>
+								target="_blank" style="font-size:12px;" id="version">v 0.010</a>, <span id="versionDate">Mar 28, 2017</span></td>
 						</tr>
 						<tr>
 							<td keyword="about_rowHeader_dhisServer">DHIS server</td>
@@ -318,7 +409,8 @@
 
 				<!-- END About page -->
 
-				
+				<!--  -->
+				<div id="dialogForm"></div>
 			</div>
 
 			<!-- /#page-content-wrapper -->

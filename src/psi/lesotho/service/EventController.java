@@ -98,6 +98,11 @@ public class EventController
                 {
                     String eventId = request.getParameter( Util.PAMAM_EVENT_ID );
                     responseInfo = EventController.getEventById( eventId );
+                } 
+                // Load report
+                else if ( key.equals( Util.KEY_GET_REPORT ) )
+                {
+                    responseInfo = EventController.getReport( loginUsername );
                 }
             }
 
@@ -198,22 +203,57 @@ public class EventController
         return responseInfo;
     }
 
-    private static ResponseInfo getCatOptionComboUid( String loginUsername )
+    private static String getCatOptionComboUid( String loginUsername )
     {
-        ResponseInfo responseInfo = null;
+        String catOptionComboId = "";
+        
         try
         {
             String url = Util.LOCATION_DHIS_SERVER + "/api/categoryOptions.json?fields=id,name,code&filter=code:eq:" + loginUsername;
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+            ResponseInfo responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+            
+            if ( responseInfo.responseCode == 200 )
+            {
+                JSONObject catOptionCombo = new JSONObject( responseInfo.output );
+                JSONArray catOptionComboList = catOptionCombo.getJSONArray( "categoryOptions" );
+                catOptionComboId = catOptionComboList.getJSONObject( 0 ).getString( "id" );
+
+            }
         }
         catch ( Exception ex )
         {
             ex.printStackTrace();
         }
 
-        return responseInfo;
+        return catOptionComboId;
     }
     
+    private static ResponseInfo getReport( String loginUsername )
+    {
+        ResponseInfo responseInfo = new ResponseInfo();
+        
+        String catOptionComboId = EventController.getCatOptionComboUid( loginUsername );
+        if ( catOptionComboId != null )
+        {
+            try
+            {
+                String url = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:I2oytRXksKN;rcVLQsClLUa;sNS1PQ1YNXA&dimension=pe:LAST_4_WEEKS;LAST_WEEK;THIS_WEEK&dimension=" + Util.USER_CATEGORY_ID + ":" + catOptionComboId + "&filter=ou:" + Util.ROOT_ORGTUNIT + "&skipMeta=true";
+                responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+            }
+            catch ( Exception ex )
+            {
+                ex.printStackTrace();
+            }
+        }
+        else
+        {
+            responseInfo.responseCode = 404;
+        }
+       
+
+        return responseInfo;
+    }
+            
     public static ResponseInfo createEvent( JSONObject eventData, String clientId, String ouId, String loginUsername )
         throws IOException, Exception
     {
@@ -221,14 +261,10 @@ public class EventController
 
         try
         {
-            responseInfo = EventController.getCatOptionComboUid( loginUsername );
+            String catOptionComboId = EventController.getCatOptionComboUid( loginUsername );
 
-            if ( responseInfo.responseCode == 200 )
+            if ( catOptionComboId != null )
             {
-                JSONObject catOptionCombo = new JSONObject( responseInfo.output );
-                JSONArray catOptionComboList = catOptionCombo.getJSONArray( "categoryOptions" );
-                String catOptionComboId = catOptionComboList.getJSONObject( 0 ).getString( "id" );
-
                 JSONObject eventJson = EventController.composeJsonEvent( eventData, clientId, ouId, catOptionComboId );
                 
                 String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events";
@@ -239,6 +275,10 @@ public class EventController
                 String eventId = responseInfo.referenceId;
                 eventJson.put( "event", eventId );
                 responseInfo.output = eventJson.toString();
+            }
+            else
+            {
+                responseInfo.responseCode = 404;
             }
 
         }
@@ -257,16 +297,11 @@ public class EventController
 
         try
         {
-            responseInfo = EventController.getCatOptionComboUid( loginUsername );
+            String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events/" + eventId;
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, eventData, null );
 
-            if ( responseInfo.responseCode == 200 )
-            {
-                String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events/" + eventId;
-                responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, eventData, null );
-
-                Util.processResponseMsg( responseInfo, "importSummaries" );
-                responseInfo.output = eventData.toString();
-            }
+            Util.processResponseMsg( responseInfo, "importSummaries" );
+            responseInfo.output = eventData.toString();
 
         }
         catch ( Exception ex )

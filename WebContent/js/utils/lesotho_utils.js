@@ -312,6 +312,7 @@ MsgManager.divMsgAreaTag;
 MsgManager.spanMsgAreaCloseTag;
 MsgManager.btnMsgAreaCloseTag;
 MsgManager.spanMsgAreaTextTag;
+MsgManager.dialogFormTag;
 
 MsgManager.initialSetup = function()
 {
@@ -319,6 +320,8 @@ MsgManager.initialSetup = function()
 	MsgManager.spanMsgAreaCloseTag = $( '#spanMsgAreaClose' );
 	MsgManager.btnMsgAreaCloseTag = $( '#btnMsgAreaClose' );
 	MsgManager.spanMsgAreaTextTag = $( '#spanMsgAreaText' );
+	MsgManager.dialogFormTag = $( '#dialogForm' );
+	
 
 
 	MsgManager.btnMsgAreaCloseTag.click( function()
@@ -366,4 +369,27 @@ MsgManager.msgAreaHide = function()
 	MsgManager.divMsgAreaTag.hide( 'fast' );
 };
 
-		
+
+MsgManager.showDialogForm = function( msg ){
+	MsgManager.dialogFormTag.html( msg );
+	MsgManager.dialogFormTag.dialog({
+		title: 'Setting Form',
+		maximize: true,
+		closable: true,
+		modal: true,
+		width: 400,
+		height: 200,
+		buttons: [ 
+          { 
+              text: "Ok",
+              class: 'btn btn-default', 
+              click: function() {
+            	  $(this).dialog("close"); 
+              } 
+          }
+      ]
+	}).show();
+};
+	
+
+	
