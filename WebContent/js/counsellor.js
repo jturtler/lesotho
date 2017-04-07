@@ -571,7 +571,7 @@ function Counsellor( storageObj, translationObj )
 			if( requestData.attributes.length == 0 )
 			{
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
-				MsgManager.msgAreaShow( tranlatedText, "ERROR" );
+				alert( tranlatedText );
 			}
 			else
 			{
@@ -749,7 +749,8 @@ function Counsellor( storageObj, translationObj )
 				me.resultFinalHIVStatusTag.val( me.resultTestResultSDBiolineTag.val() );
 			}
 		}		
-	};
+	}; 
+	
 	
 	me.setUp_DataElementResultTest1Logic = function()
 	{
@@ -1266,9 +1267,7 @@ function Counsellor( storageObj, translationObj )
 		me.activeEventHeaderTag.hide();
 		
 		// Enable the form for entering data
-		me.addEventFormTag.find("input,select").each( function(){
-			Util.disableTag( $(this), false );
-		});
+		me.disableDataEtryForm( false );
 		
 		// Add logic for [Data Entry form]
 		me.resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
@@ -1718,10 +1717,12 @@ function Counsellor( storageObj, translationObj )
 				{
 					eventDateStr = Util.formatTimeInDateTime( eventDate );
 				}
-			
+
+				var eventKey = eventDate.substring(11, 19).split(":").join("");
+				
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
 				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
-				rowTag.append( "<td><span style='display:none;'>" + eventDate + "</span>" + eventDateStr + "</td>" );
+				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + deResult1 + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
@@ -1764,10 +1765,12 @@ function Counsellor( storageObj, translationObj )
 				{
 					eventDateStr = Util.formatDate_DisplayDate( eventDate );
 				}
+				
+				var eventKey = eventDate.substring(0, 10).split("-").join("");
 			
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
 				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
-				rowTag.append( "<td><span style='display:none;'>" + eventDate + "</span>" + eventDateStr + "</td>" );
+				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + deResult1 + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
@@ -1812,9 +1815,11 @@ function Counsellor( storageObj, translationObj )
 					eventDateStr = Util.formatDate_DisplayDate( eventDate );
 				}
 				
+				var eventKey = eventDate.substring(0, 10).split("-").join("");
+				
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "positiveCaseList_msg_clickToOpenEditForm" );
 				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "'></tr>");										
-				rowTag.append( "<td><span style='display:none;'>" + eventDate + "</span><span>" + eventDateStr + "</span></td>" );
+				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
 				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
 				rowTag.append( "<td>" + numberOfTest + "</td>" );
@@ -1843,10 +1848,9 @@ function Counsellor( storageObj, translationObj )
 			var sortingList = { 'sortList': [[0,1]] };
 				
 			( sorted ) ? tableTag.trigger( "updateAll", [ sortingList, function() {} ] ) : tableTag.tablesorter( sortingList );
-			
+
+			tableTag.attr( "sorted", "true" );
 		}
-		
-		tableTag.attr( "sorted", "true" );
 	};
 	
 	
@@ -1914,8 +1918,7 @@ function Counsellor( storageObj, translationObj )
 					else if( requestData.attributes.length == 0 )
 					{
 						var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
-						
-						MsgManager.msgAreaShow( tranlatedText, "ERROR" );
+						alert( tranlatedText );
 					}
 				} else {
 					me.showExpireSessionMessage();					
@@ -1991,9 +1994,11 @@ function Counsellor( storageObj, translationObj )
 				}
 				else if( attributeId === me.attr_DistrictOB ){
 					colIdx = 4;
+					value = me.searchDoBTag.find("option[value='" + value + "']");
 				}
 				else if( attributeId === me.attr_BirthOrder ){
 					colIdx = 5;
+					value = me.searchBirthOrderTag.find("option[value='" + value + "']");
 				}
 				
 				me.searchResultTbTag.find('td:nth-child(' + colIdx + ')').each( function(){
@@ -2140,7 +2145,6 @@ function Counsellor( storageObj, translationObj )
 	{
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
-				MsgManager.msgAreaHide();
 				
 				if( me.validationObj.checkFormEntryTagsData(me.addClientFormTabTag) )
 				{
@@ -2201,24 +2205,22 @@ function Counsellor( storageObj, translationObj )
 								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
 								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
 								MsgManager.appUnblock();
-								alert(tranlatedText);
+								alert( tranlatedText );
 								
 							}
 							,error: function(response)
 							{
-								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
-								MsgManager.msgAreaShow( tranlatedText, "ERROR" );
 								MsgManager.appUnblock();
+								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
 								alert(tranlatedText);
 							}
 						});
 				}
 				else
 				{
-					var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_validation_checkErrorFields" );
-					
-					MsgManager.msgAreaShow( tranlatedText, "ERROR" );	
 					MsgManager.appUnblock();
+					var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_validation_checkErrorFields" );
+					alert( tranlatedText );
 				}
 			} else {
 				me.showExpireSessionMessage();					
@@ -2362,12 +2364,16 @@ function Counsellor( storageObj, translationObj )
 							,error: function( response )
 							{
 								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
-								MsgManager.msgAreaShow( tranlatedText, "ERROR" );
 								MsgManager.appUnblock();
 								alert(tranlatedText);
 							}
 						});
-				} 
+				}
+				else
+				{
+					var tranlatedText = me.translationObj.getTranslatedValueByKey( "datatEntryForm_validation_checkErrorFields" );
+					alert( tranlatedText );
+				}
 			}
 			else {
 				me.showExpireSessionMessage();					
@@ -2794,7 +2800,6 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-	
 	// Check if the logged counsellor if this counsellor is the person who created the active event
 	// If logged counsellor is a person who create the active event, then allow to edit data event
 	
@@ -2815,18 +2820,14 @@ function Counsellor( storageObj, translationObj )
 				
 				if( me.loginUsername === searchLoggedCounsellor.code )
 				{
-					me.addEventFormTag.find("input,select").each( function(){
-						Util.disableTag( $(this), false );
-					});
+					me.disableDataEtryForm( false );
 					me.saveEventBtnTag.show();
 					me.completedEventBtnTag.show();
 					me.activeEventHeaderTag.css( "color","gray" );
 				}
 				else
 				{
-					me.addEventFormTag.find("input,select").each( function(){
-						Util.disableTag( $(this), true );
-					});
+					me.disableDataEtryForm( true );
 					me.saveEventBtnTag.hide();
 					me.completedEventBtnTag.hide();
 					
@@ -2876,6 +2877,22 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 	
+	me.disableDataEtryForm = function( disabled )
+	{
+		me.addEventFormTag.find("input,select").each( function(){
+			var deId = $(this).attr("dataelement");
+			
+			if( deId != me.de_Testing_ResultTest1 || 
+				deId != me.de_Testing_ResultTest2 || 
+				deId != me.de_Testing_ResultParallel1 || 
+				deId != me.de_Testing_ResultParallel2 || 
+				deId != me.de_Testing_ResultSDBioline || 
+				deId != me.de_FinalResult_HIVStatus )
+			{
+				Util.disableTag( $(this), disabled );
+			}
+		});
+	};
 	
 	// Create a tbody with sections of programs. This one is used for generating history of events of a client
 		
