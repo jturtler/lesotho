@@ -273,13 +273,14 @@ Util.getCurrentWeekPeriod = function() {
 };
 
 Util.getLastWeekPeriod = function() {
-	var lastWeek = Util.getLastNDate( 7 );
-	return Util.getWeekIdx( lastWeek );
+	var date = new Date();
+    date.setDate(date.getDate() - 7);
+	return Util.getWeekIdx( date );
 };
 
 
 Util.getWeekIdx = function( date ) {
-	var onejan = new Date(curDate.getFullYear(), 0, 1);
+	var onejan = new Date(date.getFullYear(), 0, 1);
     var weekIdx =  Math.ceil((((date - onejan) / 86400000) + onejan.getDay() + 1) / 7);
     
     return date.getFullYear() + "W" + weekIdx;

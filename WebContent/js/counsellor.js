@@ -507,7 +507,7 @@ function Counsellor( storageObj, translationObj )
 				me.storageObj.addItem("page", me.PAGE_REPORT_PARAM);
 				me.resetPageDisplay();
 				me.reportParamDivTag.show();
-				//me.getReport();
+//				me.getReport();
 			});
 		});
 		
@@ -3208,7 +3208,6 @@ function Counsellor( storageObj, translationObj )
 		
 		if( dateOfBirth != "" && districtOfBirth != "" &&  firstName != "" && lastName != "" && birthOrder != "" )
 		{
-			var birthOrder = ( eval(birthOrder) < 10 ) ? "0" + birthOrder : birthOrder;
 			clientCUIC = dateOfBirth.substring(9, 12) + Util.MONTH_INDEXES[dateOfBirth.substring(3, 6)] + districtOfBirth.substring(0, 2).toUpperCase() + firstName.substring(0, 2).toUpperCase() + lastName.substring(0, 2).toUpperCase() + birthOrder;
 		}
 		
@@ -3268,32 +3267,49 @@ function Counsellor( storageObj, translationObj )
 			            {
 			            	var translatedText = me.translationObj.getTranslatedValueByKey( "report_msg_loadingReport" );
 			            	MsgManager.appBlock( translatedText );
+			            	
 			            	me.reportTblTag.hide();
-			            	me.reportTblTag.find("tbody td").html("");
+			            	me.reportTblTag.find("tbody td[dataelement]").html("");
+			            	me.reportParamDivTag.show();
 			            }
 						,success: function( response ) 
 						{
 							var curPeriod = Util.getCurrentWeekPeriod();
 							var lastPeriod = Util.getLastWeekPeriod();
 							
+							var last4WeeksData = [];
+							
 							var data = response.rows;
 							for( var i in data )
 							{
 								var deId = data[i][0];
-								var peId = data[i][1];
 								var value = eval( data[i][3] );
-								
-								var colTag = me.reportTblTag.find("td[dataelement='" + deId + "'][period='" + peId + "']");
-								colTag.html( value );
-								
-								if( deId == me.de_achieved )
-								{
-									if( value >= 80 )
+								var peId = data[i][1];
+								if( peId == curPeriod ) {
+									peId = curPeriod;
+								}
+								else if( peId == curPeriod ) {
+									peId = lastPeriod;
+									var last4WeekData = last4WeeksData[deId];
+									if( last4WeekData !== undefined )
 									{
-										colTag.append( "<img ");
+										last4WeekData = eval( last4WeekData ) + value;
+										last4WeeksData[deId] = last4WeekData;
+									}
+									else
+									{
+										last4WeeksData[deId] = value;
 									}
 								}
+								
+								me.setDataInReportCell( deId, peId, value );
 							}
+							
+							// Set values for "Last 4 weeks" column
+							
+							me.setDataInReportCell( me.de_Tested, "last4weeks", last4WeeksData[me.de_Tested] );
+							me.setDataInReportCell( me.de_Target, "last4weeks", last4WeeksData[me.de_Target] );
+							me.setDataInReportCell( me.de_achieved, "last4weeks", last4WeeksData[me.de_achieved] );
 							
 							me.reportTblTag.show();
 						}
@@ -3310,7 +3326,25 @@ function Counsellor( storageObj, translationObj )
 			}
 		});	
 	};
-	
+
+	me.setDataInReportCell = function( deId, peId, value )
+	{
+		var colTag = me.reportTblTag.find("td[dataelement='" + deId + "'][period='" + peId + "']");
+		colTag.html( value );
+		
+		if( deId == me.de_achieved )
+		{
+			if( value >= 80 ){ // Green
+				colTag.append( "<img src='../images/green.png'>");
+			}
+			else if( value >= 80 ){ // Yellow
+				colTag.append( "<img src='../images/yellow.png'>");
+			}
+			else { // Red
+				colTag.append( "<img src='../images/red.png'>");
+			}
+		}
+	};
 	
 	// -------------------------------------------------------------------
 	// RUN Init method
