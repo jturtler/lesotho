@@ -100,6 +100,7 @@ function Counsellor( storageObj, translationObj )
 	
 	// [Report]
 	me.reportParamDivTag = $("#reportParamDiv");
+	me.reportTblTag = $("#reportTbl");
 	
 	
 	// [Settings]
@@ -505,7 +506,8 @@ function Counsellor( storageObj, translationObj )
 			me.checkOrgunitSetting( function(){
 				me.storageObj.addItem("page", me.PAGE_REPORT_PARAM);
 				me.resetPageDisplay();
-				me.reportParamDivTag.show("fast");
+				me.reportParamDivTag.show();
+				//me.getReport();
 			});
 		});
 		
@@ -550,7 +552,22 @@ function Counsellor( storageObj, translationObj )
 		
 		me.searchClientBtnTag.click(function(e){
 			e.preventDefault();
-			me.runSearchClients();
+			
+			var clientData = me.getArrayJsonData( "attribute", me.searchClientFormTag );
+			var requestData = { "attributes": clientData };
+			
+			if( requestData.attributes.length == 0 )
+			{
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
+				MsgManager.msgAreaShow( tranlatedText, "ERROR" );
+				alert( tranlatedText );
+			}
+			else
+			{
+				MsgManager.msgAreaHide();
+				me.runSearchClients();
+			}
+			
 		});
 
 		me.seachAddClientFormTag.find("input,select").keyup(function(e){
@@ -565,15 +582,7 @@ function Counsellor( storageObj, translationObj )
 		
 		me.seachAddClientFormTag.find("input,select").change(function(){
 			
-			var clientData = me.getArrayJsonData( "attribute", me.searchClientFormTag );
-			var requestData = { "attributes": clientData };
-			
-			if( requestData.attributes.length == 0 )
-			{
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
-				alert( tranlatedText );
-			}
-			else
+			if( $(this).val() != "" )
 			{
 				MsgManager.msgAreaHide();
 			}
@@ -3033,7 +3042,6 @@ function Counsellor( storageObj, translationObj )
 		
 		var imgTag = headerTag.find("img.showHide");
 		
-//		imgTag.click(function(){
 		headerTag.find("span.headerInfor").click(function(){
 			
 			// STEP 1. Display table of selected header
@@ -3256,15 +3264,46 @@ function Counsellor( storageObj, translationObj )
 						,url: "../event/report"
 						,dataType: "json"
 			            ,contentType: "application/json;charset=utf-8"
+			            ,beforeSend: function()
+			            {
+			            	var translatedText = me.translationObj.getTranslatedValueByKey( "report_msg_loadingReport" );
+			            	MsgManager.appBlock( translatedText );
+			            	me.reportTblTag.hide();
+			            	me.reportTblTag.find("tbody td").html("");
+			            }
 						,success: function( response ) 
 						{
-							console.log( response );
+							var curPeriod = Util.getCurrentWeekPeriod();
+							var lastPeriod = Util.getLastWeekPeriod();
+							
+							var data = response.rows;
+							for( var i in data )
+							{
+								var deId = data[i][0];
+								var peId = data[i][1];
+								var value = eval( data[i][3] );
+								
+								var colTag = me.reportTblTag.find("td[dataelement='" + deId + "'][period='" + peId + "']");
+								colTag.html( value );
+								
+								if( deId == me.de_achieved )
+								{
+									if( value >= 80 )
+									{
+										colTag.append( "<img ");
+									}
+								}
+							}
+							
+							me.reportTblTag.show();
 						}
 						,error: function(response)
 						{
 							console.log(response);
 						}
-					});
+					}).always( function( data ) {
+						MsgManager.appUnblock();
+					});;
 			} 
 			else {
 				me.showExpireSessionMessage();					

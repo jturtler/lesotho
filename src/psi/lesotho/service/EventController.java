@@ -253,7 +253,7 @@ public class EventController
 
         return responseInfo;
     }
-            
+    
     public static ResponseInfo createEvent( JSONObject eventData, String clientId, String ouId, String loginUsername )
         throws IOException, Exception
     {
