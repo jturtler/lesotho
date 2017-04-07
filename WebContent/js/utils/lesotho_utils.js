@@ -97,13 +97,24 @@ Util.MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "O
 Util.DAYS = ["Sunday", "Monday", "Tueday", "Webnesday", "Thursday", "Friday", "Saturday"];
 Util.MONTH_INDEXES = {"Jan" : "01", "Feb" : "02", "Mar" : "03", "Apr" : "04", "May" : "05", "Jun" : "06", "Jul" : "07", "Aug" : "08", "Sep" : "09", "Oct" : "10", "Nov" : "11", "Dec" : "12"};
 
+
 Util.getLastNDate = function( noDays )
+{
+	var date = new Date();
+    date.setDate( date.getDate() - noDays );
+    
+    return Util.convertLocalTimeToUTM( date );
+};
+
+
+Util.formatDate_LastNDate = function( noDays )
 {
 	var date = new Date();
     date.setDate(date.getDate() - noDays);
     
     return Util.formatDate_DisplayDateInWeek( Util.convertLocalTimeToUTM(date) );
 };
+
 
 
 /** 
@@ -272,9 +283,8 @@ Util.getCurrentWeekPeriod = function() {
 	return Util.getWeekIdx( new Date() );
 };
 
-Util.getLastWeekPeriod = function() {
-	var date = new Date();
-    date.setDate(date.getDate() - 7);
+Util.getYesterdayPeriod = function() {
+	var date = Util.getLastNDate( 1 );
 	return Util.getWeekIdx( date );
 };
 

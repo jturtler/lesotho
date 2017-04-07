@@ -277,7 +277,7 @@ function Counsellor( storageObj, translationObj )
 		}
 		else if( page == me.PAGE_REPORT_PARAM )
 		{
-			me.reportParamDivTag.show("fast");
+			me.getReport();
 		}
 		else if( page == me.PAGE_SETTINGS )
 		{
@@ -506,8 +506,7 @@ function Counsellor( storageObj, translationObj )
 			me.checkOrgunitSetting( function(){
 				me.storageObj.addItem("page", me.PAGE_REPORT_PARAM);
 				me.resetPageDisplay();
-				me.reportParamDivTag.show();
-//				me.getReport();
+				me.getReport();
 			});
 		});
 		
@@ -1617,7 +1616,7 @@ function Counsellor( storageObj, translationObj )
 		me.storageObj.addItem( "page", me.PAGE_TODAY_LIST );
 		me.storageObj.removeItem( "subPage" );		
 		
-		me.listDateTag.html( Util.getLastNDate(0) );
+		me.listDateTag.html( Util.formatDate_LastNDate(0) );
 		me.listCases( "../event/todayCases", function( list )
 		{
 			me.populateTodayCaseData( list );
@@ -3275,7 +3274,7 @@ function Counsellor( storageObj, translationObj )
 						,success: function( response ) 
 						{
 							var curPeriod = Util.getCurrentWeekPeriod();
-							var lastPeriod = Util.getLastWeekPeriod();
+							var yesterdayPeriod = Util.getYesterdayPeriod();
 							
 							var last4WeeksData = [];
 							
@@ -3285,11 +3284,24 @@ function Counsellor( storageObj, translationObj )
 								var deId = data[i][0];
 								var value = eval( data[i][3] );
 								var peId = data[i][1];
+								
 								if( peId == curPeriod ) {
-									peId = curPeriod;
+									me.setDataInReportCell( deId, "thisWeek", value );
 								}
-								else if( peId == curPeriod ) {
-									peId = lastPeriod;
+
+								// In some cases, yesterday and current date have the same period
+								if( peId == yesterdayPeriod ) {
+									// Check the Yesterday period and calculate value
+									if( value != "" ){
+										value = value / 5;
+										value = value.toFixed( 2 );
+
+										me.setDataInReportCell( deId, "yesterday", value );
+									}
+								}
+									
+								if( peId != curPeriod && peId != yesterdayPeriod )	// Get last4Weeks values
+								{
 									var last4WeekData = last4WeeksData[deId];
 									if( last4WeekData !== undefined )
 									{
@@ -3302,7 +3314,6 @@ function Counsellor( storageObj, translationObj )
 									}
 								}
 								
-								me.setDataInReportCell( deId, peId, value );
 							}
 							
 							// Set values for "Last 4 weeks" column
@@ -3335,13 +3346,13 @@ function Counsellor( storageObj, translationObj )
 		if( deId == me.de_achieved )
 		{
 			if( value >= 80 ){ // Green
-				colTag.append( "<img src='../images/green.png'>");
+				colTag.append( " <img src='../images/green.png'>");
 			}
 			else if( value >= 80 ){ // Yellow
-				colTag.append( "<img src='../images/yellow.png'>");
+				colTag.append( " <img src='../images/yellow.png'>");
 			}
 			else { // Red
-				colTag.append( "<img src='../images/red.png'>");
+				colTag.append( " <img src='../images/red.png'>");
 			}
 		}
 	};
