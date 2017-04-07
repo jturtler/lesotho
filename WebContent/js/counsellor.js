@@ -1609,10 +1609,10 @@ function Counsellor( storageObj, translationObj )
 		me.storageObj.removeItem( "subPage" );		
 		
 		me.listDateTag.html( Util.getLastNDate(0) );
-		me.listCases( "../event/todayCases", function( list ){
+		me.listCases( "../event/todayCases", function( list )
+		{
 			me.populateTodayCaseData( list );
 			if( exeFunc !== undefined ) exeFunc();
-			
 
 			// Show table			
 			MsgManager.appUnblock();
@@ -1940,14 +1940,22 @@ function Counsellor( storageObj, translationObj )
 			var clientId = client[0];
 			var firstName = client[1].trim();
 			var lastName = client[2].trim();
+			
 			var dob = client[3].trim();
 			dob = ( dob != "" ) ? Util.formatDate_LocalDisplayDate( dob ) : "";
+			
 			var district = client[4].trim();
 			if( district != "" ) {
-				var optionText = $("#searchClientForm").find("[attribute='" + me.attr_DistrictOB + "'] option[value='" + district + "']").text();
+				var optionText = me.searchClientFormTag.find("[attribute='" + me.attr_DistrictOB + "'] option[value='" + district + "']").text();
 				district = ( optionText == "" ) ? district :  optionText;
 			}
+			
 			var birthOrder = client[5].trim();
+			if( birthOrder != "" ) {
+				var optionText = me.searchClientFormTag.find("[attribute='" + me.attr_BirthOrder + "'] option[value='" + birthOrder + "']").text();
+				birthOrder = ( optionText == "" ) ? birthOrder :  optionText;
+			}
+			
 			var adquisition = client[6].trim();
 			adquisition = ( adquisition != "" ) ? Util.formatDate_DisplayDate( adquisition ) : "";
 			var lastTestNS = client[7].trim();
@@ -1994,11 +2002,11 @@ function Counsellor( storageObj, translationObj )
 				}
 				else if( attributeId === me.attr_DistrictOB ){
 					colIdx = 4;
-					value = me.searchDoBTag.find("option[value='" + value + "']");
+					value = $(this).find("option:selected").text().toLowerCase();
 				}
 				else if( attributeId === me.attr_BirthOrder ){
 					colIdx = 5;
-					value = me.searchBirthOrderTag.find("option[value='" + value + "']");
+					value = $(this).find("option:selected").text().toLowerCase();
 				}
 				
 				me.searchResultTbTag.find('td:nth-child(' + colIdx + ')').each( function(){
@@ -2838,6 +2846,8 @@ function Counsellor( storageObj, translationObj )
 			{
 				catOptionName = attributeOptionCombo;
 			}
+			
+			me.setUp_logicEntryFormWithData();
 		}
 		else
 		{
@@ -2882,16 +2892,48 @@ function Counsellor( storageObj, translationObj )
 		me.addEventFormTag.find("input,select").each( function(){
 			var deId = $(this).attr("dataelement");
 			
-			if( deId != me.de_Testing_ResultTest1 || 
-				deId != me.de_Testing_ResultTest2 || 
-				deId != me.de_Testing_ResultParallel1 || 
-				deId != me.de_Testing_ResultParallel2 || 
-				deId != me.de_Testing_ResultSDBioline || 
+			if( deId != me.de_Testing_ResultTest1 &&
+				deId != me.de_Testing_ResultTest2 && 
+				deId != me.de_Testing_ResultParallel1 && 
+				deId != me.de_Testing_ResultParallel2 && 
+				deId != me.de_Testing_ResultSDBioline &&
 				deId != me.de_FinalResult_HIVStatus )
 			{
 				Util.disableTag( $(this), disabled );
 			}
 		});
+	};
+	
+	me.setUp_logicEntryFormWithData = function()
+	{
+		if( eval( me.addClientFormTabTag.attr("addedLogic") ) )
+		{
+			if( me.resultTestResultSDBiolineTag.val() != "" )
+			{
+				me.resultFinalHIVStatusTag.val( me.resultTestResultSDBiolineTag.val() );
+				Util.disableTag( me.resultTest2Tag, false );
+				Util.disableTag( me.resultTestParallel1Tag, false );
+				Util.disableTag( me.resultTestParallel2Tag, false );
+				Util.disableTag( me.resultTestResultSDBiolineTag, false );
+			}
+			else if( me.resultTestParallel1Tag.val() != "" && me.resultTestParallel2Tag.val() != "" )
+			{
+				Util.disableTag( me.resultTest2Tag, false );
+				Util.disableTag( me.resultTestParallel1Tag, false );
+				Util.disableTag( me.resultTestParallel2Tag, false );
+				me.setUp_DataElementResultParallelLogic();
+			}
+			else if( me.resultTest2Tag.val() != "" )
+			{
+				Util.disableTag( me.resultTest2Tag, false );
+				me.setUp_DataElementResultTest2Logic();
+			}
+			else
+			{
+				me.setUp_DataElementResultTest1Logic();
+			}
+			
+		}	
 	};
 	
 	// Create a tbody with sections of programs. This one is used for generating history of events of a client
@@ -2912,11 +2954,11 @@ function Counsellor( storageObj, translationObj )
 		var url = 'event.html?eventid=' + eventId;
 		var onclickEvent="window.open(\"" + url + "\",\"Event Report\",\"width=400,height=500\");"
 		headerTag.append("<th colspan='2'>"
-				+ "<img style='float:left' class='arrowRightImg showHide' src='../images/tab_right.png'> " 
+				+ "<span class='headerInfor'> <img style='float:left' class='arrowRightImg showHide' src='../images/tab_right.png'> " 
 				+ Util.formatDate_DisplayDateTime( eventDate ) 
-				+ "<span class='saperate'> | </span>" + event.orgUnitName 
-				+ "<span class='saperate'> | </span>" + counsellor 
-				+ "<span class='saperate'> | </span>" + testResult 
+				+ "<font class='saperate'> | </font>" + event.orgUnitName 
+				+ "<font class='saperate'> | </font>" + counsellor 
+				+ "<font class='saperate'> | </font>" + testResult + "</span>"
 				+ " <span style='float:right;'><a onclick='" + onclickEvent + "' href='#' > <img src='../images/print.png'></a></span></th>");
 		
 		tbody.append( headerTag );
@@ -2991,7 +3033,8 @@ function Counsellor( storageObj, translationObj )
 		
 		var imgTag = headerTag.find("img.showHide");
 		
-		imgTag.click(function(){
+//		imgTag.click(function(){
+		headerTag.find("span.headerInfor").click(function(){
 			
 			// STEP 1. Display table of selected header
 			
@@ -3124,10 +3167,10 @@ function Counsellor( storageObj, translationObj )
 
 		if( birthOrder != "" )
 		{
-			searchCriteria += " [" + birthOrder + "]  ";
+			searchCriteria += " [" + birthOrder + "] ";
 		}
 		
-		return searchCriteria.substring( 0, searchCriteria.length - 2 );
+		return searchCriteria.substring( 0, searchCriteria.length - 1 );
 	};
 	
 
@@ -3194,6 +3237,41 @@ function Counsellor( storageObj, translationObj )
 		var hereText = me.translationObj.getTranslatedValueByKey( "session_msg_here" ); 
 		var sessionExpiredText = me.divSessionExpireMsgTag.show().html( sessionExpiredText + ". " + loginAgainText + " <a style=\"cursor:pointer;\" onclick='window.location.href=\"../index.html\"'>" + hereText + "</a>.");
 	};
+	
+	
+
+	// -------------------------------------------------------------------
+	// [Report]
+	// -------------------------------------------------------------------
+	
+	me.getReport = function()
+	{
+		Commons.checkSession( function( isInSession ) 
+		{
+			if( isInSession ) 
+			{
+				$.ajax(
+					{
+						type: "POST"
+						,url: "../event/report"
+						,dataType: "json"
+			            ,contentType: "application/json;charset=utf-8"
+						,success: function( response ) 
+						{
+							console.log( response );
+						}
+						,error: function(response)
+						{
+							console.log(response);
+						}
+					});
+			} 
+			else {
+				me.showExpireSessionMessage();					
+			}
+		});	
+	};
+	
 	
 	// -------------------------------------------------------------------
 	// RUN Init method

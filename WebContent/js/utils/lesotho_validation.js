@@ -120,6 +120,8 @@ function Validation( translationObj )
 		if ( value && type == 'min' && value.length < length )
 		{
 			divTag.append( me.getErrorSpanTag( 'common_validation_minLength' ) );
+			divTag.append( me.getErrorSpanTag( length ) );
+			divTag.append( me.getErrorSpanTag( 'common_validation_exactCharacter' ) );
 			valid = false;
 		}
 		else if ( value && type == 'max' && value.length > length )

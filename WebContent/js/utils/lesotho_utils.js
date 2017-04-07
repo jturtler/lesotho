@@ -266,6 +266,16 @@ Util.dateTimePicker = function( dateTag, dateFormat )
 };
 
 
+Util.getWeekIdx = function() {
+	var curDate = new Date();
+    var onejan = new Date(curDate.getFullYear(), 0, 1);
+
+    return Math.ceil((((curDate - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+};
+
+
+
+
 //=====================================================================================
 //FormBlock Utils
 //=====================================================================================
