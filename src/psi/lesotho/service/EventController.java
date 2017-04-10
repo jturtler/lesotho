@@ -24,6 +24,7 @@ public class EventController
     private static String PARAM_START_DATE = "@PARAM_START_DATE";
     private static String PARAM_END_DATE = "@PARAM_END_DATE";
     private static String PARAM_EVENT_ID = "@PARAM_EVENT_ID";
+    private static String PARAM_ORGUNIT_ID = "@PARAM_ORGUNIT_ID";
 
     private static String URL_QUERY_CASES_BY_TIME = Util.LOCATION_DHIS_SERVER
         + "/api/sqlViews/IdFgIYoRINL/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
@@ -33,10 +34,17 @@ public class EventController
         + "/api/sqlViews/mayPuvHkJ7G/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
         + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.STAGE_ID;
     
-
     private static String URL_QUERY_EVENT_BY_ID = Util.LOCATION_DHIS_SERVER
         + "/api/events/" + EventController.PARAM_EVENT_ID + ".json";
 
+
+    private static String URL_QUERY_OPTIONSET_BIRTHORDER = Util.LOCATION_DHIS_SERVER
+        + "/api/optionSets/JCXrT88heOE.json?fields=options[name,code]";
+    private static String URL_QUERY_OPTIONSET_BIRTHDISTRICT = Util.LOCATION_DHIS_SERVER
+        + "/api/optionSets/LofSGLWMJnX.json?fields=options[name,code]";
+    private static String URL_QUERY_ORGUNIT = Util.LOCATION_DHIS_SERVER
+        + "/api/organisationUnits/" + PARAM_ORGUNIT_ID + ".json?fields=name,parent[name]";
+    
 
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
@@ -96,8 +104,43 @@ public class EventController
                 // Load event by ID
                 else if ( key.equals( Util.KEY_GET_EVENT_DETAILS ) )
                 {
+                    String outputData = "";
                     String eventId = request.getParameter( Util.PAMAM_EVENT_ID );
                     responseInfo = EventController.getEventById( eventId );
+                    
+                    if( responseInfo.responseCode == 200 )
+                    {
+                        outputData +="\"eventDetails\":" + responseInfo.output;
+                        
+                        JSONObject jsonEvent = new JSONObject ( responseInfo.output );
+                        String ouId = jsonEvent.getString("orgUnit");
+                        String catOptionId = jsonEvent.getString("attributeCategoryOptions" );
+                        responseInfo = EventController.getEventOrgUnit( ouId );
+                        if( responseInfo.responseCode == 200 )
+                        {
+                            outputData += ",\"ouInfo\":" + responseInfo.output;
+                            
+                            responseInfo = EventController.getBirthDistrictOptionSet();
+                            if( responseInfo.responseCode == 200 )
+                            {
+                                outputData += ",\"birthDistrict\":" + responseInfo.output;
+                                responseInfo = EventController.getBirthOrderOptionSet();
+                                if( responseInfo.responseCode == 200 )
+                                {
+                                    outputData += ",\"birthOrder\":" + responseInfo.output; 
+                                    
+                                    if( responseInfo.responseCode == 200 )
+                                    {
+                                        outputData += ",\"catOptCode\":\"" + EventController.getCatOptionComboCode( catOptionId ) + "\""; 
+                                    }
+                                    
+                                    outputData = "{" + outputData + "}";
+                                    responseInfo.output = outputData;
+                                }
+                            }
+                        }
+                        
+                    }
                 } 
                 // Load report
                 else if ( key.equals( Util.KEY_GET_REPORT ) )
@@ -228,6 +271,29 @@ public class EventController
         return catOptionComboId;
     }
     
+    private static String getCatOptionComboCode( String id )
+    {
+        String code = "";
+        
+        try
+        {
+            String url = Util.LOCATION_DHIS_SERVER + "/api/categoryOptions/" + id + ".json?fields=code";
+            ResponseInfo responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+            
+            if ( responseInfo.responseCode == 200 )
+            {
+                JSONObject catOptionCombo = new JSONObject( responseInfo.output );
+                code = catOptionCombo.getString( "code" );
+            }
+        }
+        catch ( Exception ex )
+        {
+            ex.printStackTrace();
+        }
+
+        return code;
+    }
+    
     private static ResponseInfo getReport( String loginUsername )
     {
         ResponseInfo responseInfo = new ResponseInfo();
@@ -350,7 +416,61 @@ public class EventController
         return responseInfo;
     }
     
+    public static ResponseInfo getBirthOrderOptionSet()
+        throws UnsupportedEncodingException, ServletException, IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
 
+        try
+        {
+            String requestUrl = EventController.URL_QUERY_OPTIONSET_BIRTHORDER;
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+    }
+
+    public static ResponseInfo getBirthDistrictOptionSet()
+        throws UnsupportedEncodingException, ServletException, IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+            String requestUrl = EventController.URL_QUERY_OPTIONSET_BIRTHDISTRICT;
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+    }
+
+    public static ResponseInfo getEventOrgUnit( String ouId )
+        throws UnsupportedEncodingException, ServletException, IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+            String requestUrl = EventController.URL_QUERY_ORGUNIT;
+            requestUrl = requestUrl.replace( EventController.PARAM_ORGUNIT_ID, ouId );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+    }
+    
     // CREATE JSON FOR THIS - add voucher Id, linking info.. etc..
     private static JSONObject composeJsonEvent( JSONObject eventData, String teiId, String orgUnitId,
         String catOptionComboId )
