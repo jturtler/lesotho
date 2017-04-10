@@ -2,7 +2,7 @@
 function Commons() {}
 
 Commons.VERSION = "v0.14";
-Commons.VERSION_DATE = "April 07 2017";
+Commons.VERSION_DATE = "April 10 2017";
 
 Commons.checkSession = function( returnFunc )
 {		
