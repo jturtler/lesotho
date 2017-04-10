@@ -75,13 +75,13 @@ function EventReport()
 				// Populate event date
 				var eventDate = response.eventDetails.eventDate;
 				me.eventReportTag.find("[eventDate][idx='0']").html( eventDate.charAt(8) );
-				me.eventReportTag.find("[eventDate][idx='0']").html( eventDate.charAt(9) );
-				me.eventReportTag.find("[eventDate][idx='0']").html( eventDate.charAt(5) );
-				me.eventReportTag.find("[eventDate][idx='0']").html( eventDate.charAt(6) );
-				me.eventReportTag.find("[eventDate][idx='0']").html( eventDate.charAt(0) );
-				me.eventReportTag.find("[eventDate][idx='0']").html( eventDate.charAt(1) );
-				me.eventReportTag.find("[eventDate][idx='0']").html( eventDate.charAt(2) );
-				me.eventReportTag.find("[eventDate][idx='0']").html( eventDate.charAt(3) );
+				me.eventReportTag.find("[eventDate][idx='1']").html( eventDate.charAt(9) );
+				me.eventReportTag.find("[eventDate][idx='2']").html( eventDate.charAt(5) );
+				me.eventReportTag.find("[eventDate][idx='3']").html( eventDate.charAt(6) );
+				me.eventReportTag.find("[eventDate][idx='4']").html( eventDate.charAt(0) );
+				me.eventReportTag.find("[eventDate][idx='5']").html( eventDate.charAt(1) );
+				me.eventReportTag.find("[eventDate][idx='6']").html( eventDate.charAt(2) );
+				me.eventReportTag.find("[eventDate][idx='7']").html( eventDate.charAt(3) );
 				
 				
 				// Populate event data
