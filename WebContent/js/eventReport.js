@@ -15,8 +15,7 @@ function EventReport()
 	me.attr_dateRecentHIVTest = "PyfoYtwNGrI";
 	
 
-	me.birthOrder = {};
-	me.birthDistrict = {};
+	me.metaData = {};
 	
 	
 	me.init = function()
@@ -28,7 +27,6 @@ function EventReport()
 		me.loadAndPopulateEventData();
 	};
 	
-
 	// -------------------------------------------------------------------------
 	// Load client list by cuic
 	// -------------------------------------------------------------------------
@@ -44,20 +42,39 @@ function EventReport()
             }
 			,success: function( response ) 
 			{
-				// Get birthDistrict Option set
-				var options = response.birthDistrict.options;
-				for( var i in options )
+				// Attribute OptionSet
+				var psAttributes = response.metaData.programTrackedEntityAttributes;					
+				for( var i in psAttributes )
 				{
-					var option = options[i];
-					me.birthDistrict[option.code] = option.name;
+					var attribute = psAttributes[i].trackedEntityAttribute;
+					if( attribute.optionSet !== undefined )
+					{
+						me.metaData[attribute.id] = {};
+						var options = attribute.optionSet.options;
+						for( var i in options )
+						{
+							var option = options[i];
+							me.metaData[attribute.id][option.code] = option.name;
+						}
+					}
 				}
-				
-				// Get birthDistrict Option set
-				options = response.birthOrder.options;
-				for( var i in options )
+					
+				// Data Element OptionSet
+					
+				var psDEs = response.metaData.programStages[0].programStageDataElements;					
+				for( var i in psDEs )
 				{
-					var option = options[i];
-					me.birthOrder[option.code] = option.name;
+					var dataElement = psDEs[i].dataElement;
+					if( dataElement.optionSet !== undefined )
+					{
+						me.metaData[dataElement.id] = {};
+						var options = dataElement.optionSet.options;
+						for( var i in options )
+						{
+							var option = options[i];
+							me.metaData[dataElement.id][option.code] = option.name;
+						}
+					}
 				}
 				
 				// Populate OrgUnit Information
@@ -90,6 +107,10 @@ function EventReport()
 				{
 					var deId = dataValues[i].dataElement;
 					var value = dataValues[i].value;
+					if( me.metaData[deId] !== undefined )
+					{
+						value = me.metaData[deId][value];
+					}
 					if( value == "true"){
 						value = "Yes";
 					}
@@ -125,10 +146,12 @@ function EventReport()
 				var dateOfBirth = me.getClientDateOfBirth( attributes );
 				
 				var districtOfBirth = me.getClientDistrictOfBirth( attributes );
-				districtOfBirth = ( me.birthDistrict[districtOfBirth] == undefined ) ? districtOfBirth : me.birthDistrict[districtOfBirth];
+				var districtOfBirthVal = me.metaData[me.attr_districtOfBirth][districtOfBirth];
+				districtOfBirth = ( districtOfBirthVal == undefined ) ? districtOfBirth : districtOfBirthVal;
 				
 				var orderOfBirth = me.getClientBirthOrder( attributes );
-				orderOfBirth = ( me.birthOrder[orderOfBirth] == undefined ) ? orderOfBirth : me.birthOrder[orderOfBirth];
+				var orderOfBirthVal = me.metaData[me.attr_birthOrder][orderOfBirth] ;
+				orderOfBirth = ( orderOfBirthVal == undefined ) ? orderOfBirth : orderOfBirthVal;
 	
 				
 				// STEP 2. Populate client data
@@ -169,20 +192,28 @@ function EventReport()
 				for( var i in attributes )
 				{
 					var attrValue = attributes[i];
-					if( attrValue.attribute != me.attr_CUIC 
-							&& attrValue.attribute != me.attr_dateOfBirth
-							&& attrValue.attribute != me.attr_dateRecentHIVTest
-							&& attrValue.attribute != me.attr_districtOfBirth
-							&& attrValue.attribute != me.attr_birthOrder ) {
-						var value = attrValue.value;
-						if( value == "true"){
+					var attrId = attrValue.attribute;
+					var value = attrValue.value;
+					
+					if( attrId != me.attr_CUIC 
+							&& attrId != me.attr_dateOfBirth
+							&& attrId != me.attr_dateRecentHIVTest
+							&& attrId != me.attr_districtOfBirth
+							&& attrId != me.attr_birthOrder ) 
+					{
+						if( me.metaData[attrId] !== undefined )
+						{
+							value = me.metaData[attrId][value];
+						}
+						else if( value == "true"){
 							value = "Yes";
 						}
 						else if( value == "false"){
 							value = "No";
 						}
+						
 						me.eventReportTag.find("[attribute='" + attrValue.attribute + "']").html( value );
-					} 
+					}
 				}
 				
 			}

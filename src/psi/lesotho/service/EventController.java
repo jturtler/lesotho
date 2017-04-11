@@ -38,10 +38,8 @@ public class EventController
         + "/api/events/" + EventController.PARAM_EVENT_ID + ".json";
 
 
-    private static String URL_QUERY_OPTIONSET_BIRTHORDER = Util.LOCATION_DHIS_SERVER
-        + "/api/optionSets/JCXrT88heOE.json?fields=options[name,code]";
-    private static String URL_QUERY_OPTIONSET_BIRTHDISTRICT = Util.LOCATION_DHIS_SERVER
-        + "/api/optionSets/LofSGLWMJnX.json?fields=options[name,code]";
+    private static String URL_QUERY_METADATA = Util.LOCATION_DHIS_SERVER
+        + "/api/programs/KDgzpKX3h2S.json?fields=programStages[programStageDataElements[dataElement[id,optionSet[options[code,name]]]]],programTrackedEntityAttributes[trackedEntityAttribute[id,optionSet[options[code,name]]]";
     private static String URL_QUERY_ORGUNIT = Util.LOCATION_DHIS_SERVER
         + "/api/organisationUnits/" + PARAM_ORGUNIT_ID + ".json?fields=name,parent[name]";
     
@@ -120,26 +118,15 @@ public class EventController
                         {
                             outputData += ",\"ouInfo\":" + responseInfo.output;
                             
-                            responseInfo = EventController.getBirthDistrictOptionSet();
+                            responseInfo = EventController.getMetaData();
                             if( responseInfo.responseCode == 200 )
                             {
-                                outputData += ",\"birthDistrict\":" + responseInfo.output;
-                                responseInfo = EventController.getBirthOrderOptionSet();
-                                if( responseInfo.responseCode == 200 )
-                                {
-                                    outputData += ",\"birthOrder\":" + responseInfo.output; 
-                                    
-                                    if( responseInfo.responseCode == 200 )
-                                    {
-                                        outputData += ",\"catOptCode\":\"" + EventController.getCatOptionComboCode( catOptionId ) + "\""; 
-                                    }
-                                    
-                                    outputData = "{" + outputData + "}";
-                                    responseInfo.output = outputData;
-                                }
+                                outputData += ",\"metaData\":" + responseInfo.output;
+                                outputData += ",\"catOptCode\":\"" + EventController.getCatOptionComboCode( catOptionId ) + "\""; 
+                                outputData = "{" + outputData + "}";
+                                responseInfo.output = outputData;
                             }
                         }
-                        
                     }
                 } 
                 // Load report
@@ -416,32 +403,14 @@ public class EventController
         return responseInfo;
     }
     
-    public static ResponseInfo getBirthOrderOptionSet()
+    public static ResponseInfo getMetaData()
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
         ResponseInfo responseInfo = null;
 
         try
         {
-            String requestUrl = EventController.URL_QUERY_OPTIONSET_BIRTHORDER;
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
-        }
-        catch ( Exception ex )
-        {
-            System.out.println( "Exception: " + ex.toString() );
-        }
-
-        return responseInfo;
-    }
-
-    public static ResponseInfo getBirthDistrictOptionSet()
-        throws UnsupportedEncodingException, ServletException, IOException, Exception
-    {
-        ResponseInfo responseInfo = null;
-
-        try
-        {
-            String requestUrl = EventController.URL_QUERY_OPTIONSET_BIRTHDISTRICT;
+            String requestUrl = EventController.URL_QUERY_METADATA;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
         }
         catch ( Exception ex )
