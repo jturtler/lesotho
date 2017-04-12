@@ -133,6 +133,24 @@ public class EventController
                 else if ( key.equals( Util.KEY_GET_REPORT ) )
                 {
                     responseInfo = EventController.getReport( loginUsername );
+                    String output = "\"report\":" + responseInfo.output + "";
+                    
+                    if( responseInfo.responseCode == 200 )
+                    {
+                        ResponseInfo responseInfo_AnalyticsTime = EventController.getAnalyticsTime();
+                        if( responseInfo_AnalyticsTime.responseCode == 200 )
+                        {
+                                JSONObject analyticsTime = new JSONObject( responseInfo_AnalyticsTime.output );
+                                String time = analyticsTime.getString( "intervalSinceLastAnalyticsTableSuccess" );
+                                time = time.replace("s", "seconds");
+                                time = time.replace("m", "minutes");
+                                time = time.replace("h", "hours");                                                              
+                                
+                                output += ",\"analyticsTime\":\"" + time + "\"";
+                        }
+                    }
+                    
+                    responseInfo.output = "{" + output + "}";
                 }
             }
 
@@ -438,6 +456,13 @@ public class EventController
         }
 
         return responseInfo;
+    }
+    
+    public static ResponseInfo getAnalyticsTime() throws Exception, IOException
+    {
+        String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/system/info.json";
+        
+        return Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
     }
     
     // CREATE JSON FOR THIS - add voucher Id, linking info.. etc..

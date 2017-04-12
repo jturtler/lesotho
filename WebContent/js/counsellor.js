@@ -101,6 +101,7 @@ function Counsellor( storageObj, translationObj )
 	// [Report]
 	me.reportParamDivTag = $("#reportParamDiv");
 	me.reportTblTag = $("#reportTbl");
+	me.analyticTimeTag = $("#analyticTime");
 	
 	
 	// [Settings]
@@ -209,6 +210,7 @@ function Counsellor( storageObj, translationObj )
 		MsgManager.initialSetup();		
 		me.validationObj = new Validation( me.translationObj );
 		
+		me.setup_ButtonsOnBrowser();
 		me.setupVersion();
 		me.hideHIVTestLogicActionTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_HIDE_HIV_TEST_LOGIC_ACTION_FIELDS ) );		
 		me.loadInitData();
@@ -218,6 +220,23 @@ function Counsellor( storageObj, translationObj )
 	// ----------------------------------------------------------------------------
 	// Load init data
 	// ----------------------------------------------------------------------------
+	
+	me.setup_ButtonsOnBrowser = function()
+	{
+		window.onbeforeunload = function (e) {
+		    var e = e || window.event;
+
+		    var msg = me.translationObj.getTranslatedValueByKey( "common_msg_leavePage" );
+			
+		    // For IE and Firefox
+		    if (e) {
+		        e.returnValue = msg;
+		    }
+
+		    // For Safari / chrome
+		    return msg;
+		 };
+	};
 	
 	me.setupVersion = function()
 	{
@@ -552,6 +571,9 @@ function Counsellor( storageObj, translationObj )
 		me.searchClientBtnTag.click(function(e){
 			e.preventDefault();
 			
+			var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "searchClient_msg_checkingData" );
+			MsgManager.appBlock( tranlatedMsg );
+			
 			var clientData = me.getArrayJsonData( "attribute", me.searchClientFormTag );
 			var requestData = { "attributes": clientData };
 			
@@ -560,6 +582,7 @@ function Counsellor( storageObj, translationObj )
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
 				MsgManager.msgAreaShow( tranlatedText, "ERROR" );
 				alert( tranlatedText );
+				MsgManager.appUnblock();
 			}
 			else
 			{
@@ -669,6 +692,7 @@ function Counsellor( storageObj, translationObj )
 			else{
 				event = {};
 			}
+			
 			me.execSaveEvent(event, client.trackedEntityInstance, event.event, function(){
 				tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editEvent" );
 				me.saveEventBtnTag.html( tranlatedText );
@@ -682,7 +706,7 @@ function Counsellor( storageObj, translationObj )
 			var result = confirm(tranlatedText);
 			if(result)
 			{
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_creatingEvent" );
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_completingEvent" );
 				MsgManager.appBlock( tranlatedText + " ..." );
 				
 				me.completeEvent(function(){
@@ -2162,6 +2186,10 @@ function Counsellor( storageObj, translationObj )
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
 				
+				var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_checkingData" );
+				MsgManager.appBlock( tranlatedMsg );
+				
+				
 				if( me.validationObj.checkFormEntryTagsData(me.addClientFormTabTag) )
 				{
 					$.ajax(
@@ -2298,9 +2326,13 @@ function Counsellor( storageObj, translationObj )
 	{
 		if( me.saveEventBtnTag.attr("status") == "add" )
 		{
+
+			var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_gettingCurrentGPSCoordinates" );
+			MsgManager.appBlock( tranlatedMsg );
+						
 			me.getGPSCoordinates( function( lat, lng ){
 				jsonData.coordinate = {
-					"latitude" : lat
+					"latitude" :  lat
 					,"longitude" : lng
 				}
 				
@@ -2317,6 +2349,8 @@ function Counsellor( storageObj, translationObj )
 	{
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
+				var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_checkingData" );
+				MsgManager.appBlock( tranlatedMsg );
 				
 				if( me.validationObj.checkFormEntryTagsData(me.thisTestDivTag) )
 				{
@@ -2387,6 +2421,7 @@ function Counsellor( storageObj, translationObj )
 				}
 				else
 				{
+					MsgManager.appUnblock();
 					var tranlatedText = me.translationObj.getTranslatedValueByKey( "datatEntryForm_validation_checkErrorFields" );
 					alert( tranlatedText );
 				}
@@ -2488,6 +2523,7 @@ function Counsellor( storageObj, translationObj )
 	me.resetPageDisplay = function()
 	{
 		me.mainContentTags.hide();
+		$("span.errorMsg").remove();
 	};
 	
 	me.showSearchClientForm = function()
@@ -3273,22 +3309,33 @@ function Counsellor( storageObj, translationObj )
 			            }
 						,success: function( response ) 
 						{
+							// STEP 1. Add analytic time
+							me.analyticTimeTag.html(response.analyticsTime);
+							
+							// --------------------------------------------------------------------
+							// Generate report
+							// --------------------------------------------------------------------
+							
+							// STEP 2. Get the currentPeriod and period which Yesterday is winthin
 							var curPeriod = Util.getCurrentWeekPeriod();
 							var yesterdayPeriod = Util.getYesterdayPeriod();
 							
 							var last4WeeksData = [];
 							
-							var data = response.rows;
+							var data = response.report.rows;
 							for( var i in data )
 							{
 								var deId = data[i][0];
 								var value = eval( data[i][3] );
 								var peId = data[i][1];
 								
+								// STEP 3. Set "This Week" data
 								if( peId == curPeriod ) {
 									me.setDataInReportCell( deId, "thisWeek", value );
 								}
 
+								
+								// STEP 4. Set "Yesterday" data
 								// In some cases, yesterday and current date have the same period
 								if( peId == yesterdayPeriod ) {
 									// Check the Yesterday period and calculate value
@@ -3300,6 +3347,7 @@ function Counsellor( storageObj, translationObj )
 									}
 								}
 									
+								// STEP 5. Calculate "Last 4 Week" data
 								if( peId != curPeriod && peId != yesterdayPeriod )	// Get last4Weeks values
 								{
 									var last4WeekData = last4WeeksData[deId];
@@ -3316,8 +3364,7 @@ function Counsellor( storageObj, translationObj )
 								
 							}
 							
-							// Set values for "Last 4 weeks" column
-							
+							// STEP 6. Set values for "Last 4 weeks" column							
 							me.setDataInReportCell( me.de_Tested, "last4weeks", last4WeeksData[me.de_Tested] );
 							me.setDataInReportCell( me.de_Target, "last4weeks", last4WeeksData[me.de_Target] );
 							me.setDataInReportCell( me.de_achieved, "last4weeks", last4WeeksData[me.de_achieved] );
