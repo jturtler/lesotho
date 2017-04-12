@@ -683,6 +683,9 @@ function Counsellor( storageObj, translationObj )
 	{
 		// Save an event
 		me.saveEventBtnTag.click( function(){
+			
+			Util.disableTag( me.saveEventBtnTag, true );
+						
 			var client = JSON.parse( me.addClientFormTabTag.attr("client") );
 			var event = me.addClientFormTabTag.attr("event");
 			
@@ -2183,12 +2186,14 @@ function Counsellor( storageObj, translationObj )
 	
 	me.saveClient = function()
 	{
+		// Disable the button as soon as the button is clicked
+		Util.disableTag( me.saveClientBtnTag, true );
+		
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
 				
 				var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_checkingData" );
 				MsgManager.appBlock( tranlatedMsg );
-				
 				
 				if( me.validationObj.checkFormEntryTagsData(me.addClientFormTabTag) )
 				{
@@ -2258,10 +2263,16 @@ function Counsellor( storageObj, translationObj )
 								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
 								alert(tranlatedText);
 							}
+						}).always( function( data ) {
+							// Enable the button
+							Util.disableTag( me.saveClientBtnTag, false );
 						});
 				}
 				else
 				{
+					// Enable the button
+					Util.disableTag( me.saveClientBtnTag, false );
+					
 					MsgManager.appUnblock();
 					var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_validation_checkErrorFields" );
 					alert( tranlatedText );
@@ -2326,7 +2337,6 @@ function Counsellor( storageObj, translationObj )
 	{
 		if( me.saveEventBtnTag.attr("status") == "add" )
 		{
-
 			var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_gettingCurrentGPSCoordinates" );
 			MsgManager.appBlock( tranlatedMsg );
 						
@@ -2417,10 +2427,13 @@ function Counsellor( storageObj, translationObj )
 								MsgManager.appUnblock();
 								alert(tranlatedText);
 							}
+						}).always( function( data ) {
+							Util.disableTag( me.saveEventBtnTag, false );
 						});
 				}
 				else
 				{
+					Util.disableTag( me.saveEventBtnTag, false );
 					MsgManager.appUnblock();
 					var tranlatedText = me.translationObj.getTranslatedValueByKey( "datatEntryForm_validation_checkErrorFields" );
 					alert( tranlatedText );
@@ -3377,7 +3390,7 @@ function Counsellor( storageObj, translationObj )
 						}
 					}).always( function( data ) {
 						MsgManager.appUnblock();
-					});;
+					});
 			} 
 			else {
 				me.showExpireSessionMessage();					
