@@ -2257,11 +2257,51 @@ function Counsellor( storageObj, translationObj )
 								alert( tranlatedText );
 								
 							}
-							,error: function(response)
+							,error: function( response )
 							{
+								var conflicts = response.responseJSON.response.conflicts;
+								var errorMsg = "";
+								for( var i in conflicts )
+								{
+									errorMsg += " - " + conflicts[i].value + "\n";
+								}
+								
+								for( var t in conflicts )
+								{
+									var msg = conflicts[t].value;
+									for( var i in me.attributeGroupList )
+									{
+										var list = me.attributeGroupList[i].list;
+										for( var j in list )
+										{
+											var attribute = list[j];
+											var attrId = attribute.id;
+											var attrText = attribute.shortName;
+											
+											if( errorMsg.indexOf( attrId ) >= 0 )
+											{
+												errorMsg = errorMsg.split( attrId ).join( attrText );
+												msg = msg.split( attrId ).join( attrText );
+												if( attribute.optionSet != undefined )
+												{
+													var optionSet = attribute.optionSet;
+													errorMsg = errorMsg.split( optionSet.id ).join( optionSet.name );
+													msg = msg.split( optionSet.id ).join( optionSet.name );
+												}
+												
+												me.addErrorSpanToField( me.addClientFormTag.find("[attribute='" + attrId + "']"), msg );
+											}
+											
+										}
+									}
+								}
+								
 								MsgManager.appUnblock();
-								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
-								alert(tranlatedText);
+								var errorMsgText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
+								var errorDetailsText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_errorDetails" );
+								var message = errorMsgText + "\n" + errorDetailsText + ": \n" + errorMsg;
+								MsgManager.msgAreaShow( message, "ERROR" );
+								alert( message );
 							}
 						}).always( function( data ) {
 							// Enable the button
@@ -2282,6 +2322,11 @@ function Counsellor( storageObj, translationObj )
 			}
 		});
 		
+	};
+	
+	me.addErrorSpanToField = function( inputTag, errorMsg )
+	{
+		inputTag.closest("td").append( "<span class='errorMsg'>" + errorMsg + "</span>" );
 	};
 	
 	me.generateAddClientFormHeader = function()

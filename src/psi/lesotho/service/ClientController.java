@@ -172,14 +172,18 @@ public class ClientController
         {
             String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + clientId;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, receivedData, null );
-
-            responseInfo.output = receivedData.toString();
+            
+            if( responseInfo.responseCode == 200 )
+            {
+                responseInfo.output = receivedData.toString();
+            }
+            
             Util.processResponseMsg( responseInfo, "" );
         }
         catch ( Exception ex )
         {
             System.out.println( "Exception: " + ex.toString() );
-        }
+        }  
 
         return responseInfo;
     }

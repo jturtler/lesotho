@@ -165,8 +165,10 @@ public final class Util
         }
         catch ( Exception ex )
         {
-            System.out.println( "Exception - responseCode: " + responseInfo.responseCode + ", bodyMessage: "
-                + responseMsg.toString() );
+            System.out.println( "\n data : " + responseInfo.data );
+            
+//            System.out.println( "Exception - responseCode: " + responseInfo.responseCode + ", bodyMessage: "
+//                + responseMsg.toString() );
 
             // ex.printStackTrace();
             responseMsg.append( "{ \"msg\": \"DHIS reponse code: " + responseInfo.responseCode
@@ -246,17 +248,27 @@ public final class Util
         responseInfo.responseCode = con.getResponseCode();
 
         // 5. Other response info
-        // TODO: 409 Message Throws IO Exception at here. Don't know why..
-        BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
+        InputStream inputSteam;
+        
+        if ( con.getResponseCode() == HttpURLConnection.HTTP_OK ) {
 
-        String inputLine;
+            inputSteam = con.getInputStream();
+            
+            BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
 
-        while ( (inputLine = in.readLine()) != null )
+            String inputLine;
+            while ( (inputLine = in.readLine()) != null )
+            {
+                responseMsg.append( inputLine );
+            }
+
+            in.close();
+            
+        } else 
         {
-            responseMsg.append( inputLine );
+             String json = Util.readStream(con.getErrorStream());
+             responseMsg.append( json );
         }
-
-        in.close();
 
         responseInfo.data = new JSONObject( responseMsg.toString() );
 
@@ -318,8 +330,6 @@ public final class Util
 
             byte[] postDataBytes = postData.toString().getBytes( "UTF-8" );
 
-            // con.setRequestProperty("Content-Length",
-            // String.valueOf(postDataBytes.length));
             con.setDoOutput( true );
 
             DataOutputStream wr = new DataOutputStream( con.getOutputStream() );
@@ -332,23 +342,46 @@ public final class Util
         responseInfo.responseCode = con.getResponseCode();
 
         // 5. Other response info
-        // TODO: 409 Message Throws IO Exception at here. Don't know why..
-        BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
+        InputStream inputSteam;
+        
+        if ( con.getResponseCode() == HttpURLConnection.HTTP_OK ) {
 
-        String inputLine;
+            inputSteam = con.getInputStream();
+            
+            BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
 
-        while ( (inputLine = in.readLine()) != null )
+            String inputLine;
+            while ( (inputLine = in.readLine()) != null )
+            {
+                responseMsg.append( inputLine );
+            }
+
+            in.close();
+            
+        } else 
         {
-            responseMsg.append( inputLine );
+             String json = Util.readStream(con.getErrorStream());
+             responseMsg.append( json );
         }
-
-        in.close();
-
+        
         responseInfo.data = new JSONObject( responseMsg.toString() );
 
         return responseInfo;
     }
 
+    private static String readStream(InputStream stream) throws Exception {
+        StringBuilder builder = new StringBuilder();
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(stream))) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                builder.append(line); // + "\r\n"(no need, json has no line breaks!)
+            }
+            in.close();
+        }
+        System.out.println("JSON: " + builder.toString());
+        return builder.toString();
+    }
+    
     public static void respondMsgOut( ResponseInfo responseInfo, HttpServletResponse response )
         throws IOException, Exception
     {

@@ -107,7 +107,7 @@ public class MetaDataController
         try
         {
             String url = Util.LOCATION_DHIS_SERVER + "/api/programStages/" + Util.STAGE_ID
-                + ".json?fields=programStageSections[id,displayName,programStageDataElements[compulsory,dataElement[id,formName,valueType,optionSet[options[code,name]]]";
+                + ".json?fields=programStageSections[id,displayName,programStageDataElements[compulsory,dataElement[id,formName,valueType,optionSet[id,name,options[code,name]]]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -124,7 +124,7 @@ public class MetaDataController
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributeGroups.json?filter=code:like:LSHTC&paging=false&fields=id,name,trackedEntityAttributes[id,shortName,valueType,optionSet[options[code,name]]";
+            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributeGroups.json?filter=code:like:LSHTC&paging=false&fields=id,name,trackedEntityAttributes[id,shortName,valueType,optionSet[id,name,options[code,name]]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
