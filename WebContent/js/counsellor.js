@@ -2468,9 +2468,50 @@ function Counsellor( storageObj, translationObj )
 							}
 							,error: function( response )
 							{
-								var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
+								var conflicts = response.responseJSON.response.conflicts;
+								var errorMsg = "";
+								for( var i in conflicts )
+								{
+									errorMsg += " - " + conflicts[i].value + "\n";
+								}
+								
+								for( var t in conflicts )
+								{
+									var msg = conflicts[t].value;
+									for( var i in me.sectionList )
+									{
+										var list = me.sectionList[i].programStageDataElements;
+										for( var j in list )
+										{
+											var de = list[j].dataElement;
+											var attrId = de.id;
+											var attrText = de.formName;
+											
+											if( errorMsg.indexOf( attrId ) >= 0 )
+											{
+												errorMsg = errorMsg.split( attrId ).join( attrText );
+												msg = msg.split( attrId ).join( attrText );
+												if( de.optionSet != undefined )
+												{
+													var optionSet = de.optionSet;
+													errorMsg = errorMsg.split( optionSet.id ).join( optionSet.name );
+													msg = msg.split( optionSet.id ).join( optionSet.name );
+												}
+												
+												me.addErrorSpanToField( me.addClientFormTag.find("[attribute='" + attrId + "']"), msg );
+											}
+											
+										}
+									}
+								}
+								
 								MsgManager.appUnblock();
-								alert(tranlatedText);
+								var errorMsgText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
+								var errorDetailsText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_errorDetails" );
+								var message = errorMsgText + "\n" + errorDetailsText + ": \n" + errorMsg;
+								MsgManager.msgAreaShow( message, "ERROR" );
+								alert( message );
+								
 							}
 						}).always( function( data ) {
 							Util.disableTag( me.saveEventBtnTag, false );

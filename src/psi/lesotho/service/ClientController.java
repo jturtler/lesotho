@@ -30,12 +30,7 @@ public class ClientController
     {
         try
         {         
-            // STEP 1. Get loginUsername from session
-
-            HttpSession session = request.getSession( true );
-            String loginUsername = (String) session.getAttribute( Util.KEY_LOGIN_USERNAME );
-
-            // STEP 2. Check loginUsername/password
+            // STEP 1. Check loginUsername/password
             ResponseInfo responseInfo = null;
             
             if ( request.getPathInfo() != null && request.getPathInfo().split( "/" ).length >= 2 )
@@ -43,13 +38,13 @@ public class ClientController
                 String[] queryPathList = request.getPathInfo().split( "/" );
                 String key = queryPathList[1];
 
-                // STEP 3.1. Search client
+                // STEP 2.1. Search client
                 if ( key.equals( Util.KEY_SEARCH_CASES ) )
                 {
                     JSONObject receivedData = Util.getJsonFromInputStream( request.getInputStream() );
                     responseInfo = ClientController.searchClients( request, receivedData );
                 }
-                // STEP 3.2. Get All events of an client
+                // STEP 2.2. Get All events of an client
                 else if ( key.equals( Util.KEY_CLIENT_DETAILS ) )
                 {
                     String outputData = "";
@@ -67,7 +62,7 @@ public class ClientController
                         }
                     }
                 }
-                // STEP 3.3. Add / Update Client
+                // STEP 2.3. Add / Update Client
                 else if ( key.equals( Util.KEY_SAVE_CLIENT ) )
                 {
                     String clientId = request.getParameter( Util.PAMAM_CLIENT_ID );
@@ -99,7 +94,7 @@ public class ClientController
                 } 
             }
 
-            // STEP 4. Send back the messages
+            // STEP 3. Send back the messages
             responseInfo.outMessage = responseInfo.output;
             Util.respondMsgOut( responseInfo, response );
 
@@ -243,6 +238,7 @@ public class ClientController
         return jsonData;
     }
     
+    @SuppressWarnings( "unchecked" )
     private static String createSearchClientCondition( JSONArray attributeList )
     {
         ArrayList<String> searchVariableCopy = (ArrayList<String>)ClientController.searchVariables.clone();

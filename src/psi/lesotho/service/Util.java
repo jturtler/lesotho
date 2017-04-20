@@ -165,12 +165,6 @@ public final class Util
         }
         catch ( Exception ex )
         {
-            System.out.println( "\n data : " + responseInfo.data );
-            
-//            System.out.println( "Exception - responseCode: " + responseInfo.responseCode + ", bodyMessage: "
-//                + responseMsg.toString() );
-
-            // ex.printStackTrace();
             responseMsg.append( "{ \"msg\": \"DHIS reponse code: " + responseInfo.responseCode
                 + ", No Message - Error occurred during DHIS response processing: " + responseMsg.toString() + "\" }" );
         }
@@ -192,7 +186,6 @@ public final class Util
         URL obj = new URL( url );
         // Since HttpsURLConnection extends HttpURLConnection, we can use this
         // for both HTTP & HTTPS?
-        // HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
         // add Request header
@@ -234,8 +227,6 @@ public final class Util
 
             byte[] postDataBytes = postData.toString().getBytes( "UTF-8" );
 
-            // con.setRequestProperty("Content-Length",
-            // String.valueOf(postDataBytes.length));
             con.setDoOutput( true );
 
             DataOutputStream wr = new DataOutputStream( con.getOutputStream() );
@@ -248,12 +239,8 @@ public final class Util
         responseInfo.responseCode = con.getResponseCode();
 
         // 5. Other response info
-        InputStream inputSteam;
-        
-        if ( con.getResponseCode() == HttpURLConnection.HTTP_OK ) {
-
-            inputSteam = con.getInputStream();
-            
+        if ( con.getResponseCode() == HttpURLConnection.HTTP_OK ) 
+        {
             BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
 
             String inputLine;
@@ -342,12 +329,8 @@ public final class Util
         responseInfo.responseCode = con.getResponseCode();
 
         // 5. Other response info
-        InputStream inputSteam;
-        
-        if ( con.getResponseCode() == HttpURLConnection.HTTP_OK ) {
-
-            inputSteam = con.getInputStream();
-            
+        if ( con.getResponseCode() == HttpURLConnection.HTTP_OK ) 
+        { 
             BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
 
             String inputLine;
