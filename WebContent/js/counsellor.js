@@ -109,6 +109,7 @@ function Counsellor( storageObj, translationObj )
 	me.districtListTag =  $("#districtList");
 	me.orgUnitListTag =  $("#orgUnitList");
 	me.loadingOuListImgTag = $("#loadingOuListImg");
+	me.updateTransBtnTag = $("#updateTransBtn");
 
 	
 	// [About]
@@ -439,6 +440,16 @@ function Counsellor( storageObj, translationObj )
 			me.storageObj.addItem( me.storageObj.KEY_STORAGE_ORGUNIT, me.orgUnitListTag.val() );	
 			me.populateOrgUnitNameInHeader();
 			MsgManager.msgAreaShow( tranlatedText, "SUCCESS");
+		});
+		
+		me.updateTransBtnTag.click( function(){
+			var message = me.translationObj.getTranslatedValueByKey( "settings_translation_msg_loading" );
+			MsgManager.appBlock( message );
+			me.translationObj.loadKeywords( function(){
+				me.translationObj.translatePage( function(){
+					MsgManager.appUnblock();
+				});
+			});
 		});
 		
 	};

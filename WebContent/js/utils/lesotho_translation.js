@@ -21,6 +21,7 @@ function Translation( baseURL, storageObj )
 	me.translationStatusImg_downloadTag = $("#translationStatusImg_download");
 	me.translationStatusImgTags = $( "img.checkingImages" );
 		
+	me.latestVersion = false;
 	me.lang = "en";
 	me.version = "";
 	me.autoPush = false;
@@ -185,6 +186,7 @@ function Translation( baseURL, storageObj )
 					me.storageObj.addItem( storedLangkey, JSON.stringify( response ) );
 					me.translatedKeyWords[me.lang] = response.list;
 					
+					me.translationStatusImg_checkedTag.show();
 					exeFunc();
 				}
 				,error: function() 
@@ -220,7 +222,7 @@ function Translation( baseURL, storageObj )
 						var existingVersion = me.storageObj.getItem( me.KEY_VERSION );
 						
 						// In beginning to open the app, or in case of always push
-						if( alwaysPush || (existingVersion === "" || existingVersion !== version ) )
+						if( alwaysPush && ( existingVersion === "" || existingVersion !== version ) )
 						{
 							me.translateStatusImgChange( me._TRANSLATE_STATUS_LOADING, version );
 														
