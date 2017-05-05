@@ -2270,49 +2270,69 @@ function Counsellor( storageObj, translationObj )
 							}
 							,error: function( response )
 							{
-								var conflicts = response.responseJSON.response.conflicts;
-								var errorMsg = "";
-								for( var i in conflicts )
-								{
-									errorMsg += " - " + conflicts[i].value + "\n";
-								}
-								
-								for( var t in conflicts )
-								{
-									var msg = conflicts[t].value;
-									for( var i in me.attributeGroupList )
+								if( response.responseJSON.response != undefined )
+								{	
+									var conflicts = response.responseJSON.response.conflicts;
+									var errorMsg = "";
+									for( var i in conflicts )
 									{
-										var list = me.attributeGroupList[i].list;
-										for( var j in list )
+										errorMsg += " - " + conflicts[i].value + "\n";
+									}
+									
+									for( var t in conflicts )
+									{
+										var objectId = conflicts[t].object;
+										var msg = conflicts[t].value;
+										
+										for( var t in conflicts )
 										{
-											var attribute = list[j];
-											var attrId = attribute.id;
-											var attrText = attribute.shortName;
+											var objectId = conflicts[t].object;
+											var msg = conflicts[t].value;
 											
-											if( errorMsg.indexOf( attrId ) >= 0 )
+											for( var i in me.attributeGroupList )
 											{
-												errorMsg = errorMsg.split( attrId ).join( attrText );
-												msg = msg.split( attrId ).join( attrText );
-												if( attribute.optionSet != undefined )
+												var list = me.attributeGroupList[i].list;
+												for( var j in list )
 												{
-													var optionSet = attribute.optionSet;
-													errorMsg = errorMsg.split( optionSet.id ).join( optionSet.name );
-													msg = msg.split( optionSet.id ).join( optionSet.name );
+													var attribute = list[j];
+													var attrId = attribute.id;
+													var attrText = attribute.shortName;
+													
+													if( errorMsg.indexOf( attrId ) >= 0 )
+													{
+														errorMsg = errorMsg.split( attrId ).join( attrText );
+														msg = msg.split( attrId ).join( attrText );
+														if( attribute.optionSet != undefined )
+														{
+															var optionSet = attribute.optionSet;
+															errorMsg = errorMsg.split( optionSet.id ).join( optionSet.name );
+															msg = msg.split( optionSet.id ).join( optionSet.name );
+														}
+														
+														me.addErrorSpanToField( me.addClientFormTag.find("[attribute='" + attrId + "']"), msg );
+													}
+													
 												}
-												
-												me.addErrorSpanToField( me.addClientFormTag.find("[attribute='" + attrId + "']"), msg );
 											}
-											
 										}
 									}
+									
+									// Alert error message
+									var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_validation_checkErrorFields" );
+									alert( tranlatedText );
 								}
+								else
+								{
+									var errorMsg = response.responseJSON.message;
+									alert( errorMsg );
+								}
+								// Enable the button
+								Util.disableTag( me.saveClientBtnTag, false );
 								
+								// Unblock the form
 								MsgManager.appUnblock();
-								var errorMsgText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
-								var errorDetailsText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_errorDetails" );
-								var message = errorMsgText + "\n" + errorDetailsText + ": \n" + errorMsg;
-								MsgManager.msgAreaShow( message, "ERROR" );
-								alert( message );
+								
+								
 							}
 						}).always( function( data ) {
 							// Enable the button
@@ -2391,28 +2411,6 @@ function Counsellor( storageObj, translationObj )
 	
 	me.execSaveEvent = function( jsonData, clientId, eventId, exeFunc )
 	{
-		if( me.saveEventBtnTag.attr("status") == "add" )
-		{
-			var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_gettingCurrentGPSCoordinates" );
-			MsgManager.appBlock( tranlatedMsg );
-						
-			me.getGPSCoordinates( function( lat, lng ){
-				jsonData.coordinate = {
-					"latitude" :  lat
-					,"longitude" : lng
-				}
-				
-				me.saveEvent( jsonData, clientId, eventId, exeFunc );
-			} ) 
-		}
-		else
-		{
-			me.saveEvent( jsonData, clientId, eventId, exeFunc );	
-		}
-	};
-	
-	me.saveEvent = function( jsonData, clientId, eventId, exeFunc )
-	{
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
 				var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_checkingData" );
@@ -2420,113 +2418,24 @@ function Counsellor( storageObj, translationObj )
 				
 				if( me.validationObj.checkFormEntryTagsData(me.thisTestDivTag) )
 				{
-					var url = me.getSaveEventURL( clientId, eventId );
-					jsonData.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag );
-					
-					$.ajax(
-						{
-							type: "POST"
-							,url: url
-							,dataType: "json"
-							,data: JSON.stringify( jsonData )
-				            ,contentType: "application/json;charset=utf-8"
-				            ,beforeSend: function()
-				            {
-				            	var tranlatedText = "";
-				            	if( me.saveEventBtnTag.attr("status") == "update" )
-			            		{
-				            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_editingEvent" );
-			            		}
-				            	else if( me.saveEventBtnTag.attr("status") == "add" )
-			            		{
-				            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_creatingEvent" );
-			            		}
-				            	else if( me.saveEventBtnTag.attr("status") == "complete" )
-			            		{
-				            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_completingEvent" );
-			            		}
-
-								MsgManager.appBlock( tranlatedText + " ..." );
-				            }
-							,success: function( response ) 
-							{
-								me.activeEventHeaderTag.show();
-								
-								me.addClientFormTabTag.attr( "event", JSON.stringify( response ) );
-	
-								Util.disableTag( me.completedEventBtnTag, false );
-
-								// STEP 4. Unblock form
-								var translateMsg = "";
-								if( me.saveEventBtnTag.attr("status") == "complete" )
-			            		{
-									translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventCompleted" );
-			            		}
-								else
-								{
-									translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );		
-								}
-								
-								var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editEvent" );
-								me.saveEventBtnTag.html( tranlatedText );
-								me.saveEventBtnTag.attr("status", "update");
-
-								if( exeFunc !== undefined ) exeFunc();
-								
-								MsgManager.msgAreaShow( translateMsg, "SUCCESS" );
-								MsgManager.appUnblock();
-								alert( translateMsg );
+					if( me.saveEventBtnTag.attr("status") == "add" )
+					{
+						var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_gettingCurrentGPSCoordinates" );
+						MsgManager.appBlock( tranlatedMsg );
+									
+						me.getGPSCoordinates( function( lat, lng ){
+							jsonData.coordinate = {
+								"latitude" :  lat
+								,"longitude" : lng
 							}
-							,error: function( response )
-							{
-								var conflicts = response.responseJSON.response.conflicts;
-								var errorMsg = "";
-								for( var i in conflicts )
-								{
-									errorMsg += " - " + conflicts[i].value + "\n";
-								}
-								
-								for( var t in conflicts )
-								{
-									var msg = conflicts[t].value;
-									for( var i in me.sectionList )
-									{
-										var list = me.sectionList[i].programStageDataElements;
-										for( var j in list )
-										{
-											var de = list[j].dataElement;
-											var attrId = de.id;
-											var attrText = de.formName;
-											
-											if( errorMsg.indexOf( attrId ) >= 0 )
-											{
-												errorMsg = errorMsg.split( attrId ).join( attrText );
-												msg = msg.split( attrId ).join( attrText );
-												if( de.optionSet != undefined )
-												{
-													var optionSet = de.optionSet;
-													errorMsg = errorMsg.split( optionSet.id ).join( optionSet.name );
-													msg = msg.split( optionSet.id ).join( optionSet.name );
-												}
-												
-												me.addErrorSpanToField( me.addClientFormTag.find("[attribute='" + attrId + "']"), msg );
-											}
-											
-										}
-									}
-								}
-								
-								MsgManager.appUnblock();
-								var errorMsgText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveDataFail" );
-								var errorDetailsText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_errorDetails" );
-								var message = errorMsgText + "\n" + errorDetailsText + ": \n" + errorMsg;
-								MsgManager.msgAreaShow( message, "ERROR" );
-								alert( message );
-								
-							}
-						}).always( function( data ) {
-							Util.disableTag( me.saveEventBtnTag, false );
-						});
+							
+							me.saveEvent( jsonData, clientId, eventId, exeFunc );
+						} ) 
+					}
+					else
+					{
+						me.saveEvent( jsonData, clientId, eventId, exeFunc );	
+					}
 				}
 				else
 				{
@@ -2540,6 +2449,98 @@ function Counsellor( storageObj, translationObj )
 				me.showExpireSessionMessage();					
 			}
 		});
+		
+	};
+	
+	me.saveEvent = function( jsonData, clientId, eventId, exeFunc )
+	{
+		var url = me.getSaveEventURL( clientId, eventId );
+		jsonData.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag );
+		
+		$.ajax(
+			{
+				type: "POST"
+				,url: url
+				,dataType: "json"
+				,data: JSON.stringify( jsonData )
+	            ,contentType: "application/json;charset=utf-8"
+	            ,beforeSend: function()
+	            {
+	            	var tranlatedText = "";
+	            	if( me.saveEventBtnTag.attr("status") == "update" )
+            		{
+	            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_editingEvent" );
+            		}
+	            	else if( me.saveEventBtnTag.attr("status") == "add" )
+            		{
+	            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_creatingEvent" );
+            		}
+	            	else if( me.saveEventBtnTag.attr("status") == "complete" )
+            		{
+	            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_completingEvent" );
+            		}
+
+					MsgManager.appBlock( tranlatedText + " ..." );
+	            }
+				,success: function( response ) 
+				{
+					me.activeEventHeaderTag.show();
+					
+					me.addClientFormTabTag.attr( "event", JSON.stringify( response ) );
+
+					Util.disableTag( me.completedEventBtnTag, false );
+
+					// STEP 4. Unblock form
+					var translateMsg = "";
+					if( me.saveEventBtnTag.attr("status") == "complete" )
+            		{
+						translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventCompleted" );
+            		}
+					else
+					{
+						translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );		
+					}
+					
+					var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editEvent" );
+					me.saveEventBtnTag.html( tranlatedText );
+					me.saveEventBtnTag.attr("status", "update");
+
+					if( exeFunc !== undefined ) exeFunc();
+					
+					MsgManager.msgAreaShow( translateMsg, "SUCCESS" );
+					MsgManager.appUnblock();
+					alert( translateMsg );
+				}
+				,error: function( response )
+				{
+					if(  response.responseJSON.response !== undefined )
+					{	
+						var conflicts = response.responseJSON.response.conflicts;
+						
+						for( var i in conflicts )
+						{
+							var objectId = conflicts[i].object;
+							var msg = conflicts[i].value;
+							me.addErrorSpanToField( me.addEventFormTag.find("[dataelement='" + objectId + "']"), msg );
+						}
+						
+						var errorMsgText = me.translationObj.getTranslatedValueByKey( "datatEntryForm_validation_checkErrorFields" );
+						MsgManager.msgAreaShow( errorMsgText, "ERROR" );
+						alert( errorMsgText );
+					}
+					else
+					{
+						var errorMsg = response.responseJSON.message;
+						MsgManager.msgAreaShow( errorMsg, "ERROR" );
+						alert( errorMsg );
+					}
+					
+					MsgManager.appUnblock();
+					
+				}
+			}).always( function( data ) {
+				Util.disableTag( me.saveEventBtnTag, false );
+			});
 		
 	};
 	

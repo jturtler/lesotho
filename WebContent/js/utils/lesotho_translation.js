@@ -21,7 +21,6 @@ function Translation( baseURL, storageObj )
 	me.translationStatusImg_downloadTag = $("#translationStatusImg_download");
 	me.translationStatusImgTags = $( "img.checkingImages" );
 		
-	me.latestVersion = false;
 	me.lang = "en";
 	me.version = "";
 	me.autoPush = false;
@@ -45,6 +44,14 @@ function Translation( baseURL, storageObj )
 		// STEP 2. Set up events for language selector
 		me.setup_Events();
 		
+		// STEP 3. Load keywords from storage if any
+		var storedLangkey = "lang_" + me.lang;
+		var translatedKeyList = me.storageObj.getItem( storedLangkey );
+		if( translatedKeyList !== "" )
+		{
+			var storedList = JSON.parse( translatedKeyList );
+			me.translatedKeyWords[me.lang] = storedList.list;
+		}
 	};
 	
 	me.setup_Events = function()
@@ -222,7 +229,7 @@ function Translation( baseURL, storageObj )
 						var existingVersion = me.storageObj.getItem( me.KEY_VERSION );
 						
 						// In beginning to open the app, or in case of always push
-						if( alwaysPush && ( existingVersion === "" || existingVersion !== version ) )
+						if( alwaysPush || existingVersion === "" )
 						{
 							me.translateStatusImgChange( me._TRANSLATE_STATUS_LOADING, version );
 														

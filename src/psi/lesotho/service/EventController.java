@@ -341,11 +341,14 @@ public class EventController
                 String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events";
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, eventJson, null );
 
-                Util.processResponseMsg( responseInfo, "importSummaries" );
+                if( responseInfo.responseCode == 200 )
+                {
+                    Util.processResponseMsg( responseInfo, "importSummaries" );
 
-                String eventId = responseInfo.referenceId;
-                eventJson.put( "event", eventId );
-                responseInfo.output = eventJson.toString();
+                    String eventId = responseInfo.referenceId;
+                    eventJson.put( "event", eventId );
+                    responseInfo.output = eventJson.toString();
+                }
             }
             else
             {
@@ -371,8 +374,11 @@ public class EventController
             String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events/" + eventId;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, eventData, null );
 
-            Util.processResponseMsg( responseInfo, "importSummaries" );
-            responseInfo.output = eventData.toString();
+            if( responseInfo.responseCode == 200 )
+            {
+                Util.processResponseMsg( responseInfo, "importSummaries" );
+                responseInfo.output = eventData.toString();
+            }
 
         }
         catch ( Exception ex )
