@@ -793,6 +793,7 @@ function Counsellor( storageObj, translationObj )
 			else if( attrId === me.de_Testing_ResultSDBioline )
 			{
 				me.resultFinalHIVStatusTag.val( me.resultTestResultSDBiolineTag.val() );
+				me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
 			}
 		}		
 	}; 
@@ -802,8 +803,6 @@ function Counsellor( storageObj, translationObj )
 	{
 		if( me.resultTest1Tag.val() === "Positive" )
 		{
-			me.resultFinalHIVStatusTag.val( me.resultTest1Tag.val() );
-			
 			me.resultTest2Tag.val( "" );
 			me.resultTestParallel1Tag.val( "" );
 			me.resultTestParallel2Tag.val( "" );
@@ -824,6 +823,7 @@ function Counsellor( storageObj, translationObj )
 			me.resultTestParallel2Tag.val( "" );
 			me.resultTestResultSDBiolineTag.val( "" );
 			me.resultFinalHIVStatusTag.val( me.resultTest1Tag.val() );
+			me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
 			
 			Util.disableTag( me.resultTest2Tag, true );
 			Util.disableTag( me.resultTestParallel1Tag, true );
@@ -859,6 +859,7 @@ function Counsellor( storageObj, translationObj )
 			me.resultTestParallel2Tag.val( "" );
 			me.resultTestResultSDBiolineTag.val( "" );
 			me.resultFinalHIVStatusTag.val( me.resultTest2Tag.val() );
+			me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
 			
 			Util.disableTag( me.resultTestParallel1Tag, true );
 			Util.disableTag( me.resultTestParallel2Tag, true );
@@ -886,6 +887,7 @@ function Counsellor( storageObj, translationObj )
 			{
 				me.resultTestResultSDBiolineTag.val( "" );
 				me.resultFinalHIVStatusTag.val( me.resultTestParallel1Tag.val() );
+				me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
 				
 				Util.disableTag( me.resultTestResultSDBiolineTag, true );
 				me.removeMandatoryForField( me.resultTestResultSDBiolineTag );
@@ -3066,6 +3068,8 @@ function Counsellor( storageObj, translationObj )
 			if( me.resultTestResultSDBiolineTag.val() != "" )
 			{
 				me.resultFinalHIVStatusTag.val( me.resultTestResultSDBiolineTag.val() );
+				me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
+				
 				Util.disableTag( me.resultTest2Tag, false );
 				Util.disableTag( me.resultTestParallel1Tag, false );
 				Util.disableTag( me.resultTestParallel2Tag, false );

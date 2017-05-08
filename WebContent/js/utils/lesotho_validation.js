@@ -21,6 +21,7 @@ function Validation( translationObj )
 
 		// If any of the tag is not valid, mark it as invalid.
 		formTag.find( "input,select" ).each( function() {
+			
 			if ( !me.checkValidations( $(this) ) )
 			{
 				allValid = false;
@@ -95,18 +96,18 @@ function Validation( translationObj )
 		var valid = true;
 		var value = inputTag.val();
 
-		if( inputTag.type === "checkbox" || inputTag.type === "radio" )
+		if( inputTag.attr('mandatory') === 'true' )
 		{
-			if ( inputTag.closest("td").find("input:checked") == 0 );
+			if( inputTag.attr("type") === "checkbox" && !inputTag.prop("checked") )
 			{
 				divTag.append( me.getErrorSpanTag( 'Enter data in this field' ) );
 				valid = false;
 			}
-		}
-		else if( (  value === "" || value === null ) && inputTag.attr('mandatory') === 'true' )
-		{
-			divTag.append( me.getErrorSpanTag( 'Enter data in this field' ) );
-			valid = false;
+			else if( value === "" || value === null )
+			{
+				divTag.append( me.getErrorSpanTag( 'Enter data in this field' ) );
+				valid = false;
+			}
 		}
 		
 		return valid;
