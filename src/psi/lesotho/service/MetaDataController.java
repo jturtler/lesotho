@@ -106,8 +106,7 @@ public class MetaDataController
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/programStages/" + Util.STAGE_ID
-                + ".json?fields=programStageSections[id,displayName,programStageDataElements[compulsory,dataElement[id,formName,valueType,optionSet[id,name,options[code,name]]]";
+            String url = Util.LOCATION_DHIS_SERVER + "/api/programs/" + Util.PROGRAM_ID + ".json?fields=programStages[id,programStageSections[id,displayName,programStageDataElements[compulsory,dataElement[id,formName,valueType,optionSet[id,name,options[code,name]]]]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -124,7 +123,9 @@ public class MetaDataController
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributeGroups.json?filter=code:like:LSHTC&paging=false&fields=id,name,trackedEntityAttributes[id,shortName,valueType,optionSet[id,name,options[code,name]]";
+            // The groups which start with 'LSHTC_Register_' are in [Client Attribute] tab
+            // The groups which start with 'LSHTC_LOG_' are in [Contact Log] tab
+            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributeGroups.json?filter=code:like:LSHTC&paging=false&fields=id,name,code,trackedEntityAttributes[id,shortName,valueType,optionSet[id,name,options[code,name]]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )

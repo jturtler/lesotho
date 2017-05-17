@@ -476,19 +476,23 @@ public class EventController
         String catOptionComboId )
     {
         eventData.put( "program", Util.PROGRAM_ID );
-        eventData.put( "programStage", Util.STAGE_ID );
         eventData.put( "orgUnit", orgUnitId );
         eventData.put( "trackedEntityInstance", teiId );
         eventData.put( "eventDate", Util.getCurrentDateTime() );
-        eventData.put( "status", "ACTIVE" );
+        
+        if( !eventData.has( "status"  ))
+        {
+            eventData.put( "status", "ACTIVE" );  
+        }
+       
         eventData.put( "attributeCategoryOptions", catOptionComboId );
 
         if ( eventData.isNull( "dataValues" ) )
         {
             eventData.put( "dataValues", new JSONArray() );
         }
+
         
-        System.out.println( "\n\n ***** \n eventData : " + eventData );
         return eventData;
     }
 

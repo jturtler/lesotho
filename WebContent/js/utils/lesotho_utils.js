@@ -31,6 +31,13 @@ Util.disableTag = function( tag, isDisable )
 };
 
 
+Util.resetForm = function( formTag )
+{
+	formTag("input[type=text],select").val("");
+	formTag("input[type=checkbox]").prop( "checked", false );
+};
+
+
 Util.findItemFromList = function( listData, searchProperty, searchValue )
 {
 	var foundData;
@@ -47,6 +54,27 @@ Util.findItemFromList = function( listData, searchProperty, searchValue )
 	return foundData;
 };
 
+
+Util.RemoveFromArray = function( list, propertyName, value )
+{
+	var index;
+
+	$.each( list, function( i, item )
+	{
+		if ( item[ propertyName ] == value ) 
+		{
+			index = i;
+			return false;
+		}
+	});
+
+	if ( index !== undefined ) 
+	{
+		list.splice( index, 1 );
+	}
+
+	return index;
+}
 
 
 //-------------------------------------------------------------------
@@ -253,6 +281,20 @@ Util.convertLocalTimeToUTM = function( localDate )
     return newDate;
 }  
 
+Util.getTimeElapsed = function( date1, date2 )
+{
+	var diff = date2.valueOf() - date1.valueOf();
+	var diffInHours = Math.floor( diff/1000/60/60 ); // Convert milliseconds to hours
+	
+	var noDays = Math.floor( diffInHours/24 );
+	noDays = ( noDays < 10 ) ? "0" + noDays : noDays;
+	
+	var noHours = diffInHours - ( 24 * noDays ); 
+	noHours = ( noHours < 10 ) ? "0" + noHours : noHours;
+	
+	return noDays + "d " + noHours + "h";
+};
+
 Util.datePicker = function( dateTag, dateFormat )
 {
 	dateTag.datepicker({
@@ -262,7 +304,6 @@ Util.datePicker = function( dateTag, dateFormat )
 		showOn: 'both',
 		createButton: false,
 		constrainInput: true,
-        yearRange: '-100:+100',
         maxDate: new Date()
 	});
 		  
