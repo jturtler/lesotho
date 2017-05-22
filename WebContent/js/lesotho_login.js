@@ -143,7 +143,24 @@ function LoginForm( storageObj, translationObj )
 		            ,contentType: "application/json;charset=utf-8"
 					,success: function( response ) 
 					{
-						window.location.href = "pages/counsellor.html";
+						var page = "";
+						var workerRole = response.workerRole;
+						
+						if( workerRole == "COUN" ) {
+							page = "counsellor";
+						}
+						else if( workerRole == "REFCO" ) {
+							page = "referCoordinator";
+						}
+						
+						if( page != "" ){
+							window.location.href = "pages/" + page + ".html";
+						}
+						else{
+							var tranlatedText = me.translationObj.getTranslatedValueByKey( "login_msg_notLSAccount" );
+							me.errorMessageTag.html( tranlatedText + "!");
+						}
+						
 					},
 					error: function(a,b,c)
 					{

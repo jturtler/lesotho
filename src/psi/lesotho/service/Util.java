@@ -9,14 +9,10 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Map;
-import java.util.TimeZone;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletResponse;
@@ -42,6 +38,7 @@ public final class Util
     public static String KEY_DHIS_SERVER = "dhisServer";
     public static String KEY_LOGIN_USERNAME = "loginUsername";
     public static String KEY_LOGIN_PASSWORD = "loginPassword";
+    public static String KEY_WORKER_ROLE = "workerRole";
 
 
     public static String REQUEST_TYPE_GET = "GET";
@@ -66,6 +63,7 @@ public final class Util
     public static final String STAGE_ID = "lVglvBnE3TY";
     public static final String USER_CATEGORY_ID = "qVl8p3w3fI5";
     public static final String USER_CATEGORY_PIN_ATRIBUTE_ID = "WgOzQa7KDTV";
+    public static final String USER_CATEGORY_WORKER_ROLE_ATRIBUTE_ID = "aXv3j7whLvA";
     
 
     public static final String CLIENT_ATTR_ID_CUIC = "zRA08XEYiSF";

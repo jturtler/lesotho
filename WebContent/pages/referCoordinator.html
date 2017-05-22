@@ -20,6 +20,7 @@
 <link rel="apple-touch-icon-precomposed" href="../images/appIcon.jpg" />
 
 <link rel="stylesheet" href="../css/jQuery/jquery-ui.css">
+<link rel="stylesheet" href="../css/jQuery/jquery-ui.css">
 
 <script src="../js/jQuery/jquery-1.11.1.min.js"></script>
 <script src="../js/jQuery/jquery-ui.min.js"></script>
@@ -39,7 +40,7 @@
 <script src="../js/utils/lesotho_validation.js"></script>
 <script src="../js/utils/lesotho_menu.js"></script>
 <script src="../js/utils/lesotho_commons.js"></script>
-<script src="../js/counsellor.js"></script>
+<script src="../js/referCoordinator.js"></script>
 
 </head>
 <body>
@@ -53,16 +54,14 @@
 			<ul class="nav sidebar-nav">
 				<li class="sidebar-brand"><a data-toggle="offcanvasmenu" style="cursor: pointer;">PI LS HTS</a></li>
 				
-				<li><a id="searchClientLink" href="#" keyword="menu_searchCreateClient">Search/Create Client</a></li>
+				<li><a id="searchClientLink" href="#" keyword="menu_referCoordinator_search">Search</a></li>
 				<li role="separator" class="divider"></li>
 				
-				<li><a id="todayCaseLink" href="#" keyword="menu_todayTests">Today Test</a></li>
-				<li><a id="previousCaseLink" href="#" keyword="menu_pastTests">Pass Test</a></li>
-				<li><a id="positiveCaseLink" href="#" keyword="menu_positiveTests">Positive Tests</a></li>				
+				<li><a id="todayFULink" href="#" keyword="menu_referCoordinator_todayFU">Today F/U</a></li>
+				<li><a id="allFULink" href="#" keyword="menu_referCoordinator_allFU">All F/U</a></li>			
 				<li role="separator" class="divider"></li>
 				
-				<li><a id="consumablesLink" href="#" keyword="menu_consumables">Consumables</a></li>
-				<li><a id="reportLink" href="#" keyword="menu_statistics">Statistics</a></li>				
+				<li><a id="reportLink" href="#" keyword="menu_referCoordinator_statistics">Statistics</a></li>				
 				<li role="separator" class="divider"></li>
 				
 				<li><a id="settingsLink" href="#" keyword="menu_settings">Settings</a></li>
@@ -115,20 +114,22 @@
 			
 			
 			
-				<!-- Today Cases -->				
+				<!-- Today F/U -->				
 				
 				
-				<div id="todayCaseList" style="display: none;" class="mainContent">
+				<div id="todayFUList" style="display: none;" class="mainContent">
 				 	
-					<h4 class="headerList"><span id="headerList" keyword="todayCases_headerTitle"></span> - <span id="listDate"></span></h4>
+					<h4 class="headerList"><span id="headerList" keyword="todayFU_headerTitle">Clients followed-up for ART Referral today</span> - <span id="todayFUDate"></span></h4>
 				    
-					<table id="todayCaseTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
+					<table id="todayFUTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
 						<thead>
 							<tr style="background-color:#cfe2f3">
-								<th keyword="todayCases_tableHeader_time">Time</th>
-								<th keyword="todayCases_tableHeader_cuic">CUIC</th>
-								<th keyword="todayCases_tableHeader_councilOfTesting">Council of Testing</th>
-								<th keyword="todayCases_tableHeader_lastTestResult">Last Test Result</th>
+								<th keyword="todayFU_tableHeader_time">Time</th>
+								<th keyword="todayFU_tableHeader_councilOfResidence">Council of Residence</th>
+								<th keyword="todayFU_tableHeader_facilityReferredTo">Facility Referred to</th>
+								<th keyword="todayFU_tableHeader_cuic">CUIC</th>
+								<th keyword="todayFU_tableHeader_lastAction">Last Action</th>
+								<th keyword="todayFU_tableHeader_referralStatus">Referral Status</th>
 							</tr>
 						</thead>
 						
@@ -136,76 +137,52 @@
 					</table>
 					
 					
-					<button id="registerClientBtn" class="btn btn-lg glyphicon glyphicon-plus addButton" title="Search/Create client"></button>
+					<button id="registerClientBtn" class="btn btn-lg glyphicon glyphicon-plus addButton"></button>
 					
-					<div id="todayCaseFooter" class="footerRightSideControls">*** <span keyword="todayCases_footer_msg_totalCases">Total Tested for today</span>: <span id="todayCaseNumber"></span> <span keyword="common_footer_msg_clients">cases</span></div>
+					<div id="todayCaseFooter" class="footerRightSideControls">*** <span keyword="todayFU_footer_msg">Total followed-up for ART Referral today</span>: <span id="todayFUNumber"></span> <span keyword="common_footer_msg_clients">clients</span></div>
 					
 				</div>
 				
 				
-				<!-- Previous List Cases -->
+				<!-- All F/U -->
 				
-				<div id="previousCaseList" style="display:none;" class="mainContent">
+				<div id="allFUList" style="display:none;" class="mainContent">
 				 	
-					<h4 class="headerList"><span id="headerList" keyword="previousCases_headerTitle"></span></h4>
+					<h4 class="headerList"><span id="headerList" keyword="allFU_headerTitle">Clients followed-up for ART Referral</span></h4>
 				    
-					<table id="previousCaseTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
+					<table id="allFUTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
 						<thead>
 							<tr style="background-color:#cfe2f3">
-								<th keyword="previousCases_tableHeader_date">Date</th>
-								<th keyword="previousCases_tableHeader_cuic">CUIC</th>
-								<th keyword="previousCases_tableHeader_councilOfTesting">Council of Testing</th>
-								<th keyword="previousCases_tableHeader_numberOfTest">Number of Test</th>
-								<th keyword="previousCases_tableHeader_lastTestResult">Last Test Result</th>
+								<th keyword="allFU_tableHeader_councilOfResidence">Council of Residence</th>
+								<th keyword="allFU_tableHeader_facilityReferredTo">Facility Referred to</th>
+								<th keyword="allFU_tableHeader_cuic">CUIC</th>
+								<th keyword="allFU_tableHeader_daysSinceDiagnosis">Days since Diagnosis</th>
+								<th keyword="allFU_tableHeader_lastAction">Last Action</th>
+								<th keyword="allFU_tableHeader_nextAction">Next action</th>
 							</tr>
 						</thead>
 						
 						<tbody></tbody>
 					</table>
 					
-					<div id="previousCaseFooter" class="footerRightSideControls">*** <span keyword="previousCase_footer_msg_totalCases">Total past tests last 12 months</span>: <span id="previousCaseNumber"></span> <span keyword="common_footer_msg_clients">cases</span></div>
-					
-				</div>
-				
-				
-				<!-- Positive List Cases -->
-				
-				<div id="positiveCaseList" style="display:none;" class="mainContent">
-				 	
-					<h4 class="headerList"><span id="headerList" keyword="positiveCases_headerTitle"></span></h4>
-				    
-					<table id="positiveCaseTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
-						<thead>
-							<tr style="background-color:#cfe2f3">
-								<th keyword="positiveCases_tableHeader_date">Date</th>
-								<th keyword="positiveCases_tableHeader_cuic">CUIC</th>
-								<th keyword="positiveCases_tableHeader_councilOfTesting">Council of Testing</th>
-								<th keyword="positiveCases_tableHeader_ARTReferralStatus">ART Referral Status</th>
-								<th keyword="positiveCases_tableHeader_facilityReferredTo">Facility Referred to</th>
-							</tr>
-						</thead>
-						
-						<tbody></tbody>
-					</table>
-					
-					<div id="positiveCaseFooter" class="footerRightSideControls">*** <span keyword="positiveCases_footer_msg_totalCases">Total Cases for positive</span>: <span id="positiveCaseNumber"></span> <span keyword="common_footer_msg_clients">cases</span></div>
+					<div id="allFUTblFooter" class="footerRightSideControls">*** <span keyword="allFU_footer_msg">Total clients filtered</span>: <span id="allFUNumber"></span> <span keyword="common_footer_msg_clients">clients</span></div>
 					
 				</div>
 
-				<!--  END Issued clients && Completed clients -->
+				<!--  END All F/U -->
 
 				
 				
 				<!-- Search and Create Client FORM -->
 				
 				<div id="searchClientForm" style="display:none;" class="mainContent">
-		  			<h4 class="headerList" keyword="searchClient_headerTitle">Search/Create client</h4>
+		  			<h4 class="headerList" keyword="referCoordinator_searchClient_headerTitle">Search positive client</h4>
 		  			
 		  			<div class="shadow">
-			  			<form class="form-horizontal" id="seachAddClientForm" style="padding-top:20px;padding-right:10px;"></form>
+			  			<form class="form-horizontal" id="seachForm" style="padding-top:20px;padding-right:10px;"></form>
 						
 						<div style="text-align:center;margin-bottom:10px;">
-							<button class="btn btn-default actionBtn" id="searchClientBtn" keyword="searchClient_btn_search">Search/Create</button>
+							<button class="btn btn-default actionBtn" id="searchClientBtn" keyword="referCoordinator_searchClient_btn_search">Search</button>
 		  				</div>
 	  				</div>
 	  				
@@ -213,19 +190,19 @@
 				
 				<div id="searchResult" style="display:none;" class="mainContent">
 				
-					<h4 class="headerList"><span keyword="searchResult_msg_searchCriteria">Matches for</span> <span id="searchMatchResultKey"></span></h4>
+					<h4 class="headerList"><span keyword="referCoordinator_msg_searchCriteria">Matches for</span> <span id="searchMatchResultKey"></span></h4>
 					
 					<div class="scroll-div">
 						<table class='table table-hover table-striped listTable tablesorter' id="searchResultTb">
 							<thead>
 								<tr style='background-color:#cfe2f3;'>
-									<th keyword="searchClient_result_tableHeader_firstName">First Name</th>
-									<th keyword="searchClient_result_tableHeader_surname">Surname</th>
-									<th keyword="searchClient_result_tableHeader_dob">DoB</th>
-									<th keyword="searchClient_result_tableHeader_districtOfBirth">District o B</th>
-									<th keyword="searchClient_result_tableHeader_birthOrder">Birth Order</th>
-									<th keyword="searchClient_result_tableHeader_adquisition">Adquisition</th>
-									<th keyword="searchClient_result_tableHeader_lastTestNS">Last test NS</th>
+									<th keyword="referCoordinator_searchClient_result_tableHeader_firstName">First Name</th>
+									<th keyword="referCoordinator_searchClient_result_tableHeader_surname">Surname</th>
+									<th keyword="referCoordinator_searchClient_result_tableHeader_dob">DoB</th>
+									<th keyword="referCoordinator_searchClient_result_tableHeader_districtOfBirth">District o B</th>
+									<th keyword="referCoordinator_searchClient_result_tableHeader_birthOrder">Birth Order</th>
+									<th keyword="referCoordinator_searchClient_result_tableHeader_adquisition">Adquisition</th>
+									<th keyword="referCoordinator_searchClient_result_tableHeader_lastTestNS">Last test NS</th>
 								</tr>
 							</thead>
 							<tbody></tbody>
@@ -233,10 +210,10 @@
 					</div>
 					
 					<div id="searchResultOptions" >
-						<p><span id="searchResultHeader" keyword="searchClient_result_optionTitle" class="searchOptMsg">Select a client from from above or</span> <span id="searchResultKey"  class="searchOptMsg"></span><p> 
-						<button id="showAddNewClientForm" keyword="searchClient_result_btn_addClient" class="btn btn-default actionBtn">Add a client</button>
-						<button id="backToSearchClientForm" keyword="searchClient_result_btn_backToSearch" class="btn btn-default actionBtn">Back to search</button>
-						<button id="showTodayCase" keyword="searchClient_result_btn_todayCases" class="btn btn-default actionBtn">Today's Cases</button>
+						<p><span id="searchResultHeader" keyword="referCoordinator_searchClient_result_optionTitle" class="searchOptMsg">Select a client from from above or</span> <span id="searchResultKey"  class="searchOptMsg"></span><p> 
+						<button id="showAddNewClientForm" keyword="referCoordinator_searchClient_result_btn_addClient" class="btn btn-default actionBtn">Add a client</button>
+						<button id="backToSearchClientForm" keyword="referCoordinator_searchClient_result_btn_backToSearch" class="btn btn-default actionBtn">Back to search</button>
+						<button id="showTodayCase" keyword="referCoordinator_searchClient_result_btn_todayCases" class="btn btn-default actionBtn">Today's Cases</button>
 					</div>
 				</div>
 				
@@ -299,14 +276,14 @@
 									<table class="table table-hover table-striped previousTestTb">
 										<tr>
 											<th style="width:20px;">
-												<button id="discardContactLogBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
+												<span id="discardContactLogBtn" style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span>
 											</th>
 											<th>
 												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
 												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
 											</th>
 											<th style="width:20px;">
-												<button id="saveContactLogBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+												<span id="saveContactLogBtn" style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span>
 											</th>						
 										</tr>
 									</table>
@@ -317,11 +294,12 @@
 								<tr>
 									<th>Next action: <span style="font-weight:normal;" class="nextAction"></span>
 									<th><div style="float:right;">Due date: <span style="font-weight:normal;" class="dueDate"></span></div></th>
+									
 								</tr>
 							</table>
 							
 							<div id="addContactLogEventDiv">			
-								<div class="panel panel-default" id="addContactLogEventForm">			
+								<div class="panel panel-default">			
 									<table class="table previousTestTb">
 										<thead>
 											<tr>
@@ -330,7 +308,7 @@
 													<span style="float:right;" keyword="contactLogForm_tab_btn_add">Add</span>
 												</th>
 												<th style="width:20px;">
-													<button id="addContactLogEventBtn" class="imgBtn"><span class="glyphicon glyphicon-plus"></span></button>
+													<span id="addContactLogEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-plus"></span>
 												</th>	
 											</tr>
 										</thead>
@@ -349,7 +327,7 @@
 												<td colspan="2" keyword="contactLogForm_tab_eventForm_header_nextAction">Next action</td>
 												<td><input type="text" class="form-control" dataelement="mcgzEFh5IV8"></td>
 												<td keyword="contactLogForm_tab_eventForm_header_dueDate">Due date</td>
-												<td colspan="2"><input type="text" class="form-control" isDate="true" dataelement="HcBFZsCt8Sy"></td>
+												<td colspan="2"></td>
 											</tr>
 											<tr>
 												<td colspan="2" keyword="contactLogForm_tab_eventForm_header_comments">Comments</td>
@@ -366,7 +344,7 @@
 													<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
 												</th>
 												<th style="width:20px;">
-													<button id="saveContactLogEventBtn" class="imgBtn"><span class="glyphicon glyphicon-floppy-disk"></span></button>
+													<span id="saveContactLogEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span>
 												</th>						
 											</tr>
 										</tbody>
@@ -396,7 +374,7 @@
 									<!--  Action buttons -->
 									<tr>
 										<th style="width:20px;">
-											<button id="discardARTOpenEventBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
+											<span id="discardARTOpenEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span>
 										</th>
 										<th colspan="2">
 											<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
@@ -600,7 +578,7 @@
 			MsgManager.appUnblock();
 			
 			new Menu();
-			new Counsellor( new Storage(), translationObj );
+			new ReferCoordinator( new Storage(), translationObj );
 		});
 		
 		

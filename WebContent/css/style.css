@@ -566,7 +566,7 @@ table.tablesorter thead tr .headerSortDown {
 {
 	content: '';
 	display: block;
-	height: 10px;    
+	height: 3px;    
 }
 
 .previousTestTb>tbody:last-child::after{
@@ -599,6 +599,14 @@ table.tablesorter thead tr .headerSortDown {
 	margin-right: 4px;
 }
 
+.panel{
+	border-radius: 0px !IMPORTANT;
+}
+
+.imgBtn {
+    background-color: #f2f2f2 !IMPORTANT;
+    border: 1px solid transparent;
+}
 
 /*-------------------------------*/
 /*            Action Bar         */

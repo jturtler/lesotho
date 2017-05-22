@@ -138,6 +138,8 @@ public class LoginController
                     // Check the categories if this catOption belongs to 'LS - Counsellor'
 
                     JSONArray categories = categoryOption.getJSONArray( "categories" );
+                    String workerRole = "";
+                    
                     for( int i=0; i<categories.length(); i++ )
                     {
                         String categoryId = categories.getJSONObject( i ).getString( "id" );
@@ -147,13 +149,17 @@ public class LoginController
                             for( int j=0; j<arrAttributes.length(); j++ )
                             {
                                 String attributeId = arrAttributes.getJSONObject( j ).getJSONObject( "attribute" ).getString( "id" );
-                                String pin = arrAttributes.getJSONObject( j ).getString( "value" );
+                                String attrVal = arrAttributes.getJSONObject( j ).getString( "value" );
                                 
-                                if( attributeId.equals( Util.USER_CATEGORY_PIN_ATRIBUTE_ID ) && pin.equals( loginPassword ) )
+                                if( attributeId.equals( Util.USER_CATEGORY_PIN_ATRIBUTE_ID ) && attrVal.equals( loginPassword ) )
                                 {
                                     valid = true;
-                                    break;
                                 }
+                                else if( attributeId.equals( Util.USER_CATEGORY_WORKER_ROLE_ATRIBUTE_ID ) )
+                                {
+                                    workerRole = attrVal;
+                                }
+                                    
                             }
                         }
                     }
@@ -162,7 +168,8 @@ public class LoginController
                     JSONObject responseJson = new JSONObject();
                     
                     if( valid )
-                    {
+                    {                        
+                        responseJson.put( Util.KEY_WORKER_ROLE, workerRole );
                         responseJson.put( Util.KEY_LOGIN_USERNAME, loginUsername );
                         responseJson.put( Util.KEY_FULLNAME, categoryOption.getString( "displayName" ) );
                         responseJson.put( Util.KEY_DHIS_SERVER, Util.LOCATION_DHIS_SERVER );

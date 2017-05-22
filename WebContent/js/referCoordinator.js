@@ -8,7 +8,7 @@
  * @param translationObj
  */
 
-function Counsellor( storageObj, translationObj )
+function ReferCoordinator( storageObj, translationObj )
 {
 	var me = this;
 	me.storageObj = storageObj;
@@ -18,13 +18,11 @@ function Counsellor( storageObj, translationObj )
 	me.dateFormat = "dd M yy";
 	me.dateTimeFormat = "YYYY-MM-DD HH:mm";
 	
-	me.todayCaseLinkTag = $("#todayCaseLink");
-	me.previousCaseLinkTag = $("#previousCaseLink");
-	me.positiveCaseLinkTag = $("#positiveCaseLink");
+	me.todayFULinkTag = $("#todayFULink");
+	me.allFULinkTag = $("#allFULink");
 	me.searchClientLinkTag = $("#searchClientLink");
 	me.aboutLinkTag = $("#aboutLink");
 	me.settingsLinkTag = $("#settingsLink");
-	me.consumablesLinkTag = $("#consumablesLink");
 	me.reportLinkTag = $("#reportLink");
 	
 	
@@ -33,27 +31,19 @@ function Counsellor( storageObj, translationObj )
 	me.headerSettingsLinkTag = $("#headerSettingsLink");
 	
 	
-	// Today cases
-	me.todayCaseListTag = $("#todayCaseList");
-	me.todayCaseTblTag = $("#todayCaseTbl");
-	me.listDateTag = $("#listDate");
+	// Today F/U
+	me.todayFUListTag = $("#todayFUList");
+	me.todayCaseTblTag = $("#todayFUTbl");
+	me.todayFUDateTag = $("#todayFUDate");
 	me.registerClientBtnTag = $("#registerClientBtn");
-	me.todayCaseFooterTag = $("#todayCaseFooter");
-	me.todayCaseNumberTag = $("#todayCaseNumber");
+	me.todayFUNumberTag = $("#todayFUNumber");
 	
 	
-	// Previous cases
-	me.previousCaseListTag = $("#previousCaseList");
-	me.previousCaseTblTag = $("#previousCaseTbl");
-	me.previousCaseFooterTag = $("#previousCaseFooter");
-	me.previousCaseNumberTag = $("#previousCaseNumber");
-	
-	
-	// Positive cases
-	me.positiveCaseListTag = $("#positiveCaseList");
-	me.positiveCaseTblTag = $("#positiveCaseTbl");
-	me.positiveCaseFooterTag = $("#positiveCaseFooter");
-	me.positiveCaseNumberTag = $("#positiveCaseNumber");
+	// All F/U
+	me.allFUListTag = $("#allFUList");
+	me.allFUTblTag = $("#allFUTbl");
+	me.allFUFooterTag = $("#allFUFooter");
+	me.allFUNumberTag = $("#allFUNumber");
 	
 	
 	// Search Form	
@@ -72,7 +62,7 @@ function Counsellor( storageObj, translationObj )
 	me.showTodayCaseTag = $("#showTodayCase");
 	
 	
-	// [Client Registration] form	
+	// [Add/Update Client] form	
 	me.addNewClientBtnTag = $("#addNewClientBtn");
 	me.addClientFormTabTag = $("#addClientFormTab");
 	me.addClientFormDivTag = $("#addClientFormDiv");
@@ -83,16 +73,13 @@ function Counsellor( storageObj, translationObj )
 	me.moveToSettingLinkTag = $("#moveToSettingLink");
 	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
 
-	
-	// [Contact Log] data Entry form
-	me.addContactLogEventDivTag = $("#addContactLogEventDiv");
-	me.addContactLogEventFormTag = $("#addContactLogEventForm");
 	me.contactLogFormTag  = $("#contactLogForm");
 	me.discardContactLogBtnTag = $("#discardContactLogBtnTag");
 	me.saveContactLogBtnTag = $("#saveContactLogBtn");
 	
 	me.nextContactLogActionTbTag = $("#nextContactLogActionTb");
 	
+	me.addContactLogEventTag = $("#addContactLogEventDiv");
 	me.addContactLogEventBtnTag = $("#addContactLogEventBtn");
 	me.discardContactLogEventBtnTag = $("#discardContactLogEventBtnTag");
 	me.saveContactLogEventBtnTag = $("#saveContactLogEventBtn");
@@ -100,20 +87,21 @@ function Counsellor( storageObj, translationObj )
 	me.contactLogEventHistoryTbTag = $("#contactLogEventHistoryTb");
 	
 
-	// [ART Refer. Open] Data entry form
+	// [ART Refer. Open] entry form
 	me.artReferOpenFormTag = $("#artReferOpenForm");
 	me.discardARTOpenEventBtnTag = $("#discardARTOpenEventBtn");
 	me.saveARTOpenEventBtnTag = $("#saveARTOpenEventBtn");
 
 	
-	// [ART Refer. Close] Data entry form
+	// [ART Refer. Close] entry form
 	me.artReferCloseFormTag = $("#artReferCloseForm");
 	me.discardARTCloseEventBtnTag = $("#discardARTCloseEventBtn");
 	me.saveARTCloseEventBtnTag = $("#saveARTCloseEventBtn");
+
 	me.artEventInfoTbTag = $("#artEventInfoTb");
 	
 	
-	// [This Test] form
+	// [Data Entry] form
 	me.addEventFormTag = $("#addEventForm");
 	me.previousTestsTag = $("#previousTests");
 	me.thisTestDivTag = $("#thisTestDiv");
@@ -122,10 +110,6 @@ function Counsellor( storageObj, translationObj )
 	me.completedEventBtnTag = $("#completedEventBtn");	
 	me.updateClientBtnTag = $("[name='updateClientBtn']");
 	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
-	
-	
-	// [Consumables]
-	me.consumablesDivTag = $("#consumablesDiv");
 	
 	
 	// [Report]
@@ -187,9 +171,6 @@ function Counsellor( storageObj, translationObj )
 	
 	
 	// [Contact Log] Ids
-	me.attr_ConsentToContact = "ZQiKIaeOKv4";
-	me.attr_ConsentToVisit = "W8Odb9UqA15";
-	
 	me.attr_ContactPhoneNumber = "C1twCsH0rjI";
 	me.attr_RestrictionsContacting  = "z78Y1qdewNQ";
 	me.attr_Address1 = "gY1FrhX5UTn";
@@ -201,8 +182,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.attr_NextKinPhoneNumber = "HtQU1Bfhc9m";
 	
-	
-	
+		
 	// [Data Element Ids]
 	me.de_Testing_ResultTest1 = "choHDFxMCaU";
 	me.de_Testing_ResultTest2 = "KDnhSz51HKS";
@@ -268,13 +248,11 @@ function Counsellor( storageObj, translationObj )
 	
 	me.currentList = "";
 	me.PAGE_TODAY_LIST = "todayList";
-	me.PAGE_PREVIOUS_LIST = "previousList";
-	me.PAGE_POSITIVE_LIST = "positiveList";
+	me.PAGE_ALL_LIST = "previousList";
 	me.PAGE_SEARCH_PARAM = "searchParam";
 	me.PAGE_SEARCH_CLIENT_RESULT = "searchClientResult";
 	me.PAGE_SEARCH_ADD_CLIENT = "searchAddClient";
 	me.PAGE_SEARCH_EDIT_CLIENT = "searchEditClient";
-	me.PAGE_COMSUMABLES = "Consumables";
 	me.PAGE_REPORT_PARAM = "reportParam";
 	me.PAGE_SETTINGS = "settings";
 	me.PAGE_ABOUT = "about";
@@ -292,9 +270,9 @@ function Counsellor( storageObj, translationObj )
 	me.searchClientAttributeIds = [me.attr_DoB, me.attr_DistrictOB, me.attr_FirstName, me.attr_LastName, me.attr_BirthOrder];
 
 	
-	// ---------------------------------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------
 	// Init methods
-	// ---------------------------------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------
 	
 	me.init = function()
 	{		
@@ -308,9 +286,9 @@ function Counsellor( storageObj, translationObj )
 	};
 	
 
-	// ---------------------------------------------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------
 	// Load init data
-	// ---------------------------------------------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------
 	
 	me.setup_ButtonsOnBrowser = function()
 	{
@@ -361,16 +339,10 @@ function Counsellor( storageObj, translationObj )
 				me.loadSearchSubPage( me.todayCaseTblTag );
 			});
 		}
-		else if( page == me.PAGE_PREVIOUS_LIST )
+		else if( page == me.PAGE_ALL_LIST )
 		{
 			me.listPreviousCases(function(){
-				me.loadSearchSubPage( me.previousCaseTblTag );
-			});
-		}
-		else if( page == me.PAGE_POSITIVE_LIST )
-		{
-			me.listPositiveCases(function(){
-				me.loadSearchSubPage( me.positiveCaseTblTag );
+				me.loadSearchSubPage( me.allFUTblTag );
 			});
 		}
 		else if( page == me.PAGE_SEARCH_PARAM )
@@ -380,10 +352,6 @@ function Counsellor( storageObj, translationObj )
 		else if( page == me.PAGE_SEARCH_CLIENT_RESULT )
 		{
 			me.loadSearchSubPage( me.searchResultTbTag );			
-		}
-		else if( page == me.PAGE_COMSUMABLES )
-		{
-			me.consumablesDivTag.show("fast");
 		}
 		else if( page == me.PAGE_REPORT_PARAM )
 		{
@@ -549,8 +517,8 @@ function Counsellor( storageObj, translationObj )
 	
 	me.setUp_Events_Menus = function()
 	{
-		me.todayCaseLinkTag.click(function(e){
-			console.log("todayCaseLinkTag");
+		me.todayFULinkTag.click(function(e){
+			console.log("todayFULinkTag");
 			$('.overlay').click();
 			
 			me.checkOrgunitSetting( function(){
@@ -559,21 +527,12 @@ function Counsellor( storageObj, translationObj )
 			});
 		});
 		
-		me.previousCaseLinkTag.click(function(){
+		me.allFULinkTag.click(function(){
 			$('.overlay').click();
 			
 			me.checkOrgunitSetting( function(){
 				me.registerClientBtnTag.hide();
 				me.listPreviousCases();
-			});
-		});
-		
-		me.positiveCaseLinkTag.click(function(){
-			$('.overlay').click();
-			
-			me.checkOrgunitSetting( function(){
-				me.registerClientBtnTag.hide();
-				me.listPositiveCases();
 			});
 		});
 		
@@ -608,16 +567,6 @@ function Counsellor( storageObj, translationObj )
 			me.resetPageDisplay();
 			me.settingsDivTag.show("fast");
 			$('.overlay').click();
-		});
-		
-		me.consumablesLinkTag.click(function(){
-			$('.overlay').click();
-			
-			me.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.PAGE_COMSUMABLES);
-				me.resetPageDisplay();
-				me.consumablesDivTag.show("fast");
-			});
 		});
 		
 		me.reportLinkTag .click(function(){
@@ -754,15 +703,10 @@ function Counsellor( storageObj, translationObj )
 				me.registerClientBtnTag.show();
 				me.listTodayCases();
 			}
-			else if( me.currentList == me.PAGE_PREVIOUS_LIST )
+			else if( me.currentList == me.PAGE_ALL_LIST )
 			{
 				me.registerClientBtnTag.hide();
 				me.listPreviousCases();
-			}
-			else if( me.currentList == me.PAGE_POSITIVE_LIST )
-			{
-				me.registerClientBtnTag.hide();
-				me.listPositiveCases();
 			}
 		});
 		
@@ -853,21 +797,6 @@ function Counsellor( storageObj, translationObj )
 			
 			me.execSaveEvent( jsonEvent, jsonClient.trackedEntityInstance, undefined, function( jsonData ){
 				me.showARTOpeningForm( me.artReferOpenFormTag );
-				
-				// Set [event] attribute for [ART Refer Opening] Tab
-				me.artReferOpenFormTag.attr( "event", JSON.stringify( response ) );
-				
-				// Set up Event creating logic
-				var latestHIVTestingEvent = me.addClientFormTabTag.attr("latestEvent");				
-				
-				var artClosureEvent = me.artReferCloseFormTag.attr("event");
-				if( artClosureEvent !== undefined )
-				{
-					artClosureEvent = JSON.parse( artClosureEvent );
-				}
-				
-				me.setUp_EventCreatingLogic( event, response, artClosureEvent );
-				
 			});
 		});
 		
@@ -890,20 +819,6 @@ function Counsellor( storageObj, translationObj )
 			
 			me.execSaveEvent( jsonEvent, jsonClient.trackedEntityInstance, undefined, function( jsonData ){
 				me.showARTOpeningForm( me.artReferCloseFormTag );
-				
-				// Set [event] attribute for [ART Refer Closure] Tab
-				me.artReferCloseFormTag.attr( "event", JSON.stringify( response ) );
-				
-				// Set up Event creating logic
-				var latestHIVTestingEvent = me.addClientFormTabTag.attr("latestEvent");				
-				
-				var artOpenEvent = me.artReferOpenFormTag.attr("event");
-				if( artOpenEvent !== undefined )
-				{
-					artOpenEvent = JSON.parse( artOpenEvent );
-				}
-				
-				me.setUp_EventCreatingLogic( latestHIVTestingEvent, artOpenEvent, response );
 			});
 		});
 		
@@ -920,7 +835,7 @@ function Counsellor( storageObj, translationObj )
 			Util.disableTag( me.saveEventBtnTag, true );
 						
 			var client = JSON.parse( me.addClientFormTabTag.attr("client") );
-			var event = me.addClientFormTag.attr("event");
+			var event = me.addClientFormTabTag.attr("event");
 			
 			if( event !== undefined ){
 				event = JSON.parse( event );
@@ -931,11 +846,7 @@ function Counsellor( storageObj, translationObj )
 			
 			event.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag );
 			
-			me.execSaveEvent(event, client.trackedEntityInstance, event.event, function( eventJson ){
-				
-				me.addClientFormTag.attr("event", JSON.stringify( eventJson ));
-				me.addClientFormTabTag.attr("latestEvent", JSON.stringify( eventJson ));
-				
+			me.execSaveEvent(event, client.trackedEntityInstance, event.event, function(){
 				tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editEvent" );
 				me.saveEventBtnTag.html( tranlatedText );
 			} );
@@ -992,7 +903,7 @@ function Counsellor( storageObj, translationObj )
 	
 	
 	// ----------------------------------------------------------------------------
-	// Add logic for data elements in [This Test] form
+	// Add logic for data elements in [Data Entry form]
 	// ----------------------------------------------------------------------------
 	
 	me.setUp_DataEntryFormLogic = function( item )
@@ -1034,6 +945,7 @@ function Counsellor( storageObj, translationObj )
 		me.setUp_DataElementFinalHIVStatusLogic();
 		me.setUp_DataElementTBScreeningConductedLogic();
 		me.setUp_DataElementBMI();
+//		me.setUp_ContactLogTab();
 	}; 
 	
 	
@@ -1240,6 +1152,7 @@ function Counsellor( storageObj, translationObj )
 		bmiTag.val( result );
 	};	
 	
+	
 	me.getDataElementField = function( deId )
 	{
 		return me.addClientFormTabTag.find( "input[dataElement='" + deId + "'],select[dataElement='" + deId + "']" );
@@ -1251,7 +1164,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.createClientForm = function()
 	{
-		me.createRegisterClientForm();
+		me.createAddClientForm();
 		me.createSearchClientForm();
 		me.createDataEntryForm();
 		
@@ -1261,7 +1174,7 @@ function Counsellor( storageObj, translationObj )
 	
 	
 	// Create [Search Client] form with attribute-groups and program-attributes from server
-	me.createRegisterClientForm = function()
+	me.createAddClientForm = function()
 	{
 		me.createAttributeClientForm( me.addClientFormTag, "LSHTC_Register_", false );
 		me.createAttributeClientForm( me.contactLogFormTag, "LSHTC_LOG_", true );
@@ -1290,7 +1203,7 @@ function Counsellor( storageObj, translationObj )
 				tbody.append( headerTag );		
 				
 				// Add event for header to collapse the fields inside
-				me.setUp_ClientRegistrationFormHeaderEvent( headerTag, table, "groupId" );
+				me.setUp_AddClientFormHeaderEvent( headerTag, table, "groupId" );
 				
 				
 				// STEP 3. Populate attributes in group
@@ -1337,24 +1250,24 @@ function Counsellor( storageObj, translationObj )
 					historyGroupTb.append( "<tr><td colspan='3' class='historyInfo'></td></tr>" );
 					
 					// Add event for header to collapse the fields inside
-					me.setUp_ClientRegistrationFormHeaderEvent( historyHeaderTag, historyGroupTb, "historyGroupId" );
+					me.setUp_AddClientFormHeaderEvent( historyHeaderTag, historyGroupTb, "historyGroupId" );
 					
 					// Add event for Edit form and Save data
-					me.setUp_Events_EditSectionContactLogForm( formTag, historyHeaderTag );
+					me.setUp_EditSectionContactLogForm( formTag, historyHeaderTag );
 					
 					table.prepend( historyGroupTb );
 				}
 			}// END Attribute Groups
 			
 			// Add logic for [Add Client form]
-			me.setUp_ClientRegistrationFormValidation();
+			me.setUp_AddClientFormValidation();
 			
 			// Add logic for [Add Client form]
-			me.setUp_Events_ClientRegistrationFormDataLogic();
+			me.setUp_AddClientFormLogic();
 		}
 	};
 	
-	me.setUp_Events_EditSectionContactLogForm = function( formTag, historyHeaderTag )
+	me.setUp_EditSectionContactLogForm = function( formTag, historyHeaderTag )
 	{
 		var editBtnTag = historyHeaderTag.find("span.editBtn");
 		var historyGroupTbTag = historyHeaderTag.closest("tbody[historyGroupId]");
@@ -1378,7 +1291,6 @@ function Counsellor( storageObj, translationObj )
 			}, groupId );
 		});
 	};
-	
 	
 	// Create [Add Client] form with attribute-groups and program-attributes from server
 	
@@ -1406,6 +1318,12 @@ function Counsellor( storageObj, translationObj )
 	};	
 
 	
+	me.tog = function(v)
+	{
+		return v?'addClass':'removeClass';
+	}; 
+	
+	
 	// Create [Data Entry form]
 	
 	me.createDataEntryForm = function()
@@ -1416,7 +1334,7 @@ function Counsellor( storageObj, translationObj )
 		me.addEventFormTag.prepend( "<div id='activeEventHeader' class='testMsg'>" + translatedByText + " '<span></span>'</div>" );
 		
 		
-		// STEP 1. Create the [Entry form] table
+		// STEP 1. Create the table
 		
 		me.generateDataEntryFormTable( me.addEventFormTag, me.stage_HIVTesting );
 		me.generateDataEntryFormTable( me.artReferOpenFormTag, me.stage_ARTReferralOpenning );
@@ -1460,7 +1378,7 @@ function Counsellor( storageObj, translationObj )
 	// Add logic in [Add Client] Form
 	// ----------------------------------------------------------------------------
 	
-	me.setUp_ClientRegistrationFormHeaderEvent = function( headerTag, tableTag, attrName )
+	me.setUp_AddClientFormHeaderEvent = function( headerTag, tableTag, attrName )
 	{
 		// --------------------------------------------------------------
 		// Set up to Show/Hide event data in "Previous" TAB
@@ -1496,7 +1414,7 @@ function Counsellor( storageObj, translationObj )
 
 	};
 	
-	me.setUp_ClientRegistrationFormValidation = function()
+	me.setUp_AddClientFormValidation = function()
 	{
 		// Disable [Client CUIC] field. The value of this attribute will be generated from another attribute values		
 		Util.disableTag( me.getAttributeField( me.attr_ClientCUIC ), true );
@@ -1511,14 +1429,14 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-	me.setUp_ClientRegistrationFormDataLogic = function()
+	me.init_AddClientFormLogicInit = function()
 	{
-		me.setUp_ClientRegistrationFormLogic_sexField();
-		me.setUp_ClientRegistrationFormLogic_everTested();
-		me.setUp_ClientRegistrationFormLogic_Age();
+		me.setUp_AddClientFormLogic_sexField();
+		me.setUp_AddClientFormLogic_everTested();
+		me.setUp_AddClientFormLogic_Age();
 	}
 	
-	me.setUp_Events_ClientRegistrationFormDataLogic = function()
+	me.setUp_AddClientFormLogic = function()
 	{
 		var sexTag = me.getAttributeField( me.attr_Sex );
 		sexTag.change( function(){
@@ -1528,12 +1446,12 @@ function Counsellor( storageObj, translationObj )
 			keyPopulationTag.val("");
 			circumcisedTag.val("");
 			
-			me.setUp_ClientRegistrationFormLogic_sexField();
+			me.setUp_AddClientFormLogic_sexField();
 		});
 		
 		var everTestedTag = me.getAttributeField( me.attr_EverTested );
 		everTestedTag.change( function(){
-			me.setUp_ClientRegistrationFormLogic_everTested();
+			me.setUp_AddClientFormLogic_everTested();
 		});
 		
 		var dobTag = me.getAttributeField( me.attr_DoB );
@@ -1541,13 +1459,13 @@ function Counsellor( storageObj, translationObj )
 			var ppocvTag = me.getAttributeField( me.attr_PPOVC );
 			ppocvTag.val("");
 			
-			me.setUp_ClientRegistrationFormLogic_Age();
+			me.setUp_AddClientFormLogic_Age();
 		});
 	};
 	
 	
 	// Add logic for [keyPopulation] fields
-	me.setUp_ClientRegistrationFormLogic_sexField = function()
+	me.setUp_AddClientFormLogic_sexField = function()
 	{
 		var sexTag = me.getAttributeField( me.attr_Sex );
 		var keyPopulationTag = me.getAttributeField( me.attr_KeyPopulation );
@@ -1579,7 +1497,7 @@ function Counsellor( storageObj, translationObj )
 	}
 	
 	// Add Logic for [LastHIVTestResult] and [Date of last HIV test]
-	me.setUp_ClientRegistrationFormLogic_everTested = function()
+	me.setUp_AddClientFormLogic_everTested = function()
 	{
 		var everTestedTag = me.getAttributeField( me.attr_EverTested );
 		var lastHIVTestResultTag = me.getAttributeField( me.attr_LastHIVTestResult );
@@ -1605,7 +1523,7 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 	
-	me.setUp_ClientRegistrationFormLogic_Age = function()
+	me.setUp_AddClientFormLogic_Age = function()
 	{
 		var dobTag = me.getAttributeField( me.attr_DoB );
 		var age = "";
@@ -1644,12 +1562,6 @@ function Counsellor( storageObj, translationObj )
 	    	
 	    });
 	};
-		
-	me.tog = function(v)
-	{
-		return v ? 'addClass' : 'removeClass';
-	};
-	
 	
 	me.getAttributeField = function( attrId )
 	{
@@ -1682,6 +1594,7 @@ function Counsellor( storageObj, translationObj )
 		inputRowTag.show();
 	};
 	
+	
 	me.removeMandatoryForField = function( tag )
 	{
 		var inputRowTag = tag.closest("tr");
@@ -1701,11 +1614,13 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 	
+
 	me.setUp_DataEntryFormHeaderEvent = function( headerTag, tableTag )
 	{
 		// --------------------------------------------------------------
 		// Set up to Show/Hide event data in "Previous" TAB
 		// --------------------------------------------------------------
+		
 		
 		headerTag.click(function(){
 
@@ -1871,7 +1786,7 @@ function Counsellor( storageObj, translationObj )
 		
 		// Reset values in the form
 		// Empty fields from "This Test" tab
-		me.thisTestDivTag.find("input[type='text']:enabled,select:enabled").val("");
+		me.thisTestDivTag.find("input[type='text'],select").val("");
 		me.thisTestDivTag.find("input[type='checkbox']").prop("checked", false);
 		me.addClientFormDivTag.find( "span.errorMsg" ).remove();
 		
@@ -1906,7 +1821,8 @@ function Counsellor( storageObj, translationObj )
 		// Empty fields from "This Test" tab
 		me.clientAttributeDivTag.find("input[type='text'],select").val("");
 		me.clientAttributeDivTag.find("input[type='checkbox']").prop("checked", false);
-	};
+		me.clientAttributeDivTag.find("input[type='radio']").prop("checked", false);
+	}
 	
 	// ----------------------------------------------------------------------------
 	// Generate Input Tags
@@ -2203,7 +2119,7 @@ function Counsellor( storageObj, translationObj )
 		me.storageObj.addItem( "page", me.PAGE_TODAY_LIST );
 		me.storageObj.removeItem( "subPage" );		
 		
-		me.listDateTag.html( Util.formatDate_LastNDate(0) );
+		me.todayFUDateTag.html( Util.formatDate_LastNDate(0) );
 		me.listCases( "../event/todayCases", function( list )
 		{
 			me.populateTodayCaseData( list );
@@ -2212,46 +2128,28 @@ function Counsellor( storageObj, translationObj )
 			// Show table			
 			MsgManager.appUnblock();
 			me.todayCaseTblTag.show();
-			me.todayCaseListTag.show("fast");
+			me.todayFUListTag.show("fast");
 		} );
 	}
 		
 	me.listPreviousCases = function( exeFunc )
 	{
-		me.currentList = me.PAGE_PREVIOUS_LIST;
-		me.storageObj.addItem("page", me.PAGE_PREVIOUS_LIST);
+		me.currentList = me.PAGE_ALL_LIST;
+		me.storageObj.addItem("page", me.PAGE_ALL_LIST);
 		me.storageObj.removeItem( "subPage" );
 		
-		me.listCases( "../event/previousCases", function( list ){
+		me.listCases( "../event/allFUs", function( list ){
 			me.populatePreviousCaseData( list )
 			
 			if( exeFunc !== undefined ) exeFunc();
 
 			// Show table	
 			MsgManager.appUnblock();
-			me.previousCaseTblTag.show();
-			me.previousCaseListTag.show("fast");
+			me.allFUTblTag.show();
+			me.allFUListTag.show("fast");
 		} );
 	}
-	
-	me.listPositiveCases = function( exeFunc )
-	{
-		me.currentList = me.PAGE_POSITIVE_LIST;
-		me.storageObj.addItem("page", me.PAGE_POSITIVE_LIST);
-		me.storageObj.removeItem( "subPage" );
 		
-		me.listCases( "../event/positiveCases", function( list ){
-			me.populatePositiveCaseData( list );
-			
-			if( exeFunc !== undefined ) exeFunc();
-			
-			// Show table	
-			MsgManager.appUnblock();
-			me.positiveCaseTblTag.show();
-			me.positiveCaseListTag.show("fast");
-		} );
-	}
-	
 	me.listCases = function( url, exeFunc )
 	{
 		me.storageObj.removeItem("param" );
@@ -2302,8 +2200,8 @@ function Counsellor( storageObj, translationObj )
 				var clientId = event[0];
 				var eventId = event[1];
 				var eventDate = event[2];
-				var deResult1 = event[3];
-				var cuic = event[4];
+				var fullName = event[3] + " " + event[4];
+				var deResult1 = event[5];
 				var ouName = event[6];
 				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
@@ -2318,9 +2216,9 @@ function Counsellor( storageObj, translationObj )
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
 				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
 				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
-				rowTag.append( "<td>" + cuic + "</td>" );
-				rowTag.append( "<td>" + ouName + "</td>" );
+				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + deResult1 + "</td>" );
+				rowTag.append( "<td>" + ouName + "</td>" );
 				
 				me.addEventForRowInList(rowTag);
 				
@@ -2332,12 +2230,12 @@ function Counsellor( storageObj, translationObj )
 		// Sortable		
 		me.sortTable( me.todayCaseTblTag );
 		
-		me.todayCaseNumberTag.html( me.todayCaseTblTag.find("tbody tr").length );
+		me.todayFUNumberTag.html( me.todayCaseTblTag.find("tbody tr").length );
 	}
 
 	me.populatePreviousCaseData = function( list )
 	{	
-		var tbodyTag = me.previousCaseTblTag.find("tbody");
+		var tbodyTag = me.allFUTblTag.find("tbody");
 		tbodyTag.find("tr").remove();
 		
 		if( list.length > 0 )
@@ -2349,10 +2247,10 @@ function Counsellor( storageObj, translationObj )
 				var clientId = event[0];
 				var eventId = event[1];
 				var eventDate = event[2];
-				var deResult1 = event[3];
-				var cuic = event[4];
-				var noTest = event[5];
+				var fullName = event[3] + " " + event[4];
+				var deResult1 = event[5];
 				var ouName = event[6];
+				var noTest = event[7];
 				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
 				var eventDateStr = eventDate;
@@ -2366,10 +2264,10 @@ function Counsellor( storageObj, translationObj )
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
 				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
 				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
-				rowTag.append( "<td>" + cuic + "</td>" );
+				rowTag.append( "<td>" + fullName + "</td>" );
+				rowTag.append( "<td>" + deResult1 + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
 				rowTag.append( "<td>" + noTest + "</td>" );
-				rowTag.append( "<td>" + deResult1 + "</td>" );
 				
 				me.addEventForRowInList(rowTag);
 				
@@ -2379,9 +2277,9 @@ function Counsellor( storageObj, translationObj )
 		}
 		
 		// Sortable
-		me.sortTable( me.previousCaseTblTag );
+		me.sortTable( me.allFUTblTag );
 		
-		me.previousCaseNumberTag.html( me.previousCaseTblTag.find("tbody tr").length );
+		me.allFUNumberTag.html( me.allFUTblTag.find("tbody tr").length );
 	}
 	
 	me.populatePositiveCaseData = function( list )
@@ -2395,11 +2293,10 @@ function Counsellor( storageObj, translationObj )
 			{
 				var event = list[i];
 				var clientId = event[0];
-				var eventId = event[1];
+				var eventId = event[1];	
 				var eventDate = event[2];
-				var cuic = event[4];
-				var ouName = event[6];
-				var deARTVal = event[7];
+				var fullName = event[3] + " " + event[4];
+				var deARTVal = event[5];
 				deARTVal = ( deARTVal !== "" ) ? "[None]" : deARTVal;
 				var ouName = event[6];
 				var numberOfTest = event[7];
@@ -2416,10 +2313,10 @@ function Counsellor( storageObj, translationObj )
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "positiveCaseList_msg_clickToOpenEditForm" );
 				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "'></tr>");										
 				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
-				rowTag.append( "<td>" + cuic + "</td>" );
+				rowTag.append( "<td>" + fullName + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
-				rowTag.append( "<td>" + deARTVal + "</td>" );
-				rowTag.append( "<td>??</td>" );
+				rowTag.append( "<td>" + numberOfTest + "</td>" );
+				rowTag.append( "<td></td>" );
 
 				me.addEventForRowInList(rowTag);
 				
@@ -2449,6 +2346,7 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 	
+	
 	me.addEventForRowInList = function(rowTag)
 	{
 		rowTag.css("cursor", "pointer");
@@ -2466,9 +2364,9 @@ function Counsellor( storageObj, translationObj )
 	};
 	
 	
-	// ---------------------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------
 	// Search Client
-	// ---------------------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------
 	
 	me.runSearchClients = function( exeFunc )
 	{
@@ -2625,6 +2523,7 @@ function Counsellor( storageObj, translationObj )
 		});	
 	};
 	
+	
 	// Load [Client details] when a row in search result is clicked
 	
 	me.loadClientDetails = function( clientId, eventId, exeFunc ){
@@ -2662,6 +2561,7 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
+
 	me.searchClients = function( jsonQuery, event, exeFunc )
 	{
 		$.ajax(
@@ -2692,12 +2592,11 @@ function Counsellor( storageObj, translationObj )
 	};
 	
 	
-	// ---------------------------------------------------------------------------------------------------------------
-	// Client Registration
-	// ---------------------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------
+	// Add/Update Client
+	// -------------------------------------------------------------------
 	
-	// Get client JSON data from FORM
-	
+	// Get client JSON data from attribute of the tab
 	me.getClientJsonData = function( formTag )
 	{
 		var attributeData = me.getArrayJsonData( "attribute", formTag );
@@ -2784,15 +2683,56 @@ function Counsellor( storageObj, translationObj )
 				            }
 							,success: function( response ) 
 							{
-								me.saveClientAfter( response, exeFunc, groupId );								
+								// STEP 1. Set the client as attribute for the form. 
+								
+								me.addClientFormTabTag.attr( "client", JSON.stringify( response ) );
+								
+								// STEP 2. Set the header of the [Client Form] Tab
+								
+								me.generateAddClientFormHeader();
+
+								// STEP 3. Set the value of the [Save Client] button
+								
+								tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editClient" );
+								me.saveClientBtnTag.html( tranlatedText );
+								
+								// STEP 4. Set the value of the [Save Event] button
+								
+								tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_createEvent" );
+								me.saveEventBtnTag.html( tranlatedText );
+								
+								// STEP 5. Disable [Complete Event] button
+								
+								Util.disableTag( me.completedEventBtnTag, true );
+								
+								// STEP 6. Display [This Test] Tab if the "status" mode is "Add Client"
+								
+								if( me.saveClientBtnTag.attr("status") == "add" )
+								{
+									me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
+								}
+								
+								// STEP 7. Set the status "Update" for [Client Form]
+								
+								me.saveClientBtnTag.attr("status", "update");
+								
+								
+								// STEP 8. Set data values based on client attribute values
+								me.initDataValues();
+								
+								if( exeFunc !== undefined ) exeFunc(groupId);
+								
+								// STEP 9. Unblock form
+								
+								tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
+								MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
+								MsgManager.appUnblock();
+								alert( tranlatedText );
+								
 							}
 							,error: function( response )
 							{
-								if( response.responseJSON.trackedEntityInstance != undefined )
-								{
-									me.saveClientAfter( response, exeFunc, groupId );
-								}
-								else if( response.responseJSON.response != undefined )
+								if( response.responseJSON.response != undefined )
 								{	
 									var conflicts = response.responseJSON.response.conflicts;
 									var errorMsg = "";
@@ -2877,57 +2817,7 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-	me.saveClientAfter = function( response, exeFunc, groupId )
-	{
-		// STEP 1. Set the client as attribute for the form. 
-		
-		me.addClientFormTabTag.attr( "client", JSON.stringify( response ) );
-		
-		// STEP 2. Set the header of the [Client Form] Tab
-		
-		me.generateAddClientFormHeader();
-
-		// STEP 3. Set the value of the [Save Client] button
-		
-		tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editClient" );
-		me.saveClientBtnTag.html( tranlatedText );
-		
-		// STEP 4. Set the value of the [Save Event] button
-		
-		tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_createEvent" );
-		me.saveEventBtnTag.html( tranlatedText );
-		
-		// STEP 5. Disable [Complete Event] button
-		
-		Util.disableTag( me.completedEventBtnTag, true );
-		
-		// STEP 6. Display [This Test] Tab if the "status" mode is "Add Client"
-		
-		if( me.saveClientBtnTag.attr("status") == "add" )
-		{
-			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
-		}
-		
-		// STEP 7. Set the status "Update" for [Client Form]
-		
-		me.saveClientBtnTag.attr("status", "update");
-		
-		
-		// STEP 8. Set data values based on client attribute values
-		me.setUp_InitDataValues();
-		
-		if( exeFunc !== undefined ) exeFunc(groupId);
-		
-		// STEP 9. Unblock form
-		
-		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_clientSaved" );
-		MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );						
-		MsgManager.appUnblock();
-		alert( tranlatedText );
-	};
-	
-	
-	me.setUp_InitDataValues = function()
+	me.initDataValues = function()
 	{
 		var dobTag = me.getAttributeField( me.attr_DoB );
 		var age = "";
@@ -2960,6 +2850,7 @@ function Counsellor( storageObj, translationObj )
 			// Hide [Number of sexual partners last 6 months]
 			numberSexualPartnersLast6MonthTag.val("");
 			numberSexualPartnersLast6MonthTag.closest("tr").hide();
+			
 		}
 		else
 		{
@@ -3007,10 +2898,9 @@ function Counsellor( storageObj, translationObj )
 		me.addClientFormDivTag.find(".headerList").html( headerText );
 	};
 	
-	
-	// ---------------------------------------------------------------------------------------------------------------
-	// Actions for event ( Create/Update, Complete events )
-	// ---------------------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------
+	// Add/Update Event
+	// -------------------------------------------------------------------
 	
 	me.getSaveEventURL = function( clientId, eventId )
 	{
@@ -3027,28 +2917,6 @@ function Counsellor( storageObj, translationObj )
 		}
 		
 		return url;
-	};
-
-	me.getGPSCoordinates = function( exeFunc ) 
-	{
-		if (navigator.geolocation) {
-		    var location_timeout = setTimeout( 10000 );
-
-		    navigator.geolocation.getCurrentPosition(function(position) {
-		        clearTimeout(location_timeout);
-
-		        var lat = position.coords.latitude;
-		        var lng = position.coords.longitude;
-
-		        exeFunc( lat, lng );
-		    }, function(error) {
-		        clearTimeout(location_timeout);
-		        exeFunc( "", "" );
-		    });
-		} else {
-			 exeFunc( "", "" );
-		}
-		 
 	};
 	
 	me.execSaveEvent = function( jsonData, clientId, eventId, exeFunc )
@@ -3127,6 +2995,8 @@ function Counsellor( storageObj, translationObj )
 				{
 					me.activeEventHeaderTag.show();
 					
+					me.addClientFormTabTag.attr( "event", JSON.stringify( response ) );
+
 					Util.disableTag( me.completedEventBtnTag, false );
 
 					// STEP 4. Unblock form
@@ -3144,7 +3014,6 @@ function Counsellor( storageObj, translationObj )
 					me.saveEventBtnTag.html( tranlatedText );
 					me.saveEventBtnTag.attr("status", "update");
 
-					
 					if( exeFunc !== undefined ) exeFunc( response );
 					
 					MsgManager.msgAreaShow( translateMsg, "SUCCESS" );
@@ -3184,9 +3053,35 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
+	me.getGPSCoordinates = function( exeFunc ) 
+	{
+		if (navigator.geolocation) {
+		    var location_timeout = setTimeout( 10000 );
+
+		    navigator.geolocation.getCurrentPosition(function(position) {
+		        clearTimeout(location_timeout);
+
+		        var lat = position.coords.latitude;
+		        var lng = position.coords.longitude;
+
+		        exeFunc( lat, lng );
+		    }, function(error) {
+		        clearTimeout(location_timeout);
+		        exeFunc( "", "" );
+		    });
+		} else {
+			 exeFunc( "", "" );
+		}
+		 
+	}
+
+	function showPosition(position) {
+	   
+	};
+		
 	me.completeEvent = function( exeFunc )
 	{
-		var event = JSON.parse( me.addClientFormTag.attr( "event" ) );
+		var event = JSON.parse( me.addClientFormTabTag.attr( "event" ) );
 		var eventId = event.event;
 		
 		
@@ -3215,38 +3110,17 @@ function Counsellor( storageObj, translationObj )
 			me.saveEventBtnTag.html( tranlatedText );
 			me.saveEventBtnTag.attr("status", "add");
 			
-			// Set [event] attribute for [This test] Tab
-			me.addClientFormTag.attr( "event", JSON.stringify( event ) );
-			me.addClientFormTabTag.attr( "latestEvent", JSON.stringify( event ) );
-
-			
-			// Set up Event creating logic
-			var artOpeningEvent = me.artReferOpenFormTag.attr("event");
-			if( artOpeningEvent !== undefined )
-			{
-				artOpeningEvent = JSON.parse( artOpeningEvent );
-			}
-			
-			var artClosureEvent = me.artReferCloseFormTag.attr("event");
-			if( artClosureEvent !== undefined )
-			{
-				artClosureEvent = JSON.parse( artClosureEvent );
-			}
-			
-			me.setUp_ContactLogAndARTRefTab( event, [] );
-					
-			me.setUp_EventCreatingLogic( event, artOpeningEvent, artClosureEvent );
-			
 			if( exeFunc !== undefined ) exeFunc();
+			
 			
 		} );
 	
 	};
 	
 	
-	// -------------------------------------------------------------------------------------------------
-	// Show/Hide modules
-	// -------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------
+	// Show / Hide forms
+	// -------------------------------------------------------------------
 	
 	me.showOrgUnitWarningMsg = function()
 	{
@@ -3301,15 +3175,6 @@ function Counsellor( storageObj, translationObj )
 		me.searchResultTag.show("fast");
 	};
 	
-	
-	// -------------------------------------------------------------------------------------------------
-	// Client details form TAB
-	// -------------------------------------------------------------------------------------------------
-	
-	
-	// -------------------------------------------------------------------------------------------------
-	// Add new [Client details] form TAB
-	
 	me.showAddClientForm = function()
 	{
 		me.storageObj.addItem("subPage", me.PAGE_SEARCH_ADD_CLIENT);
@@ -3319,10 +3184,11 @@ function Counsellor( storageObj, translationObj )
 		me.saveEventBtnTag.attr("status", "add" );
 		me.resetClientForm();
 		me.resetDataEntryForm();
-		me.setUp_ContactLogAndARTRefTab();
+		me.setUp_ContactLogTab();
+		me.setUp_ARTReferTab();
 		
 		// Init attribute fields
-		me.setUp_ClientRegistrationFormDataLogic();
+		me.init_AddClientFormLogicInit();
 		
 		
 		// Change the Header title && 'Save' buton display name
@@ -3363,129 +3229,83 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
-	
-	// -------------------------------------------------------------------------------------------------
-	// Update new [Client details] form TAB
-	
 	me.showUpdateClientForm = function( data, selectedEventId )
 	{
 		me.storageObj.addItem("subPage", me.PAGE_SEARCH_EDIT_CLIENT);
 
-		// STEP 1. Update the status of client ( "add"/ "update" )
+		// Update the status of client
 		me.saveClientBtnTag.attr("status", "update" );
 
-		// STEP 2. Reset te TAB
 		me.resetClientForm();
 		me.resetDataEntryForm();
 		me.searchResultTbTag.hide();
 		me.searchResultTag.hide();
 		me.searchClientFormTag.hide();
 		
-		
-		// ------------------------------------------------------------------------------------------------
-		// [Client Attribute] TAB
-		
-		// STEP 3. Set display name for 'Save' client registration buton 
+		// Set 'Save' buton display name
 		tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_btn_editClient" );
 		me.saveClientBtnTag.html( tranlatedText );
 			
-		// STEP 4. Populate Client Registration data		
-		me.populateClientAttrValues( data.client );	
+		// Populate Client data		
+		me.populateClientDataInForm( data.client );	
 		
-		// STEP 5. Init logic for attribute fields based on attribute values
-		me.setUp_ClientRegistrationFormDataLogic();
+		// Init attribute fields
+		me.init_AddClientFormLogicInit();
 		
-		// STEP 6. Create header for [Update client] form
+		// Create header for client form
 		me.generateAddClientFormHeader();
 		
-		
-		// ------------------------------------------------------------------------------------------------
-		// STEP 7. Get events
+		// Get activeHIVTestingEvent and completedHIVTestingEvents list
 		
 		var events = data.events.events;
 		var activeHIVTestingEvent;
-		var latestHIVTestingEvent;
-		var completedHIVTestingEvents = [];
-		
 		var contactLogEvents = [];
-		var artOpeningEvent;
-		var artClosureEvent;
+		var completedHIVTestingEvents = [];
 		
 		for( var i=0; i<events.length; i++ )
 		{
 			var event = events[i];
-			
-			// Get [HIV Testing] events
 			if( event.programStage == me.stage_HIVTesting )
 			{
 					
 				var dataValues = event.dataValues;
 				var eventId = event.event;
 				
-				// Get active event if any
-				if( event.status == "ACTIVE" ) // && activeHIVTestingEvent === undefined )
+				if( event.status == "ACTIVE" && activeHIVTestingEvent === undefined )
 				{
 					activeHIVTestingEvent = event;
 				}
-				// Get completed event list
 				else
 				{
 					completedHIVTestingEvents.push( event );
 				}
 			}
-			// Get [Contact Log] event
 			else if( event.programStage == me.stage_ContactLog )
 			{
 				contactLogEvents.push( event );
 			}
-			// Get [ART Refer. Opening] event
-			else if( event.programStage == me.stage_ARTReferralOpenning )
-			{
-				artOpeningEvent = event;
-			}
-			// Get [ART Refer. Closure] event
-			else if( event.programStage == stage_ARTReferralClosure )
-			{
-				artClosureEvent = event;
-			}
 		}
-
-		if ( activeHIVTestingEvent != undefined )
-		{
-			latestHIVTestingEvent = activeHIVTestingEvent;
-			me.addClientFormTag.attr( "event",  JSON.stringify( activeHIVTestingEvent ) );
-		}
-		else if( completedHIVTestingEvents.length > 0 ){
-			latestHIVTestingEvent = completedHIVTestingEvents[0];
-		}
-		
-		if( latestHIVTestingEvent != undefined ){
-			me.addClientFormTabTag.attr( "latestEvent", JSON.stringify( latestHIVTestingEvent ) );
-		}
-		
-		// ---------------------------------------------------------------------------------------
-		// Set up HIV Testing event data
-		
-		// STEP 8. Set up data in "Previous Test" tab
+			
+		// Set up data in "Previous Test" tab
 		me.setUp_DataInPreviousTestTab( completedHIVTestingEvents, selectedEventId );
 				
-		// STEP 9. Set up data in "This Test" tab
+		// Set up data in "This Test" tab
 		me.setUp_DataInThisTestTab( activeHIVTestingEvent );
 		
+		// Set up data in "Contact Log" tab
+		me.setUp_ContactLogTab();
+		
+		// Populate [Contact Log Event] data( history data )
+		me.populateContactLogEventListHistory( contactLogEvents );
+		
+		// Set up data in "ART" tab
+		me.setUp_ARTReferTab( activeHIVTestingEvent );
 		
 		// ---------------------------------------------------------------------------------------
-		// STEP 10. Set up data in "Contact Log" tab and "ART Refer" tab
-		
-		// Set up data in "Contact Log" tab and "ART Refer" tab
-		me.setUp_ContactLogAndARTRefTab( latestHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent );
-		
-		// Set up logic for creating events for stages
-		me.setUp_EventCreatingLogic( latestHIVTestingEvent, artOpeningEvent, artClosureEvent );
-		
+		// STEP 5. Show "This Test" / "Previous Test" tab if there is a "seleted event id"
 		// ---------------------------------------------------------------------------------------
-		// STEP 11. Show [This Test] / [Previous Test] tab if there is a "seleted event id"
 		
-		if( selectedEventId !== undefined )
+		if( selectedEventId !== undefined  )
 		{
 			if( activeHIVTestingEvent !== undefined && activeHIVTestingEvent.event == selectedEventId )
 			{
@@ -3503,14 +3323,14 @@ function Counsellor( storageObj, translationObj )
 		
 		
 		// ---------------------------------------------------------------------------------------
-		// STEP 12. Show form
+		// STEP 5. Show form
 		// ---------------------------------------------------------------------------------------
 				
 		me.addClientFormDivTag.show("fast");
 		
 	};
 	
-	me.populateClientAttrValues = function( client )
+	me.populateClientDataInForm = function( client )
 	{
 		me.addClientFormTabTag.attr( "client", JSON.stringify( client ) );
 		var clientDetails = client.attributes;
@@ -3548,116 +3368,31 @@ function Counsellor( storageObj, translationObj )
 	
 	// ---------------------------------------------------------------------------------------
 	// Setup "Contact Log" TAB
+	// ---------------------------------------------------------------------------------------
 	
-	me.setUp_ContactLogAndARTRefTab = function( latestHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent )
+	me.setUp_ContactLogTab = function( contactLogEvents )
 	{
-		// STEP 1. Show [Contact Log] if [Referrals Out - ART] is checked
-		
-		if( latestHIVTestingEvent !== undefined )
-		{
-		 	var artVal = me.getEventDataValue( latestHIVTestingEvent, me.de_ReferralsOutART );
-		 	if( latestHIVTestingEvent.status == "COMPLETED" && artVal == "true" )
-		 	{
-		 		me.addClientFormTabTag.find("a[href='#" + me.TAB_NAME_CONTACT_LOG + "']").closest("li").show();
-		 	}
-		 	else
-		 	{
-		 		me.hideTabInClientForm( me.TAB_NAME_CONTACT_LOG );
-				me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
-		 	}
-		}
-		else
-		{
-			me.hideTabInClientForm( me.TAB_NAME_CONTACT_LOG );
-			me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
-		}
-		
-	 	// STEP 2. Populate [Contact Log Event] data( history data )
-		me.populateContactLogEventListHistory( contactLogEvents );
-		
-		
-		// STEP 3. Set event data for [ART Refer. Opening] form
-		if( artOpeningEvent !== undefined )
-		{
-			me.artReferOpenFormTag.attr("event", artOpeningEvent );
-		}
-		
-		// STEP 4. Set event data for [ART Refer. Opening] form
-		if( artOpeningEvent !== undefined )
-		{
-			me.artReferCloseFormTag.attr("event", artClosureEvent );
-		}
-		
-	};
-	
-	me.getEventDataValue = function( event, deId )
-	{
-		var dataValues = event.dataValues;
-		var found = Util.findItemFromList( dataValues, "dataElement", deId );
-		return ( found !== undefined ) ? found.value : "";
-	}
-	
-	me.setUp_EventCreatingLogic = function( latestHIVTestingEvent, artOpeningEvent, artClosureEvent )
-	{
-	 	// STEP 1. Show [Contact Log Register] history if all mandatory fields are filled
-	 	var showContactLogRegDetails = true;
-	 	var consentToContactVal = me.getEventDataValue( latestHIVTestingEvent, me.attr_ConsentToContact );
-	 	var consentToVisit = me.getEventDataValue( latestHIVTestingEvent, me.attr_ConsentToVisit );
-	 	showContactLogRegDetails = ( consentToContactVal != "" && consentToVisit != "" );
-	 	
-	 	/* me.contactLogFormTag.find("input[mandatory='true'],select[mandatory='true']").each(function(){
-	 		if( $(this).val() == "" ){
-	 			showContactLogRegDetails = false;
-	 		}
-	 	}); */
-	 	
-	 	if( showContactLogRegDetails ) {
-	 		me.showAttrContactLogHistory();
- 		}
-	 	else {
-	 		me.hideAttrContactLogHistory();
-	 	}
-	 	
-
-		// STEP 2. If [latestHIVTestingEvent] is COMPLETED, and showContactLogRegDetails is true
-	 	//  --> [ART Refer Opening] event can be created --> Show [ART Refer] TAB
-		if( latestHIVTestingEvent.status == "COMPLETED" && showContactLogRegDetails )
-		{
-			me.addClientFormTabTag.find("a[href='#" + me.TAB_NAME_ART_REFER + "']").closest("li").show();
+	 	var artTag = me.getDataElementField( me.de_ReferralsOutART );
+	 	if( artTag.prop("checked") )
+	 	{
+	 		me.addClientFormTabTag.find("a[href='#" + me.TAB_NAME_CONTACT_LOG + "']").closest("li").show();
 	 	}
 	 	else
 	 	{
-	 		me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
-	 	}
-		
-		
-	 	// STEP 3. If there is any artOpeningEvent,
-		if( artOpeningEvent !== undefined ) 
-		{
-	 		// STEP 3.1. Hide [This Test] TAB ( not allow to create more [HIV Testing] event )
-		 	me.hideTabInClientForm( me.TAB_NAME_THIS_TEST );
-		 	
-		 	// STEP 3.2. NOT allow to enter any [Contact Log] event If there is any artClosureEvent
-		 	if( artClosureEvent !== undefined )
-		 	{
-		 		me.addContactLogEventFormTag.hide();
-	 		}
-		 	// STEP 3.3. Allow to create a [Contact Log] event
-		 	else
-		 	{
-		 		me.addContactLogEventFormTag.show();
-		 	}	 		
-	 	}
-	 	else 
-	 	{
-	 		// STEP 3.2. Show [This Test] TAB ( not allow to create more [HIV Testing] event )
-	 		me.addClientFormTabTag.find("a[href='#" + me.TAB_NAME_THIS_TEST + "']").closest("li").show();
-	 		
-	 		// STEP 3.1. NOT Allow to create a [Contact Log] event
-	 		me.addContactLogEventFormTag.hide();
+	 		me.addClientFormTabTag.find("a[href='#" + me.TAB_NAME_CONTACT_LOG + "']").closest("li").hide();
+			me.addClientFormTabTag.find('#' + me.TAB_NAME_CONTACT_LOG ).hide();
 	 	}
 
-	}
+	 	var contactPhoneNumberTag = me.getAttributeField( me.attr_ContactPhoneNumber );
+	 	if( contactPhoneNumberTag.val() != "" )
+ 		{
+	 		me.showAttrContactLogHistory();
+ 		}
+	 	else
+	 	{
+	 		me.hideAttrContactLogHistory();
+	 	}
+	};
 	
 	me.showAttrContactLogHistory = function()
 	{
@@ -3725,10 +3460,7 @@ function Counsellor( storageObj, translationObj )
 	 
 	me.populateContactLogEventHistory = function( eventJson )
 	{
-		var eventDate = "";
-		if( eventJson.eventDate !== undefined ){
-			Util.formatDate_DisplayDate( eventJson.eventDate );
-		}
+		var eventDate = Util.formatDate_DisplayDate( eventJson.eventDate );
 		var typeOfContact = "";
 		var outcome = "";
 		var comments = "";
@@ -3976,7 +3708,7 @@ function Counsellor( storageObj, translationObj )
 		me.setUp_IfDataEntryFormEditable( activeEvent );
 
 		// Set data values based on client attribute values
-		me.setUp_InitDataValues();
+		me.initDataValues();
 		
 		Util.disableTag( me.getDataElementField( me.de_Age ), true );
 		Util.disableTag( me.getDataElementField( me.de_BMI ), true );

@@ -206,7 +206,7 @@ public class EventController
 
         try
         {
-            String startDate = "1900-01-01";
+            String startDate = Util.getXLastMonth( 12 );
             String endDate = Util.getCurrentDate();
 
             String requestUrl = EventController.URL_QUERY_CASES_BY_TIME;
