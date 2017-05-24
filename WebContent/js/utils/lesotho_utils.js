@@ -30,11 +30,19 @@ Util.disableTag = function( tag, isDisable )
 	}
 };
 
+Util.disableForm = function( tag, isDisable )
+{
+	var inputTags = tag.find("input,select,button");
+	inputTags.each( function(){
+		Util.disableTag( $(this), isDisable);
+	});
+}
+
 
 Util.resetForm = function( formTag )
 {
-	formTag("input[type=text],select").val("");
-	formTag("input[type=checkbox]").prop( "checked", false );
+	formTag.find("input[type=text],select,textarea").val("");
+	formTag.find("input[type=checkbox]").prop( "checked", false );
 };
 
 

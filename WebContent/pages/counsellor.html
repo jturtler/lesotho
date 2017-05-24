@@ -258,38 +258,57 @@
 				  		
 	  					<div id="clientAttributeDiv">
 	  						<form class="form-horizontal" id="addClientForm" >
-	  							<table class="table table-hover table-striped previousTestTb"></table>
+	  							<table class="table table-hover table-striped previousTestTb">
+	  								
+	  								<!--  Action bar -->
+	  								<tbody>
+	  									<tr>
+											<th style="width:20px;">
+												<button id="discardClientRegFormBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
+											</th>
+											<th colspan="2">
+												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+											</th>
+											<th style="width:20px;">
+												<button id="saveClientRegBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+											</th>						
+										</tr>
+									</tbody>
+	  							</table>
 	  						</form>
 	  						
-	 						<div class="form-group" style="text-align:center;">
-								<button class="btn btn-default actionBtn" id="saveClientBtn">Save</button>
-								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-								<button class="btn btn-default actionBtn" name="backToCaseListBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-							</div>
-						
 						</div>
 	  
 					   	<div id="previousTestDiv">
 					   		<div id="previousTests">
 					   			<table class='table table-hover table-striped previousTestTb'></table>
 					   		</div>
-					   		<div class="form-group" style="text-align:center;">
-								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-								<button class="btn btn-default actionBtn" name="backToCaseListBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-							</div>
 					   	</div>
 	 
 				      	<div id="thisTestDiv">
 				  			<form class="form-horizontal"" id="addEventForm">
-				  				<table class='table table-hover table-striped previousTestTb'></table>
+				  				<table class='table table-hover table-striped previousTestTb'>
+				  				
+	  								<!--  Action bar -->
+	  								<tbody>
+	  									<tr>
+											<th style="width:20px;">
+												<button id="discardClientRegFormBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
+											</th>
+											<th colspan="2">
+												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+											</th>
+											<th style="width:90px;">
+												<button id="saveEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+												<span style="color:#d6d2d2;"> | </span>
+												<button id="completedEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-saved"></span></button>
+											</th>						
+										</tr>
+									</tbody>
+				  				</table>
 				  			</form>
-				  			
-	 						<div class="form-group" style="text-align:center;">
-								<button class="btn btn-default actionBtn" id="saveEventBtn">Save</button>
-								<button class="btn btn-default actionBtn" id="completedEventBtn" keyword="dataEntryForm_tab_thisTest_btn_complete">Complete</button>
-								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-								<button class="btn btn-default actionBtn" name="backToCaseListBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-							</div>
 							
 				  		</div>
 					
@@ -297,6 +316,7 @@
 							<div class="panel panel-default">
 								<form class="form-horizontal" id="contactLogForm" >
 									<table class="table table-hover table-striped previousTestTb">
+										
 										<tr>
 											<th style="width:20px;">
 												<button id="discardContactLogBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
@@ -359,7 +379,7 @@
 											<!--  Action buttons -->
 											<tr>
 												<th style="width:20px;">
-													<span id="discardContactLogEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span>
+													<button id="" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span></button>
 												</th>
 												<th colspan="4">
 													<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
@@ -390,47 +410,59 @@
 							</table>
 							
 							
-							<form class="form-horizontal" id="artReferOpenForm" >
-								<table class='table table-hover table-striped previousTestTb'>
-									
-									<!--  Action buttons -->
-									<tr>
-										<th style="width:20px;">
-											<button id="discardARTOpenEventBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
-										</th>
-										<th colspan="2">
-											<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
-											<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
-										</th>
-										<th style="width:20px;">
-											<span id="saveARTOpenEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span>
-										</th>						
-									</tr>
-								</table>
-							</form>
+							<div class="panel panel-default" id="artReferOpenForm">
+								<form class="form-horizontal">
+									<table class='table table-hover table-striped previousTestTb'>
+																			
+										<!--  Action buttons -->
+										<tr>
+											<th style="width:20px;">
+												<button id="discardARTOpenEventBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
+											</th>
+											<th colspan="2">
+												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+											</th>
+											<th style="width:20px;">
+												<button id="saveARTOpenEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+											</th>						
+										</tr>
+									</table>
+								</form>
+							</div>
 							
-							<form class="form-horizontal" id="artReferCloseForm" >
-								<table class='table table-hover table-striped previousTestTb'>
-								
-									<!--  Action buttons -->
-									<tr>
-										<th style="width:20px;">
-											<span id="discardARTCloseEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span>
-										</th>
-										<th colspan="2">
-											<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
-											<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
-										</th>
-										<th style="width:20px;">
-											<span id="saveARTCloseEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span>
-										</th>						
-									</tr>
-								</table>
-							</form>
+							<div class="panel panel-default" id="artReferCloseForm">
+								<form class="form-horizontal" >
+									<table class='table table-hover table-striped previousTestTb'>
+									
+										<!--  Action buttons -->
+										<tr>
+											<th style="width:20px;">
+												<button id="discardARTCloseEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span></button>
+											</th>
+											<th colspan="2">
+												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+											</th>
+											<th style="width:20px;">
+												<button id="saveARTCloseEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+											</th>						
+										</tr>
+									</table>
+								</form>
+							</div>
+							
 						</div>
+						  
 						  						
 					</div>	
 					
+					<div class="form-group" style="text-align:center;">
+						<br>
+						<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
+						<button class="btn btn-default actionBtn" name="backToCaseListBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
+					</div>
+						
 		  		</div>	
 				
 				<!-- END Search and Create Client  -->
