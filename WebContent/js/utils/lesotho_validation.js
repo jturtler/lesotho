@@ -50,6 +50,7 @@ function Validation( translationObj )
 			me.performValidationCheck( tag, 'minvalue', divTag );
 			me.performValidationCheck( tag, 'number', divTag );
 			me.performValidationCheck( tag, 'letter', divTag );
+			me.performValidationCheck( tag, 'phonenumber', divTag );
 		}
 
 		var valid = ( tag.attr( 'valid' ) == 'true' );
@@ -81,7 +82,7 @@ function Validation( translationObj )
 			else if ( type == 'integerZeroPositive' ) valid = me.checkValueIntegerZeroOrPositive( tag, divTag );
 			else if ( type == 'integerNegative' ) valid = me.checkValueIntegerNegative( tag, divTag );
 			else if ( type == 'letter' ) valid = me.checkValueLetter( tag, divTag );
-			else if ( type == 'phoneNumValidate' ) valid = me.checkPhoneNumberValue( tag, divTag );
+			else if ( type == 'phonenumber' ) valid = me.checkPhoneNumberValue( tag, divTag );
 			
 			if ( !valid ) tag.attr( 'valid', false );
 		}		
@@ -242,7 +243,7 @@ function Validation( translationObj )
 		// Check if Phone number is in [ 12, 15 ]
 		inputTag.attr( 'altval', '' );
 
-		var validationInfo = Commons.phoneNumberValidation( inputTag.val() );		
+		var validationInfo = me.phoneNumberValidation( inputTag.val() );		
 		if ( !validationInfo.success ) 
 		{
 			divTag.append( me.getErrorSpanTag( validationInfo.msg ) );
@@ -256,6 +257,59 @@ function Validation( translationObj )
 		
 		return valid;
 	};
+	
+	
+
+	me.phoneNumberValidation = function( phoneVal )
+	{
+		var success = ( phoneVal == "" ) ? true : false;
+		if( success ) {
+			return { 'success': success, 'phoneNumber': phoneVal, 'msg': '' };
+		}
+		var msg = '';
+
+
+		// Trim value
+		var value = Util.trim( phoneVal );
+
+		// Starts with '0'
+		if ( Util.startsWith( value, "0" ) )
+		{
+			if ( !( value.length >= 12 && value.length <= 15 ) )
+			{
+				msg += 'common_validation_phoneNumberLengthFor0';
+			}
+			else if( Util.isNumberDigit(value) )
+			{
+				success = true;
+			}
+			else
+			{
+				msg += 'common_validation_phoneNumberAcceptPlusLetterAndNumberOnly';
+			}
+		}
+		else if ( Util.startsWith( value, "+" ) )
+		{
+			if ( value.length != 11 )
+			{
+				msg += 'common_validation_phoneNumberLengthForLocal';
+			}
+			else if( Util.isNumberDigit(value.replace("+","")) )
+			{
+				success = true;
+			}
+			else{
+				msg += 'common_validation_phoneNumberAcceptPlusLetterAndNumberOnly';
+			}
+		}
+		else
+		{
+			msg += "common_validation_phoneNumberStartWith";
+		}
+
+		
+		return { 'success': success, 'phoneNumber': value, 'msg': msg };	
+	}
 	
 	// -----------------------------
 	// -- Others

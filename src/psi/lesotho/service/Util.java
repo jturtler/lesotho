@@ -52,8 +52,8 @@ public final class Util
     public static String PAMAM_DISTRICT_ID = "districtId";
     
     
-    public static String ACCESS_SERVER_USERNAME = "tranc";
-    public static String ACCESS_SERVER_PASSWORD = "Tran@10121984";
+    public static String ACCESS_SERVER_USERNAME = "lesotho_superuser";
+    public static String ACCESS_SERVER_PASSWORD = "ABCD1234";
     
     
     public static final String ROOT_ORGTUNIT = "FvUGp8I75zV";    

@@ -562,7 +562,7 @@ table.tablesorter thead tr .headerSortDown {
 /*        Previous Test Table     */
 /*-------------------------------*/
 
-.previousTestTb>tbody::after
+.separateTb::after
 {
 	content: '';
 	display: block;
@@ -576,8 +576,9 @@ table.tablesorter thead tr .headerSortDown {
 
 .previousTestTb th
 {
-	background-color:#cfe2f3;
+	background-color:#d1e2f3;
     border: 1px solid #d6d2d2;
+    vertical-align: middle !IMPORTANT;
 }
 
 .previousTestTb td
@@ -590,6 +591,18 @@ table.tablesorter thead tr .headerSortDown {
 {
     float: right;
 }
+
+
+tr.actionBar th
+{
+	background-color: #afc3d8 !IMPORTANT;
+}
+
+.activeBar th
+{
+	background-color: #ffe599;
+}
+
 
 .errorMsg
 {
@@ -604,29 +617,11 @@ table.tablesorter thead tr .headerSortDown {
 }
 
 .imgBtn {
-    background-color: #cfe2f3 !IMPORTANT;
+    background-color: #afc3d8 !IMPORTANT;
     border: 1px solid transparent;
+    font-size: 20px !IMPORTANT;
 }
 
-/*-------------------------------*/
-/*            Action Bar         */
-/*-------------------------------*/
-
-.actionbar th
-{
-	background-color: #cfe2f3;
-	border: 1px solid #d6d2d2;
-}
-
-.activeBar tr
-{
-	border: 1px solid #d6d2d2;	
-}
-
-.activeBar th
-{
-	background-color: #ffe599;
-}
 
 
 /*-------------------------------*/

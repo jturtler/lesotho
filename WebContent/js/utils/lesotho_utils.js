@@ -16,15 +16,15 @@ Util.disableTag = function( tag, isDisable )
 	for( var i=0; i<tag.length; i++ )
 	{
 		var element = $(tag[i]);
-		if( element.prop( "tagName" ) == 'SELECT' || element.prop( "tagName" ) == 'INPUT' )
+		if( element.prop( "tagName" ) == 'SELECT' || element.prop( "tagName" ) == 'INPUT' || element.prop( "tagName" ) == 'BUTTON' )
 		{
 			if( isDisable )
 			{
-				element.css( 'background-color', '#FAFAFA' ).css( 'cursor', 'auto' ).css( 'color', '#444' );
+				element.css( 'background-color', '#FAFAFA' ).css( 'cursor', 'auto' ).css( 'color', 'gray' );
 			}
 			else
 			{
-				element.css( 'background-color', 'white' ).css( 'cursor', '' );
+				element.css( 'background-color', 'white' ).css( 'cursor', '' ).css( 'color', '' );;
 			}
 		}
 	}
@@ -41,8 +41,9 @@ Util.disableForm = function( tag, isDisable )
 
 Util.resetForm = function( formTag )
 {
-	formTag.find("input[type=text],select,textarea").val("");
-	formTag.find("input[type=checkbox]").prop( "checked", false );
+	formTag.find("input[type='text']:enabled,select:enabled,textarea").val("");
+	formTag.find("input[type='checkbox']").prop("checked", false);
+	formTag.find( "span.errorMsg" ).remove();
 };
 
 
@@ -84,6 +85,20 @@ Util.RemoveFromArray = function( list, propertyName, value )
 	return index;
 }
 
+Util.trim = function( input )
+{
+	return input.replace( /^\s+|\s+$/gm, '' );
+};
+
+Util.isNumberDigit = function( input )
+{
+	return /^\d+$/.test( input );
+};
+
+Util.startsWith = function( fullVal, val )
+{
+	return ( fullVal.indexOf( val ) == 0 );
+};
 
 //-------------------------------------------------------------------
 // URL Utils
@@ -289,7 +304,7 @@ Util.convertLocalTimeToUTM = function( localDate )
     return newDate;
 }  
 
-Util.getTimeElapsed = function( date1, date2 )
+Util.getDaysTimeElapsed = function( date1, date2 )
 {
 	var diff = date2.valueOf() - date1.valueOf();
 	var diffInHours = Math.floor( diff/1000/60/60 ); // Convert milliseconds to hours
@@ -301,6 +316,19 @@ Util.getTimeElapsed = function( date1, date2 )
 	noHours = ( noHours < 10 ) ? "0" + noHours : noHours;
 	
 	return noDays + "d " + noHours + "h";
+};
+
+Util.getTimeElapsed = function( date1, date2 )
+{
+	var diff = date2.valueOf() - date1.valueOf();
+	
+	var noHours = Math.floor( diff/1000/60/60 ); // Convert milliseconds to hours
+	var noSeconds = Math.floor( ( diff - ( noHours * 1000*60*60 ))/1000/60 );
+	
+	noHours = ( noHours < 10 ) ? "0" + noHours : noHours;
+	noSeconds = ( noSeconds < 10 ) ? "0" + noSeconds : noSeconds;
+	
+	return noHours + ":" + noSeconds;
 };
 
 Util.datePicker = function( dateTag, dateFormat )
