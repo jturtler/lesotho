@@ -352,7 +352,23 @@ Util.datePicker = function( dateTag, dateFormat )
 		showOn: 'both',
 		createButton: false,
 		constrainInput: true,
+		yearRange: "-100:+0",
         maxDate: new Date()
+	});
+		  
+};
+
+
+Util.dateFuturePicker = function( dateTag, dateFormat )
+{
+	dateTag.datepicker({
+		dateFormat: dateFormat,
+		changeMonth: true,
+		changeYear: true,
+		showOn: 'both',
+		createButton: false,
+		constrainInput: true,
+		yearRange: "-100:+100"
 	});
 		  
 };

@@ -2254,7 +2254,16 @@ function Counsellor( storageObj, translationObj )
 				rowTag.append( inputColTag );
 				
 				// Add "DATE" picker for "Date" field
-				Util.datePicker( rowTag.find("input[isDate='true']"), me.dateFormat );
+				if( de == me.de_DueDate )
+				{
+					Util.dateFuturePicker( rowTag.find("input[isDate='true']"), me.dateFormat );
+				}
+				else
+				{
+					Util.datePicker( rowTag.find("input[isDate='true']"), me.dateFormat );
+				}
+				
+				
 				
 				tbody.append( rowTag );
 				
@@ -4104,43 +4113,37 @@ function Counsellor( storageObj, translationObj )
 		me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
 		
 		if( eventData != undefined )
-		{	
-			// STEP 0. Show [ART Refer] Tab
-			me.showTabInClientForm( me.TAB_NAME_ART_REFER );
-			
-			if( eventData != undefined )
+		{
+			// STEP 1. Check IF Final status is positive 
+			// 		AND results are received 
+			//		AND Referral to ART is given, apply the logic the [Contact Log] and [ART Refer] Tabs
+			// ( create ART referral opening event,
+			//	 move to contact log tab to force user to complete data points 
+			// 	 and move to ART referral tab )
+			var artValue = me.getEventDataValue( eventData, me.de_ReferralGiven_ART );
+			var finalHIVTestValue = me.getEventDataValue( eventData, me.de_FinalResult_HIVStatus );
+			var testResultGivenValue = me.getEventDataValue( eventData, me.de_TestResultsGiven );
+
+			if( finalHIVTestValue == "Positive" && artValue == "true" && testResultGivenValue == "true" )
 			{
-				// STEP 1. Check IF Final status is positive 
-				// 		AND results are received 
-				//		AND Referral to ART is given, apply the logic the [Contact Log] and [ART Refer] Tabs
-				// ( create ART referral opening event,
-				//	 move to contact log tab to force user to complete data points 
-				// 	 and move to ART referral tab )
-				var artValue = me.getEventDataValue( eventData, me.de_ReferralGiven_ART );
-				var finalHIVTestValue = me.getEventDataValue( eventData, me.de_FinalResult_HIVStatus );
-				var testResultGivenValue = me.getEventDataValue( eventData, me.de_TestResultsGiven );
-	
-				if( finalHIVTestValue == "Positive" && artValue == "true" && testResultGivenValue == "true" )
-				{
-					// STEP 2. Force user to enter data for [Contact Log] attribute values
-					me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
-					
-					// STEP 3. Show [ART Opening] tab
-					me.showOpeningTag = true;
-				}
+				// STEP 2. Force user to enter data for [Contact Log] attribute values
+				me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+				
+				// STEP 3. Show [ART Opening] tab
+				me.showOpeningTag = true;
 			}
-			
-			// Show [ART Closure] form only when there is one [ART Opening] event
-			if( me.artReferOpenFormTag.attr("event") != undefined )
-			{
-				me.artReferCloseFormTag.show();
-				Util.disableForm( me.artReferOpenFormTag, true );
-			}
-			else
-			{
-				Util.disableForm( me.artReferOpenFormTag, false );
-				me.artReferCloseFormTag.hide();
-			}
+		}
+		
+		// Show [ART Closure] form only when there is one [ART Opening] event
+		if( me.artReferOpenFormTag.attr("event") != undefined )
+		{
+			me.artReferCloseFormTag.show();
+			Util.disableForm( me.artReferOpenFormTag, true );
+		}
+		else
+		{
+			Util.disableForm( me.artReferOpenFormTag, false );
+			me.artReferCloseFormTag.hide();
 		}
 	};
 	
