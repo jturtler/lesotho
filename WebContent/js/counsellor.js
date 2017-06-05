@@ -4128,6 +4128,7 @@ function Counsellor( storageObj, translationObj )
 			{
 				// STEP 2. Force user to enter data for [Contact Log] attribute values
 				me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+				me.showTabInClientForm( me.TAB_NAME_ART_REFER );
 				
 				// STEP 3. Show [ART Opening] tab
 				me.showOpeningTag = true;
