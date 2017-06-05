@@ -100,8 +100,14 @@ function Counsellor( storageObj, translationObj )
 	me.contactLogEventFormTag = $("#contactLogEventForm");
 	me.contactLogEventHistoryTbTag = $("#contactLogEventHistoryTb");
 	
+	
 
 	// [ART Refer. Open] Data entry form
+	
+	
+	me.linkageStatusLableTag = $("#linkageStatus");
+	
+	
 	me.artReferOpenFormTag = $("#artReferOpenForm");
 	me.discardARTOpenEventBtnTag = $("#discardARTOpenEventBtn");
 	me.saveARTOpenEventBtnTag = $("#saveARTOpenEventBtn");
@@ -113,8 +119,6 @@ function Counsellor( storageObj, translationObj )
 	me.saveARTCloseEventBtnTag = $("#saveARTCloseEventBtn");
 	me.artEventInfoTbTag = $("#artEventInfoTb");
 	me.artAttributeFormTag = $("#artAttributeForm");
-	me.discardARTAttributeBtnTag = $("#discardARTAttributeBtn");
-	me.saveARTAttributeBtnTag = $("#saveARTAttributeBtn");
 	
 	
 	// [This Test] form
@@ -211,6 +215,10 @@ function Counsellor( storageObj, translationObj )
 	me.attr_KinName = "Kn6E1pGJzFR";
 	me.attr_KinRelation = "zZRKJdqskbC";
 	me.attr_NextKinPhoneNumber = "HtQU1Bfhc9m";
+	
+	
+	me.attr_LinkageStatus = "mYdfuRItatP";
+	me.de_ARTClosureLinkageOutcome  = "nOK8JcDWT9X";
 	
 	
 	
@@ -935,32 +943,6 @@ function Counsellor( storageObj, translationObj )
 		
 		me.setUp_validationCheck( me.contactLogFormTag.find( 'input,select,textarea' ) );
 		
-
-		// -----------------------------------------------------------------------------------------
-		// [ART Refer Attribute Form] button events
-		
-		me.discardARTAttributeBtnTag.click(function(){
-			var translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_contactLogForm_discardChanges" );
-			var result = confirm( translatedText );			
-			if( result )
-			{
-				Util.resetForm( me.artAttributeFormTag );
-				var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
-				me.populateClientAttrValues( me.artAttributeFormTag, jsonClient );				
-
-				translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_contactLogForm_changesDiscarded" );
-				MsgManager.msgAreaShow( translatedText, "SUCCESS" );
-			}
-			
-			return false;
-		});
-		
-		me.saveARTAttributeBtnTag.click( function(){
-			me.saveClient( me.artAttributeFormTag );
-			
-			return false;
-		});
-		
 		
 		// -----------------------------------------------------------------------------------------
 		// [ART Refer Open] button events
@@ -1016,20 +998,25 @@ function Counsellor( storageObj, translationObj )
 			
 			me.execSaveEvent( jsonEvent, jsonClient.trackedEntityInstance, eventId, function( response ){
 				
-				// Set [event] attribute for [ART Refer Opening] Tab
-				me.artReferOpenFormTag.attr( "event", JSON.stringify( response ) );
+				me.setAndSaveARTLinkageStatusAttrValue( function(){
+					// Set [event] attribute for [ART Refer Opening] Tab
+					me.artReferOpenFormTag.attr( "event", JSON.stringify( response ) );
+					
+					// Generate [Time Elapsed] attribute value for [ART Closure] form
+					me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( "00:00" );
+					
+					var artClosureEvent = me.artReferCloseFormTag.attr("event");
+					if( artClosureEvent !== undefined )
+					{
+						artClosureEvent = JSON.parse( artClosureEvent );
+					}
+					me.populateTimeElapsed( response, artClosureEvent );
+					
+					me.artReferCloseFormTag.show();
+					
+					Util.disableForm( me.artReferOpenFormTag, true );
+				});
 				
-				// Generate [Time Elapsed] attribute value for [ART Closure] form
-				me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( "00:00" );
-				
-				var artClosureEvent = me.artReferCloseFormTag.attr("event");
-				if( artClosureEvent !== undefined )
-				{
-					artClosureEvent = JSON.parse( artClosureEvent );
-				}
-				me.populateTimeElapsed( response, artClosureEvent );
-				
-				me.artReferCloseFormTag.show();
 			});
 		
 
@@ -1085,9 +1072,10 @@ function Counsellor( storageObj, translationObj )
 			}
 			
 			me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
-				Util.disableForm( me.thisTestDivTag, true );
-				
-				me.showTabInClientForm( me.TAB_NAME_ART_REFER );
+				me.setAndSaveARTLinkageStatusAttrValue( function(){
+					Util.disableForm( me.thisTestDivTag, true );				
+					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
+				});
 			} );
 			
 			return false;
@@ -1384,8 +1372,6 @@ function Counsellor( storageObj, translationObj )
 		var resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
 		var testResultsGivenTag = me.getDataElementField( me.de_TestResultsGiven );
 		var previousKnowledgeHIVPositiveStatusTag = me.getDataElementField( me.de_PreviousKnowledgeHIVPositiveStatus );
-		var referralGivenPRePNegativeTag = me.getDataElementField( me.de_ReferralGivenPRePNegative );
-		var referralOfferedTag = me.getDataElementField( me.de_Referral_Offered );
 		
 		// Reset field [Previous knowledge of HIV+ status]
 		me.setHideLogicTag( previousKnowledgeHIVPositiveStatusTag.closest("tr"), true );
@@ -1393,14 +1379,6 @@ function Counsellor( storageObj, translationObj )
 		
 		// Reset field [testResultsGivenTag]
 		Util.disableTag( testResultsGivenTag, false );	
-		
-		// Reset [Referrals Out - PReP (HIV-)]
-		me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), true );
-		
-		// Reset [Referrals Out - ART]
-		me.setHideLogicTag( referralOfferedTag.closest("tr"), true );
-		me.removeMandatoryForField( referralOfferedTag );
-		
 		
 		if( resultFinalHIVStatusTag.val() === "Indeterminate" )
 		{
@@ -1415,24 +1393,8 @@ function Counsellor( storageObj, translationObj )
 				// Add mandatory for [Previous knowledge of HIV+ status]
 				me.addMandatoryForField( previousKnowledgeHIVPositiveStatusTag );
 				me.setHideLogicTag( previousKnowledgeHIVPositiveStatusTag.closest("tr"), false );
-				
-				// Show [Referrals Out - Referral(s) offered]
-				me.setHideLogicTag( referralOfferedTag.closest("tr"), false );
-				me.addMandatoryForField( referralOfferedTag );
-			}
-			else
-			{
-				referralOfferedTag.val("");
 			}
 			
-		}
-		else if( resultFinalHIVStatusTag.val() === "Negative" )
-		{
-//			if( referralOfferedTag.val() == "true" )
-//			{
-				// Hide [Referrals Out - PReP (HIV-)]
-				me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), false );
-//			}
 		}
 		
 	};
@@ -1446,6 +1408,10 @@ function Counsellor( storageObj, translationObj )
 		var referralGivenFPTag = me.getDataElementField( me.de_ReferralGiven_FP );
 		var referralGivenVMMCTag = me.getDataElementField( me.de_ReferralGiven_VMMC );
 		var referralGivenARTTag = me.getDataElementField( me.de_ReferralGiven_ART );
+		var referralGivenPRePNegativeTag = me.getDataElementField( me.de_ReferralGivenPRePNegative );
+		
+		var resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
+		var genderTag = me.getAttributeField( me.attr_Sex );
 		
 		// Hidden all [Referral Given xxx]
 		me.setHideLogicTag( referralGivenSTITag.closest("tr"), true );
@@ -1453,25 +1419,33 @@ function Counsellor( storageObj, translationObj )
 		me.setHideLogicTag( referralGivenFPTag.closest("tr"), true );
 		me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), true );
 		me.setHideLogicTag( referralGivenARTTag.closest("tr"), true );
+		me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), true );
 		
 		
 		if( referralOfferedTag.val() == "true" )
 		{
 
-			me.setHideLogicTag( referralGivenSTITag.closest("tr"), false );
-			me.setHideLogicTag( referralGivenTBTag.closest("tr"), false );
-			me.setHideLogicTag( referralGivenFPTag.closest("tr"), false );
-			me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), false );
-			
-			if( testResultsGivenTag.val() == "true" )
+			if( resultFinalHIVStatusTag.val() == "Positive" )
 			{
-				me.setHideLogicTag( referralGivenARTTag.closest("tr"), false );
+				me.setHideLogicTag( referralGivenSTITag.closest("tr"), false );
+				me.setHideLogicTag( referralGivenTBTag.closest("tr"), false );
+				me.setHideLogicTag( referralGivenFPTag.closest("tr"), false );
+				
+				if( testResultsGivenTag.val() == "true" )
+				{
+					me.setHideLogicTag( referralGivenARTTag.closest("tr"), false );
+				}
 			}
 			else
 			{
-				me.setHideLogicTag( referralGivenARTTag.closest("tr"), true );
-				referralGivenARTTag.prop("checked", false);
+				me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), false );
 			}
+			
+			if( genderTag.val() == "Male" )
+			{
+				me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), false );
+			}
+			
 		}
 		else
 		{
@@ -2326,7 +2300,14 @@ function Counsellor( storageObj, translationObj )
 		me.contactLogFormTag.find("tbody[historyGroupId]").hide();
 		me.contactLogFormTag.find("tbody[historyGroupId]").find("td.historyInfo").html("");
 		me.contactLogFormTag.find("tbody[groupId]").show();
+		me.contactLogFormTag.find("tbody:last").show();
+		
+		
+		me.nextContactLogActionTbTag.hide();
 		me.contactLogEventFormTag.find("tbody:last").show();
+		me.contactLogEventHistoryTbTag.html("");
+		
+		
 		
 		// -- [Contact Log] event form
 		me.contactLogEventFormTag.find("input[type='text'],select").val("");
@@ -2854,7 +2835,7 @@ function Counsellor( storageObj, translationObj )
 				var cuic = event[4];
 				var ouName = event[6];
 				var artVal = event[7];
-				artVal = ( artVal !== "" ) ? "[None]" : artVal;
+				artVal = ( artVal == "" ) ? "[None]" : artVal;
 				var ouName = event[6];
 				var numberOfTest = event[7];
 				
@@ -2872,7 +2853,7 @@ function Counsellor( storageObj, translationObj )
 				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
 				rowTag.append( "<td>" + cuic + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
-				rowTag.append( "<td>" + deARTVal + "</td>" );
+				rowTag.append( "<td>" + artVal + "</td>" );
 				rowTag.append( "<td>??</td>" );
 
 				me.addEventForRowInList(rowTag);
@@ -3233,8 +3214,12 @@ function Counsellor( storageObj, translationObj )
 							,data: JSON.stringify( me.getClientJsonData( formTag ) )
 				            ,contentType: "application/json;charset=utf-8"
 			            	,beforeSend: function( xhr ) {
-				        		var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingClient" );
-								MsgManager.appBlock( tranlatedText + " ..." );
+			            		if( showSuccessMsg )
+		            			{
+			            			var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingClient" );
+									MsgManager.appBlock( tranlatedText + " ..." );
+		            			}
+				        		
 				            }
 							,success: function( response ) 
 							{
@@ -3375,6 +3360,41 @@ function Counsellor( storageObj, translationObj )
 		}, undefined, false );
 	};
 	
+	me.setAndSaveARTLinkageStatusAttrValue = function( exeFunc )
+	{
+		me.setARTLinkageStatusAttrValue();
+		
+		me.saveClient( me.artAttributeFormTag, function(){
+			var linkageStatusFieldTag = me.getAttributeField( me.attr_LinkageStatus );
+			me.linkageStatusLableTag.html( linkageStatusFieldTag.find("option:selected").text() );
+			if( exeFunc != undefined ) exeFunc();
+		}, undefined, true );
+	};
+	
+	me.setARTLinkageStatusAttrValue = function()
+	{
+		var artOpeningEvent = me.artReferOpenFormTag.attr("event");
+		var artClosureEvent = me.artReferCloseFormTag.attr("event");
+		
+
+		var linkageStatusFieldTag = me.getAttributeField( me.attr_LinkageStatus );
+		
+		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		
+		if( artOpeningEvent != undefined && artClosureEvent == undefined )
+		{
+			linkageStatusFieldTag.val( "PENDING" );
+		}
+		else if( artClosureEvent != undefined )
+		{
+			linkageStatusFieldTag.val( closureLinkageOutcomeTag.val() );
+		}
+		
+		var value = linkageStatusFieldTag.find("option:selected").val();
+		value = ( value != "" ) ? linkageStatusFieldTag.find("option:selected").text() : "[none]";
+		me.linkageStatusLableTag.html( value );
+	};
+	
 	me.saveClientAfter = function( response, exeFunc, groupId, showSuccessMsg )
 	{
 		// STEP 1. Set the client as attribute for the form. 
@@ -3396,7 +3416,6 @@ function Counsellor( storageObj, translationObj )
 		{
 			me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
 			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
-//			me.addContactLogEventDivTag.hide();
 		}
 		
 		// STEP 3. Set the status "Update" for [Client Form]
@@ -4053,6 +4072,8 @@ function Counsellor( storageObj, translationObj )
  		// Generate [Time elapse] in header of [ART Ref.] form AND in [ART Closure] form
  		me.populateTimeElapsed( artOpeningEvent, artClosureEvent );
  		
+ 		// Set [inkageStatus] info
+ 		me.setARTLinkageStatusAttrValue();
  		
 		// STEP 3. Populate data for [ART Refer. Opening] form
 		if( artOpeningEvent !== undefined )
@@ -4127,8 +4148,16 @@ function Counsellor( storageObj, translationObj )
 			if( finalHIVTestValue == "Positive" && artValue == "true" && testResultGivenValue == "true" )
 			{
 				// STEP 2. Force user to enter data for [Contact Log] attribute values
-				me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
-				me.showTabInClientForm( me.TAB_NAME_ART_REFER );
+				var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
+				if( consentToContactTag.val() != "" )
+				{
+					me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
+				}
+				else
+				{
+					me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+				}
 				
 				// STEP 3. Show [ART Opening] tab
 				me.showOpeningTag = true;
@@ -4420,8 +4449,8 @@ function Counsellor( storageObj, translationObj )
 				if( me.loginUsername === searchLoggedCounsellor.code )
 				{
 					me.disableDataEtryForm( false );
-					me.saveEventBtnTag.show();
-					me.completedEventBtnTag.show();
+//					me.saveEventBtnTag.show();
+//					me.completedEventBtnTag.show();
 					me.activeEventHeaderTag.css( "color","gray" );
 				}
 				else

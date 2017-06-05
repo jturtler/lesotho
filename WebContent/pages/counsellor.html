@@ -396,29 +396,17 @@
 							
 						<div id="artReferDiv">
 							
-							<table class="table activeBar" id="artEventInfoTb" style="margin:0px;">
+							<table class="table activeBar" id="artEventInfoTb" >
 								<tbody>
 									<tr>
 										<th colspan="2">Client referred to ART on: <span style="font-weight:normal;" class="dateClientReferredARTOn"></span></th>
+										<th>Status: <span style="font-weight:normal;" id="linkageStatus"></span></th>
 										<th colspan="2"><div style="float:right;">Time elapsed: <span style="font-weight:normal;" class="timeClientReferredARTOn"></span></div>
 									</tr>
 								</tbody>
 							</table>
-							<table id="artAttributeForm" class="table activeBar previousTestTb" >
-								
-								<!--  Action buttons -->
-								<tr class="actionBar">
-									<th style="width:20px;background-color: #d6c388 !important;">
-										<button style="background-color:#d6c388 !IMPORTANT;" id="discardARTAttributeBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
-									</th>
-									<th colspan="2" style="background-color: #d6c388 !important;">
-										<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
-										<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
-									</th>
-									<th style="width:20px;background-color: #d6c388 !important;">
-										<button style="background-color:#d6c388 !IMPORTANT;" id="saveARTAttributeBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
-									</th>						
-								</tr>
+							
+							<table id="artAttributeForm" class="table activeBar previousTestTb" style="display:none;">
 							</table>
 							
 							
