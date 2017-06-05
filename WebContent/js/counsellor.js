@@ -1428,11 +1428,11 @@ function Counsellor( storageObj, translationObj )
 		}
 		else if( resultFinalHIVStatusTag.val() === "Negative" )
 		{
-			if( referralOfferedTag.val() == "true" )
-			{
+//			if( referralOfferedTag.val() == "true" )
+//			{
 				// Hide [Referrals Out - PReP (HIV-)]
 				me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), false );
-			}
+//			}
 		}
 		
 	};
