@@ -265,6 +265,11 @@ function Counsellor( storageObj, translationObj )
 	me.de_Target = "rcVLQsClLUa";
 	me.de_achieved = "sNS1PQ1YNXA";
 	
+	me.reportName_AllClient = "reportAllClients";
+	me.reportName_PositiveClient = "reportPostitiveClients";
+	me.reportName_ARTClient = "reportARTReferrals";
+	
+	
 	
 	// Search INPUT fields
 	me.searchDoBTag;
@@ -4418,8 +4423,8 @@ function Counsellor( storageObj, translationObj )
 				else
 				{
 					me.disableDataEtryForm( true );
-					me.saveEventBtnTag.hide();
-					me.completedEventBtnTag.hide();
+//					me.saveEventBtnTag.hide();
+//					me.completedEventBtnTag.hide();
 					
 					me.activeEventHeaderTag.css( "color","tomato" );
 				}
@@ -4867,7 +4872,7 @@ function Counsellor( storageObj, translationObj )
 								
 								// STEP 3. Set "This Week" data
 								if( peId == curPeriod ) {
-									me.setDataInReportCell( deId, "thisWeek", value );
+									me.setDataInReportCell( me.reportName_AllClient,deId, "thisWeek", value );
 								}
 
 								
@@ -4879,7 +4884,7 @@ function Counsellor( storageObj, translationObj )
 										value = value / 5;
 										value = value.toFixed( 2 );
 
-										me.setDataInReportCell( deId, "yesterday", value );
+										me.setDataInReportCell( me.reportName_AllClient, deId, "yesterday", value );
 									}
 								}
 									
@@ -4901,9 +4906,9 @@ function Counsellor( storageObj, translationObj )
 							}
 							
 							// STEP 6. Set values for "Last 4 weeks" column							
-							me.setDataInReportCell( me.de_Tested, "last4weeks", last4WeeksData[me.de_Tested] );
-							me.setDataInReportCell( me.de_Target, "last4weeks", last4WeeksData[me.de_Target] );
-							me.setDataInReportCell( me.de_achieved, "last4weeks", last4WeeksData[me.de_achieved] );
+							me.setDataInReportCell( me.reportName_AllClient, me.de_Tested, "last4weeks", last4WeeksData[me.de_Tested] );
+							me.setDataInReportCell( me.reportName_AllClient, me.de_Target, "last4weeks", last4WeeksData[me.de_Target] );
+							me.setDataInReportCell( me.reportName_AllClient, me.de_achieved, "last4weeks", last4WeeksData[me.de_achieved] );
 							
 							me.reportTblTag.show();
 						}
@@ -4921,9 +4926,9 @@ function Counsellor( storageObj, translationObj )
 		});	
 	};
 
-	me.setDataInReportCell = function( deId, peId, value )
+	me.setDataInReportCell = function( clazzTableName, deId, peId, value )
 	{
-		var colTag = me.reportTblTag.find("td[dataelement='" + deId + "'][period='" + peId + "']");
+		var colTag = me.reportTblTag.find("tbody." + clazzTableName ).find("td[dataelement='" + deId + "'][period='" + peId + "']");
 		colTag.html( value );
 		
 		if( deId == me.de_achieved )

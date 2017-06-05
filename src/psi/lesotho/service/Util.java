@@ -82,6 +82,12 @@ public final class Util
     public static final String KEY_GET_EVENT_DETAILS = "details";
     public static final String KEY_GET_REPORT = "report";
     
+    
+
+
+    public static final String KEY_TODAY_FU = "todayFU";
+    public static final String KEY_ALL_FU = "allFU";
+    
 
 //    public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "98319"; // On Rodolfo account
 //    public static String KEY_TRANSLATION_VERSION_PROJECT_ID = "95765"; // On Rodolfo account

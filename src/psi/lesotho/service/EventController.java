@@ -44,6 +44,12 @@ public class EventController
         + "/api/organisationUnits/" + PARAM_ORGUNIT_ID + ".json?fields=name,parent[name]";
     
 
+
+    private static String URL_QUERY_FUCASE_BY_TIME = Util.LOCATION_DHIS_SERVER
+        + "/api/sqlViews/llbPbszABjd/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
+        + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.STAGE_ID;
+    
+    
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
@@ -69,7 +75,6 @@ public class EventController
                 {
                     responseInfo = EventController.getTodayCases( request, loginUsername );
                 }
-
                 // Load Previous case
                 else if ( key.equals( Util.KEY_PREVIOUS_CASES ) )
                 {
@@ -152,6 +157,16 @@ public class EventController
                     
                     responseInfo.output = "{" + output + "}";
                 }
+                // Load Today F/U
+                else if ( key.equals( Util.KEY_TODAY_FU ) )
+                {
+                    responseInfo = EventController.getTodayFU( request, loginUsername );
+                }  
+                // Load Previous F/U
+                else if ( key.equals( Util.KEY_ALL_FU ) )
+                {
+                    responseInfo = EventController.getAllFU( request, loginUsername );
+                }
             }
 
             // STEP 4. Send back the messages
@@ -198,7 +213,7 @@ public class EventController
 
         return responseInfo;
     }
-
+    
     private static ResponseInfo getPreviousCases( HttpServletRequest request, String loginUsername )
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
@@ -309,6 +324,32 @@ public class EventController
             try
             {
                 String url = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:I2oytRXksKN;rcVLQsClLUa;sNS1PQ1YNXA&dimension=pe:LAST_4_WEEKS;LAST_WEEK;THIS_WEEK&dimension=" + Util.USER_CATEGORY_ID + ":" + catOptionComboId + "&filter=ou:" + Util.ROOT_ORGTUNIT + "&skipMeta=true";
+                responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+            }
+            catch ( Exception ex )
+            {
+                ex.printStackTrace();
+            }
+        }
+        else
+        {
+            responseInfo.responseCode = 404;
+        }
+       
+
+        return responseInfo;
+    }
+    
+    private static ResponseInfo getCoordinatorReport( String loginUsername )
+    {
+        ResponseInfo responseInfo = new ResponseInfo();
+        
+        String catOptionComboId = EventController.getCatOptionComboUid( loginUsername );
+        if ( catOptionComboId != null )
+        {
+            try
+            {
+                String url = Util.LOCATION_DHIS_SERVER + "/api/analytics/events/aggregate/KDgzpKX3h2S.json?stage=gmBozy0KAMC&dimension=ou:FvUGp8I75zV&dimension=pe:THIS_WEEK;LAST_12_MONTHS&dimension=mYdfuRItatP:IN%3APENDING%3BSUCCESS&outputType=EVENT&displayProperty=SHORTNAME";
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
             }
             catch ( Exception ex )
@@ -464,6 +505,65 @@ public class EventController
         return responseInfo;
     }
     
+    // ===============================================================================================================
+    // Coordinator
+    // ===============================================================================================================
+
+    private static ResponseInfo getTodayFU( HttpServletRequest request, String loginUsername )
+        throws UnsupportedEncodingException, ServletException, IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+            String curDate = Util.getCurrentDate();
+            String tomorrow = Util.getXLastDate( -1 );
+
+            String requestUrl = EventController.URL_QUERY_FUCASE_BY_TIME;
+            requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
+            requestUrl = requestUrl.replace( PARAM_START_DATE, curDate );
+            requestUrl = requestUrl.replace( PARAM_END_DATE, tomorrow );
+
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+    }
+    
+    private static ResponseInfo getAllFU( HttpServletRequest request, String loginUsername )
+        throws UnsupportedEncodingException, ServletException, IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+            String startDate = "1000-01-01";
+            String tomorrow = Util.getXLastDate( -1 );
+
+            String requestUrl = EventController.URL_QUERY_FUCASE_BY_TIME;
+            requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
+            requestUrl = requestUrl.replace( PARAM_START_DATE, startDate );
+            requestUrl = requestUrl.replace( PARAM_END_DATE, tomorrow );
+
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+    }
+    
+    
+    
+    
     public static ResponseInfo getAnalyticsTime() throws Exception, IOException
     {
         String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/system/info.json";
@@ -495,5 +595,9 @@ public class EventController
         
         return eventData;
     }
+    
+    
+    
+    
 
 }

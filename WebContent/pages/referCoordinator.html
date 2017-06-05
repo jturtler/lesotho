@@ -153,6 +153,7 @@
 					<table id="allFUTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
 						<thead>
 							<tr style="background-color:#cfe2f3">
+								<th keyword="allFU_tableHeader_date">Date</th>
 								<th keyword="allFU_tableHeader_councilOfResidence">Council of Residence</th>
 								<th keyword="allFU_tableHeader_facilityReferredTo">Facility Referred to</th>
 								<th keyword="allFU_tableHeader_cuic">CUIC</th>
@@ -211,11 +212,12 @@
 					
 					<div id="searchResultOptions" >
 						<p><span id="searchResultHeader" keyword="referCoordinator_searchClient_result_optionTitle" class="searchOptMsg">Select a client from from above or</span> <span id="searchResultKey"  class="searchOptMsg"></span><p> 
-						<button id="showAddNewClientForm" keyword="referCoordinator_searchClient_result_btn_addClient" class="btn btn-default actionBtn">Add a client</button>
 						<button id="backToSearchClientForm" keyword="referCoordinator_searchClient_result_btn_backToSearch" class="btn btn-default actionBtn">Back to search</button>
-						<button id="showTodayCase" keyword="referCoordinator_searchClient_result_btn_todayCases" class="btn btn-default actionBtn">Today's Cases</button>
+						<button id="showTodayCase" keyword="referCoordinator_searchClient_result_btn_todayFollowUp" class="btn btn-default actionBtn">Today's Follow-up</button>
 					</div>
 				</div>
+				
+					
 				
 					
 				<div id="addClientFormDiv" style="display:none;" class="mainContent">	
@@ -224,9 +226,9 @@
 					<div id="addClientFormTab">
 		  				
 						<ul>
-				    		<li><a href="#clientAttributeDiv" keyword="dataEntryForm_tab_clientAttributes_headerTitle">Client Attributes</a></li>
+				    		<li><a href="#clientAttributeDiv" keyword="dataEntryForm_tab_clientAttributes_headerTitle">Client Information</a></li>
 				    		<li><a href="#previousTestDiv" keyword="dataEntryForm_tab_previousTests_headerTitle">Previous Tests</a></li>
-				    		<li><a href="#thisTestDiv" keyword="dataEntryForm_tab_thisTest_headerTitle">This Test</a></li>
+				    		<li><a href="#thisTestDiv" keyword="dataEntryForm_tab_thisTest_headerTitle">New Test</a></li>
 				    		
 				    		<li><a href="#contactLogDiv" keyword="dataEntryForm_tab_contactLog_headerTitle">Contact Log</a></li>
 				    		<li><a href="#artReferDiv" keyword="dataEntryForm_tab_ARTRefer_headerTitle">ART Refer.</a></li>
@@ -234,181 +236,220 @@
 				  		
 				  		
 	  					<div id="clientAttributeDiv">
-	  						<form class="form-horizontal" id="addClientForm" >
-	  							<table class="table table-hover table-striped previousTestTb"></table>
+	  						<form class="form-horizontal">
+	  							<table class="table table-hover table-striped previousTestTb" id="addClientForm">
+	  								
+	  								<!--  Action bar -->
+	  								<tbody>
+	  									<tr class="actionBar">
+											<th style="width:20px;">
+												<button id="discardClientRegFormBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
+											</th>
+											<th colspan="2">
+												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+											</th>
+											<th style="width:20px;">
+												<button id="saveClientRegBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+											</th>						
+										</tr>
+									</tbody>
+	  							</table>
 	  						</form>
 	  						
-	 						<div class="form-group" style="text-align:center;">
-								<button class="btn btn-default actionBtn" id="saveClientBtn">Save</button>
-								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-								<button class="btn btn-default actionBtn" name="backToCaseListBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-							</div>
-						
 						</div>
 	  
 					   	<div id="previousTestDiv">
 					   		<div id="previousTests">
 					   			<table class='table table-hover table-striped previousTestTb'></table>
 					   		</div>
-					   		<div class="form-group" style="text-align:center;">
-								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-								<button class="btn btn-default actionBtn" name="backToCaseListBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-							</div>
 					   	</div>
 	 
 				      	<div id="thisTestDiv">
-				  			<form class="form-horizontal"" id="addEventForm">
-				  				<table class='table table-hover table-striped previousTestTb'></table>
+				  			<form class="form-horizontal"">
+				  				<table class='table table-hover table-striped previousTestTb panel panel-default' id="addEventForm">
+				  				
+	  								<!--  Action bar -->
+	  								<tbody>
+	  									<tr class="actionBar">
+											<th style="width:20px;">
+												<button id="discardEventFormBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
+											</th>
+											<th colspan="2">
+												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+											</th>
+											<th style="width:100px;">
+												<button id="saveEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+												<span style="color:#d6d2d2;"> | </span>
+												<button id="completedEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-saved"></span></button>
+											</th>						
+										</tr>
+									</tbody>
+				  				</table>
 				  			</form>
-				  			
-	 						<div class="form-group" style="text-align:center;">
-								<button class="btn btn-default actionBtn" id="saveEventBtn">Save</button>
-								<button class="btn btn-default actionBtn" id="completedEventBtn" keyword="dataEntryForm_tab_thisTest_btn_complete">Complete</button>
-								<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-								<button class="btn btn-default actionBtn" name="backToCaseListBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-							</div>
 							
 				  		</div>
 					
 						<div id="contactLogDiv">
-							<div class="panel panel-default">
-								<form class="form-horizontal" id="contactLogForm" >
-									<table class="table table-hover table-striped previousTestTb">
-										<tr>
-											<th style="width:20px;">
-												<span id="discardContactLogBtn" style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span>
-											</th>
-											<th>
-												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
-												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
-											</th>
-											<th style="width:20px;">
-												<span id="saveContactLogBtn" style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span>
-											</th>						
-										</tr>
-									</table>
-								</form>
-							</div>
+							<form class="form-horizontal" >
+								<table class="table table-hover table-striped previousTestTb panel panel-default" id="contactLogForm" >
+									
+									<tr class="actionBar">
+										<th style="width:20px;">
+											<button id="discardContactLogBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
+										</th>
+										<th colspan="2">
+											<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+											<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+										</th>
+										<th style="width:20px;">
+											<button id="saveContactLogBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+										</th>						
+									</tr>
+								</table>
+							</form>
 							
 							<table class="table activeBar" id="nextContactLogActionTb" style="display:none;">
 								<tr>
 									<th>Next action: <span style="font-weight:normal;" class="nextAction"></span>
 									<th><div style="float:right;">Due date: <span style="font-weight:normal;" class="dueDate"></span></div></th>
-									
 								</tr>
 							</table>
 							
-							<div id="addContactLogEventDiv">			
-								<div class="panel panel-default">			
-									<table class="table previousTestTb">
-										<thead>
-											<tr>
-												<th colspan="5">
-													<span style="float:left;" keyword="contactLogForm_tab_logNewContact">Log new Contact</span>
-													<span style="float:right;" keyword="contactLogForm_tab_btn_add">Add</span>
-												</th>
-												<th style="width:20px;">
-													<span id="addContactLogEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-plus"></span>
-												</th>	
-											</tr>
-										</thead>
+							<div id="addContactLogEventDiv">
+								<table class="table previousTestTb panel panel-default" id="addContactLogEventForm">
+									<thead>
+										<tr>
+											<th colspan="5">
+												<span style="float:left;" keyword="contactLogForm_tab_logNewContact">Log new Contact</span>
+												<span style="float:right;" keyword="contactLogForm_tab_btn_add">Add</span>
+											</th>
+											<th style="width:20px;background-color:#afc3d8;">
+												<button id="addContactLogEventBtn" class="imgBtn" style="background-color:#afc3d8 !important"><span class="glyphicon glyphicon-plus"></span></button>
+											</th>	
+										</tr>
+									</thead>
+									
+									<tbody id="contactLogEventForm" style="display:none;">
+									
+										<!--  Event Form -->
 										
-										<tbody id="contactLogEventForm" style="display:none;">
+										<tr>
+											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_typeOfContact">Type of contact</td>
+											<td><input class="form-control" type="text" dataelement="wzM3bUiPowS"></td>
+											<td keyword="contactLogForm_tab_eventForm_header_outcome">Outcome</td>
+											<td colspan="2"><input class="form-control" type="text" dataelement="hjpNXAyZ0cm"></td>
+										</tr>
+										<tr>
+											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_nextAction">Next action</td>
+											<td><input type="text" class="form-control" dataelement="mcgzEFh5IV8"></td>
+											<td keyword="contactLogForm_tab_eventForm_header_dueDate">Due date</td>
+											<td colspan="2"><input type="text" class="form-control" isDate="true" dataelement="HcBFZsCt8Sy"></td>
+										</tr>
+										<tr>
+											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_comments">Comments</td>
+											<td colspan="4"><textarea class="form-control" style="width:100%;height:45px;" type="text" dataelement="HaauwE6JkEs"></textarea></td>
+										</tr>
 										
-											<!--  Event Form -->
-											
-											<tr>
-												<td colspan="2" keyword="contactLogForm_tab_eventForm_header_typeOfContact">Type of contact</td>
-												<td><input class="form-control" type="text" dataelement="wzM3bUiPowS"></td>
-												<td keyword="contactLogForm_tab_eventForm_header_outcome">Outcome</td>
-												<td colspan="2"><input class="form-control" type="text" dataelement="hjpNXAyZ0cm"></td>
-											</tr>
-											<tr>
-												<td colspan="2" keyword="contactLogForm_tab_eventForm_header_nextAction">Next action</td>
-												<td><input type="text" class="form-control" dataelement="mcgzEFh5IV8"></td>
-												<td keyword="contactLogForm_tab_eventForm_header_dueDate">Due date</td>
-												<td colspan="2"></td>
-											</tr>
-											<tr>
-												<td colspan="2" keyword="contactLogForm_tab_eventForm_header_comments">Comments</td>
-												<td colspan="4"><textarea class="form-control" style="width:100%;height:45px;" type="text" dataelement="HaauwE6JkEs"></textarea></td>
-											</tr>
-											
-											<!--  Action buttons -->
-											<tr>
-												<th style="width:20px;">
-													<span id="discardContactLogEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span>
-												</th>
-												<th colspan="4">
-													<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
-													<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
-												</th>
-												<th style="width:20px;">
-													<span id="saveContactLogEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span>
-												</th>						
-											</tr>
-										</tbody>
-									</table>
-								</div>
+										<!--  Action buttons -->
+										<tr class="actionBar">
+											<th style="width:20px;">
+												<button id="discardContactLogEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span></button>
+											</th>
+											<th colspan="4">
+												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+											</th>
+											<th style="width:20px;">
+												<button id="saveContactLogEventBtn" class="imgBtn"><span class="glyphicon glyphicon-floppy-disk"></span></button>
+											</th>						
+										</tr>
+									</tbody>
+								</table>
 								
-								<div class="panel panel-default">
-									<table class="table previousTestTb" id="contactLogEventHistoryTb"></table>
-								</div>
+								<table class="table previousTestTb panel panel-default" id="contactLogEventHistoryTb"></table>
 								
 							</div>
 						</div>
 							
 						<div id="artReferDiv">
 							
-							<table class="table activeBar" id="artEventInfoTb">
-								<tr>
-									<th>Client referred to ART on: <span style="font-weight:normal;" class="dateClientReferredARTOn"></span></th>
-									<th><div style="float:right;">Time elapsed: <span style="font-weight:normal;" class="timeClientReferredARTOn"></span></div>
+							<table class="table activeBar" id="artEventInfoTb" style="margin:0px;">
+								<tbody>
+									<tr>
+										<th colspan="2">Client referred to ART on: <span style="font-weight:normal;" class="dateClientReferredARTOn"></span></th>
+										<th colspan="2"><div style="float:right;">Time elapsed: <span style="font-weight:normal;" class="timeClientReferredARTOn"></span></div>
+									</tr>
+								</tbody>
+							</table>
+							<table id="artAttributeForm" class="table activeBar previousTestTb" >
+								
+								<!--  Action buttons -->
+								<tr class="actionBar">
+									<th style="width:20px;background-color: #d6c388 !important;">
+										<button style="background-color:#d6c388 !IMPORTANT;" id="discardARTAttributeBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
+									</th>
+									<th colspan="2" style="background-color: #d6c388 !important;">
+										<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+										<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+									</th>
+									<th style="width:20px;background-color: #d6c388 !important;">
+										<button style="background-color:#d6c388 !IMPORTANT;" id="saveARTAttributeBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+									</th>						
 								</tr>
 							</table>
 							
 							
-							<form class="form-horizontal" id="artReferOpenForm" >
-								<table class='table table-hover table-striped previousTestTb'>
-									
+							<form class="form-horizontal">
+								<table class='table table-hover table-striped previousTestTb panel panel-default' id="artReferOpenForm">
+																		
 									<!--  Action buttons -->
-									<tr>
+									<tr class="actionBar">
 										<th style="width:20px;">
-											<span id="discardARTOpenEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span>
+											<button id="discardARTOpenEventBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
 										</th>
 										<th colspan="2">
 											<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
 											<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
 										</th>
 										<th style="width:20px;">
-											<span id="saveARTOpenEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span>
+											<button id="saveARTOpenEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
 										</th>						
 									</tr>
 								</table>
 							</form>
 							
-							<form class="form-horizontal" id="artReferCloseForm" >
-								<table class='table table-hover table-striped previousTestTb'>
+							<form class="form-horizontal">
+								<table class='table table-hover table-striped previousTestTb panel panel-default' id="artReferCloseForm">
 								
 									<!--  Action buttons -->
-									<tr>
+									<tr class="actionBar">
 										<th style="width:20px;">
-											<span id="discardARTCloseEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span>
+											<button id="discardARTCloseEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span></button>
 										</th>
 										<th colspan="2">
 											<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
 											<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
 										</th>
 										<th style="width:20px;">
-											<span id="saveARTCloseEventBtn" style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span>
+											<button id="saveARTCloseEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
 										</th>						
 									</tr>
 								</table>
 							</form>
+							
 						</div>
+						  
 						  						
 					</div>	
 					
+					<div class="form-group" style="text-align:center;">
+						<br>
+						<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
+						<button class="btn btn-default actionBtn" name="backToCaseListBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
+					</div>
+						
 		  		</div>	
 				
 				<!-- END Search and Create Client  -->
@@ -481,35 +522,35 @@
 				<!-- Report -->
 				
 				<div id="reportParamDiv" class="mainContent" style="display:none">
-					<h4 class="headerList" keyword="report_headerTitle">Statistics</h4>
+					<h4 class="headerList" keyword="referCoordinator_report_headerTitle">Statistics</h4>
 					<table id="reportTbl" sorted="false" class='table table-hover table-striped listTable' style="display:none;">
 						<thead>
 							<tr style="background-color:#cfe2f3">
 								<th>#</th>
-								<th keyword="report_tableHeader_yesterday">Yesterday</th>
-								<th keyword="report_tableHeader_thisWeek">This Week</th>
-								<th keyword="report_tableHeader_last4weeks">Last 4 weeks</th>
+								<th keyword="referCoordinator_report_tableHeader_yesterday">Yesterday</th>
+								<th keyword="referCoordinator_report_tableHeader_last3Days">Last 3 Days</th>
+								<th keyword="referCoordinator_report_tableHeader_thisWeek">This Week</th>
+								<th keyword="referCoordinator_report_tableHeader_last4weeks">Last 4 weeks</th>
 							</tr>
 						</thead>
 						
-						<tbody>
+						<tbody class="artReferrals">
 							<tr>
-								<td style="font-weight:bold;" keyword="report_rowTitle_tested">Tested</td>
+								<td colspan='4' class="note" keyword="referCoordinator_report_rowTitle_header_ARTReferrals">ART Referrals</td>
+							</tr>
+							<tr>
+								<td style="background-color:#f9f9f9 ;text-align:left;" keyword="referCoordinator_report_rowTitle_clientUpdated">Client Updated</td>
 								<td dataelement="I2oytRXksKN" period="yesterday"></td>
+								<td dataelement="I2oytRXksKN" period="last3Days"></td>
 								<td dataelement="I2oytRXksKN" period="thisWeek"></td>
 								<td dataelement="I2oytRXksKN" period="last4weeks"></td>
 							</tr>
 							<tr>
-								<td style="font-weight:bold;" keyword="report_rowTitle_target">Target</td>
+								<td style="font-weight:bold;" keyword="referCoordinator_report_rowTitle_successfulLinkages">Successful Linkages</td>
 								<td dataelement="rcVLQsClLUa" period="yesterday"></td>
+								<td dataelement="I2oytRXksKN" period="last3Days"></td>
 								<td dataelement="rcVLQsClLUa" period="thisWeek"></td>
 								<td dataelement="rcVLQsClLUa" period="last4weeks"></td>
-							</tr>
-							<tr>
-								<td style="font-weight:bold;" keyword="report_rowTitle_achieved">% achieved</td>
-								<td dataelement="sNS1PQ1YNXA" period="yesterday"></td>
-								<td dataelement="sNS1PQ1YNXA" period="thisWeek"></td>
-								<td dataelement="sNS1PQ1YNXA" period="last4weeks"></td>
 							</tr>
 						</tbody>
 					</table>

@@ -788,8 +788,13 @@ tr.actionBar th
 .clearable::-ms-clear {display: none; width:0; height:0;}
 
 
-
-
+.note
+{
+	font-style: italic;
+    text-align: left !important;
+    background-color: white;
+    font-weight:bold;
+}
 
 
 

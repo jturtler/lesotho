@@ -20,11 +20,23 @@ Util.disableTag = function( tag, isDisable )
 		{
 			if( isDisable )
 			{
-				element.css( 'background-color', '#FAFAFA' ).css( 'cursor', 'auto' ).css( 'color', 'gray' );
+				element.css( 'background-color', '#FAFAFA' ).css( 'cursor', 'auto' );
+				if( element.prop( "tagName" ) == 'BUTTON' && element.find("span").length > 0  )
+				{
+					element.find("span").css( 'color', 'gray' );
+				}
+				else
+				{
+					element.css( 'color', 'gray' );
+				}
 			}
 			else
 			{
 				element.css( 'background-color', 'white' ).css( 'cursor', '' ).css( 'color', '' );;
+				if( element.prop( "tagName" ) == 'BUTTON' && element.find("span").length > 0  )
+				{
+					element.find("span").css( 'color', '' );
+				}
 			}
 		}
 	}
