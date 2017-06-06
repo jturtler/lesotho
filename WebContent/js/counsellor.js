@@ -1071,11 +1071,16 @@ function Counsellor( storageObj, translationObj )
 				me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( timeElapsed );
 			}
 			
+			
+			me.setARTLinkageStatusAttrValue();
+			var jsonClient = me.getClientJsonData( me.artAttributeFormTag );
+			var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
+			
 			me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
-				me.setAndSaveARTLinkageStatusAttrValue( function(){
+//				me.setAndSaveARTLinkageStatusAttrValue( function(){
 					Util.disableForm( me.thisTestDivTag, true );				
 					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
-				});
+//				});
 			} );
 			
 			return false;
