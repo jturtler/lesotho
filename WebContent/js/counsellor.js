@@ -252,7 +252,8 @@ function Counsellor( storageObj, translationObj )
 	me.de_ReferralGiven_TB  = "a9x8qqtTs0J";
 	me.de_ReferralGiven_FP = "BqyBHC6eEFr";
 	me.de_ReferralGiven_VMMC = "DbfyDJ04SjL";
-	me.de_ReferralGiven_ART = "tUIkmIFMEDS";	
+	me.de_ReferralGiven_ART = "tUIkmIFMEDS";
+	me.de_ReferralGiven_DNAPCR = "ZKWK5UIO9wp";
 	
 	
 	me.de_TypeOfContact = "wzM3bUiPowS";
@@ -266,6 +267,8 @@ function Counsellor( storageObj, translationObj )
 	me.de_WhatMotivatedHIVTest = "vOrRzjpdQC6";
 	me.de_WhatMotivatedHIVTest_OtherReason = "GCl3ORKj1jC";
 	
+	me.de_Layer = "fGSXGuPIEOy";
+	me.de_Layer_OtherReason = "omugvBULuf0";
 	
 	
 	//[Report]
@@ -1072,9 +1075,9 @@ function Counsellor( storageObj, translationObj )
 			}
 			
 			
-			me.setARTLinkageStatusAttrValue();
-			var jsonClient = me.getClientJsonData( me.artAttributeFormTag );
-			var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
+			//me.setARTLinkageStatusAttrValue();
+			//var jsonClient = me.getClientJsonData( me.artAttributeFormTag );
+			//var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
 			
 			me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
 //				me.setAndSaveARTLinkageStatusAttrValue( function(){
@@ -1238,8 +1241,7 @@ function Counsellor( storageObj, translationObj )
 		me.setUp_DataElementFinalHIVStatusLogic();
 		me.setUp_ReferralOfferedLogic();
 		me.setUp_DataElementTBScreeningConductedLogic();
-		me.setUp_HIVTestChannelLogic();
-		me.setUp_WhatMotivatedHIVTest();
+		me.setUp_OtherReasonTagLogic();
 		me.setUp_DataElementBMI();
 		
 //		var artHIVTestingEvent =  me.addClientFormTabTag.attr("artHIVTestingEvent");
@@ -1413,6 +1415,7 @@ function Counsellor( storageObj, translationObj )
 		var referralGivenFPTag = me.getDataElementField( me.de_ReferralGiven_FP );
 		var referralGivenVMMCTag = me.getDataElementField( me.de_ReferralGiven_VMMC );
 		var referralGivenARTTag = me.getDataElementField( me.de_ReferralGiven_ART );
+		var referralGivenDNAPCRTag = me.getDataElementField( me.de_ReferralGiven_DNAPCR ); 
 		var referralGivenPRePNegativeTag = me.getDataElementField( me.de_ReferralGivenPRePNegative );
 		
 		var resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
@@ -1425,6 +1428,7 @@ function Counsellor( storageObj, translationObj )
 		me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), true );
 		me.setHideLogicTag( referralGivenARTTag.closest("tr"), true );
 		me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), true );
+		me.setHideLogicTag( referralGivenDNAPCRTag.closest("tr"), true );
 		
 		
 		if( referralOfferedTag.val() == "true" )
@@ -1435,6 +1439,7 @@ function Counsellor( storageObj, translationObj )
 				me.setHideLogicTag( referralGivenSTITag.closest("tr"), false );
 				me.setHideLogicTag( referralGivenTBTag.closest("tr"), false );
 				me.setHideLogicTag( referralGivenFPTag.closest("tr"), false );
+				me.setHideLogicTag( referralGivenDNAPCRTag.closest("tr"), false );
 				
 				if( testResultsGivenTag.val() == "true" )
 				{
@@ -1459,6 +1464,7 @@ function Counsellor( storageObj, translationObj )
 			referralGivenFPTag.prop("checked", false);
 			referralGivenVMMCTag.prop("checked", false);
 			referralGivenARTTag.prop("checked", false);
+			referralGivenDNAPCRTag.prop("checked", false);
 		}
 	};
 	
@@ -1478,10 +1484,11 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 
-	me.setUp_HIVTestChannelLogic = function()
+	me.setUp_OtherReasonTagLogic = function()
 	{
+		// HIVTestChannel
 		var testChannelTag = me.getDataElementField( me.de_HIVTestChannel );
-		var otherReasonTag = me.getDataElementField( me.de_HIVTestChannel_OtherReason );
+		otherReasonTag = me.getDataElementField( me.de_HIVTestChannel_OtherReason );
 		if( testChannelTag.val() == "LS_CHA7" ) // [Other testing channel] Option
 		{
 			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
@@ -1491,12 +1498,10 @@ function Counsellor( storageObj, translationObj )
 			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
 			otherReasonTag.val("");
 		}
-	};
-	
-	me.setUp_WhatMotivatedHIVTest = function()
-	{
+		
+		// whatMotivatedHIVTest
 		var whatMotivatedHIVTestTag = me.getDataElementField( me.de_WhatMotivatedHIVTest );
-		var otherReasonTag = me.getDataElementField( me.de_WhatMotivatedHIVTest_OtherReason );
+		otherReasonTag = me.getDataElementField( me.de_WhatMotivatedHIVTest_OtherReason );
 		if( whatMotivatedHIVTestTag.val() == "OTHER" ) // Other (specifiy)
 		{
 			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
@@ -1506,8 +1511,21 @@ function Counsellor( storageObj, translationObj )
 			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
 			otherReasonTag.val("");
 		}
+		
+		// Layger
+		var layerTag = me.getDataElementField( me.de_Layer );
+		otherReasonTag = me.getDataElementField( me.de_Layer_OtherReason );
+		if( layerTag.val() == "LAY08" ) // Other (specifiy)
+		{
+			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
+		}
+		else
+		{
+			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
+			otherReasonTag.val("");
+		}
 	};
-	
+		
 	me.setUp_DataElementBMI = function()
 	{
 		var height = me.getDataElementField( me.de_Height ).val();
@@ -1783,6 +1801,23 @@ function Counsellor( storageObj, translationObj )
 		me.generateDataEntryFormTable( me.addEventFormTag, me.stage_HIVTesting );
 		me.generateDataEntryFormTable( me.artReferOpenFormTag, me.stage_ARTReferralOpenning );
 		me.generateDataEntryFormTable( me.artReferCloseFormTag, me.stage_ARTReferralClosure );
+		
+		// Generate data elements for [Contact Log] event form
+		for( var i in me.contactLogDeList )
+		{
+			var psDE = me.contactLogDeList[i];
+			var deId = psDE.dataElement.id;
+			
+			var colTag = me.contactLogEventFormTag.find("[dataelementtag='" + deId + "']");
+			var inputTag = me.generateInputTag( psDE.dataElement, "dataelement" );
+			colTag.append( inputTag );
+			
+			if( psDE.compulsory == "true" )
+			{
+				me.addMandatoryForField( inputTag );
+			}
+		}
+		
 		
 		// [Contact Log] event form - Add "DATE" picker for "Date" field
 		me.addContactLogEventFormTag.find("input[isDate='true']").each(function(){
@@ -2488,7 +2523,17 @@ function Counsellor( storageObj, translationObj )
 				// STEP 1. Save the sectionList in memory
 				
 				me.sectionList = jsonData.sections.programStages;
-				me.catOptionComboList = jsonData.catOptions.categoryOptions;				
+				me.catOptionComboList = jsonData.catOptions.categoryOptions;	
+				
+				// Get [Contact Log] data elements configuration
+				for( var i in me.sectionList )
+				{
+					var stage = me.sectionList[i];
+					if( stage.id == me.stage_ContactLog )
+					{
+						me.contactLogDeList = stage.programStageDataElements;
+					}
+				}
 				
 				
 				// STEP 2. Structure attGroups with attributes in memory
@@ -4270,25 +4315,26 @@ function Counsellor( storageObj, translationObj )
 			
 			if( deId == me.de_TypeOfContact )
 			{
-				typeOfContact = value;
+				typeOfContact = me.getDisplayNameByDataValue( deId, value );
 			}
 			else if( deId == me.de_Outcome )
 			{
-				outcome = value;
+				outcome = me.getDisplayNameByDataValue( deId, value );
 			}
 			else if( deId == me.de_NextAction )
 			{
-				nextAction = value;
+				nextAction = me.getDisplayNameByDataValue( deId, value );
 			}
 			else if( deId == me.de_DueDate )
 			{
-				dueDate = value;
+				dueDate = me.getDisplayNameByDataValue( deId, value );
 			}
 			else if( deId == me.de_Comments )
 			{
-				comments = value;
+				comments = me.getDisplayNameByDataValue( deId, value );
 			}
 		}
+		
 		
 		// Add history
 		var tbody = $("<tbody></tbody");
@@ -4315,6 +4361,16 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 	
+	me.getDisplayNameByDataValue = function( deId, value )
+	{
+		var tag = me.getDataElementField( deId );
+		if( tag.prop( "tagName" ) == 'SELECT'  )
+		{
+			value = tag.find("option[value='" + value + "']").text();
+		}
+		
+		return value;
+	}
 	
 	// ---------------------------------------------------------------------------------------
 	// Setup data in "This Test" TAB
@@ -4798,10 +4854,6 @@ function Counsellor( storageObj, translationObj )
 		return me.thisTestDivTag.find("[dataelement='" + deId + "']");
 	};
 	
-	me.getAttrField = function( attrId )
-	{
-		return me.addClientFormTabTag.find("[attribute='" + attrId + "']");
-	};
 	
 	// Generate 'Client CUIC' value
 	

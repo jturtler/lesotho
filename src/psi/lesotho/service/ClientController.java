@@ -167,7 +167,7 @@ public class ClientController
         {
             String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + clientId;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, receivedData, null );
-   System.out.println("\n\n receivedData.toString() : " + receivedData.toString() );       
+  
             if( responseInfo.responseCode == 200 )
             {
                 responseInfo.output = receivedData.toString();
@@ -208,7 +208,7 @@ public class ClientController
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + clientId + ".json";
+            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + clientId + ".json?fields=*,attributes[attribute,value]";
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
