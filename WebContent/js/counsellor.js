@@ -233,6 +233,8 @@ function Counsellor( storageObj, translationObj )
 	me.de_ClientPartnerCUIC = "UYyCL2xz8Wz";
 	me.de_Age = "e4XZKCNJjlc";
 	me.de_ClientType = "RvYugZqBKoN";
+	me.de_partnerCUICOpt = "csHM60DUGkG";
+	me.de_partnerCUIC= "UYyCL2xz8Wz";
 	me.de_PartnerKnowsHIVStatus = "TSqDjQSS2Qi";
 	me.de_PartnerHIVStatus = "C4Zu5mKJQ9y";
 	me.de_NumberSexualPartnersLast6Month = "drqngyyqyP3";
@@ -1075,15 +1077,13 @@ function Counsellor( storageObj, translationObj )
 			}
 			
 			
-			//me.setARTLinkageStatusAttrValue();
-			//var jsonClient = me.getClientJsonData( me.artAttributeFormTag );
-			//var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
+			me.setARTLinkageStatusAttrValue();
+			var jsonClient = me.getClientJsonData( me.artAttributeFormTag );
+			var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
 			
 			me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
-//				me.setAndSaveARTLinkageStatusAttrValue( function(){
-					Util.disableForm( me.thisTestDivTag, true );				
-					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
-//				});
+				Util.disableForm( me.thisTestDivTag, true );				
+				me.showTabInClientForm( me.TAB_NAME_ART_REFER );
 			} );
 			
 			return false;
@@ -1097,6 +1097,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.setUp_Events_DataEntryForm = function()
 	{
+		// Discard data
 		me.discardEventFormBtnTag.click( function(){
 			var translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_contactLogForm_discardChanges" );
 			var result = confirm( translatedText );			
@@ -1137,13 +1138,13 @@ function Counsellor( storageObj, translationObj )
 			me.execSaveEvent(event, client.trackedEntityInstance, event.event, function( eventJson ){
 				
 				me.addEventFormTag.attr("event", JSON.stringify( eventJson ));
+				Util.disableForm( me.addClientFormTag, true );
 				
 				if( me.checkIfARTEvent( eventJson ) )
 				{
 					me.addClientFormTabTag.attr("artHIVTestingEvent", JSON.stringify( eventJson ));
 					me.showOpeningTag = false;
 				}
-				
 				me.checkAndShowARTReferTab( eventJson );
 			} );
 		});
@@ -1242,14 +1243,8 @@ function Counsellor( storageObj, translationObj )
 		me.setUp_ReferralOfferedLogic();
 		me.setUp_DataElementTBScreeningConductedLogic();
 		me.setUp_OtherReasonTagLogic();
+		me.setUp_ClientTypeTagLogic();
 		me.setUp_DataElementBMI();
-		
-//		var artHIVTestingEvent =  me.addClientFormTabTag.attr("artHIVTestingEvent");
-//		if( artHIVTestingEvent != undefined )
-//		{
-//			artHIVTestingEvent = JSON.parse( artHIVTestingEvent );
-//		}
-//		me.checkAndShowARTReferTab( artHIVTestingEvent );
 	}; 
 	
 	
@@ -1526,6 +1521,29 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 		
+	me.setUp_ClientTypeTagLogic = function()
+	{
+		var clientTypeTag = me.getDataElementField( me.de_ClientType );
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		if( clientTypeTag.val() == "LS_SER1" )
+		{
+			partnerCUICOptTag.val("");
+			partnerCUICTag.val("");
+			
+			// Hide [Client partner's CUIC - Option] && [Client partner's CUIC] fields
+			me.setHideLogicTag( partnerCUICOptTag, true );
+			me.setHideLogicTag( partnerCUICTag, true );
+		}
+		else
+		{
+			// Show [Client partner's CUIC - Option] && [Client partner's CUIC] fields
+			me.setHideLogicTag( partnerCUICOptTag, false );
+			me.setHideLogicTag( partnerCUICTag, false );
+		}
+		
+	};
+	
 	me.setUp_DataElementBMI = function()
 	{
 		var height = me.getDataElementField( me.de_Height ).val();
@@ -2404,10 +2422,6 @@ function Counsellor( storageObj, translationObj )
 		{
 			inputTag = me.generateNumberInputTag( attribute, inputKey );
 		}
-//		else if( attribute.valueType === "LONG_TEXT" )
-//		{
-//			inputTag = "<textarea class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' ></textarea>";
-//		}
 		else if( attribute.valueType === "LETTER" )
 		{
 			inputTag = "<input type='text' letter='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
@@ -3516,6 +3530,10 @@ function Counsellor( storageObj, translationObj )
 			clientTypeTag.val( "LS_SER1" );
 			Util.disableTag( clientTypeTag, true );
 			
+			// Hide [Client partner's CUIC - Option] && [Client partner's CUIC] fields
+			me.setHideLogicTag( me.getDataElementField( me.de_partnerCUICOpt ), true );
+			me.setHideLogicTag( me.getDataElementField( me.de_partnerCUIC ), true );
+			
 			// Hide [Partner knows HIV status]
 			partnerKnowsHIVStatusTag.val("");
 			me.setHideLogicTag( partnerKnowsHIVStatusTag.closest("tr"), true );
@@ -3933,21 +3951,7 @@ function Counsellor( storageObj, translationObj )
 		
 		
 		// ------------------------------------------------------------------------------------------------
-		// [Client Attribute] TAB
-		
-		// STEP 3. Populate Client Registration data		
-		me.addClientFormTabTag.attr( "client", JSON.stringify( data.client ) );
-		me.populateClientAttrValues( me.addClientFormTabTag, data.client );	
-
-		// STEP 4. Init logic for attribute fields based on attribute values
-		me.setUp_ClientRegistrationFormDataLogic();
-
-		// STEP 5. Create header for [Update client] form
-		me.generateAddClientFormHeader();
-		
-
-		// ------------------------------------------------------------------------------------------------
-		// STEP 6. Get events
+		// STEP 3. Get events
 		
 		var events = data.events.events;
 		var activeHIVTestingEvent;
@@ -4005,6 +4009,29 @@ function Counsellor( storageObj, translationObj )
 		if( artHIVTestingEvent != undefined ){
 			me.addClientFormTabTag.attr( "artHIVTestingEvent", JSON.stringify( artHIVTestingEvent ) );
 		}
+		
+
+		// ------------------------------------------------------------------------------------------------
+		// [Client Attribute] TAB
+		
+		// STEP 4. Populate Client Registration data		
+		me.addClientFormTabTag.attr( "client", JSON.stringify( data.client ) );
+		me.populateClientAttrValues( me.addClientFormTabTag, data.client );	
+
+		var lockClientForm = ( completedHIVTestingEvents.lenght > 0 || activeHIVTestingEvent != undefined );
+		if( lockClientForm )
+		{
+			Util.disableForm( me.addClientFormTag, true );
+		}
+		else
+		{
+			// STEP 5. Init logic for attribute fields based on attribute values
+			me.setUp_ClientRegistrationFormDataLogic();
+
+			// STEP 6. Create header for [Update client] form
+			me.generateAddClientFormHeader();
+		}
+		
 		
 		// ---------------------------------------------------------------------------------------
 		// Set up HIV Testing event data
