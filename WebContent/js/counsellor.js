@@ -787,6 +787,13 @@ function Counsellor( storageObj, translationObj )
 			me.generateClientCUIC();
 		});
 		
+		// Add [District] of [Contact Log] change event
+		var districtTag = me.getAttributeField( me.attr_Address3 );
+		districtTag.change( function(){
+			me.filterCouncilsByDistrict();
+		});
+			
+		
 		me.setUp_validationCheck( me.seachAddClientFormTag.find( 'input,select' ) );
 		
 	};
@@ -1626,6 +1633,9 @@ function Counsellor( storageObj, translationObj )
 		// Set Mandatory for [Consent to contact] field
 		var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
 		me.addMandatoryForField( consentToContactTag );
+		
+		// Hide Councils list in [Contact Log] attribute form
+		me.filterCouncilsByDistrict();
 	};
 
 	me.createAttributeClientForm = function( table, preFixGroupName, addHistoryDiv )
@@ -4016,7 +4026,8 @@ function Counsellor( storageObj, translationObj )
 		
 		// STEP 4. Populate Client Registration data		
 		me.addClientFormTabTag.attr( "client", JSON.stringify( data.client ) );
-		me.populateClientAttrValues( me.addClientFormTabTag, data.client );	
+		me.populateClientAttrValues( me.addClientFormTabTag, data.client );
+		me.filterCouncilsByDistrict();
 
 		var lockClientForm = ( completedHIVTestingEvents.lenght > 0 || activeHIVTestingEvent != undefined );
 		if( lockClientForm )
@@ -4283,23 +4294,28 @@ function Counsellor( storageObj, translationObj )
 		
 		if( groupId == "TTTT4Ll5TdV" ) // Attribute Group [LS LOG 2 - Contact Details]
 		{
-			var contactPhoneNumberTag = me.getAttributeField( me.attr_ContactPhoneNumber );
+			var contactPhoneNumber = me.getAttributeField( me.attr_ContactPhoneNumber ).val();
 		
-			var restrictionsContactingTag  = me.getAttributeField( me.attr_RestrictionsContacting );
-			var address1Tag = me.getAttributeField( me.attr_Address1 );
-			var address2Tag = me.getAttributeField( me.attr_Address2 );
-			var address3Tag = me.getAttributeField( me.attr_Address3 );
-			var address4Tag = me.getAttributeField( me.attr_Address4 );
-			var address5Tag = me.getAttributeField( me.attr_Address5 );
+			var restrictionsContacting  = me.getAttributeField( me.attr_RestrictionsContacting ).val();
+			restrictionsContacting = ( restrictionsContacting != "" ) ? " - Restrictions: " +  restrictionsContacting : "";
 			
-			if( contactPhoneNumberTag.val() != "" )
-			{
-				var restrictionsVal = restrictionsContactingTag.val();
-				restrictionsVal = ( restrictionsVal != "" ) ? " - Restrictions: " +  restrictionsVal : "";
-				historyTag.append("<p><span class='glyphicon glyphicon-earphone'></span> " + contactPhoneNumberTag.val() + restrictionsVal + "</p>");
-			}
+			var address1 = me.getAttributeField( me.attr_Address1 ).val();
+			address1 = me.getDisplayNameByAttributeValue( me.attr_Address1, address1 );
 			
-			historyTag.append("<p><span class='glyphicon glyphicon-list-alt'></span> " + address1Tag.val() + "<br>Landmark: " + address2Tag.val() + "<br>" + address3Tag.val() + ", " + address4Tag.val() + ", " + address5Tag.val() + "</p>");
+			var address2 = me.getAttributeField( me.attr_Address2 ).val();
+			address2 = me.getDisplayNameByAttributeValue( me.attr_Address2, address2 );
+			
+			var address3 = me.getAttributeField( me.attr_Address3 ).val();
+			address3 = me.getDisplayNameByAttributeValue( me.attr_Address3, address3 );
+			
+			var address4 = me.getAttributeField( me.attr_Address4 ).val();
+			address4 = me.getDisplayNameByAttributeValue( me.attr_Address4, address4 );
+			
+			var address5 = me.getAttributeField( me.attr_Address5 ).val();
+			address5 = me.getDisplayNameByAttributeValue( me.attr_Address5, address5 );
+						
+			historyTag.append("<p><span class='glyphicon glyphicon-earphone'></span> " + contactPhoneNumber + restrictionsContacting + "</p>");
+			historyTag.append("<p><span class='glyphicon glyphicon-list-alt'></span> " + address1 + "<br>Landmark: " + address2 + "<br>" + address3 + ", " + address4 + ", " + address5 + "</p>");
 		}
 		else if( groupId == "CqBvWGKEKLP" ) // Attribute Group [LS LOG 3 - Next of kin]
 		{
@@ -4391,6 +4407,17 @@ function Counsellor( storageObj, translationObj )
 	me.getDisplayNameByDataValue = function( deId, value )
 	{
 		var tag = me.getDataElementField( deId );
+		if( tag.prop( "tagName" ) == 'SELECT'  )
+		{
+			value = tag.find("option[value='" + value + "']").text();
+		}
+		
+		return value;
+	}
+
+	me.getDisplayNameByAttributeValue = function( attrId, value )
+	{
+		var tag = me.getAttributeField( attrId );
 		if( tag.prop( "tagName" ) == 'SELECT'  )
 		{
 			value = tag.find("option[value='" + value + "']").text();
@@ -4904,6 +4931,27 @@ function Counsellor( storageObj, translationObj )
 		me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']").val( clientCUIC );
 	};
 	
+	// Filter councils by selected district
+	me.filterCouncilsByDistrict = function()
+	{
+		var districtTag = me.getAttributeField( me.attr_Address3 );
+		var councilOptionsTag = me.getAttributeField( me.attr_Address4 ).find("option");
+		councilOptionsTag.hide();
+		
+		if( districtTag.val() != "" )
+		{
+			councilOptionsTag.each( function(){
+				var optionTag = $(this);
+				var key = "LS" + districtTag.val();
+				if( optionTag.val().indexOf( key ) == 0 )
+				{
+					optionTag.show();
+				}
+			});
+		}
+	};
+
+
 	// Show/Hide a tab in Add/Update Client form
 	
 	me.hideTabInClientForm = function( tabName )
