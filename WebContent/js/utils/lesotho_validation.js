@@ -67,9 +67,10 @@ function Validation( translationObj )
 		// , and if not valid, set the tag as '"valid"=false' in the attribute
 		var valid = true;
 		var validationAttr = tag.attr( type );
+		var rowTag = tag.closest("tr");
 		
 		// If the validation attribute is present in the tag
-		if ( validationAttr )
+		if ( validationAttr && !rowTag.hasClass("logicHide") )
 		{						
 			if ( type == 'mandatory' ) valid = me.checkRequiredValue( tag, divTag );
 			else if ( type == 'minlength' ) valid = me.checkValueLen( tag, divTag, 'min', Number( validationAttr ) );

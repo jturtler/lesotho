@@ -177,6 +177,8 @@ function Counsellor( storageObj, translationObj )
 
 	
 	// [Register Attribute] Ids
+	me.attrGroup_ClientDetailsAndCUIC = "KgeLi7PFYxe";
+	
 	me.attr_FirstName = "mW2l3T2zL0N";
 	me.attr_LastName = "mUxDHgywnn2";
 	me.attr_DoB = "wSp6Q7QDMsk";
@@ -223,6 +225,7 @@ function Counsellor( storageObj, translationObj )
 	
 	
 	// [Data Element Ids]
+	
 	me.de_Testing_ResultTest1 = "choHDFxMCaU";
 	me.de_Testing_ResultTest2 = "KDnhSz51HKS";
 	me.de_Testing_ResultParallel1 = "rMh4ZGNzrh1";
@@ -233,6 +236,8 @@ function Counsellor( storageObj, translationObj )
 	me.de_ClientPartnerCUIC = "UYyCL2xz8Wz";
 	me.de_Age = "e4XZKCNJjlc";
 	me.de_ClientType = "RvYugZqBKoN";
+	me.de_DiscordantCouple = "Umu8i2QXCZk";
+	me.de_EQCPPTPassed = "H61nmZKhACr";
 	me.de_partnerCUICOpt = "csHM60DUGkG";
 	me.de_partnerCUIC= "UYyCL2xz8Wz";
 	me.de_PartnerKnowsHIVStatus = "TSqDjQSS2Qi";
@@ -256,6 +261,7 @@ function Counsellor( storageObj, translationObj )
 	me.de_ReferralGiven_VMMC = "DbfyDJ04SjL";
 	me.de_ReferralGiven_ART = "tUIkmIFMEDS";
 	me.de_ReferralGiven_DNAPCR = "ZKWK5UIO9wp";
+	
 	
 	
 	me.de_TypeOfContact = "wzM3bUiPowS";
@@ -903,6 +909,7 @@ function Counsellor( storageObj, translationObj )
 
 				if( me.showOpeningTag )
 				{
+					me.setARTLinkageStatusAttrValue();
 					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
 				}
 			} );
@@ -970,8 +977,6 @@ function Counsellor( storageObj, translationObj )
 				if( me.artReferOpenFormTag.attr("event") != undefined )
 				{
 					// Reset data
-//					var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
-//					me.populateClientAttrValues( me.artReferOpenFormTag, jsonClient );
 					var jsonEvent = JSON.parse( me.artReferOpenFormTag.attr("event") );
 					me.populateDataValuesInEntryForm( me.artReferOpenFormTag, jsonEvent );
 				}
@@ -1010,9 +1015,10 @@ function Counsellor( storageObj, translationObj )
 			
 			me.execSaveEvent( jsonEvent, jsonClient.trackedEntityInstance, eventId, function( response ){
 				
+				// Set [event] attribute for [ART Refer Opening] Tab
+				me.artReferOpenFormTag.attr( "event", JSON.stringify( response ) );
+				
 				me.setAndSaveARTLinkageStatusAttrValue( function(){
-					// Set [event] attribute for [ART Refer Opening] Tab
-					me.artReferOpenFormTag.attr( "event", JSON.stringify( response ) );
 					
 					// Generate [Time Elapsed] attribute value for [ART Closure] form
 					me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( "00:00" );
@@ -1145,7 +1151,7 @@ function Counsellor( storageObj, translationObj )
 			me.execSaveEvent(event, client.trackedEntityInstance, event.event, function( eventJson ){
 				
 				me.addEventFormTag.attr("event", JSON.stringify( eventJson ));
-				Util.disableForm( me.addClientFormTag, true );
+				me.disableClientDetailsAndCUICAttrGroup( true );
 				
 				if( me.checkIfARTEvent( eventJson ) )
 				{
@@ -1189,6 +1195,10 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
+	me.disableClientDetailsAndCUICAttrGroup = function( disabled )
+	{
+		Util.disableForm( me.addClientFormTag.find("tbody[groupid=" + me.attrGroup_ClientDetailsAndCUIC + "]" ), disabled );
+	}
 	
 	me.setUp_validationCheck = function( tags )
 	{
@@ -1244,6 +1254,29 @@ function Counsellor( storageObj, translationObj )
 				me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
 			}
 		}
+		
+		// Set data for [EQC / PPT Passed]
+		var clientTypeTag = me.getDataElementField( me.de_ClientType );
+		if( clientTypeTag.val() == "LS_SER3" )
+		{
+			var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
+			if( me.resultTest1Tag.val() != "" && me.resultTest2Tag.val() != "" )
+			{
+				if( me.resultTest1Tag.val() ==  me.resultTest2Tag.val() )
+				{
+					EQCPPTPassedTag.val("true");
+				}
+				else
+				{
+					EQCPPTPassedTag.val("false");
+				}
+			}
+			else
+			{
+				EQCPPTPassedTag.val("");
+			}
+		}
+	
 				
 		me.setUp_DataElementPartnerKnowHIVStatusLogic();
 		me.setUp_DataElementFinalHIVStatusLogic();
@@ -1533,20 +1566,65 @@ function Counsellor( storageObj, translationObj )
 		var clientTypeTag = me.getDataElementField( me.de_ClientType );
 		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
 		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		var discordantCoupleTag = me.getDataElementField( me.de_DiscordantCouple );
+		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
+		var resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
+		var resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
+		
+		// STEP 1. Show all tbody and input in [New Test]
+		me.addEventFormTag.find("tbody[sectionid]").show();
+		me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
+			me.setHideLogicTag( $(this), false );
+		});
+		
+		me.addEventFormTag.find("tbody[sectionid].hideHeader").find("tr:not([header])").hide();
+		
+		// Hide [Client partner's CUIC - Option] && [Client partner's CUIC] fields
+		me.setHideLogicTag( partnerCUICOptTag, true );
+		me.setHideLogicTag( partnerCUICTag, true );
+		me.setHideLogicTag( discordantCoupleTag, true );
+		me.setHideLogicTag( EQCPPTPassedTag, true );
+		
+		
+		// Individual
 		if( clientTypeTag.val() == "LS_SER1" )
 		{
 			partnerCUICOptTag.val("");
 			partnerCUICTag.val("");
-			
-			// Hide [Client partner's CUIC - Option] && [Client partner's CUIC] fields
-			me.setHideLogicTag( partnerCUICOptTag, true );
-			me.setHideLogicTag( partnerCUICTag, true );
 		}
-		else
+		// Couple test
+		else if( clientTypeTag.val() == "LS_SER2" )
 		{
-			// Show [Client partner's CUIC - Option] && [Client partner's CUIC] fields
 			me.setHideLogicTag( partnerCUICOptTag, false );
 			me.setHideLogicTag( partnerCUICTag, false );
+			me.setHideLogicTag( discordantCoupleTag, false );
+		}
+		// EQC / PPT
+		else if( clientTypeTag.val() == "LS_SER3" )
+		{
+			// STEP 1. Hide all tbody and input in [New Test]
+			me.addEventFormTag.find("tbody[sectionid]").hide();
+			me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
+				me.setHideLogicTag( $(this), true );
+			});
+			
+			// STEP 2. Show [Client Type] field
+			var clientInfoTb = clientTypeTag.closest("tbody");
+			clientInfoTb.show();
+			me.setHideLogicTag( clientTypeTag, false );
+			
+			// STEP 2. Show [EQC / PPT Passed] field
+			clientInfoTb = EQCPPTPassedTag.closest("tbody");
+			clientInfoTb.show();
+			me.setHideLogicTag( EQCPPTPassedTag, false );
+			
+			// STEP 3. Hide all fields in [Today] section
+			var todayTestTb = resultTest1Tag.closest("tbody");
+			todayTestTb.show();
+			me.setHideLogicTag( resultTest1Tag, false );
+			me.setHideLogicTag( resultTest2Tag, false );
+			
+			me.addEventFormTag.find("tbody[sectionid].hideHeader").find("tr:not([header])").hide();
 		}
 		
 	};
@@ -1929,6 +2007,7 @@ function Counsellor( storageObj, translationObj )
 				imgTag.addClass('arrowDownImg');
 				imgTag.removeClass('arrowRightImg');
 				tbodyTag.find("tr:not([header])").show("fast");
+				tbodyTag.removeClass( "hideHeader" );
 				
 				tableTag.find("tr.actionBar").show();
 			}
@@ -1939,6 +2018,7 @@ function Counsellor( storageObj, translationObj )
 				imgTag.removeClass('arrowDownImg');
 				imgTag.addClass('arrowRightImg');
 				tbodyTag.find("tr:not([header])").hide("fast");
+				tbodyTag.addClass( "hideHeader" );
 				
 				tbodyTag.addClass("separateTb");
 				tableTag.find("tr.actionBar").hide();
@@ -2005,6 +2085,9 @@ function Counsellor( storageObj, translationObj )
 		var keyPopulationTag = me.getAttributeField( me.attr_KeyPopulation );
 		var circumcisedTag = me.getDataElementField( me.de_circumcisedTag );
 		
+		var referralGivenVMMCTag = me.getDataElementField( me.de_ReferralGiven_VMMC );
+		var referralOfferedTag = me.getDataElementField( me.de_Referral_Offered );
+		
 		// Reset option values for attribute [Key Population]
 		keyPopulationTag.find("option[value='MSMSW']").hide();
 		keyPopulationTag.find("option[value='MSMNONSW']").hide();
@@ -2021,12 +2104,22 @@ function Counsellor( storageObj, translationObj )
 			
 			// Hide data element [Circumcised]
 			me.setHideLogicTag( circumcisedTag.closest("tr"), true );
+			
+			// Hide [Referral to VMMC]
+			me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), true );
 		}
 		else if( sexTag.val() == "Male" ) // If Sex = Male, HIDE FSW
 		{
 			// Show option values [MSM] of attribute [Key Population]
 			keyPopulationTag.find("option[value='MSMSW']").show();
 			keyPopulationTag.find("option[value='MSMNONSW']").show();
+			
+			if( referralOfferedTag.val() == "true" )
+			{
+				// Hide [Referral to VMMC]
+				me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), false );
+			}
+			
 		}
 	}
 	
@@ -2187,6 +2280,7 @@ function Counsellor( storageObj, translationObj )
 				imgTag.addClass('arrowDownImg');
 				imgTag.removeClass('arrowRightImg');
 				tbodyTag.find("tr:not([header])").show("fast");
+				tbodyTag.removeClass( "hideHeader" );
 			}
 			else
 			{
@@ -2195,6 +2289,7 @@ function Counsellor( storageObj, translationObj )
 				imgTag.addClass('arrowRightImg');
 				tbodyTag.find("tr:not([header])").hide("fast");
 				tbodyTag.addClass("separateTb");
+				tbodyTag.addClass( "hideHeader" );
 			}
 			
 			// Hide all hideLogic fields
@@ -2319,6 +2414,12 @@ function Counsellor( storageObj, translationObj )
 	
 	me.resetDataEntryForm = function()
 	{
+		// Show all tbody and input in [New Test]
+		me.addEventFormTag.closest("tbody[sectionid]").show();
+		me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
+			me.setHideLogicTag( $(this), false );
+		});
+		
 		me.activeEventHeaderTag.hide();
 		
 		// Enable the form for entering data
@@ -2395,6 +2496,11 @@ function Counsellor( storageObj, translationObj )
 	
 	me.resetClientForm = function()
 	{
+		me.disableClientDetailsAndCUICAttrGroup( false );
+		
+		// Disable [Client CUIC] field. The value of this attribute will be generated from another attribute values		
+		Util.disableTag( me.getAttributeField( me.attr_ClientCUIC ), true );
+		
 		me.addClientFormTabTag.removeAttr( "client" );
 		me.addClientFormTabTag.removeAttr( "artHIVTestingEvent" );
 		me.addEventFormTag.removeAttr( "event" );
@@ -3465,7 +3571,9 @@ function Counsellor( storageObj, translationObj )
 		}
 		
 		var value = linkageStatusFieldTag.find("option:selected").val();
-		value = ( value != "" ) ? linkageStatusFieldTag.find("option:selected").text() : "[none]";
+		
+		var noneStatusStr = me.translationObj.getTranslatedValueByKey( "artRefer_tab_msg_statusNone" );
+		value = ( value != "" ) ? linkageStatusFieldTag.find("option:selected").text() : "[" + noneStatusStr + "]";
 		me.linkageStatusLableTag.html( value );
 	};
 	
@@ -3479,30 +3587,40 @@ function Counsellor( storageObj, translationObj )
 		
 		me.generateAddClientFormHeader();
 
-		
 		// STEP 3. Disable [Complete Event] button
 		
 		Util.disableTag( me.completedEventBtnTag, true );
 		
-		// STEP 3. Display [This Test] Tab if the "status" mode is "Add Client"
+		// STEP 4. Display [This Test] Tab if the "status" mode is "Add Client"
 		
-		if( me.saveClientRegBtnTag.attr("status") == "add" )
+		var firstName = me.getAttributeValue( response, me.attr_FirstName );
+		var surName = me.getAttributeValue( response, me.attr_LastName );
+		if( me.saveClientRegBtnTag.attr("status") == "add"  )
 		{
-			me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
 			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
+			if( firstName != "EQC" && ( surName != "POS" || surName != "NEG" ) )
+			{
+				me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+			}
+			else
+			{
+				// Set client Type as [EQC / PPT]
+				me.checkAndSetClientTypeValue( response );
+			}
 		}
 		
-		// STEP 3. Set the status "Update" for [Client Form]
+		// STEP 5. Set the status "Update" for [Client Form]
 		
 		me.saveClientRegBtnTag.attr("status", "update");
 		
 		
-		// STEP 3. Set data values based on client attribute values
+		// STEP 6. Set data values based on client attribute values
 		me.setUp_InitDataValues();
+		
 		
 		if( exeFunc !== undefined ) exeFunc(groupId);
 		
-		// STEP 8. Unblock form
+		// STEP 7. Unblock form
 		
 		if( showSuccessMsg == undefined || showSuccessMsg )
 		{
@@ -3513,9 +3631,68 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 	
+	me.checkAndSetClientTypeValue = function( jsonClient )
+	{
+		var clientTypeTag = me.getDataElementField( me.de_ClientType );
+		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
+		
+		clientTypeTag.val("");
+		EQCPPTPassedTag.val("");
+		
+		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName );
+		var surName = me.getAttributeValue( jsonClient, me.attr_LastName );
+		
+		if( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )
+		{
+			clientTypeTag.val("LS_SER3");
+			Util.disableTag( clientTypeTag, true );
+			Util.disableTag( EQCPPTPassedTag, true );
+			
+			me.hideTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+			me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
+		}
+		else
+		{
+			Util.disableTag( EQCPPTPassedTag, false );
+			
+			var dob = me.getAttributeValue( jsonClient, me.attr_DoB );
+			if( dob != "" ){
+				var birthDateStr = Util.formatDate_DbDate( dob );
+				var age = me.calculateAge( birthDateStr );
+				if( age < 8 )
+				{
+					// ASSIGN [Individual Test] value for data element [Client type]
+					clientTypeTag.val( "LS_SER1" );
+					Util.disableTag( clientTypeTag, true );
+				}
+			}
+			else
+			{
+				Util.disableTag( clientTypeTag, false );
+			}
+		}
+	};
+	
+	me.getAttributeValue = function( jsonClient, attrId )
+	{
+		var attributes = jsonClient.attributes;
+		var found = Util.findItemFromList( attributes, "attribute", attrId );
+		return ( found !== undefined ) ? found.value : "";
+	};
+	
 	
 	me.setUp_InitDataValues = function()
 	{
+		me.setUp_ClientRegistrationFormDataLogic();
+		
+		// Set [EQC] type
+		var jsonClient = me.addClientFormTabTag.attr( "client" );
+		if( jsonClient!= undefined )
+		{
+			jsonClient = JSON.parse( jsonClient );
+			me.checkAndSetClientTypeValue( jsonClient );
+		}
+		
 		var dobTag = me.getAttributeField( me.attr_DoB );
 		var age = "";
 		if( dobTag.val() != "" ){
@@ -3536,10 +3713,6 @@ function Counsellor( storageObj, translationObj )
 		var numberSexualPartnersLast6MonthTag = me.getDataElementField( me.de_NumberSexualPartnersLast6Month );
 		if( dobTag.val() != "" && age < 8 )
 		{
-			// ASSIGN [Individual Test] value for data element [Client type]
-			clientTypeTag.val( "LS_SER1" );
-			Util.disableTag( clientTypeTag, true );
-			
 			// Hide [Client partner's CUIC - Option] && [Client partner's CUIC] fields
 			me.setHideLogicTag( me.getDataElementField( me.de_partnerCUICOpt ), true );
 			me.setHideLogicTag( me.getDataElementField( me.de_partnerCUIC ), true );
@@ -3555,7 +3728,10 @@ function Counsellor( storageObj, translationObj )
 		else
 		{
 			// Enable data element [Client type]
-			Util.disableTag( clientTypeTag, false );
+			if( clientTypeTag.val() == "" )
+			{
+				Util.disableTag( clientTypeTag, false );
+			}
 			
 			// Show [Partner knows HIV status]
 			me.setHideLogicTag( partnerKnowsHIVStatusTag.closest("tr"), false );
@@ -3563,6 +3739,9 @@ function Counsellor( storageObj, translationObj )
 			// Show [Number of sexual partners last 6 months]
 			me.setHideLogicTag( numberSexualPartnersLast6MonthTag.closest("tr"), false );
 		}
+		
+		// --------------------------------------------------------------------------
+		me.setUp_DataEntryFormLogic();
 	};
 	
 	me.addErrorSpanToField = function( inputTag, errorMsg )
@@ -3719,6 +3898,7 @@ function Counsellor( storageObj, translationObj )
 					me.activeEventHeaderTag.show();
 					
 					Util.disableTag( me.completedEventBtnTag, false );
+					me.disableClientDetailsAndCUICAttrGroup( true );
 
 					// STEP 4. Unblock form
 					var translateMsg = "";
@@ -4032,7 +4212,7 @@ function Counsellor( storageObj, translationObj )
 		var lockClientForm = ( completedHIVTestingEvents.lenght > 0 || activeHIVTestingEvent != undefined );
 		if( lockClientForm )
 		{
-			Util.disableForm( me.addClientFormTag, true );
+			me.disableClientDetailsAndCUICAttrGroup( true );
 		}
 		else
 		{
@@ -4115,6 +4295,9 @@ function Counsellor( storageObj, translationObj )
 				
 		});
 		
+//		// Set value for data element [Client Type]
+//		var jsonClient = JSON.parse( me.addClientFormTabTag.attr( "client" ) );
+//		me.checkAndSetClientTypeValue( jsonClient );
 	};
 	
 	
@@ -4221,7 +4404,15 @@ function Counsellor( storageObj, translationObj )
 	{
 		me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
 		
-		if( eventData != undefined )
+		var jsonClient = JSON.parse( me.addClientFormTabTag.attr( "client" ) );
+		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName );
+		var surName = me.getAttributeValue( jsonClient, me.attr_LastName );
+		if( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )
+		{
+			me.hideTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+			me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
+		}
+		else if( eventData != undefined )
 		{
 			// STEP 1. Check IF Final status is positive 
 			// 		AND results are received 
