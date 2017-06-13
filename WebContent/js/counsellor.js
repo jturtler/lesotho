@@ -879,7 +879,7 @@ function Counsellor( storageObj, translationObj )
 		// Validation for INPUT fields
 		
 		me.thisTestDivTag.find("input,select").change(function(e){
-			me.setUp_DataEntryFormLogic( $(this).attr("dataelement") );			
+			me.setUp_DataEntryFormInputTagEvent( $(this).attr("dataelement") );			
 		});
 
 		me.setUp_validationCheck( me.addClientFormTag.find( 'input,select' ) );
@@ -1223,7 +1223,7 @@ function Counsellor( storageObj, translationObj )
 	// Add logic for data elements in [This Test] form
 	// ----------------------------------------------------------------------------
 	
-	me.setUp_DataEntryFormLogic = function( attrId )
+	me.setUp_DataEntryFormInputTagEvent = function( attrId )
 	{
 		if( attrId != undefined && eval( me.addClientFormTabTag.attr("addedLogic") ) )
 		{
@@ -2027,7 +2027,7 @@ function Counsellor( storageObj, translationObj )
 		Util.disableTag( me.getDataElementField( me.de_BMI ), true );
 		
 		// Add logic validation for input fields
-		me.setUp_DataEntryFormLogic();
+		me.setUp_DataEntryFormInputTagEvent();
 	};
 
 
@@ -3076,10 +3076,10 @@ function Counsellor( storageObj, translationObj )
 				var eventDate = event[2];
 				var cuic = event[4];
 				var ouName = event[6];
-				var artVal = event[7];
-				artVal = ( artVal == "" ) ? "[None]" : artVal;
-				var ouName = event[6];
-				var numberOfTest = event[7];
+				var artStatus = event[7];
+				artStatus = ( artStatus == "" ) ? "[None]" : artStatus;
+				var numberOfTest = event[5];
+				var openingFacility = event[8];
 				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
 				var eventDateStr = eventDate;
@@ -3095,8 +3095,8 @@ function Counsellor( storageObj, translationObj )
 				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
 				rowTag.append( "<td>" + cuic + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
-				rowTag.append( "<td>" + artVal + "</td>" );
-				rowTag.append( "<td>??</td>" );
+				rowTag.append( "<td>" + artStatus + "</td>" );
+				rowTag.append( "<td>" + openingFacility + "</td>" );
 
 				me.addEventForRowInList(rowTag);
 				
@@ -3803,7 +3803,7 @@ function Counsellor( storageObj, translationObj )
 		}
 		
 		// --------------------------------------------------------------------------
-		me.setUp_DataEntryFormLogic();
+		me.setUp_DataEntryFormInputTagEvent();
 	};
 	
 	me.addErrorSpanToField = function( inputTag, errorMsg )
@@ -4823,7 +4823,7 @@ function Counsellor( storageObj, translationObj )
 		Util.disableTag( me.getDataElementField( me.de_BMI ), true );
 
 		// Add logic validation for input fields
-		me.setUp_DataEntryFormLogic();
+		me.setUp_DataEntryFormInputTagEvent();
 	};
 	
 	// Check if the logged counsellor if this counsellor is the person who created the active event
