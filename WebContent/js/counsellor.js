@@ -1276,14 +1276,13 @@ function Counsellor( storageObj, translationObj )
 				EQCPPTPassedTag.val("");
 			}
 		}
-	
-				
+		
+		me.setUp_ClientTypeTagLogic();
 		me.setUp_DataElementPartnerKnowHIVStatusLogic();
 		me.setUp_DataElementFinalHIVStatusLogic();
 		me.setUp_ReferralOfferedLogic();
 		me.setUp_DataElementTBScreeningConductedLogic();
 		me.setUp_OtherReasonTagLogic();
-		me.setUp_ClientTypeTagLogic();
 		me.setUp_DataElementBMI();
 	}; 
 	
@@ -1625,6 +1624,16 @@ function Counsellor( storageObj, translationObj )
 			me.setHideLogicTag( resultTest2Tag, false );
 			
 			me.addEventFormTag.find("tbody[sectionid].hideHeader").find("tr:not([header])").hide();
+			
+			me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
+				if( $(this).attr("dataelement") != me.de_ClientType 
+						&&  $(this).attr("dataelement") != me.de_EQCPPTPassed 
+						&& $(this).attr("dataelement") != me.de_Testing_ResultTest1 
+						&& $(this).attr("dataelement") != me.de_Testing_ResultTest2 )
+				{
+					 $(this).val("");
+				}
+			});
 		}
 		
 	};
@@ -3597,7 +3606,6 @@ function Counsellor( storageObj, translationObj )
 		var surName = me.getAttributeValue( response, me.attr_LastName );
 		if( me.saveClientRegBtnTag.attr("status") == "add"  )
 		{
-			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 			if( firstName != "EQC" && ( surName != "POS" || surName != "NEG" ) )
 			{
 				me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
@@ -3607,6 +3615,8 @@ function Counsellor( storageObj, translationObj )
 				// Set client Type as [EQC / PPT]
 				me.checkAndSetClientTypeValue( response );
 			}
+			
+			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 		}
 		
 		// STEP 5. Set the status "Update" for [Client Form]
@@ -3657,8 +3667,7 @@ function Counsellor( storageObj, translationObj )
 			
 			var dob = me.getAttributeValue( jsonClient, me.attr_DoB );
 			if( dob != "" ){
-				var birthDateStr = Util.formatDate_DbDate( dob );
-				var age = me.calculateAge( birthDateStr );
+				var age = me.calculateAge( dob );
 				if( age < 8 )
 				{
 					// ASSIGN [Individual Test] value for data element [Client type]

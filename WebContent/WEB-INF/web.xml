@@ -63,4 +63,10 @@
     <servlet-name>TranslationController</servlet-name>
     <url-pattern>/translation/*</url-pattern>
   </servlet-mapping>
+  
+  
+  <session-config>
+    <session-timeout>30</session-timeout> <!-- in minutes -->
+  </session-config>
+  
 </web-app>
