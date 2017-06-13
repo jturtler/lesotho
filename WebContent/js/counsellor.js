@@ -221,8 +221,9 @@ function Counsellor( storageObj, translationObj )
 	
 	me.attr_LinkageStatus = "mYdfuRItatP";
 	me.de_ARTClosureLinkageOutcome  = "nOK8JcDWT9X";
+	me.de_LinkageStatusDropReason = "ZRfojTCqVhc";
 	
-	
+	me.attrGroupARTLinkageSuccess = "";
 	
 	// [Data Element Ids]
 	
@@ -1558,6 +1559,19 @@ function Counsellor( storageObj, translationObj )
 			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
 			otherReasonTag.val("");
 		}
+
+//		// [Main reason for dropping] of [Linkage outcome]
+//		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+//		otherReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
+//		if( closureLinkageOutcomeTag.val() == "DROPPED" ) // Other (specifiy)
+//		{
+//			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
+//		}
+//		else
+//		{
+//			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
+//			otherReasonTag.val("");
+//		}
 	};
 		
 	me.setUp_ClientTypeTagLogic = function()
@@ -1950,6 +1964,36 @@ function Counsellor( storageObj, translationObj )
 			me.addMandatoryForField( $(this) );
 		});
 		
+		// [[ART Closure] Linkage Status
+		
+		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		closureLinkageOutcomeTag.change( function(){
+			if( closureLinkageOutcomeTag.val() == "" )
+			{
+				me.artReferCloseFormTag.find("input,select").each(function(){
+					if( $(this).attr("dataelement") != me.de_ARTClosureLinkageOutcome )
+					{
+						me.setHideLogicTag( $(this), true);
+					}
+				});
+			}
+			else if( closureLinkageOutcomeTag.val() == "SUCCESS" )
+			{
+				me.artReferCloseFormTag.find("input,select").each(function(){
+					me.setHideLogicTag( $(this), false);
+				});
+				
+				var otherReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
+				me.setHideLogicTag( otherReasonTag, true);
+			}
+			else if( closureLinkageOutcomeTag.val() == "DROPPED" )
+			{
+				me.artReferCloseFormTag.find("input,select").each(function(){
+					me.setHideLogicTag( $(this), false);
+				});
+			}
+			
+		});
 		
 		// STEP 2. Disable some DEs in form. Will add login for these DE in 'change' event
 		
@@ -2501,6 +2545,15 @@ function Counsellor( storageObj, translationObj )
 		me.setHideLogicTag( me.getDataElementField( me.de_PartnerHIVStatus ).closest("tr"), true );
 		me.setUp_InitDataValues();
 		me.showOpeningTag = false;
+		
+		// Hide fields in [AR Closure] form, except [Linkage outcome] field
+		me.artReferCloseFormTag.find("input,select").each(function(){
+			if( $(this).attr("dataelement") != me.de_ARTClosureLinkageOutcome )
+			{
+				me.setHideLogicTag( $(this), true);
+			}
+		});
+		
 	};
 	
 	me.resetClientForm = function()
@@ -4005,7 +4058,7 @@ function Counsellor( storageObj, translationObj )
 				artClosureEvent = JSON.parse( artClosureEvent );
 			}
 			
-			me.setUp_ContactLogAndARTRefTab( event, [] );
+			me.populateDataValueForContactLogAndARTRefTab( event, [] );
 			
 			if( exeFunc !== undefined ) exeFunc();
 			
@@ -4246,7 +4299,7 @@ function Counsellor( storageObj, translationObj )
 		// STEP 9. Set up data in "Contact Log" tab and "ART Refer" tab
 		
 		// Set up data in "Contact Log" tab and "ART Refer" tab
-		me.setUp_ContactLogAndARTRefTab( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent );
+		me.populateDataValueForContactLogAndARTRefTab( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent );
 		me.checkAndShowARTReferTab( artHIVTestingEvent );
 		
 		// ---------------------------------------------------------------------------------------
@@ -4330,7 +4383,7 @@ function Counsellor( storageObj, translationObj )
 	// ---------------------------------------------------------------------------------------
 	// Setup "Contact Log" TAB
 	
-	me.setUp_ContactLogAndARTRefTab = function( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent )
+	me.populateDataValueForContactLogAndARTRefTab = function( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent )
 	{		
 		// STEP 0. Show/Hide history of [Contact log] attribute form
 		var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
@@ -4372,6 +4425,36 @@ function Counsellor( storageObj, translationObj )
 			// Populate event data
 			me.populateDataValuesInEntryForm( me.artReferCloseFormTag, artClosureEvent );
 		}
+		
+		
+		// Hide fields in [AR Closure] form, except [Linkage outcome] field
+		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		if( closureLinkageOutcomeTag.val() == "" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				if( $(this).attr("dataelement") != me.de_ARTClosureLinkageOutcome )
+				{
+					me.setHideLogicTag( $(this), true);
+				}
+			});
+		}
+		else if( closureLinkageOutcomeTag.val() == "SUCCESS" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				me.setHideLogicTag( $(this), false);
+			});
+			
+			var otherReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
+			me.setHideLogicTag( otherReasonTag, true);
+		}
+		else if( closureLinkageOutcomeTag.val() == "DROPPED" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				me.setHideLogicTag( $(this), false);
+			});
+		}
+		
+		
 		
 	};
 	
@@ -4863,7 +4946,33 @@ function Counsellor( storageObj, translationObj )
 				me.setUp_DataElementResultTest1Logic();
 			}
 			
-		}	
+		}
+//		
+//		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+//		if( closureLinkageOutcomeTag.val() == "" )
+//		{
+//			me.artReferCloseFormTag.find("input,select").each(function(){
+//				if( $(this).attr("dataelement") != me.de_ARTClosureLinkageOutcome )
+//				{
+//					me.setHideLogicTag( $(this), true);
+//				}
+//			});
+//		}
+//		else if( closureLinkageOutcomeTag.val() == "SUCCESS" )
+//		{
+//			me.artReferCloseFormTag.find("input,select").each(function(){
+//				if( $(this).attr("dataelement") != me.de_LinkageStatusDropReason )
+//				{
+//					me.setHideLogicTag( $(this), true);
+//				}
+//			});
+//		}
+//		else if( closureLinkageOutcomeTag.val() == "DROPPED" )
+//		{
+//			me.artReferCloseFormTag.find("input,select").each(function(){
+//				me.setHideLogicTag( $(this), true);
+//			});
+//		}
 	};
 	
 	// Create a tbody with sections of programs. This one is used for generating history of events of a client
