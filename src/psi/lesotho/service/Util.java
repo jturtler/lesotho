@@ -50,6 +50,7 @@ public final class Util
     public static String PAMAM_CLIENT_ID = "clientId";
     public static String PAMAM_EVENT_ID = "eventId";
     public static String PAMAM_DISTRICT_ID = "districtId";
+    public static String PAMAM_PARTNER_CUIC = "partnerCUIC";
     
     
     public static String ACCESS_SERVER_USERNAME = "lesotho_superuser";
@@ -64,6 +65,9 @@ public final class Util
     public static final String USER_CATEGORY_ID = "qVl8p3w3fI5";
     public static final String USER_CATEGORY_PIN_ATRIBUTE_ID = "WgOzQa7KDTV";
     public static final String USER_CATEGORY_WORKER_ROLE_ATRIBUTE_ID = "aXv3j7whLvA";
+    
+    
+    public static final String ID_DE_PARTNER_CUIC = "UYyCL2xz8Wz";
     
 
     public static final String CLIENT_ATTR_ID_CUIC = "zRA08XEYiSF";
@@ -81,6 +85,9 @@ public final class Util
     public static final String KEY_SAVE_EVENT = "save"; 
     public static final String KEY_GET_EVENT_DETAILS = "details";
     public static final String KEY_GET_REPORT = "report";
+    
+    public static final String KEY_FIND_PARTNER = "findPartner";
+    public static final String KEY_SAVE_PARTNER_CUIC = "savePartnerCUIC";    
     
     
 

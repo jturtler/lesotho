@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import jdk.nashorn.internal.parser.JSONParser;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -44,6 +46,9 @@ public class EventController
         + "/api/organisationUnits/" + PARAM_ORGUNIT_ID + ".json?fields=name,parent[name]";
     
 
+    private static String URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/SKI1rT5vA3m/data.json?var=startDate:" + EventController.PARAM_START_DATE 
+        + "&var=stageId:" + Util.STAGE_ID + "&var=username:" + EventController.PARAM_USERNAME + "&var=ouId:KauEn2jKOk6&var=endDate:" + EventController.PARAM_END_DATE;
+    
 
     private static String URL_QUERY_FUCASE_BY_TIME = Util.LOCATION_DHIS_SERVER
         + "/api/sqlViews/llbPbszABjd/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
@@ -167,6 +172,28 @@ public class EventController
                 {
                     responseInfo = EventController.getAllFU( request, loginUsername );
                 }
+                // Find fist client in couple -- Used for finding partner CUIC and partner event UID
+                else if ( key.equals( Util.KEY_FIND_PARTNER ) )
+                {
+                    String ouId = request.getParameter( Util.PAMAM_ORGUNIT_ID );
+                    responseInfo =  EventController.findClientPartner( ouId, loginUsername );
+                }
+                else if ( key.equals( Util.KEY_SAVE_PARTNER_CUIC ) )
+                {
+                    String eventId = request.getParameter( Util.PAMAM_EVENT_ID );
+                    String partnerCUIC = request.getParameter( Util.PAMAM_PARTNER_CUIC );
+
+                    responseInfo = EventController.getEventById( eventId );
+                    JSONObject jsonEvent = responseInfo.data;
+                    JSONObject dataValue = new JSONObject();
+                    dataValue.put( "dataElement", Util.ID_DE_PARTNER_CUIC );
+                    dataValue.put( "value", partnerCUIC );
+                    jsonEvent.getJSONArray( "dataValues" ).put( dataValue );
+                    
+                    responseInfo = EventController.updateEvent( eventId, jsonEvent, loginUsername );
+                    
+                } 
+               
             }
 
             // STEP 4. Send back the messages
@@ -323,7 +350,7 @@ public class EventController
         {
             try
             {
-                String url = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:I2oytRXksKN;rcVLQsClLUa;sNS1PQ1YNXA&dimension=pe:LAST_4_WEEKS;LAST_WEEK;THIS_WEEK&dimension=" + Util.USER_CATEGORY_ID + ":" + catOptionComboId + "&filter=ou:" + Util.ROOT_ORGTUNIT + "&skipMeta=true";
+                String url = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:KDgzpKX3h2S.QLMo6Kh3eVP;KDgzpKX3h2S.tUIkmIFMEDS;KXSdghPqhl6;LE7tDH8dfDV;rcVLQsClLUa;sNS1PQ1YNXA;sX8wCJQEm2l&dimension=pe:THIS_FINANCIAL_YEAR;THIS_MONTH;THIS_QUARTER;THIS_WEEK&filter=ou:" + Util.ROOT_ORGTUNIT + "&filter=" + Util.USER_CATEGORY_ID + ":" + catOptionComboId + "&skipMeta=false";
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
             }
             catch ( Exception ex )
@@ -505,6 +532,32 @@ public class EventController
         return responseInfo;
     }
     
+    
+    private static ResponseInfo findClientPartner( String ouId, String loginUsername )
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+            String startDate = Util.getCurrentDate();
+            String endDate = Util.getXLastDate( -1 );
+            
+            String requestUrl = EventController.URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE;
+            requestUrl = requestUrl.replace( EventController.PARAM_START_DATE, startDate );
+            requestUrl = requestUrl.replace( EventController.PARAM_END_DATE, endDate );
+            requestUrl = requestUrl.replace( EventController.PARAM_USERNAME, loginUsername );
+            requestUrl = requestUrl.replace( EventController.PARAM_ORGUNIT_ID, ouId );
+            
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+        
+    }
     // ===============================================================================================================
     // Coordinator
     // ===============================================================================================================

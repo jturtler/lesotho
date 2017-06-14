@@ -234,7 +234,6 @@ function Counsellor( storageObj, translationObj )
 	me.de_Testing_ResultSDBioline = "M11JqgkJt2X";
 	me.de_FinalResult_HIVStatus = "UuKat0HFjWS";
 	
-	me.de_ClientPartnerCUIC = "UYyCL2xz8Wz";
 	me.de_Age = "e4XZKCNJjlc";
 	me.de_ClientType = "RvYugZqBKoN";
 	me.de_DiscordantCouple = "Umu8i2QXCZk";
@@ -281,15 +280,26 @@ function Counsellor( storageObj, translationObj )
 	
 	
 	//[Report]
-	me.de_Tested = "I2oytRXksKN";
-	me.de_Target = "rcVLQsClLUa";
-	me.de_achieved = "sNS1PQ1YNXA";
+	
+	me.de_AllClient_Tested = "KDgzpKX3h2S.QLMo6Kh3eVP";
+	me.de_AllClient_Target = "rcVLQsClLUa";
+	me.de_AllClient_achieved = "sNS1PQ1YNXA";
+	
+	me.de_PositiveClient_Tested = "KDgzpKX3h2S.tUIkmIFMEDS";
+	me.de_PositiveClient_Target = "LE7tDH8dfDV";
+	me.de_PositiveClient_achieved = "KXSdghPqhl6";
+	
+	me.de_Yield = "sX8wCJQEm2l";
 	
 	me.reportName_AllClient = "reportAllClients";
 	me.reportName_PositiveClient = "reportPostitiveClients";
-	me.reportName_ARTClient = "reportARTReferrals";
+	me.reportName_Yield = "reportYield";
 	
-	
+
+	me.COLOR_GREEN = "lime";
+	me.COLOR_ORGANGE = "#FF9900";
+	me.COLOR_RED = "red";
+
 	
 	// Search INPUT fields
 	me.searchDoBTag;
@@ -881,6 +891,12 @@ function Counsellor( storageObj, translationObj )
 		me.thisTestDivTag.find("input,select").change(function(e){
 			me.setUp_DataEntryFormInputTagEvent( $(this).attr("dataelement") );			
 		});
+		
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		partnerCUICOptTag.change( function(){
+			me.setUp_PartnerCUICOption();
+		});
+		
 
 		me.setUp_validationCheck( me.addClientFormTag.find( 'input,select' ) );
 		
@@ -1150,6 +1166,14 @@ function Counsellor( storageObj, translationObj )
 			event.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag );
 			
 			me.execSaveEvent(event, client.trackedEntityInstance, event.event, function( eventJson ){
+				
+				var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+				var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+				var partnerEventId = me.addEventFormTag.attr("partnerEventId")
+				if( partnerCUICOptTag.val() == "2" && partnerCUICTag.val() != "" && partnerEventId != undefined )
+				{
+					me.savePartnerCUIC();
+				}
 				
 				me.addEventFormTag.attr("event", JSON.stringify( eventJson ));
 				me.disableClientDetailsAndCUICAttrGroup( true );
@@ -1560,18 +1584,6 @@ function Counsellor( storageObj, translationObj )
 			otherReasonTag.val("");
 		}
 
-//		// [Main reason for dropping] of [Linkage outcome]
-//		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
-//		otherReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
-//		if( closureLinkageOutcomeTag.val() == "DROPPED" ) // Other (specifiy)
-//		{
-//			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
-//		}
-//		else
-//		{
-//			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
-//			otherReasonTag.val("");
-//		}
 	};
 		
 	me.setUp_ClientTypeTagLogic = function()
@@ -1608,6 +1620,7 @@ function Counsellor( storageObj, translationObj )
 		// Couple test
 		else if( clientTypeTag.val() == "LS_SER2" )
 		{
+			
 			me.setHideLogicTag( partnerCUICOptTag, false );
 			me.setHideLogicTag( partnerCUICTag, false );
 			me.setHideLogicTag( discordantCoupleTag, false );
@@ -1615,6 +1628,9 @@ function Counsellor( storageObj, translationObj )
 		// EQC / PPT
 		else if( clientTypeTag.val() == "LS_SER3" )
 		{
+			partnerCUICOptTag.val("");
+			partnerCUICTag.val("");
+		
 			// STEP 1. Hide all tbody and input in [New Test]
 			me.addEventFormTag.find("tbody[sectionid]").hide();
 			me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
@@ -1667,6 +1683,51 @@ function Counsellor( storageObj, translationObj )
 		
 		bmiTag.val( result );
 	};	
+	
+	me.setUp_PartnerCUICOption = function()
+	{
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		
+		partnerCUICTag.val("");
+		
+		if( partnerCUICOptTag.val() == "2" )
+		{
+			// Fill data for [Partner CUIC]
+			me.populateParterCUIC();
+		}
+	};
+	
+	me.setUp_ARTClosureForm = function()
+	{
+		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		var droppedReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
+		
+		if( closureLinkageOutcomeTag.val() == "" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				me.setHideLogicTag( $(this), true);
+			});
+		}
+		else if( closureLinkageOutcomeTag.val() == "SUCCESS" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				me.setHideLogicTag( $(this), false);
+			});
+			
+			me.setHideLogicTag( droppedReasonTag, true);
+		}
+		else if( closureLinkageOutcomeTag.val() == "DROPPED" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				me.setHideLogicTag( $(this), true);
+			});
+			
+			me.setHideLogicTag( droppedReasonTag, false);
+		}
+
+		me.setHideLogicTag( closureLinkageOutcomeTag, false);
+	};
 	
 	me.getDataElementField = function( deId )
 	{
@@ -1968,30 +2029,7 @@ function Counsellor( storageObj, translationObj )
 		
 		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
 		closureLinkageOutcomeTag.change( function(){
-			if( closureLinkageOutcomeTag.val() == "" )
-			{
-				me.artReferCloseFormTag.find("input,select").each(function(){
-					if( $(this).attr("dataelement") != me.de_ARTClosureLinkageOutcome )
-					{
-						me.setHideLogicTag( $(this), true);
-					}
-				});
-			}
-			else if( closureLinkageOutcomeTag.val() == "SUCCESS" )
-			{
-				me.artReferCloseFormTag.find("input,select").each(function(){
-					me.setHideLogicTag( $(this), false);
-				});
-				
-				var otherReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
-				me.setHideLogicTag( otherReasonTag, true);
-			}
-			else if( closureLinkageOutcomeTag.val() == "DROPPED" )
-			{
-				me.artReferCloseFormTag.find("input,select").each(function(){
-					me.setHideLogicTag( $(this), false);
-				});
-			}
+			me.setUp_ARTClosureForm();
 			
 		});
 		
@@ -2507,6 +2545,10 @@ function Counsellor( storageObj, translationObj )
 		me.resultTestResultSDBiolineTag.val("");
 		me.resultFinalHIVStatusTag.val("");
 		
+		
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		Util.disableTag( partnerCUICTag, true );
+		
 		// Reset values in the form
 		Util.resetForm( me.thisTestDivTag );
 		Util.resetForm( me.contactLogEventFormTag );
@@ -2565,9 +2607,13 @@ function Counsellor( storageObj, translationObj )
 		
 		me.addClientFormTabTag.removeAttr( "client" );
 		me.addClientFormTabTag.removeAttr( "artHIVTestingEvent" );
+		
 		me.addEventFormTag.removeAttr( "event" );
+		me.addEventFormTag.removeAttr( "partnereventid" );
+		
 		me.artReferOpenFormTag.removeAttr( "event" );
 		me.artReferCloseFormTag.removeAttr( "event" );
+		
 		me.previousTestsTag.find("table").html("");
 		
 		// Empty fields from "This Test" tab
@@ -3568,6 +3614,44 @@ function Counsellor( storageObj, translationObj )
 		
 	};
 	
+	me.savePartnerCUIC = function()
+	{
+		Commons.checkSession( function( isInSession ) 
+		{
+			if( isInSession ) 
+			{
+				var partnerCUIC = me.getAttributeField( me.attr_ClientCUIC ).val();
+				var partnerEventId = me.addEventFormTag.attr("partnerEventId");
+				$.ajax(
+					{
+						type: "POST"
+						,url: "../event/savePartnerCUIC?eventId=" + partnerEventId + "&partnerCUIC=" + partnerCUIC
+						,dataType: "json"
+			            ,contentType: "application/json;charset=utf-8"
+			            ,beforeSend: function()
+			            {
+			            	var translatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_updatingPartnerCUIC" );
+			            	MsgManager.appBlock( translatedText );
+			            }
+						,success: function( response ) 
+						{
+							tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_updatedPartnerCUIC" );
+							MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );	
+						}
+						,error: function(response)
+						{
+							console.log(response);
+						}
+					}).always( function( data ) {
+						MsgManager.appUnblock();
+					});
+			} 
+			else {
+				me.showExpireSessionMessage();					
+			}
+		});	
+	}
+	
 	me.saveClientAndEvent = function( formTag, stageId, exeFunc )
 	{
 		// Save [ART Referral status] attributes
@@ -3699,8 +3783,8 @@ function Counsellor( storageObj, translationObj )
 		var clientTypeTag = me.getDataElementField( me.de_ClientType );
 		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
 		
-		clientTypeTag.val("");
-		EQCPPTPassedTag.val("");
+//		clientTypeTag.val("");
+//		EQCPPTPassedTag.val("");
 		
 		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName );
 		var surName = me.getAttributeValue( jsonClient, me.attr_LastName );
@@ -4427,34 +4511,8 @@ function Counsellor( storageObj, translationObj )
 		}
 		
 		
-		// Hide fields in [AR Closure] form, except [Linkage outcome] field
-		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
-		if( closureLinkageOutcomeTag.val() == "" )
-		{
-			me.artReferCloseFormTag.find("input,select").each(function(){
-				if( $(this).attr("dataelement") != me.de_ARTClosureLinkageOutcome )
-				{
-					me.setHideLogicTag( $(this), true);
-				}
-			});
-		}
-		else if( closureLinkageOutcomeTag.val() == "SUCCESS" )
-		{
-			me.artReferCloseFormTag.find("input,select").each(function(){
-				me.setHideLogicTag( $(this), false);
-			});
-			
-			var otherReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
-			me.setHideLogicTag( otherReasonTag, true);
-		}
-		else if( closureLinkageOutcomeTag.val() == "DROPPED" )
-		{
-			me.artReferCloseFormTag.find("input,select").each(function(){
-				me.setHideLogicTag( $(this), false);
-			});
-		}
-		
-		
+		// Set up [ART Closure] form
+		me.setUp_ARTClosureForm();
 		
 	};
 	
@@ -4947,32 +5005,6 @@ function Counsellor( storageObj, translationObj )
 			}
 			
 		}
-//		
-//		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
-//		if( closureLinkageOutcomeTag.val() == "" )
-//		{
-//			me.artReferCloseFormTag.find("input,select").each(function(){
-//				if( $(this).attr("dataelement") != me.de_ARTClosureLinkageOutcome )
-//				{
-//					me.setHideLogicTag( $(this), true);
-//				}
-//			});
-//		}
-//		else if( closureLinkageOutcomeTag.val() == "SUCCESS" )
-//		{
-//			me.artReferCloseFormTag.find("input,select").each(function(){
-//				if( $(this).attr("dataelement") != me.de_LinkageStatusDropReason )
-//				{
-//					me.setHideLogicTag( $(this), true);
-//				}
-//			});
-//		}
-//		else if( closureLinkageOutcomeTag.val() == "DROPPED" )
-//		{
-//			me.artReferCloseFormTag.find("input,select").each(function(){
-//				me.setHideLogicTag( $(this), true);
-//			});
-//		}
 	};
 	
 	// Create a tbody with sections of programs. This one is used for generating history of events of a client
@@ -5240,6 +5272,56 @@ function Counsellor( storageObj, translationObj )
 		me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']").val( clientCUIC );
 	};
 	
+	me.populateParterCUIC = function()
+	{
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		partnerCUICTag.val("");
+		
+		Commons.checkSession( function( isInSession ) 
+				{
+					if( isInSession ) 
+					{
+						$.ajax(
+							{
+								type: "POST"
+								,url: "../event/findPartner?ouId=" + me.orgUnitListTag.val()
+								,dataType: "json"
+					            ,contentType: "application/json;charset=utf-8"
+					            ,beforeSend: function()
+					            {
+					            	var translatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_findingPartnerCUIC" );
+					            	MsgManager.appBlock( translatedText );
+					            }
+								,success: function( response ) 
+								{
+									var rows = response.rows;
+									if( rows.length == 1 )
+									{
+										var partnerCUICVal = rows[0][2];
+										partnerCUICTag.val( partnerCUICVal );
+										
+										var partnerEventId = rows[0][0];
+										me.addEventFormTag.attr( "partnerEventId", partnerEventId );
+									}
+									else
+									{
+										console.log("Finding partner fail.");
+									}
+								}
+								,error: function(response)
+								{
+									console.log(response);
+								}
+							}).always( function( data ) {
+								MsgManager.appUnblock();
+							});
+					} 
+					else {
+						me.showExpireSessionMessage();					
+					}
+				});	
+	}
+	
 	// Filter councils by selected district
 	me.filterCouncilsByDistrict = function()
 	{
@@ -5319,7 +5401,7 @@ function Counsellor( storageObj, translationObj )
 			            	MsgManager.appBlock( translatedText );
 			            	
 			            	me.reportTblTag.hide();
-			            	me.reportTblTag.find("tbody td[dataelement]").html("");
+			            	me.reportTblTag.find("tbody td[dataelement]").find("span").html("");
 			            	me.reportParamDivTag.show();
 			            }
 						,success: function( response ) 
@@ -5332,8 +5414,10 @@ function Counsellor( storageObj, translationObj )
 							// --------------------------------------------------------------------
 							
 							// STEP 2. Get the currentPeriod and period which Yesterday is winthin
-							var curPeriod = Util.getCurrentWeekPeriod();
-							var yesterdayPeriod = Util.getYesterdayPeriod();
+							var thisWeekPeriod = response.report.metaData.pe[3];
+							var thisMonthPeriod = response.report.metaData.pe[1];
+							var thisQuarterlyPeriod = response.report.metaData.pe[2];
+							var thisFinancialPeriod = response.report.metaData.pe[0];
 							
 							var last4WeeksData = [];
 							
@@ -5341,48 +5425,43 @@ function Counsellor( storageObj, translationObj )
 							for( var i in data )
 							{
 								var deId = data[i][0];
-								var value = eval( data[i][3] );
 								var peId = data[i][1];
+								var value = data[i][2];
 								
+								var periodKey = "";
 								// STEP 3. Set "This Week" data
-								if( peId == curPeriod ) {
-									me.setDataInReportCell( me.reportName_AllClient,deId, "thisWeek", value );
-								}
-
-								
-								// STEP 4. Set "Yesterday" data
-								// In some cases, yesterday and current date have the same period
-								if( peId == yesterdayPeriod ) {
-									// Check the Yesterday period and calculate value
-									if( value != "" ){
-										value = value / 5;
-										value = value.toFixed( 2 );
-
-										me.setDataInReportCell( me.reportName_AllClient, deId, "yesterday", value );
-									}
-								}
-									
-								// STEP 5. Calculate "Last 4 Week" data
-								if( peId != curPeriod && peId != yesterdayPeriod )	// Get last4Weeks values
+								if( peId == thisWeekPeriod ) 
 								{
-									var last4WeekData = last4WeeksData[deId];
-									if( last4WeekData !== undefined )
-									{
-										last4WeekData = eval( last4WeekData ) + value;
-										last4WeeksData[deId] = last4WeekData;
-									}
-									else
-									{
-										last4WeeksData[deId] = value;
-									}
+									periodKey = "thisWeek";
 								}
-								
+								else if( peId == thisMonthPeriod ) 
+								{
+									periodKey = "thisMonth";
+								}
+								else if( peId == thisQuarterlyPeriod ) 
+								{
+									periodKey = "thisQuarterly";
+								}
+								else if( peId == thisFinancialPeriod ) 
+								{
+									periodKey = "thisFinancialYear";
+								}
+
+
+								if( deId == me.de_AllClient_Tested || deId == me.de_AllClient_Target ||deId == me.de_AllClient_achieved )
+								{
+									me.setDataInReportCell( me.reportName_AllClient, deId, periodKey, value );
+								}
+								else if( deId == me.de_PositiveClient_Tested || deId == me.de_PositiveClient_Target ||deId == me.de_PositiveClient_achieved )
+								{
+									me.setDataInReportCell( me.reportName_PositiveClient, deId, periodKey, value );
+								}
+
+								else if( deId == me.de_Yield )
+								{
+									me.setDataInReportCell( me.reportName_Yield, deId, periodKey, value );
+								}
 							}
-							
-							// STEP 6. Set values for "Last 4 weeks" column							
-							me.setDataInReportCell( me.reportName_AllClient, me.de_Tested, "last4weeks", last4WeeksData[me.de_Tested] );
-							me.setDataInReportCell( me.reportName_AllClient, me.de_Target, "last4weeks", last4WeeksData[me.de_Target] );
-							me.setDataInReportCell( me.reportName_AllClient, me.de_achieved, "last4weeks", last4WeeksData[me.de_achieved] );
 							
 							me.reportTblTag.show();
 						}
@@ -5402,20 +5481,28 @@ function Counsellor( storageObj, translationObj )
 
 	me.setDataInReportCell = function( clazzTableName, deId, peId, value )
 	{
+		value = Util.formatNumber( eval( value ) );
 		var colTag = me.reportTblTag.find("tbody." + clazzTableName ).find("td[dataelement='" + deId + "'][period='" + peId + "']");
-		colTag.html( value );
+		colTag.find("span.value").html( value );
 		
-		if( deId == me.de_achieved )
+		var trafficLightTag = colTag.find("span.trafficLight");
+		if( trafficLightTag.length > 0 )
 		{
+			colTag.find("span.value").html( value + "%" );
+			
+			var color = "";
 			if( value >= 80 ){ // Green
-				colTag.append( " <img src='../images/green.png'>");
+				color = me.COLOR_GREEN;
 			}
-			else if( value >= 80 ){ // Yellow
-				colTag.append( " <img src='../images/yellow.png'>");
+			else if( value >= 60 ){ // Yellow
+				color = me.COLOR_ORGANGE;
 			}
 			else { // Red
-				colTag.append( " <img src='../images/red.png'>");
+				color = me.COLOR_RED;
 			}
+			
+			trafficLightTag.css( "color", color );
+			trafficLightTag.html("&#9679;");
 		}
 	};
 	

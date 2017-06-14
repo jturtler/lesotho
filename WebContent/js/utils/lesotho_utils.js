@@ -152,6 +152,19 @@ Util.highlightWords = function( data, search )
 	return data.replace( new RegExp( "(" + searchExp + ")" , 'gi' ), "<span style=\"background-color:yellow\">$1</span>" );
 };
 
+
+Util.formatNumber = function( value ){
+	var floorVal = Math.floor( value );
+	var ceilVal = Math.ceil( value );
+	
+	if( floorVal == ceilVal )
+	{
+		return floorVal;
+	}
+	
+	return value;
+};
+
 //-------------------------------------------------------------------
 // Date Utils
 //-------------------------------------------------------------------
@@ -388,17 +401,34 @@ Util.getCurrentWeekPeriod = function() {
 	return Util.getWeekIdx( new Date() );
 };
 
-Util.getYesterdayPeriod = function() {
-	var date = Util.getLastNDate( 1 );
-	return Util.getWeekIdx( date );
-};
-
-
 Util.getWeekIdx = function( date ) {
 	var onejan = new Date(date.getFullYear(), 0, 1);
     var weekIdx =  Math.ceil((((date - onejan) / 86400000) + onejan.getDay() + 1) / 7);
     
     return date.getFullYear() + "W" + weekIdx;
+};
+
+Util.getCurrentMonthPeriod = function() {
+	var date = new Date();
+	
+	var month = date.getMonth();
+	month = ( month < 10 ) ? "0" + month : month + "";
+	
+	return date.getFullYear() + month;
+};
+
+Util.getCurrentQuarterly = function( reportPeriodList )
+{
+	var period = "";
+	for( var i in reportPeriodList )
+	{
+		if( reportPeriodList[i].indexOf("Q") )
+		{
+			period = reportPeriodList[i];
+		}
+	}
+	
+	return period;
 };
 
 
