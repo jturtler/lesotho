@@ -15,6 +15,9 @@ function Counsellor( storageObj, translationObj )
 	me.translationObj = translationObj;
 	me.validationObj;
 	
+	
+	me.listManagement = new CounsellorListMaganement( me, storageObj, translationObj );
+	
 	me.dateFormat = "dd M yy";
 	me.dateTimeFormat = "YYYY-MM-DD HH:mm";
 	
@@ -33,27 +36,8 @@ function Counsellor( storageObj, translationObj )
 	me.headerSettingsLinkTag = $("#headerSettingsLink");
 	
 	
-	// Today cases
-	me.todayCaseListTag = $("#todayCaseList");
-	me.todayCaseTblTag = $("#todayCaseTbl");
-	me.listDateTag = $("#listDate");
+	// Today cases	
 	me.registerClientBtnTag = $("#registerClientBtn");
-	me.todayCaseFooterTag = $("#todayCaseFooter");
-	me.todayCaseNumberTag = $("#todayCaseNumber");
-	
-	
-	// Previous cases
-	me.previousCaseListTag = $("#previousCaseList");
-	me.previousCaseTblTag = $("#previousCaseTbl");
-	me.previousCaseFooterTag = $("#previousCaseFooter");
-	me.previousCaseNumberTag = $("#previousCaseNumber");
-	
-	
-	// Positive cases
-	me.positiveCaseListTag = $("#positiveCaseList");
-	me.positiveCaseTblTag = $("#positiveCaseTbl");
-	me.positiveCaseFooterTag = $("#positiveCaseFooter");
-	me.positiveCaseNumberTag = $("#positiveCaseNumber");
 	
 	
 	// Search Form	
@@ -366,6 +350,11 @@ function Counsellor( storageObj, translationObj )
 		me.loadInitData();
 	};
 	
+	
+	me.setCurrentPage = function( pageName )
+	{
+		me.currentList = pageName;
+	}
 
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Load init data
@@ -443,19 +432,19 @@ function Counsellor( storageObj, translationObj )
 		var page = me.storageObj.getItem( "page" );
 		if( page == me.PAGE_TODAY_LIST )
 		{
-			me.listTodayCases(function(){
+			me.listManagement.listTodayCases(function(){
 				me.loadSearchSubPage( me.todayCaseTblTag );
 			});
 		}
 		else if( page == me.PAGE_PREVIOUS_LIST )
 		{
-			me.listPreviousCases(function(){
+			me.listManagement.listPreviousCases(function(){
 				me.loadSearchSubPage( me.previousCaseTblTag );
 			});
 		}
 		else if( page == me.PAGE_POSITIVE_LIST )
 		{
-			me.listPositiveCases(function(){
+			me.listManagement.listPositiveCases(function(){
 				me.loadSearchSubPage( me.positiveCaseTblTag );
 			});
 		}
@@ -645,7 +634,7 @@ function Counsellor( storageObj, translationObj )
 			
 			me.checkOrgunitSetting( function(){
 				me.registerClientBtnTag.show();
-				me.listTodayCases();
+				me.listManagement.listTodayCases();
 			});
 		});
 		
@@ -654,7 +643,7 @@ function Counsellor( storageObj, translationObj )
 			
 			me.checkOrgunitSetting( function(){
 				me.registerClientBtnTag.hide();
-				me.listPreviousCases();
+				me.listManagement.listPreviousCases();
 			});
 		});
 		
@@ -663,7 +652,7 @@ function Counsellor( storageObj, translationObj )
 			
 			me.checkOrgunitSetting( function(){
 				me.registerClientBtnTag.hide();
-				me.listPositiveCases();
+				me.listManagement.listPositiveCases();
 			});
 		});
 		
@@ -754,7 +743,7 @@ function Counsellor( storageObj, translationObj )
 		
 		me.showTodayCaseTag.click( function(){
 			me.registerClientBtnTag.show();
-			me.listTodayCases();
+			me.listManagement.listTodayCases();
 		});
 				
 		// Call [Search clients] function
@@ -849,17 +838,17 @@ function Counsellor( storageObj, translationObj )
 			if( me.currentList == me.PAGE_TODAY_LIST )
 			{
 				me.registerClientBtnTag.show();
-				me.listTodayCases();
+				me.listManagement.listTodayCases();
 			}
 			else if( me.currentList == me.PAGE_PREVIOUS_LIST )
 			{
 				me.registerClientBtnTag.hide();
-				me.listPreviousCases();
+				me.listManagement.listPreviousCases();
 			}
 			else if( me.currentList == me.PAGE_POSITIVE_LIST )
 			{
 				me.registerClientBtnTag.hide();
-				me.listPositiveCases();
+				me.listManagement.listPositiveCases();
 			}
 		});
 		
@@ -3041,7 +3030,7 @@ function Counsellor( storageObj, translationObj )
 			var page = me.storageObj.getItem( "page" );
 			if( page == "" )
 			{
-				me.listTodayCases();
+				me.listManagement.listTodayCases();
 			}
 			else
 			{
@@ -3050,277 +3039,277 @@ function Counsellor( storageObj, translationObj )
 		}
 	};
 	
-	// -------------------------------------------------------------------
-	// Load list of cases
-	// -------------------------------------------------------------------
-	
-	me.listTodayCases = function( exeFunc )
-	{
-		me.currentList = me.PAGE_TODAY_LIST;
-		me.storageObj.addItem( "page", me.PAGE_TODAY_LIST );
-		me.storageObj.removeItem( "subPage" );		
-		
-		me.listDateTag.html( Util.formatDate_LastNDate(0) );
-		me.listCases( "../event/todayCases", function( list )
-		{
-			me.populateTodayCaseData( list );
-			if( exeFunc !== undefined ) exeFunc();
-
-			// Show table			
-			MsgManager.appUnblock();
-			me.todayCaseTblTag.show();
-			me.todayCaseListTag.show("fast");
-		} );
-	}
-		
-	me.listPreviousCases = function( exeFunc )
-	{
-		me.currentList = me.PAGE_PREVIOUS_LIST;
-		me.storageObj.addItem("page", me.PAGE_PREVIOUS_LIST);
-		me.storageObj.removeItem( "subPage" );
-		
-		me.listCases( "../event/previousCases", function( list ){
-			me.populatePreviousCaseData( list )
-			
-			if( exeFunc !== undefined ) exeFunc();
-
-			// Show table	
-			MsgManager.appUnblock();
-			me.previousCaseTblTag.show();
-			me.previousCaseListTag.show("fast");
-		} );
-	}
-	
-	me.listPositiveCases = function( exeFunc )
-	{
-		me.currentList = me.PAGE_POSITIVE_LIST;
-		me.storageObj.addItem("page", me.PAGE_POSITIVE_LIST);
-		me.storageObj.removeItem( "subPage" );
-		
-		me.listCases( "../event/positiveCases", function( list ){
-			me.populatePositiveCaseData( list );
-			
-			if( exeFunc !== undefined ) exeFunc();
-			
-			// Show table	
-			MsgManager.appUnblock();
-			me.positiveCaseTblTag.show();
-			me.positiveCaseListTag.show("fast");
-		} );
-	}
-	
-	me.listCases = function( url, exeFunc )
-	{
-		me.storageObj.removeItem("param" );
-		
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
-		
-		me.resetPageDisplay();
-		
-		MsgManager.appBlock( tranlatedText + " ..." );
-		
-		Commons.checkSession( function( isInSession ) 
-		{
-			if( isInSession ) 
-			{
-				$.ajax(
-					{
-						type: "POST"
-						,url: url
-						,dataType: "json"
-			            ,contentType: "application/json;charset=utf-8"
-						,success: function( response ) 
-						{
-							exeFunc( response.rows );
-						}
-						,error: function(response)
-						{
-							console.log(response);
-						}
-					});
-			} 
-			else {
-				me.showExpireSessionMessage();					
-			}
-		});	
-		
-	};
-	
-	me.populateTodayCaseData = function( list )
-	{		
-		var tbodyTag = me.todayCaseTblTag.find("tbody");
-		tbodyTag.find("tr").remove();
-		
-		if( list.length > 0 )
-		{
-			for( var i in list )
-			{
-				var event = list[i];
-				var clientId = event[0];
-				var eventId = event[1];
-				var eventDate = event[2];
-				var deResult1 = event[3];
-				var cuic = event[4];
-				var ouName = event[6];
-				
-				eventDate = ( eventDate !== undefined ) ? eventDate : "";
-				var eventDateStr = eventDate;
-				if( eventDate !== "" )
-				{
-					eventDateStr = Util.formatTimeInDateTime( eventDate );
-				}
-
-				var eventKey = eventDate.substring(11, 19).split(":").join("");
-				
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
-				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
-				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
-				rowTag.append( "<td>" + cuic + "</td>" );
-				rowTag.append( "<td>" + ouName + "</td>" );
-				rowTag.append( "<td>" + deResult1 + "</td>" );
-				
-				me.addEventForRowInList(rowTag);
-				
-				tbodyTag.append( rowTag );
-			}
-			
-		}
-		
-		// Sortable		
-		me.sortTable( me.todayCaseTblTag );
-		
-		me.todayCaseNumberTag.html( me.todayCaseTblTag.find("tbody tr").length );
-	}
-
-	me.populatePreviousCaseData = function( list )
-	{	
-		var tbodyTag = me.previousCaseTblTag.find("tbody");
-		tbodyTag.find("tr").remove();
-		
-		if( list.length > 0 )
-		{
-			
-			for( var i in list )
-			{
-				var event = list[i];
-				var clientId = event[0];
-				var eventId = event[1];
-				var eventDate = event[2];
-				var deResult1 = event[3];
-				var cuic = event[4];
-				var noTest = event[5];
-				var ouName = event[6];
-				
-				eventDate = ( eventDate !== undefined ) ? eventDate : "";
-				var eventDateStr = eventDate;
-				if( eventDate !== "" )
-				{
-					eventDateStr = Util.formatDate_DisplayDate( eventDate );
-				}
-				
-				var eventKey = eventDate.substring(0, 10).split("-").join("");
-			
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
-				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
-				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
-				rowTag.append( "<td>" + cuic + "</td>" );
-				rowTag.append( "<td>" + ouName + "</td>" );
-				rowTag.append( "<td>" + noTest + "</td>" );
-				rowTag.append( "<td>" + deResult1 + "</td>" );
-				
-				me.addEventForRowInList(rowTag);
-				
-				tbodyTag.append( rowTag );
-			}
-			
-		}
-		
-		// Sortable
-		me.sortTable( me.previousCaseTblTag );
-		
-		me.previousCaseNumberTag.html( me.previousCaseTblTag.find("tbody tr").length );
-	}
-	
-	me.populatePositiveCaseData = function( list )
-	{
-		var tbodyTag = me.positiveCaseTblTag.find("tbody");
-		tbodyTag.find("tr").remove();
-		
-		if( list.length > 0 )
-		{
-			for( var i in list )
-			{
-				var event = list[i];
-				var clientId = event[0];
-				var eventId = event[1];
-				var eventDate = event[2];
-				var cuic = event[4];
-				var ouName = event[6];
-				var artStatus = event[7];
-				artStatus = ( artStatus == "" ) ? "[None]" : artStatus;
-				var numberOfTest = event[5];
-				var openingFacility = event[8];
-				
-				eventDate = ( eventDate !== undefined ) ? eventDate : "";
-				var eventDateStr = eventDate;
-				if( eventDate !== "" )
-				{
-					eventDateStr = Util.formatDate_DisplayDate( eventDate );
-				}
-				
-				var eventKey = eventDate.substring(0, 10).split("-").join("");
-				
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "positiveCaseList_msg_clickToOpenEditForm" );
-				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "'></tr>");										
-				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
-				rowTag.append( "<td>" + cuic + "</td>" );
-				rowTag.append( "<td>" + ouName + "</td>" );
-				rowTag.append( "<td>" + artStatus + "</td>" );
-				rowTag.append( "<td>" + openingFacility + "</td>" );
-
-				me.addEventForRowInList(rowTag);
-				
-				tbodyTag.append( rowTag );
-			}
-			
-		}
-		
-		// Sortable
-
-		me.sortTable( me.positiveCaseTblTag );
-		
-		me.positiveCaseNumberTag.html( me.positiveCaseTblTag.find("tbody tr").length );
-	};
-
-	me.sortTable = function( tableTag )
-	{
-		// Sortable
-		var sorted = eval( tableTag.attr("sorted") );
-		if( tableTag.find("tbody tr").length > 0  )
-		{
-			var sortingList = { 'sortList': [[0,1]] };
-				
-			( sorted ) ? tableTag.trigger( "updateAll", [ sortingList, function() {} ] ) : tableTag.tablesorter( sortingList );
-
-			tableTag.attr( "sorted", "true" );
-		}
-	};
-	
-	me.addEventForRowInList = function(rowTag)
-	{
-		rowTag.css("cursor", "pointer");
-		rowTag.click( function(){
-			me.backToSearchClientResultBtnTag.hide();
-			me.backToCaseListBtnTag.show();
-			var clientId = rowTag.attr("clientId");
-			var eventId = rowTag.attr("eventId");
-			
-			me.resetPageDisplay();
-			me.loadClientDetails( clientId, eventId, function(){
-				me.addClientFormDivTag.show();
-			} );
-		});
-	};
+//	// -------------------------------------------------------------------
+//	// Load list of cases
+//	// -------------------------------------------------------------------
+//	
+//	me.listManagement.listTodayCases = function( exeFunc )
+//	{
+//		me.currentList = me.PAGE_TODAY_LIST;
+//		me.storageObj.addItem( "page", me.PAGE_TODAY_LIST );
+//		me.storageObj.removeItem( "subPage" );		
+//		
+//		me.listDateTag.html( Util.formatDate_LastNDate(0) );
+//		me.listCases( "../event/todayCases", function( list )
+//		{
+//			me.populateTodayCaseData( list );
+//			if( exeFunc !== undefined ) exeFunc();
+//
+//			// Show table			
+//			MsgManager.appUnblock();
+//			me.todayCaseTblTag.show();
+//			me.todayCaseListTag.show("fast");
+//		} );
+//	}
+//		
+//	me.listManagement.listPreviousCases = function( exeFunc )
+//	{
+//		me.currentList = me.PAGE_PREVIOUS_LIST;
+//		me.storageObj.addItem("page", me.PAGE_PREVIOUS_LIST);
+//		me.storageObj.removeItem( "subPage" );
+//		
+//		me.listCases( "../event/previousCases", function( list ){
+//			me.populatePreviousCaseData( list )
+//			
+//			if( exeFunc !== undefined ) exeFunc();
+//
+//			// Show table	
+//			MsgManager.appUnblock();
+//			me.previousCaseTblTag.show();
+//			me.previousCaseListTag.show("fast");
+//		} );
+//	}
+//	
+//	me.listManagement.listPositiveCases = function( exeFunc )
+//	{
+//		me.currentList = me.PAGE_POSITIVE_LIST;
+//		me.storageObj.addItem("page", me.PAGE_POSITIVE_LIST);
+//		me.storageObj.removeItem( "subPage" );
+//		
+//		me.listCases( "../event/positiveCases", function( list ){
+//			me.populatePositiveCaseData( list );
+//			
+//			if( exeFunc !== undefined ) exeFunc();
+//			
+//			// Show table	
+//			MsgManager.appUnblock();
+//			me.positiveCaseTblTag.show();
+//			me.positiveCaseListTag.show("fast");
+//		} );
+//	}
+//	
+//	me.listCases = function( url, exeFunc )
+//	{
+//		me.storageObj.removeItem("param" );
+//		
+//		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
+//		
+//		me.resetPageDisplay();
+//		
+//		MsgManager.appBlock( tranlatedText + " ..." );
+//		
+//		Commons.checkSession( function( isInSession ) 
+//		{
+//			if( isInSession ) 
+//			{
+//				$.ajax(
+//					{
+//						type: "POST"
+//						,url: url
+//						,dataType: "json"
+//			            ,contentType: "application/json;charset=utf-8"
+//						,success: function( response ) 
+//						{
+//							exeFunc( response.rows );
+//						}
+//						,error: function(response)
+//						{
+//							console.log(response);
+//						}
+//					});
+//			} 
+//			else {
+//				me.showExpireSessionMessage();					
+//			}
+//		});	
+//		
+//	};
+//	
+//	me.populateTodayCaseData = function( list )
+//	{		
+//		var tbodyTag = me.todayCaseTblTag.find("tbody");
+//		tbodyTag.find("tr").remove();
+//		
+//		if( list.length > 0 )
+//		{
+//			for( var i in list )
+//			{
+//				var event = list[i];
+//				var clientId = event[0];
+//				var eventId = event[1];
+//				var eventDate = event[2];
+//				var deResult1 = event[3];
+//				var cuic = event[4];
+//				var ouName = event[6];
+//				
+//				eventDate = ( eventDate !== undefined ) ? eventDate : "";
+//				var eventDateStr = eventDate;
+//				if( eventDate !== "" )
+//				{
+//					eventDateStr = Util.formatTimeInDateTime( eventDate );
+//				}
+//
+//				var eventKey = eventDate.substring(11, 19).split(":").join("");
+//				
+//				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
+//				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
+//				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
+//				rowTag.append( "<td>" + cuic + "</td>" );
+//				rowTag.append( "<td>" + ouName + "</td>" );
+//				rowTag.append( "<td>" + deResult1 + "</td>" );
+//				
+//				me.addEventForRowInList(rowTag);
+//				
+//				tbodyTag.append( rowTag );
+//			}
+//			
+//		}
+//		
+//		// Sortable		
+//		me.sortTable( me.todayCaseTblTag );
+//		
+//		me.todayCaseNumberTag.html( me.todayCaseTblTag.find("tbody tr").length );
+//	}
+//
+//	me.populatePreviousCaseData = function( list )
+//	{	
+//		var tbodyTag = me.previousCaseTblTag.find("tbody");
+//		tbodyTag.find("tr").remove();
+//		
+//		if( list.length > 0 )
+//		{
+//			
+//			for( var i in list )
+//			{
+//				var event = list[i];
+//				var clientId = event[0];
+//				var eventId = event[1];
+//				var eventDate = event[2];
+//				var deResult1 = event[3];
+//				var cuic = event[4];
+//				var noTest = event[5];
+//				var ouName = event[6];
+//				
+//				eventDate = ( eventDate !== undefined ) ? eventDate : "";
+//				var eventDateStr = eventDate;
+//				if( eventDate !== "" )
+//				{
+//					eventDateStr = Util.formatDate_DisplayDate( eventDate );
+//				}
+//				
+//				var eventKey = eventDate.substring(0, 10).split("-").join("");
+//			
+//				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
+//				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
+//				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
+//				rowTag.append( "<td>" + cuic + "</td>" );
+//				rowTag.append( "<td>" + ouName + "</td>" );
+//				rowTag.append( "<td>" + noTest + "</td>" );
+//				rowTag.append( "<td>" + deResult1 + "</td>" );
+//				
+//				me.addEventForRowInList(rowTag);
+//				
+//				tbodyTag.append( rowTag );
+//			}
+//			
+//		}
+//		
+//		// Sortable
+//		me.sortTable( me.previousCaseTblTag );
+//		
+//		me.previousCaseNumberTag.html( me.previousCaseTblTag.find("tbody tr").length );
+//	}
+//	
+//	me.populatePositiveCaseData = function( list )
+//	{
+//		var tbodyTag = me.positiveCaseTblTag.find("tbody");
+//		tbodyTag.find("tr").remove();
+//		
+//		if( list.length > 0 )
+//		{
+//			for( var i in list )
+//			{
+//				var event = list[i];
+//				var clientId = event[0];
+//				var eventId = event[1];
+//				var eventDate = event[2];
+//				var cuic = event[4];
+//				var ouName = event[6];
+//				var artStatus = event[7];
+//				artStatus = ( artStatus == "" ) ? "[None]" : artStatus;
+//				var numberOfTest = event[5];
+//				var openingFacility = event[8];
+//				
+//				eventDate = ( eventDate !== undefined ) ? eventDate : "";
+//				var eventDateStr = eventDate;
+//				if( eventDate !== "" )
+//				{
+//					eventDateStr = Util.formatDate_DisplayDate( eventDate );
+//				}
+//				
+//				var eventKey = eventDate.substring(0, 10).split("-").join("");
+//				
+//				var tranlatedText = me.translationObj.getTranslatedValueByKey( "positiveCaseList_msg_clickToOpenEditForm" );
+//				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "'></tr>");										
+//				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
+//				rowTag.append( "<td>" + cuic + "</td>" );
+//				rowTag.append( "<td>" + ouName + "</td>" );
+//				rowTag.append( "<td>" + artStatus + "</td>" );
+//				rowTag.append( "<td>" + openingFacility + "</td>" );
+//
+//				me.addEventForRowInList(rowTag);
+//				
+//				tbodyTag.append( rowTag );
+//			}
+//			
+//		}
+//		
+//		// Sortable
+//
+//		me.sortTable( me.positiveCaseTblTag );
+//		
+//		me.positiveCaseNumberTag.html( me.positiveCaseTblTag.find("tbody tr").length );
+//	};
+//
+//	me.sortTable = function( tableTag )
+//	{
+//		// Sortable
+//		var sorted = eval( tableTag.attr("sorted") );
+//		if( tableTag.find("tbody tr").length > 0  )
+//		{
+//			var sortingList = { 'sortList': [[0,1]] };
+//				
+//			( sorted ) ? tableTag.trigger( "updateAll", [ sortingList, function() {} ] ) : tableTag.tablesorter( sortingList );
+//
+//			tableTag.attr( "sorted", "true" );
+//		}
+//	};
+//	
+//	me.addEventForRowInList = function(rowTag)
+//	{
+//		rowTag.css("cursor", "pointer");
+//		rowTag.click( function(){
+//			me.backToSearchClientResultBtnTag.hide();
+//			me.backToCaseListBtnTag.show();
+//			var clientId = rowTag.attr("clientId");
+//			var eventId = rowTag.attr("eventId");
+//			
+//			me.resetPageDisplay();
+//			me.loadClientDetails( clientId, eventId, function(){
+//				me.addClientFormDivTag.show();
+//			} );
+//		});
+//	};
 	
 	
 	// ---------------------------------------------------------------------------------------------------------------
