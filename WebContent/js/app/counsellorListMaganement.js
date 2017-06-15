@@ -29,10 +29,9 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 	me.positiveCaseNumberTag = $("#positiveCaseNumber");
 	
 
-	
-	// -------------------------------------------------------------------
-	// Load list of cases
-	// -------------------------------------------------------------------
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Load cases
+	// ---------------------------------------------------------------------------------------------------------------------------
 	
 	me.listTodayCases = function( exeFunc )
 	{
@@ -88,6 +87,11 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 			me.positiveCaseListTag.show("fast");
 		} );
 	}
+
+	
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Load data from server
+	// ---------------------------------------------------------------------------------------------------------------------------
 	
 	me.listCases = function( url, exeFunc )
 	{
@@ -95,7 +99,7 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 		
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
 		
-		me.counsellorObj.resetPageDisplay();
+		Util.resetPageDisplay();
 		
 		MsgManager.appBlock( tranlatedText + " ..." );
 		
@@ -125,6 +129,11 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 		});	
 		
 	};
+
+	
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Populate data to tables
+	// ---------------------------------------------------------------------------------------------------------------------------
 	
 	me.populateTodayCaseData = function( list )
 	{		
@@ -272,6 +281,7 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 		me.positiveCaseNumberTag.html( me.positiveCaseTblTag.find("tbody tr").length );
 	};
 
+	// Sort table
 	me.sortTable = function( tableTag )
 	{
 		// Sortable
@@ -286,6 +296,7 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 		}
 	};
 	
+	// Set up event for rows in table - Show Client Details when a row is clicked
 	me.addEventForRowInList = function(rowTag)
 	{
 		rowTag.css("cursor", "pointer");
@@ -295,7 +306,7 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 			var clientId = rowTag.attr("clientId");
 			var eventId = rowTag.attr("eventId");
 			
-			me.counsellorObj.resetPageDisplay();
+			Util.resetPageDisplay();
 			me.counsellorObj.loadClientDetails( clientId, eventId, function(){
 				me.counsellorObj.addClientFormDivTag.show();
 			} );

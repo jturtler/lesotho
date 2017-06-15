@@ -3,6 +3,12 @@ function Util() {}
 
 Util.CONTROL_VALUE = "WebApp v 0.3";
 
+
+//-------------------------------------------------------------------
+// Utils INPUT Tags
+
+
+
 Util.getInputTag = function( attributeId )
 {
 	return $("[attributeId='" + attributeId + "']");
@@ -42,6 +48,11 @@ Util.disableTag = function( tag, isDisable )
 	}
 };
 
+//-------------------------------------------------------------------
+// Utils - FORM
+//-------------------------------------------------------------------
+
+
 Util.disableForm = function( tag, isDisable )
 {
 	var inputTags = tag.find("input,select,button");
@@ -58,6 +69,15 @@ Util.resetForm = function( formTag )
 	formTag.find( "span.errorMsg" ).remove();
 };
 
+Util.resetPageDisplay = function()
+{
+	$("div.mainContent").hide();
+	$("span.errorMsg").remove();
+};
+
+//-------------------------------------------------------------------
+// Utils - List
+//-------------------------------------------------------------------
 
 Util.findItemFromList = function( listData, searchProperty, searchValue )
 {
@@ -97,6 +117,11 @@ Util.RemoveFromArray = function( list, propertyName, value )
 	return index;
 }
 
+
+//-------------------------------------------------------------------
+// Utils - Strings
+
+
 Util.trim = function( input )
 {
 	return input.replace( /^\s+|\s+$/gm, '' );
@@ -112,9 +137,28 @@ Util.startsWith = function( fullVal, val )
 	return ( fullVal.indexOf( val ) == 0 );
 };
 
+Util.highlightWords = function( data, search )
+{
+	var searchExp = (search + '').replace(/([\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:])/g, "\\$1");	
+	return data.replace( new RegExp( "(" + searchExp + ")" , 'gi' ), "<span style=\"background-color:yellow\">$1</span>" );
+};
+
+
+Util.formatNumber = function( value ){
+	var floorVal = Math.floor( value );
+	var ceilVal = Math.ceil( value );
+	
+	if( floorVal == ceilVal )
+	{
+		return floorVal;
+	}
+	
+	return value;
+};
+
+
 //-------------------------------------------------------------------
-// URL Utils
-//-------------------------------------------------------------------
+// Utils URL
 
 Util.getURLParameterByName = function( url, name )
 {
@@ -146,28 +190,10 @@ Util.addUrlParam = function( key, val )
 	document.location.pathname + params;
 };
 
-Util.highlightWords = function( data, search )
-{
-	var searchExp = (search + '').replace(/([\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:])/g, "\\$1");	
-	return data.replace( new RegExp( "(" + searchExp + ")" , 'gi' ), "<span style=\"background-color:yellow\">$1</span>" );
-};
-
-
-Util.formatNumber = function( value ){
-	var floorVal = Math.floor( value );
-	var ceilVal = Math.ceil( value );
-	
-	if( floorVal == ceilVal )
-	{
-		return floorVal;
-	}
-	
-	return value;
-};
 
 //-------------------------------------------------------------------
 // Date Utils
-//-------------------------------------------------------------------
+
 
 Util.MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 Util.DAYS = ["Sunday", "Monday", "Tuesday", "Webnesday", "Thursday", "Friday", "Saturday"];
@@ -395,7 +421,9 @@ Util.dateTimePicker = function( dateTag, dateFormat )
 };
 
 
-// Week Periods
+//-------------------------------------------------------------------------------------
+// Utils Periods
+
 
 Util.getCurrentWeekPeriod = function() {
 	return Util.getWeekIdx( new Date() );
@@ -433,7 +461,7 @@ Util.getCurrentQuarterly = function( reportPeriodList )
 
 
 //=====================================================================================
-//FormBlock Utils
+// FormBlock Utils
 //=====================================================================================
 
 function FormBlock() {}
