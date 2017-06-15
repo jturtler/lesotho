@@ -236,7 +236,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.de_Age = "e4XZKCNJjlc";
 	me.de_ClientType = "RvYugZqBKoN";
-	me.de_DiscordantCouple = "Umu8i2QXCZk";
+	me.de_CoupleStatus = "Umu8i2QXCZk";
 	me.de_EQCPPTPassed = "H61nmZKhACr";
 	me.de_partnerCUICOpt = "csHM60DUGkG";
 	me.de_partnerCUIC= "UYyCL2xz8Wz";
@@ -373,7 +373,7 @@ function Counsellor( storageObj, translationObj )
 	
 	me.setup_ButtonsOnBrowser = function()
 	{
-		window.onbeforeunload = function (e) {
+		/* window.onbeforeunload = function (e) {
 		    var e = e || window.event;
 
 		    var msg = me.translationObj.getTranslatedValueByKey( "common_msg_leavePage" );
@@ -385,9 +385,9 @@ function Counsellor( storageObj, translationObj )
 
 		    // For Safari / chrome
 		    return msg;
-		 };
+		 }; */
 		
-		/* window.onload = function () {
+		window.onload = function () {
 		    if (typeof history.pushState === "function") {
 		        history.pushState("jibberish", null, null);
 		        window.onpopstate = function () {
@@ -412,7 +412,7 @@ function Counsellor( storageObj, translationObj )
 		            }
 		        };
 		    } 
-		}*/
+		}
 	};
 	
 	me.setupVersion = function()
@@ -578,6 +578,10 @@ function Counsellor( storageObj, translationObj )
 		
 		me.setUp_Events_AddClientForm();
 
+		me.setUp_Events_ContactLogTab();	
+		
+		me.setUp_Events_ARTReferTab();
+			
 		me.setUp_Events_DataEntryForm();
 		
 		
@@ -886,21 +890,15 @@ function Counsellor( storageObj, translationObj )
 			return false;
 		});
 		
-		// Validation for INPUT fields
 		
-		me.thisTestDivTag.find("input,select").change(function(e){
-			me.setUp_DataEntryFormInputTagEvent( $(this).attr("dataelement") );			
-		});
-		
-		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
-		partnerCUICOptTag.change( function(){
-			me.setUp_PartnerCUICOption();
-		});
-		
-
+		// -----------------------------------------------------------------------------------------
+		// Add validation
 		me.setUp_validationCheck( me.addClientFormTag.find( 'input,select' ) );
 		
-		
+	};
+	
+	me.setUp_Events_ContactLogTab = function()
+	{
 		// -----------------------------------------------------------------------------------------
 		// [Register Contact Log] button events
 		
@@ -979,11 +977,13 @@ function Counsellor( storageObj, translationObj )
 		
 		me.setUp_validationCheck( me.contactLogFormTag.find( 'input,select,textarea' ) );
 		
-		
+	};
+	
+	me.setUp_Events_ARTReferTab = function()
+	{
 		// -----------------------------------------------------------------------------------------
 		// [ART Refer Open] button events
 		
-
 		me.discardARTOpenEventBtnTag.click( function(){
 			var translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_ARTEventForm_discardChanges" );
 			var result = confirm( translatedText );
@@ -1127,6 +1127,79 @@ function Counsellor( storageObj, translationObj )
 	
 	me.setUp_Events_DataEntryForm = function()
 	{
+		// -----------------------------------------------------------------------------------------
+		// Set up events INPUT tags in [New test] form
+		
+		// Set up events for HIV Test input tags
+		me.getDataElementField( me.de_Testing_ResultTest1 ).change( function(){
+			var deId = $(this).attr("dataelement");
+			me.setUp_DataEntryHIVTestInputTagEvent( deId );	
+		});
+		
+		me.getDataElementField( me.de_Testing_ResultTest2 ).change( function(){
+			var deId = $(this).attr("dataelement");
+			me.setUp_DataEntryHIVTestInputTagEvent( deId );	
+		});
+		
+		me.getDataElementField( me.de_Testing_ResultParallel1 ).change( function(){
+			var deId = $(this).attr("dataelement");
+			me.setUp_DataEntryHIVTestInputTagEvent( deId );	
+		});
+		
+		me.getDataElementField( me.de_Testing_ResultParallel2 ).change( function(){
+			var deId = $(this).attr("dataelement");
+			me.setUp_DataEntryHIVTestInputTagEvent( deId );	
+		});
+		
+		me.getDataElementField( me.de_Testing_ResultSDBioline ).change( function(){
+			var deId = $(this).attr("dataelement");
+			me.setUp_DataEntryHIVTestInputTagEvent( deId );	
+		});
+		
+		// Client Type
+		me.getDataElementField( me.de_ClientType ).change( function(){
+			me.setUp_ClientTypeTagLogic();
+		});
+
+		// Partner CUIC option
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		partnerCUICOptTag.change( function(){
+			me.setUp_PartnerCUICOption();
+		});
+		
+		// Partner Knows HIV Status
+		me.getDataElementField( me.de_PartnerKnowsHIVStatus ).change( function(){
+			me.setUp_DataElementPartnerKnowHIVStatusLogic();
+		});
+		
+		// Final HIV Test result
+		me.getDataElementField( me.de_ClientType ).change( function(){
+			me.setUp_DataElementFinalHIVStatusLogic();
+		});
+		
+		// Referral offered
+		me.getDataElementField( me.de_Referral_Offered ).change( function(){
+			me.setUp_ReferralOfferedLogic();
+		});
+		
+		// TB Screening Conducted
+		me.getDataElementField( me.de_TBScreeningConducted ).change( function(){
+			me.setUp_DataElementTBScreeningConductedLogic();
+		});
+		
+		// Hide other reson fields for INPUT tags
+		me.getDataElementField( me.de_HIVTestChannel ).change( me.setUp_OtherReasonTagLogic );
+		me.getDataElementField( me.de_WhatMotivatedHIVTest ).change( me.setUp_OtherReasonTagLogic );
+		me.getDataElementField( me.de_Layer ).change( me.setUp_OtherReasonTagLogic );
+		
+		// BMI
+		me.getDataElementField( me.de_BMI ).change( function(){
+			me.setUp_DataElementBMI();
+		});
+		
+		// -----------------------------------------------------------------------------------------
+		// Set up events for buttons
+		
 		// Discard data
 		me.discardEventFormBtnTag.click( function(){
 			var translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_contactLogForm_discardChanges" );
@@ -1152,7 +1225,9 @@ function Counsellor( storageObj, translationObj )
 		me.saveEventBtnTag.click( function(){
 			
 			Util.disableTag( me.saveEventBtnTag, true );
-						
+					
+			// Get Json Event data
+			
 			var client = JSON.parse( me.addClientFormTabTag.attr("client") );
 			var event = me.addEventFormTag.attr("event");
 			
@@ -1165,6 +1240,7 @@ function Counsellor( storageObj, translationObj )
 			
 			event.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag );
 			
+			// Save Event
 			me.execSaveEvent(event, client.trackedEntityInstance, event.event, function( eventJson ){
 				
 				var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
@@ -1232,7 +1308,6 @@ function Counsellor( storageObj, translationObj )
 		});
 	};
 
-	
 	me.setUp_FloatButton = function()
 	{
 		var width = $(window).width() - 80;
@@ -1247,7 +1322,19 @@ function Counsellor( storageObj, translationObj )
 	// Add logic for data elements in [This Test] form
 	// ----------------------------------------------------------------------------
 	
-	me.setUp_DataEntryFormInputTagEvent = function( attrId )
+	me.setUp_DataEntryFormInputTagEvent = function()
+	{		
+		me.setUp_ClientTypeTagLogic();
+		me.setUp_DataElementPartnerKnowHIVStatusLogic();
+		me.setUp_DataElementFinalHIVStatusLogic();
+		me.setUp_ReferralOfferedLogic();
+		me.setUp_DataElementTBScreeningConductedLogic();
+		me.setUp_OtherReasonTagLogic();
+		me.setUp_DataElementBMI();
+	}; 
+	
+	
+	me.setUp_DataEntryHIVTestInputTagEvent = function( attrId )
 	{
 		if( attrId != undefined && eval( me.addClientFormTabTag.attr("addedLogic") ) )
 		{
@@ -1278,39 +1365,11 @@ function Counsellor( storageObj, translationObj )
 				me.resultFinalHIVStatusTag.val( result );
 				me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
 			}
+			
+			// Generate [Couple Status] data value
+			me.generateCoupleStatusIfAny();
 		}
-		
-		// Set data for [EQC / PPT Passed]
-		var clientTypeTag = me.getDataElementField( me.de_ClientType );
-		if( clientTypeTag.val() == "LS_SER3" )
-		{
-			var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
-			if( me.resultTest1Tag.val() != "" && me.resultTest2Tag.val() != "" )
-			{
-				if( me.resultTest1Tag.val() ==  me.resultTest2Tag.val() )
-				{
-					EQCPPTPassedTag.val("true");
-				}
-				else
-				{
-					EQCPPTPassedTag.val("false");
-				}
-			}
-			else
-			{
-				EQCPPTPassedTag.val("");
-			}
-		}
-		
-		me.setUp_ClientTypeTagLogic();
-		me.setUp_DataElementPartnerKnowHIVStatusLogic();
-		me.setUp_DataElementFinalHIVStatusLogic();
-		me.setUp_ReferralOfferedLogic();
-		me.setUp_DataElementTBScreeningConductedLogic();
-		me.setUp_OtherReasonTagLogic();
-		me.setUp_DataElementBMI();
-	}; 
-	
+	};
 	
 	me.setUp_DataElementResultTest1Logic = function()
 	{
@@ -1464,7 +1523,37 @@ function Counsellor( storageObj, translationObj )
 		}
 		
 	};
+		
+	// Generate [Couple Status] data value
+	me.generateCoupleStatusIfAny = function()
+	{
+		var clientTypeTag = me.getDataElementField( me.de_ClientType );
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		var partnerHIVTest = me.getDataElementField( me.de_partnerCUIC ).removeAttr( "lastHIVTest" );
+		var clientHIVTest = me.getDataElementField( me.de_FinalResult_HIVStatus ).val();
+		if( clientTypeTag.val() == "LS_SER2" && partnerCUICOptTag.val() == "2" && partnerHIVTest != undefined && clientHIVTest != "" )
+		{
+			var coupleStatusTag = me.getDataElementField( me.de_CoupleStatus );
+			
+			if( partnerHIVTest == clientHIVTest )
+			{
+				if( clientHIVTest == "Positive" )
+				{
+					coupleStatusTag.val( "CON" );
+				}
+				else if( clientHIVTest == "Negative" )
+				{
+					coupleStatusTag.val( "NEG" );
+				}
+			}
+			else
+			{
+				coupleStatusTag.val( "DIS" );
+			}
+		}
+	};
 	
+
 	me.setUp_ReferralOfferedLogic = function()
 	{
 		var referralOfferedTag = me.getDataElementField( me.de_Referral_Offered );
@@ -1591,7 +1680,7 @@ function Counsellor( storageObj, translationObj )
 		var clientTypeTag = me.getDataElementField( me.de_ClientType );
 		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
 		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
-		var discordantCoupleTag = me.getDataElementField( me.de_DiscordantCouple );
+		var coupleStatusTag = me.getDataElementField( me.de_CoupleStatus );
 		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
 		var resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
 		var resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
@@ -1607,7 +1696,7 @@ function Counsellor( storageObj, translationObj )
 		// Hide [Client partner's CUIC - Option] && [Client partner's CUIC] fields
 		me.setHideLogicTag( partnerCUICOptTag, true );
 		me.setHideLogicTag( partnerCUICTag, true );
-		me.setHideLogicTag( discordantCoupleTag, true );
+		me.setHideLogicTag( coupleStatusTag, true );
 		me.setHideLogicTag( EQCPPTPassedTag, true );
 		
 		
@@ -1622,8 +1711,15 @@ function Counsellor( storageObj, translationObj )
 		{
 			
 			me.setHideLogicTag( partnerCUICOptTag, false );
-			me.setHideLogicTag( partnerCUICTag, false );
-			me.setHideLogicTag( discordantCoupleTag, false );
+			me.setHideLogicTag( coupleStatusTag, false );
+			if( partnerCUICOptTag.val() == "" || partnerCUICOptTag.val() == "2" )
+			{
+				me.setHideLogicTag( partnerCUICTag, false ); 
+			}
+			else
+			{
+				me.setHideLogicTag( partnerCUICTag, true ); 
+			}
 		}
 		// EQC / PPT
 		else if( clientTypeTag.val() == "LS_SER3" )
@@ -1664,6 +1760,26 @@ function Counsellor( storageObj, translationObj )
 					 $(this).val("");
 				}
 			});
+			
+			
+			// Set value for data element field [EQC/PPT Passed]
+			
+			var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
+			if( me.resultTest1Tag.val() != "" && me.resultTest2Tag.val() != "" )
+			{
+				if( me.resultTest1Tag.val() ==  me.resultTest2Tag.val() )
+				{
+					EQCPPTPassedTag.val("true");
+				}
+				else
+				{
+					EQCPPTPassedTag.val("false");
+				}
+			}
+			else
+			{
+				EQCPPTPassedTag.val("");
+			}
 		}
 		
 	};
@@ -1689,12 +1805,17 @@ function Counsellor( storageObj, translationObj )
 		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
 		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
 		
-		partnerCUICTag.val("");
 		
 		if( partnerCUICOptTag.val() == "2" )
 		{
 			// Fill data for [Partner CUIC]
 			me.populateParterCUIC();
+			me.setHideLogicTag( partnerCUICTag, false );
+		}
+		else
+		{
+			partnerCUICTag.val("");
+			me.setHideLogicTag( partnerCUICTag, true );
 		}
 	};
 	
@@ -1992,6 +2113,14 @@ function Counsellor( storageObj, translationObj )
 		me.generateDataEntryFormTable( me.artReferOpenFormTag, me.stage_ARTReferralOpenning );
 		me.generateDataEntryFormTable( me.artReferCloseFormTag, me.stage_ARTReferralClosure );
 		
+		
+		// Add details icon for Partner CUIC tag
+
+		var imgTag = $( "<img src='../images/clientDetails.png' class='partnerDetails' >"  );
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		partnerCUICTag.closest( "td" ).append( imgTag );
+//		partnerCUICTag.css("width", "80%")
+		
 		// Generate data elements for [Contact Log] event form
 		for( var i in me.contactLogDeList )
 		{
@@ -2064,8 +2193,8 @@ function Counsellor( storageObj, translationObj )
 		Util.disableTag( me.getDataElementField( me.de_Age ), true );
 		Util.disableTag( me.getDataElementField( me.de_BMI ), true );
 		
-		// Add logic validation for input fields
-		me.setUp_DataEntryFormInputTagEvent();
+//		// Add logic validation for input fields
+//		me.setUp_DataEntryFormInputTagEvent();
 	};
 
 
@@ -2549,6 +2678,9 @@ function Counsellor( storageObj, translationObj )
 		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
 		Util.disableTag( partnerCUICTag, true );
 		
+		var coupleStatusTag = me.getDataElementField( me.de_CoupleStatus );
+		Util.disableTag( coupleStatusTag, true );
+		
 		// Reset values in the form
 		Util.resetForm( me.thisTestDivTag );
 		Util.resetForm( me.contactLogEventFormTag );
@@ -2610,6 +2742,8 @@ function Counsellor( storageObj, translationObj )
 		
 		me.addEventFormTag.removeAttr( "event" );
 		me.addEventFormTag.removeAttr( "partnereventid" );
+		me.addEventFormTag.find( "img.partnerDetails" ).removeAttr( "title" );
+		me.getDataElementField( me.de_partnerCUIC ).removeAttr("lastHIVTest" );
 		
 		me.artReferOpenFormTag.removeAttr( "event" );
 		me.artReferCloseFormTag.removeAttr( "event" );
@@ -4880,8 +5014,8 @@ function Counsellor( storageObj, translationObj )
 		Util.disableTag( me.getDataElementField( me.de_Age ), true );
 		Util.disableTag( me.getDataElementField( me.de_BMI ), true );
 
-		// Add logic validation for input fields
-		me.setUp_DataEntryFormInputTagEvent();
+//		// Add logic validation for input fields
+//		me.setUp_DataEntryFormInputTagEvent();
 	};
 	
 	// Check if the logged counsellor if this counsellor is the person who created the active event
@@ -5297,11 +5431,15 @@ function Counsellor( storageObj, translationObj )
 									var rows = response.rows;
 									if( rows.length == 1 )
 									{
-										var partnerCUICVal = rows[0][2];
+										var partnerCUICVal = rows[0][3];
 										partnerCUICTag.val( partnerCUICVal );
-										
+										partnerCUICTag.attr("lastHIVTest", rows[0][6] );
+
 										var partnerEventId = rows[0][0];
 										me.addEventFormTag.attr( "partnerEventId", partnerEventId );
+										
+										var partnerDetails = rows[0][4] + " " + rows[0][5] + " (" + rows[0][6] + ")";
+										me.addEventFormTag.find( "img.partnerDetails" ).attr( "title", partnerDetails );
 									}
 									else
 									{

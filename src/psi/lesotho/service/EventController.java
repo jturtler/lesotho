@@ -350,7 +350,7 @@ public class EventController
         {
             try
             {
-                String url = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:KDgzpKX3h2S.QLMo6Kh3eVP;KDgzpKX3h2S.tUIkmIFMEDS;KXSdghPqhl6;LE7tDH8dfDV;rcVLQsClLUa;sNS1PQ1YNXA;sX8wCJQEm2l&dimension=pe:THIS_FINANCIAL_YEAR;THIS_MONTH;THIS_QUARTER;THIS_WEEK&filter=ou:" + Util.ROOT_ORGTUNIT + "&filter=" + Util.USER_CATEGORY_ID + ":" + catOptionComboId + "&skipMeta=false";
+                String url = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:KDgzpKX3h2S.QLMo6Kh3eVP;KDgzpKX3h2S.tUIkmIFMEDS;KXSdghPqhl6;LE7tDH8dfDV;rcVLQsClLUa;sNS1PQ1YNXA;sX8wCJQEm2l&dimension=pe:THIS_FINANCIAL_YEAR;THIS_MONTH;THIS_QUARTER;THIS_WEEK&filter=ou:" + Util.ROOT_ORGTUNIT_LESOTHO + "&filter=" + Util.USER_CATEGORY_ID + ":" + catOptionComboId + "&skipMeta=false";
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
             }
             catch ( Exception ex )
