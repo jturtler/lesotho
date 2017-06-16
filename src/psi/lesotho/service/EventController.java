@@ -49,11 +49,14 @@ public class EventController
     private static String URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/SKI1rT5vA3m/data.json?var=startDate:" + EventController.PARAM_START_DATE 
         + "&var=stageId:" + Util.STAGE_ID + "&var=username:" + EventController.PARAM_USERNAME + "&var=ouId:KauEn2jKOk6&var=endDate:" + EventController.PARAM_END_DATE;
     
-
+    private static String URL_QUERY_GET_PARTNER_BY_EVENTID = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/aZX9hTaN0aj/data.json?var=partnerEventId:" + EventController.PARAM_EVENT_ID; 
+    
+    
     private static String URL_QUERY_FUCASE_BY_TIME = Util.LOCATION_DHIS_SERVER
         + "/api/sqlViews/llbPbszABjd/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
         + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.STAGE_ID;
     
+
     
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
@@ -180,17 +183,32 @@ public class EventController
                 }
                 else if ( key.equals( Util.KEY_SAVE_PARTNER_CUIC ) )
                 {
-                    String eventId = request.getParameter( Util.PAMAM_EVENT_ID );
+                    String clientEventId = request.getParameter( Util.PAMAM_EVENT_ID );
+                    String partnerEventId = request.getParameter( Util.PAMAM_PARTNER_ID );
                     String partnerCUIC = request.getParameter( Util.PAMAM_PARTNER_CUIC );
+                    String coupleStatus = request.getParameter( Util.PAMAM_COUPLE_STAUTS );
 
-                    responseInfo = EventController.getEventById( eventId );
+                    responseInfo = EventController.getEventById( partnerEventId );
+                   
                     JSONObject jsonEvent = responseInfo.data;
-                    JSONObject dataValue = new JSONObject();
-                    dataValue.put( "dataElement", Util.ID_DE_PARTNER_CUIC );
-                    dataValue.put( "value", partnerCUIC );
-                    jsonEvent.getJSONArray( "dataValues" ).put( dataValue );
                     
-                    responseInfo = EventController.updateEvent( eventId, jsonEvent, loginUsername );
+                    JSONObject dataValueCUIC = new JSONObject();                    
+                    dataValueCUIC.put( "dataElement", Util.ID_DE_PARTNER_CUIC );
+                    dataValueCUIC.put( "value", partnerCUIC );
+                    jsonEvent.getJSONArray( "dataValues" ).put( dataValueCUIC );
+
+                    JSONObject dataValueEventId = new JSONObject();
+                    dataValueEventId.put( "dataElement", Util.ID_DE_PARTNER_EVENTID );
+                    dataValueEventId.put( "value", clientEventId );
+                    jsonEvent.getJSONArray( "dataValues" ).put( dataValueEventId );
+                    
+                    JSONObject dataValueCoupleStatus = new JSONObject();
+                    dataValueCoupleStatus.put( "dataElement", Util.ID_DE_COPUPLE_STATUS );
+                    dataValueCoupleStatus.put( "value", coupleStatus );
+                    jsonEvent.getJSONArray( "dataValues" ).put( dataValueCoupleStatus );
+                    
+                    
+                    responseInfo = EventController.updateEvent( partnerEventId, jsonEvent, loginUsername );
                     
                 } 
                
@@ -558,6 +576,37 @@ public class EventController
         return responseInfo;
         
     }
+    
+    
+    public static ResponseInfo getAnalyticsTime() throws Exception, IOException
+    {
+        String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/system/info.json";
+        
+        return Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+    }
+    
+    public static ResponseInfo getPartnerByEventId( String eventId )
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+           
+            String requestUrl = EventController.URL_QUERY_GET_PARTNER_BY_EVENTID;
+            requestUrl = requestUrl.replace( EventController.PARAM_EVENT_ID, eventId );
+            
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+        
+    }
+    
+    
     // ===============================================================================================================
     // Coordinator
     // ===============================================================================================================
@@ -613,17 +662,45 @@ public class EventController
 
         return responseInfo;
     }
+
     
+    // ===============================================================================================================
+    // Supportive methods
+    // ===============================================================================================================
+
     
-    
-    
-    public static ResponseInfo getAnalyticsTime() throws Exception, IOException
+    public static String getPartnerEventId( JSONObject event )
     {
-        String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/system/info.json";
+        if( event != null )
+        {
+            JSONArray dataValues = event.getJSONArray( "dataValues" );
+            for( int i=0; i < dataValues.length(); i ++ )
+            {
+                JSONObject dataValue = dataValues.getJSONObject( i );
+                if( dataValue.getString( "dataElement" ).equals( Util.ID_DE_PARTNER_EVENTID ) )
+                {
+                    return dataValue.getString( "value" );
+                }
+            }
+        }
         
-        return Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+        return null;
     }
-    
+
+    public static JSONObject getActiveEvent( JSONArray eventList, String stageId )
+    {
+        for( int i=0; i < eventList.length(); i++ )
+        {
+            JSONObject event = eventList.getJSONObject( i );
+            if( event.getString( "status" ).equals( "ACTIVE" ) && event.getString( "programStage" ).equals( stageId ) )
+            {
+                return event;
+            }
+        }
+        
+        return null;
+    }
+
     // CREATE JSON FOR THIS - add voucher Id, linking info.. etc..
     private static JSONObject composeJsonEvent( JSONObject eventData, String teiId, String orgUnitId,
         String catOptionComboId )

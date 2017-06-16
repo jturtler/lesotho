@@ -57,8 +57,23 @@ public class ClientController
                         if ( responseInfo.responseCode == 200 )
                         {
                             outputData += ",\"events\":" + responseInfo.output;
+                             
+                            // STEP 2.2.1 Get active event
+                            JSONArray eventList = responseInfo.data.getJSONArray( "events" );
+                            JSONObject activeHIVTestingEvent = EventController.getActiveEvent( eventList, Util.STAGE_ID );
+                            String partnerEventId = EventController.getPartnerEventId( activeHIVTestingEvent );
+                            if( partnerEventId != null )
+                            {
+                                responseInfo = EventController.getPartnerByEventId( partnerEventId );
+                                if ( responseInfo.responseCode == 200 )
+                                {
+                                    outputData += ",\"partner\":" + responseInfo.output;
+                                }
+                            }
+                            
                             outputData = "{" + outputData + "}";
-                            responseInfo.output = outputData;
+                            responseInfo.output = outputData; 
+                            
                         }
                     }
                 }

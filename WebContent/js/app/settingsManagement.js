@@ -18,7 +18,7 @@ function SettingsManagement( _counsellorObj, _storageObj, _translationObj, _afte
 	me.orgUnitListTag =  $("#orgUnitList");
 	me.loadingOuListImgTag = $("#loadingOuListImg");
 	me.updateTransBtnTag = $("#updateTransBtn");
-
+	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
 	
 	// [About]
 	me.userFullNameTag = $("[name='userFullName']");
@@ -46,6 +46,7 @@ function SettingsManagement( _counsellorObj, _storageObj, _translationObj, _afte
 	
 	me.init = function()
 	{
+		me.hideHIVTestLogicActionTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_HIDE_HIV_TEST_LOGIC_ACTION_FIELDS ) );	
 		me.setupVersion();
 		me.setUp_Events();
 		me.loadInitData();
@@ -127,6 +128,15 @@ function SettingsManagement( _counsellorObj, _storageObj, _translationObj, _afte
 				});
 			});
 		});
+		
+		// Add Logic for "HIV Test" in entry form
+		me.hideHIVTestLogicActionTag.change( function(){
+			me.storageObj.addItem( me.storageObj.KEY_STORAGE_HIDE_HIV_TEST_LOGIC_ACTION_FIELDS, me.hideHIVTestLogicActionTag.val() );
+
+			var translatedText = me.translationObj.getTranslatedValueByKey( "common_msg_settingsHideLogicActionFieldsSaved" );
+			MsgManager.msgAreaShow( translatedText, "SUCCESS" );
+		});
+		
 	};
 	
 	
@@ -286,6 +296,26 @@ function SettingsManagement( _counsellorObj, _storageObj, _translationObj, _afte
 		var sessionExpiredText = me.divSessionExpireMsgTag.show().html( sessionExpiredText + ". " + loginAgainText + " <a style=\"cursor:pointer;\" onclick='window.location.href=\"../index.html\"'>" + hereText + "</a>.");
 	};
 	
+
+	// ----------------------------------------------------------------------------
+	// Check if any Org Unit is selected. If no any Org Unit is selected, 
+	// the show dialog to ask user go to Settings to select an orgunit
+	// ----------------------------------------------------------------------------
+	
+	me.checkOrgunitSetting = function( exeFunc )
+	{
+		var orgUnit = me.orgUnitListTag.val();
+		if( orgUnit == "" || orgUnit === null )
+		{
+			var translatedText = me.translationObj.getTranslatedValueByKey( "settings_msg_selectOrgUnit" );
+			MsgManager.showDialogForm( translatedText );
+		}
+		else
+		{
+			exeFunc();
+		}
+		
+	};
 	
 	// ===========================================================================================================================
 	// RUN Init methods

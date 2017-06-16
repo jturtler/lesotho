@@ -1,11 +1,12 @@
 
 
-function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
+function CounsellorListMaganement( _mainPage, storageObj, translationObj )
 {
 	var me = this;
-	me.counsellorObj = _counsellorObj;
+	me.mainPage = _mainPage;
 	me.storageObj = storageObj;
 	me.translationObj = translationObj;
+	me.clientManagement = me.mainPage.clientManagement;
 	
 	// Today cases
 	me.todayCaseListTag = $("#todayCaseList");
@@ -13,6 +14,8 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 	me.listDateTag = $("#listDate");
 	me.todayCaseFooterTag = $("#todayCaseFooter");
 	me.todayCaseNumberTag = $("#todayCaseNumber");
+	me.registerClientBtnTag = $("#registerClientBtn");
+	
 	
 	
 	// Previous cases
@@ -28,15 +31,78 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 	me.positiveCaseFooterTag = $("#positiveCaseFooter");
 	me.positiveCaseNumberTag = $("#positiveCaseNumber");
 	
+	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
+	
 
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Load cases
+	// ---------------------------------------------------------------------------------------------------------------------------
+	
+	
+	me.init = function()
+	{
+		me.setUp_Events();
+	};
+	
+	
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Load cases
+	// ---------------------------------------------------------------------------------------------------------------------------
+	
+	me.setUp_Events = function()
+	{
+		me.setUp_FloatButton();
+		window.addEventListener( "resize", me.setUp_FloatButton );
+		
+		// Back to [Current Cases]
+		
+		me.backToCaseListBtnTag.click(function(){
+			if( me.mainPage.currentList == me.mainPage.PAGE_TODAY_LIST )
+			{
+				me.registerClientBtnTag.show();
+				me.listTodayCases();
+			}
+			else if( me.mainPage.currentList == me.mainPage.PAGE_PREVIOUS_LIST )
+			{
+				me.registerClientBtnTag.hide();
+				me.listPreviousCases();
+			}
+			else if( me.mainPage.currentList == me.mainPage.PAGE_POSITIVE_LIST )
+			{
+				me.registerClientBtnTag.hide();
+				me.listPositiveCases();
+			}
+		});
+		
+		
+
+		// Open "Search/Add client" form from "Today Cases" list
+		
+		me.registerClientBtnTag.click(function(){
+			Util.resetPageDisplay();
+			me.clientManagement.resetSearchClientForm();
+			me.clientManagement.showSearchClientForm();
+		});
+	};
+
+	me.setUp_FloatButton = function()
+	{
+		var width = $(window).width() - 80;
+		var height = $(window).height() - 120;
+		
+		me.registerClientBtnTag.css({top: height, left: width, position:'fixed'});
+	};
+	
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Load cases
 	// ---------------------------------------------------------------------------------------------------------------------------
 	
 	me.listTodayCases = function( exeFunc )
 	{
-		me.counsellorObj.setCurrentPage( me.counsellorObj.PAGE_TODAY_LIST );
-		me.storageObj.addItem( "page", me.counsellorObj.PAGE_TODAY_LIST );
+		me.mainPage.registerClientBtnTag.show();
+		
+		me.mainPage.setCurrentPage( me.mainPage.PAGE_TODAY_LIST );
+		me.storageObj.addItem( "page", me.mainPage.PAGE_TODAY_LIST );
 		me.storageObj.removeItem( "subPage" );		
 		
 		me.listDateTag.html( Util.formatDate_LastNDate(0) );
@@ -54,8 +120,10 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 		
 	me.listPreviousCases = function( exeFunc )
 	{
-		me.counsellorObj.setCurrentPage( me.counsellorObj.PAGE_PREVIOUS_LIST );
-		me.storageObj.addItem("page", me.counsellorObj.PAGE_PREVIOUS_LIST);
+		me.registerClientBtnTag.hide();
+	
+		me.mainPage.setCurrentPage( me.mainPage.PAGE_PREVIOUS_LIST );
+		me.storageObj.addItem("page", me.mainPage.PAGE_PREVIOUS_LIST);
 		me.storageObj.removeItem( "subPage" );
 		
 		me.listCases( "../event/previousCases", function( list ){
@@ -72,8 +140,10 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 	
 	me.listPositiveCases = function( exeFunc )
 	{
-		me.counsellorObj.setCurrentPage( me.counsellorObj.PAGE_POSITIVE_LIST );
-		me.storageObj.addItem("page", me.counsellorObj.PAGE_POSITIVE_LIST);
+		me.registerClientBtnTag.hide();
+		
+		me.mainPage.setCurrentPage( me.mainPage.PAGE_POSITIVE_LIST );
+		me.storageObj.addItem("page", me.mainPage.PAGE_POSITIVE_LIST);
 		me.storageObj.removeItem( "subPage" );
 		
 		me.listCases( "../event/positiveCases", function( list ){
@@ -124,7 +194,7 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 					});
 			} 
 			else {
-				me.counsellorObj.showExpireSessionMessage();					
+				me.mainPage.settingsManagement.showExpireSessionMessage();					
 			}
 		});	
 		
@@ -246,7 +316,6 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 				var cuic = event[4];
 				var ouName = event[6];
 				var artStatus = event[7];
-				artStatus = ( artStatus == "" ) ? "[None]" : artStatus;
 				var numberOfTest = event[5];
 				var openingFacility = event[8];
 				
@@ -301,16 +370,22 @@ function CounsellorListMaganement( _counsellorObj, storageObj, translationObj )
 	{
 		rowTag.css("cursor", "pointer");
 		rowTag.click( function(){
-			me.counsellorObj.backToSearchClientResultBtnTag.hide();
-			me.counsellorObj.backToCaseListBtnTag.show();
+			me.clientManagement.backToSearchClientResultBtnTag.hide();
+			me.backToCaseListBtnTag.show();
 			var clientId = rowTag.attr("clientId");
 			var eventId = rowTag.attr("eventId");
 			
 			Util.resetPageDisplay();
-			me.counsellorObj.loadClientDetails( clientId, eventId, function(){
-				me.counsellorObj.addClientFormDivTag.show();
+			me.clientManagement.loadClientDetails( clientId, eventId, function(){
+				me.clientManagement.addClientFormDivTag.show();
 			} );
 		});
 	};
+	
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// RUN init method
+	// ---------------------------------------------------------------------------------------------------------------------------
+	
+	me.init();
 	
 }

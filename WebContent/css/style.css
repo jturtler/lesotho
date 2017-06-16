@@ -796,7 +796,10 @@ tr.actionBar th
     font-weight:bold;
 }
 
-
+.ui-state-default
+{
+	background: white !importance;
+}
 
 
 

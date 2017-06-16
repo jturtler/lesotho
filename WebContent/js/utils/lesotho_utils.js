@@ -48,6 +48,96 @@ Util.disableTag = function( tag, isDisable )
 	}
 };
 
+Util.setAutoCompleteTag = function( selectTag )
+{
+//	var mySource = [];
+//	selectTag.children("option").map(function() {
+//	   mySource.push( { "label": $(this).text(), "value": $(this).val() } );
+//	});
+	
+	selectTag.hide();
+    selected = selectTag.children(":selected");
+    var value = selected.val() ? selected.val() : "";
+    var text = selected.text() ? selected.text() : "";
+    var wrapper = $("<span>").addClass("ui-combobox").insertAfter(selectTag);
+    
+	var input = $("<input>").appendTo(wrapper).val( text );
+	input.addClass( "form-control" );
+    input.autocomplete( {
+        delay: 0,
+        minLength: 2,
+        source: function(request, response) {
+            var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+            response( selectTag.children("option").map(function() {
+                var text = $(this).text();
+                var value = $(this).val();
+                if ( this.value && (!request.term || matcher.test(text))) return {
+                    label: text,
+                    value: text,
+                    option: this
+                };
+            }));
+        },
+        select: function ( event, ui ) {	
+    	  ui.item.option.selected = true;
+        },
+        focus: function(event, ui) {
+        	$(this).val(ui.item.label);
+        	return false;
+        },
+        change: function( event, ui ) {
+        	 if (!ui.item) {
+                 var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex($(this).val()) + "$", "i"),
+                     valid = false;
+                 selectTag.children("option").each(function() {
+                     if ($(this).text().match(matcher)) {
+                         this.selected = valid = true;
+                         return false;
+                     }
+                 });
+                 if (!valid) {
+                     // remove invalid value, as it didn't match anything
+                     $(this).val("");
+                     selectTag.val("");
+                     input.data("autocomplete").term = "";
+                     return false;
+                 }
+             }
+        }
+    } ).addClass( 'ui-widget' );
+
+    input.data( 'ui-autocomplete' )._renderItem = function ( ul, item ) {
+        return $( '<li></li>' )
+            .data( 'item.autocomplete', item )
+            .append( '<a>' + item.label + '</a>' )
+            .appendTo( ul );
+    };
+
+    var wrapper = this.wrapper = $( '<span style="width:200px">' )
+        .addClass( 'ui-combobox' )
+        .insertAfter( input );
+
+    var button = $( '<a style="width:20px; margin-bottom:1px; height:20px;">' )
+        .attr( 'tabIndex', -1 )
+        .appendTo( wrapper )
+        .button( {
+            icons: {
+                primary: 'ui-icon-triangle-1-s'
+            },
+            text: false
+        } )
+        .addClass( 'small-button' )
+        .click( function () {
+            if ( input.autocomplete( 'widget' ).is( ':visible' ) ) {
+                input.autocomplete( 'close' );
+                return;
+            }
+            $( this ).blur();
+            input.autocomplete( 'search', '' );
+            input.focus();
+        } );
+}
+
 //-------------------------------------------------------------------
 // Utils - FORM
 //-------------------------------------------------------------------

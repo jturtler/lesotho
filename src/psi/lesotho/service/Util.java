@@ -49,8 +49,10 @@ public final class Util
     public static String PAMAM_ORGUNIT_ID = "ouId";
     public static String PAMAM_CLIENT_ID = "clientId";
     public static String PAMAM_EVENT_ID = "eventId";
+    public static String PAMAM_PARTNER_ID = "partnerEventId";
     public static String PAMAM_DISTRICT_ID = "districtId";
     public static String PAMAM_PARTNER_CUIC = "partnerCUIC";
+    public static String PAMAM_COUPLE_STAUTS = "coupleStatus";
     
     
     public static String ACCESS_SERVER_USERNAME = "lesotho_superuser";
@@ -68,6 +70,8 @@ public final class Util
     
     
     public static final String ID_DE_PARTNER_CUIC = "UYyCL2xz8Wz";
+    public static final String ID_DE_PARTNER_EVENTID = "UV2AsoZJ7fw";
+    public static final String ID_DE_COPUPLE_STATUS = "Umu8i2QXCZk";
     
 
     public static final String CLIENT_ATTR_ID_CUIC = "zRA08XEYiSF";
