@@ -18,6 +18,7 @@ function Counsellor( storageObj, translationObj )
 	me.settingsManagement;
 	me.listManagement;
 	me.clientManagement;
+	me.reportManagement;
 	
 	me.dateFormat = "dd M yy";
 	me.dateTimeFormat = "YYYY-MM-DD HH:mm";
@@ -66,9 +67,10 @@ function Counsellor( storageObj, translationObj )
 		me.setUp_Events();
 		
 		
-		me.settingsManagement = new SettingsManagement( me, me.storageObj, me.translationObj, function( metaData ){
-			me.clientManagement = new ClientManagement( me, me.storageObj, me.translationObj );
-			me.listManagement = new CounsellorListMaganement( me, me.storageObj, me.translationObj );
+		me.settingsManagement = new SettingsManagement( me, function( metaData ){
+			me.clientManagement = new ClientManagement( me );
+			me.listManagement = new CounsellorListMaganement( me );
+			me.reportManagement = new CounsellorReportManagement( me );
 			me.checkAndLoadDataAfterInit( metaData );
 			
 		} );
@@ -170,7 +172,7 @@ function Counsellor( storageObj, translationObj )
 			me.settingsManagement.checkOrgunitSetting( function(){
 				me.storageObj.addItem("page", me.PAGE_REPORT_PARAM);
 				Util.resetPageDisplay();
-				me.clientManagement.getReport();
+				me.reportManagement.getReport();
 			});
 		});
 		
@@ -180,7 +182,7 @@ function Counsellor( storageObj, translationObj )
 	// Not allow user to click on Back buttons of browser
 	me.setup_ButtonsOnBrowser = function()
 	{
-		/* window.onbeforeunload = function (e) {
+		window.onbeforeunload = function (e) {
 		    var e = e || window.event;
 
 		    var msg = me.translationObj.getTranslatedValueByKey( "common_msg_leavePage" );
@@ -192,9 +194,9 @@ function Counsellor( storageObj, translationObj )
 
 		    // For Safari / chrome
 		    return msg;
-		 }; */
+		 };
 		
-		window.onload = function () {
+		/* window.onload = function () {
 		    if (typeof history.pushState === "function") {
 		        history.pushState("jibberish", null, null);
 		        window.onpopstate = function () {
@@ -219,7 +221,7 @@ function Counsellor( storageObj, translationObj )
 		            }
 		        };
 		    } 
-		}
+		} */
 	};
 	
 	// ----------------------------------------------------------------------------
@@ -251,7 +253,7 @@ function Counsellor( storageObj, translationObj )
 		}
 		else if( page == me.PAGE_SEARCH_PARAM )
 		{
-			me.showSearchClientForm();
+			me.clientManagement.showSearchClientForm();
 		}
 		else if( page == me.PAGE_SEARCH_CLIENT_RESULT )
 		{
@@ -263,15 +265,15 @@ function Counsellor( storageObj, translationObj )
 		}
 		else if( page == me.PAGE_REPORT_PARAM )
 		{
-			me.getReport();
+			me.reportManagement.getReport();
 		}
 		else if( page == me.PAGE_SETTINGS )
 		{
-			me.settingsDivTag.show("fast");
+			me.settingsManagement.settingsDivTag.show("fast");
 		}
 		else if( page == me.PAGE_ABOUT )
 		{
-			me.aboutDivTag.show("fast");
+			me.settingsManagement.aboutDivTag.show("fast");
 		}
 		
 	};

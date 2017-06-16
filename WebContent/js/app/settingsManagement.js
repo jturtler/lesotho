@@ -1,11 +1,11 @@
 
-function SettingsManagement( _counsellorObj, _storageObj, _translationObj, _afterLoadedMetaDataFunc )
+function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 {
 	var me = this;
 	
-	me.counsellorObj = _counsellorObj;
-	me.storageObj = _storageObj;
-	me.translationObj = _translationObj;
+	me.mainPage = mainPage;
+	me.storageObj = me.mainPage.storageObj;
+	me.translationObj = me.mainPage.translationObj;
 	me.afterLoadedMetaDataFunc = _afterLoadedMetaDataFunc;
 
 	// [APP Header]

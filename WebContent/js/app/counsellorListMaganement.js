@@ -1,11 +1,11 @@
 
 
-function CounsellorListMaganement( _mainPage, storageObj, translationObj )
+function CounsellorListMaganement( _mainPage  )
 {
 	var me = this;
 	me.mainPage = _mainPage;
-	me.storageObj = storageObj;
-	me.translationObj = translationObj;
+	me.storageObj = me.mainPage.storageObj;
+	me.translationObj = me.mainPage.translationObj;
 	me.clientManagement = me.mainPage.clientManagement;
 	
 	// Today cases
