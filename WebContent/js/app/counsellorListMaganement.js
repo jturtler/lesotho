@@ -6,7 +6,7 @@ function CounsellorListMaganement( _mainPage  )
 	me.mainPage = _mainPage;
 	me.storageObj = me.mainPage.storageObj;
 	me.translationObj = me.mainPage.translationObj;
-	me.clientManagement = me.mainPage.clientManagement;
+	me.clientFormManagement = me.mainPage.clientFormManagement;
 	
 	// Today cases
 	me.todayCaseListTag = $("#todayCaseList");
@@ -35,7 +35,7 @@ function CounsellorListMaganement( _mainPage  )
 	
 
 	// ---------------------------------------------------------------------------------------------------------------------------
-	// Load cases
+	// Init method
 	// ---------------------------------------------------------------------------------------------------------------------------
 	
 	
@@ -46,7 +46,7 @@ function CounsellorListMaganement( _mainPage  )
 	
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
-	// Load cases
+	// Set up events
 	// ---------------------------------------------------------------------------------------------------------------------------
 	
 	me.setUp_Events = function()
@@ -80,8 +80,8 @@ function CounsellorListMaganement( _mainPage  )
 		
 		me.registerClientBtnTag.click(function(){
 			Util.resetPageDisplay();
-			me.clientManagement.resetSearchClientForm();
-			me.clientManagement.showSearchClientForm();
+			me.clientFormManagement.resetSearchClientForm();
+			me.clientFormManagement.showSearchClientForm();
 		});
 	};
 
@@ -370,14 +370,14 @@ function CounsellorListMaganement( _mainPage  )
 	{
 		rowTag.css("cursor", "pointer");
 		rowTag.click( function(){
-			me.clientManagement.backToSearchClientResultBtnTag.hide();
+			me.mainPage.searchClientManagement.backToSearchClientResultBtnTag.hide();
 			me.backToCaseListBtnTag.show();
 			var clientId = rowTag.attr("clientId");
 			var eventId = rowTag.attr("eventId");
 			
 			Util.resetPageDisplay();
-			me.clientManagement.loadClientDetails( clientId, eventId, function(){
-				me.clientManagement.addClientFormDivTag.show();
+			me.clientFormManagement.loadClientDetails( clientId, eventId, function(){
+				me.clientFormManagement.addClientFormDivTag.show();
 			} );
 		});
 	};

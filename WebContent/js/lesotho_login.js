@@ -150,7 +150,7 @@ function LoginForm( storageObj, translationObj )
 							page = "counsellor";
 						}
 						else if( workerRole == "REFCO" ) {
-							page = "referCoordinator";
+							page = "coordinator";
 						}
 						
 						if( page != "" ){

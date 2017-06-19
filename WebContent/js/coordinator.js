@@ -8,29 +8,26 @@
  * @param translationObj
  */
 
-function Counsellor( storageObj, translationObj )
+function Coordinator( storageObj, translationObj )
 {
 	var me = this;
 	me.storageObj = storageObj;
 	me.translationObj = translationObj;
 	me.validationObj;
-
+	
+	me.dateFormat = "dd M yy";
+	me.dateTimeFormat = "YYYY-MM-DD HH:mm";
+	
 	me.settingsManagement;
 	me.listManagement;
 	me.clientFormManagement;
 	me.reportManagement;
 	
-	me.dateFormat = "dd M yy";
-	me.dateTimeFormat = "YYYY-MM-DD HH:mm";
-
-	// [Menu] links
-	me.todayCaseLinkTag = $("#todayCaseLink");
-	me.previousCaseLinkTag = $("#previousCaseLink");
-	me.positiveCaseLinkTag = $("#positiveCaseLink");
+	me.todayFULinkTag = $("#todayFULink");
+	me.allFULinkTag = $("#allFULink");
 	me.searchClientLinkTag = $("#searchClientLink");
 	me.aboutLinkTag = $("#aboutLink");
 	me.settingsLinkTag = $("#settingsLink");
-	me.consumablesLinkTag = $("#consumablesLink");
 	me.reportLinkTag = $("#reportLink");
 	
 	// [Today] list	
@@ -40,13 +37,9 @@ function Counsellor( storageObj, translationObj )
 	me.moveToSettingLinkTag = $("#moveToSettingLink");
 	
 	
-	// [Consumables]
-	me.consumablesDivTag = $("#consumablesDiv");
-	
 	me.currentList = "";
-	me.PAGE_TODAY_LIST = "todayList";
-	me.PAGE_PREVIOUS_LIST = "previousList";
-	me.PAGE_POSITIVE_LIST = "positiveList";
+	me.PAGE_TODAY_FU_LIST = "todayFUList";
+	me.PAGE_ALL_FU_LIST = "allFUList";
 	me.PAGE_SEARCH_PARAM = "searchParam";
 	me.PAGE_SEARCH_CLIENT_RESULT = "searchClientResult";
 	me.PAGE_SEARCH_ADD_CLIENT = "searchAddClient";
@@ -63,16 +56,15 @@ function Counsellor( storageObj, translationObj )
 	
 	me.init = function()
 	{
-		MsgManager.initialSetup();
-		
-		me.validationObj = new Validation( me.translationObj );	
+		MsgManager.initialSetup();		
 		me.setUp_Events();
+		
 		
 		me.settingsManagement = new SettingsManagement( me, function( metaData ){
 			me.clientFormManagement = new ClientFormManagement( me, metaData );
-			me.searchClientManagement = new SearchClientManagement( me, metaData );
-			me.listManagement = new CounsellorListMaganement( me );
-			me.reportManagement = new CounsellorReportManagement( me );
+			
+			me.listManagement = new CoordinatorListManagement( me );
+//			me.reportManagement = new CounsellorReportManagement( me );
 			me.checkAndLoadDataAfterInit();
 			
 		} );
@@ -100,28 +92,21 @@ function Counsellor( storageObj, translationObj )
 	
 	me.setUp_Events_Menus = function()
 	{
-		me.todayCaseLinkTag.click(function(e){
-			console.log("todayCaseLinkTag");
+		me.todayFULinkTag.click(function(e){
 			$('.overlay').click();
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
+				me.registerClientBtnTag.show();
 				me.listManagement.listTodayCases();
 			});
 		});
 		
-		me.previousCaseLinkTag.click(function(){
+		me.allFULinkTag.click(function(){
 			$('.overlay').click();
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
-				me.listManagement.listPreviousCases();
-			});
-		});
-		
-		me.positiveCaseLinkTag.click(function(){
-			$('.overlay').click();
-			
-			me.settingsManagement.checkOrgunitSetting( function(){
-				me.listManagement.listPositiveCases();
+				me.registerClientBtnTag.hide();
+				me.listManagement.listAllCase();
 			});
 		});
 		
@@ -130,8 +115,8 @@ function Counsellor( storageObj, translationObj )
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
 				Util.resetPageDisplay();
-				me.searchClientManagement.resetSearchClientForm();
-				me.searchClientManagement.showSearchClientForm();
+				me.clientFormManagement.resetSearchClientForm();
+				me.clientFormManagement.showSearchClientForm();
 			});
 		});
 		
@@ -156,16 +141,6 @@ function Counsellor( storageObj, translationObj )
 			Util.resetPageDisplay();
 			me.settingsManagement.settingsDivTag.show("fast");
 			$('.overlay').click();
-		});
-		
-		me.consumablesLinkTag.click(function(){
-			$('.overlay').click();
-			
-			me.settingsManagement.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.PAGE_COMSUMABLES);
-				Util.resetPageDisplay();
-				me.consumablesDivTag.show("fast");
-			});
 		});
 		
 		me.reportLinkTag .click(function(){
@@ -340,11 +315,8 @@ function Counsellor( storageObj, translationObj )
 
 	// Populate data and Setup events for components in HTML page
 	
-	me.checkAndLoadDataAfterInit = function( metaData )
+	me.checkAndLoadDataAfterInit = function()
 	{
-//		me.clientFormManagement.checkAndLoadDataAfterInit( metaData );
-//		me.searchClientManagement.createSearchClientForm();
-		
 		var page = me.storageObj.getItem( "page" );
 		if( page == "" )
 		{

@@ -8,58 +8,15 @@
  * @param translationObj
  */
 
-function ReferCoordinator( storageObj, translationObj )
+function ClientFormManagement( _mainPage, _metaData )
 {
 	var me = this;
-	me.storageObj = storageObj;
-	me.translationObj = translationObj;
-	me.validationObj;
-	
-	me.dateFormat = "dd M yy";
-	me.dateTimeFormat = "YYYY-MM-DD HH:mm";
-	
-	me.todayFULinkTag = $("#todayFULink");
-	me.allFULinkTag = $("#allFULink");
-	me.searchClientLinkTag = $("#searchClientLink");
-	me.aboutLinkTag = $("#aboutLink");
-	me.settingsLinkTag = $("#settingsLink");
-	me.reportLinkTag = $("#reportLink");
-	
-	
-	// [APP Header]
-	me.headerOrgUnitTag = $("#headerOrgUnit");
-	me.headerSettingsLinkTag = $("#headerSettingsLink");
-	
-	
-	// Today F/U
-	me.todayFUListTag = $("#todayFUList");
-	me.todayCaseTblTag = $("#todayFUTbl");
-	me.todayFUDateTag = $("#todayFUDate");
-	me.registerClientBtnTag = $("#registerClientBtn");
-	me.todayFUNumberTag = $("#todayFUNumber");
-	
-	
-	// All F/U
-	me.allFUListTag = $("#allFUList");
-	me.allFUTblTag = $("#allFUTbl");
-	me.allFUFooterTag = $("#allFUFooter");
-	me.allFUNumberTag = $("#allFUNumber");
-	
-	
-	// Search Form	
-	me.searchClientFormTag = $("#searchClientForm");
-	me.searchClientBtnTag = $("#searchClientBtn");
-	me.searchResultTag = $("#searchResult");
-	me.searchResultTbTag = $("#searchResultTb");
-	me.searchResultKeyTag = $("#searchResultKey");
-	me.searchMatchResultKeyTag = $("#searchMatchResultKey");
-	me.searchResultOptionsTag = $("#searchResultOptions");
-	me.seachFormTag = $("#seachForm");
-	me.backToSearchClientResultBtnTag = $("[name=backToSearchClientResultBtn]");
-	me.searchResultHeaderTag = $("#searchResultHeader");
-	me.showAddNewClientFormTag = $("#showAddNewClientForm");
-	me.backToSearchClientFormTag = $("#backToSearchClientForm");
-	me.showTodayCaseTag = $("#showTodayCase");
+	me.mainPage = _mainPage;
+	me.metaData = _metaData;
+	me.storageObj = me.mainPage.storageObj;
+	me.translationObj = me.mainPage.translationObj;
+	me.validationObj = me.mainPage.validationObj;
+	me.inputTagGeneration;
 	
 	
 	// [Client Registration] form	
@@ -71,9 +28,9 @@ function ReferCoordinator( storageObj, translationObj )
 	me.saveClientRegBtnTag = $("#saveClientRegBtn");
 	me.discardClientRegFormBtnTag = $("#discardClientRegFormBtn");
 	me.selectOrgUnitWarningMsgTag = $("#selectOrgUnitWarningMsg");
-	me.moveToSettingLinkTag = $("#moveToSettingLink");
-	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
 
+	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
+	
 	
 	// [Contact Log] data Entry form
 	me.addContactLogEventDivTag = $("#addContactLogEventDiv");
@@ -90,8 +47,10 @@ function ReferCoordinator( storageObj, translationObj )
 	me.contactLogEventFormTag = $("#contactLogEventForm");
 	me.contactLogEventHistoryTbTag = $("#contactLogEventHistoryTb");
 	
-
+	
 	// [ART Refer. Open] Data entry form
+	
+	me.linkageStatusLableTag = $("#linkageStatus");
 	me.artReferOpenFormTag = $("#artReferOpenForm");
 	me.discardARTOpenEventBtnTag = $("#discardARTOpenEventBtn");
 	me.saveARTOpenEventBtnTag = $("#saveARTOpenEventBtn");
@@ -103,8 +62,6 @@ function ReferCoordinator( storageObj, translationObj )
 	me.saveARTCloseEventBtnTag = $("#saveARTCloseEventBtn");
 	me.artEventInfoTbTag = $("#artEventInfoTb");
 	me.artAttributeFormTag = $("#artAttributeForm");
-	me.discardARTAttributeBtnTag = $("#discardARTAttributeBtn");
-	me.saveARTAttributeBtnTag = $("#saveARTAttributeBtn");
 	
 	
 	// [This Test] form
@@ -119,33 +76,18 @@ function ReferCoordinator( storageObj, translationObj )
 	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
 	
 	
-	// [Report]
-	me.reportParamDivTag = $("#reportParamDiv");
-	me.reportTblTag = $("#reportTbl");
-	me.analyticTimeTag = $("#analyticTime");
-	
-	
 	// [Settings]
-	me.settingsDivTag = $("#settingsDiv");
-	me.districtListTag =  $("#districtList");
 	me.orgUnitListTag =  $("#orgUnitList");
-	me.loadingOuListImgTag = $("#loadingOuListImg");
-	me.updateTransBtnTag = $("#updateTransBtn");
 
 	
 	// [About]
 	me.userFullNameTag = $("[name='userFullName']");
-	me.dhisServerTag = $("#dhisServer");
-	me.aboutDivTag = $("#aboutDiv");
-	me.versionTag = $("#version");
-	me.versionTag = $("#version");
-	me.versionDateTag = $("#versionDate");
+	
 	
 	// [Common]
 	me.divSessionExpireMsgTag =  $( "#divSessionExpireMsg" );
 	me.menuIcon = $("button.hamburger");
 	me.headerRightSideControlsTag = $("div.headerRightSideControls");
-	me.mainContentTags = $("div.mainContent");
 	
 	
 	// --------------------------------------------------------------------------------------------
@@ -159,6 +101,8 @@ function ReferCoordinator( storageObj, translationObj )
 
 	
 	// [Register Attribute] Ids
+	me.attrGroup_ClientDetailsAndCUIC = "KgeLi7PFYxe";
+	
 	me.attr_FirstName = "mW2l3T2zL0N";
 	me.attr_LastName = "mUxDHgywnn2";
 	me.attr_DoB = "wSp6Q7QDMsk";
@@ -199,8 +143,14 @@ function ReferCoordinator( storageObj, translationObj )
 	me.attr_NextKinPhoneNumber = "HtQU1Bfhc9m";
 	
 	
+	me.attr_LinkageStatus = "mYdfuRItatP";
+	me.de_ARTClosureLinkageOutcome  = "nOK8JcDWT9X";
+	me.de_LinkageStatusDropReason = "ZRfojTCqVhc";
+	
+	me.attrGroupARTLinkageSuccess = "";
 	
 	// [Data Element Ids]
+	
 	me.de_Testing_ResultTest1 = "choHDFxMCaU";
 	me.de_Testing_ResultTest2 = "KDnhSz51HKS";
 	me.de_Testing_ResultParallel1 = "rMh4ZGNzrh1";
@@ -208,9 +158,15 @@ function ReferCoordinator( storageObj, translationObj )
 	me.de_Testing_ResultSDBioline = "M11JqgkJt2X";
 	me.de_FinalResult_HIVStatus = "UuKat0HFjWS";
 	
-	me.de_ClientPartnerCUIC = "UYyCL2xz8Wz";
 	me.de_Age = "e4XZKCNJjlc";
+	
 	me.de_ClientType = "RvYugZqBKoN";
+	me.de_CoupleStatus = "Umu8i2QXCZk";
+	me.de_partnerCUICOpt = "csHM60DUGkG";
+	me.de_partnerCUIC= "UYyCL2xz8Wz";
+	me.de_PartnerEventId = "UV2AsoZJ7fw";
+	
+	me.de_EQCPPTPassed = "H61nmZKhACr";
 	me.de_PartnerKnowsHIVStatus = "TSqDjQSS2Qi";
 	me.de_PartnerHIVStatus = "C4Zu5mKJQ9y";
 	me.de_NumberSexualPartnersLast6Month = "drqngyyqyP3";
@@ -225,43 +181,34 @@ function ReferCoordinator( storageObj, translationObj )
 	me.de_BMI = "r0Lh3dEecPF";
 	
 
+	me.de_HIVTestChannel = "quOYwc0SOqD";
+	me.de_HIVTestChannel_OtherReason = "Tjw4iDAjyy6";
+	me.de_WhatMotivatedHIVTest = "vOrRzjpdQC6";
+	me.de_WhatMotivatedHIVTest_OtherReason = "GCl3ORKj1jC";
+	me.de_Layer = "fGSXGuPIEOy";
+	me.de_Layer_OtherReason = "omugvBULuf0";
+	
+	
 	me.de_Referral_Offered = "r8AftzZCjWP";
 	me.de_ReferralGiven_STI  = "hv1oAJf18cE";
 	me.de_ReferralGiven_TB  = "a9x8qqtTs0J";
 	me.de_ReferralGiven_FP = "BqyBHC6eEFr";
 	me.de_ReferralGiven_VMMC = "DbfyDJ04SjL";
-	me.de_ReferralGiven_ART = "tUIkmIFMEDS";	
+	me.de_ReferralGiven_ART = "tUIkmIFMEDS";
+	me.de_ReferralGiven_DNAPCR = "ZKWK5UIO9wp";
 	
-	
+	// [Contact Log] event
 	me.de_TypeOfContact = "wzM3bUiPowS";
 	me.de_Outcome = "hjpNXAyZ0cm";
 	me.de_NextAction = "mcgzEFh5IV8";
 	me.de_DueDate = "HcBFZsCt8Sy";
 	me.de_Comments = "HaauwE6JkEs";
 
-	me.de_HIVTestChannel = "quOYwc0SOqD";
-	me.de_HIVTestChannel_OtherReason = "Tjw4iDAjyy6";
-	me.de_WhatMotivatedHIVTest = "vOrRzjpdQC6";
-	me.de_WhatMotivatedHIVTest_OtherReason = "GCl3ORKj1jC";
-	
-	
-	
-	//[Report]
-	me.de_Tested = "I2oytRXksKN";
-	me.de_Target = "rcVLQsClLUa";
-	me.de_achieved = "sNS1PQ1YNXA";
-	
-	me.reportName_AllClient = "reportAllClients";
-	me.reportName_PositiveClient = "reportPostitiveClients";
-	me.reportName_ARTClient = "reportARTReferrals";
-	
-	
-	
-	// Search INPUT fields
-	me.searchDoBTag;
-	me.searchDistrictOBTag;
-	me.searchLastNameTag;
-	me.searchFirstNameTag;
+	// [ART Opening] form
+	me.de_ARTOpen_ReferralFacilityName = "E1KAxdya3y5";
+
+	// [ART Closure] form
+	me.attr_ARTClosure_ReferralFacilityName = "LCLiPzJWVAb";
 	
 	
 	// Data Element Logic fields
@@ -281,465 +228,78 @@ function ReferCoordinator( storageObj, translationObj )
 	me.TAB_NAME_ART_REFER = "artReferDiv";
 	
 	
-	me.currentList = "";
-	me.PAGE_TODAY_LIST = "todayList";
-	me.PAGE_ALL_LIST = "previousList";
-	me.PAGE_SEARCH_PARAM = "searchParam";
-	me.PAGE_SEARCH_CLIENT_RESULT = "searchClientResult";
-	me.PAGE_SEARCH_ADD_CLIENT = "searchAddClient";
-	me.PAGE_SEARCH_EDIT_CLIENT = "searchEditClient";
-	me.PAGE_REPORT_PARAM = "reportParam";
-	me.PAGE_SETTINGS = "settings";
-	me.PAGE_ABOUT = "about";
-	
-	
-	me.userInfoLoaded = false;
-	me.metadataLoaded = false;
-	me.orgUnitListLoaded = false;
-	
-	
 	me.sectionList = [];
 	me.attributeGroupList = [];
 	
 	
-	me.searchClientAttributeIds = [me.attr_DoB, me.attr_DistrictOB, me.attr_FirstName, me.attr_LastName, me.attr_BirthOrder];
-
-	
 	// ---------------------------------------------------------------------------------------------------------------------------
-	// Init methods
+	// Init methods - Populate data and Setup events for components in HTML page
 	// ---------------------------------------------------------------------------------------------------------------------------
 	
 	me.init = function()
-	{		
-		MsgManager.initialSetup();		
-		me.validationObj = new Validation( me.translationObj );
+	{
+		me.inputTagGeneration = new InputTagGeneration();
 		
-		me.setup_ButtonsOnBrowser();
-		me.setupVersion();
-		me.hideHIVTestLogicActionTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_HIDE_HIV_TEST_LOGIC_ACTION_FIELDS ) );		
-		me.loadInitData();
-	};
-	
-
-	// ---------------------------------------------------------------------------------------------------------------------------
-	// Load init data
-	// ---------------------------------------------------------------------------------------------------------------------------
-	
-	me.setup_ButtonsOnBrowser = function()
-	{
-		window.onbeforeunload = function (e) {
-		    var e = e || window.event;
-
-		    var msg = me.translationObj.getTranslatedValueByKey( "common_msg_leavePage" );
-			
-		    // For IE and Firefox
-		    if (e) {
-		        e.returnValue = msg;
-		    }
-
-		    // For Safari / chrome
-		    return msg;
-		 };
+		// STEP 1. Save the sectionList in memory
 		
-		/* window.onload = function () {
-		    if (typeof history.pushState === "function") {
-		        history.pushState("jibberish", null, null);
-		        window.onpopstate = function () {
-		            history.pushState('newjibberish', null, null);
-		            // Handle the back (or forward) buttons here
-		            // Will NOT handle refresh, use onbeforeunload for this.
-		        };
-		    }
-		    else {
-		        var ignoreHashChange = true;
-		        window.onhashchange = function () {
-		            if (!ignoreHashChange) {
-		                ignoreHashChange = true;
-		                window.location.hash = Math.random();
-		                // Detect and redirect change here
-		                // Works in older FF and IE9
-		                // * it does mess with your hash symbol (anchor?) pound sign
-		                // delimiter on the end of the URL
-		            }
-		            else {
-		                ignoreHashChange = false;   
-		            }
-		        };
-		    } 
-		}*/
-	};
-	
-	me.setupVersion = function()
-	{
-		me.versionTag.text( Commons.VERSION );
-		me.versionDateTag.text( Commons.VERSION_DATE );
-	};	
-	
-	
-	me.loadInitData = function()
-	{
-		Commons.checkSession( function( isInSession ) {
-			if ( isInSession ) {
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_initializing" );
-				MsgManager.appBlock( tranlatedText + " ... " );
-				me.loadCurrentUserInfo();
-				me.loadMetadata();
-			} else {
-				me.showExpireSessionMessage();					
-			}
-		});	
-	};
-	
-	me.loadPageWithParam = function()
-	{
-		MsgManager.appUnblock();
+		me.sectionList = me.metaData.sections.programStages;
+		me.catOptionComboList = me.metaData.catOptions.categoryOptions;	
 		
-		var page = me.storageObj.getItem( "page" );
-		if( page == me.PAGE_TODAY_LIST )
+		// Get [Contact Log] data elements configuration
+		for( var i in me.sectionList )
 		{
-			me.listTodayFU(function(){
-				me.loadSearchSubPage( me.todayCaseTblTag );
-			});
-		}
-		else if( page == me.PAGE_PREVIOUS_LIST )
-		{
-			me.listPreviousCases(function(){
-				me.loadSearchSubPage( me.previousCaseTblTag );
-			});
-		}
-		else if( page == me.PAGE_POSITIVE_LIST )
-		{
-			me.listPositiveCases(function(){
-				me.loadSearchSubPage( me.positiveCaseTblTag );
-			});
-		}
-		else if( page == me.PAGE_SEARCH_PARAM )
-		{
-			me.showSearchClientForm();
-		}
-		else if( page == me.PAGE_SEARCH_CLIENT_RESULT )
-		{
-			me.loadSearchSubPage( me.searchResultTbTag );			
-		}
-		else if( page == me.PAGE_COMSUMABLES )
-		{
-			me.consumablesDivTag.show("fast");
-		}
-		else if( page == me.PAGE_REPORT_PARAM )
-		{
-			me.getReport();
-		}
-		else if( page == me.PAGE_SETTINGS )
-		{
-			me.settingsDivTag.show("fast");
-		}
-		else if( page == me.PAGE_ABOUT )
-		{
-			me.aboutDivTag.show("fast");
-		}
-		
-	};
-	
-	me.loadSearchSubPage = function( tableTag )
-	{
-		var subPage = me.storageObj.getItem( "subPage" );
-		if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
-		{
-			// If [Client Form] was called from a list ( Today list, Previous list, Positive list ),
-			// look for the row in table list with the clientId and eventId to call [Click] event of the row
-			if( me.storageObj.getItem("param" ) == "" )
+			var stage = me.sectionList[i];
+			if( stage.id == me.stage_ContactLog )
 			{
-				var clientId = me.storageObj.getItem( "clientId" );
-				var eventId = me.storageObj.getItem( "eventId" );
-				
-				var rowTag = tableTag.find("table").find("tr[clientId='" + clientId + "'][eventId='" + eventId + "']");
-				rowTag.click();
+				me.contactLogDeList = stage.programStageDataElements;
 			}
-			else
-			{
-				var clientSearch = JSON.parse( me.storageObj.getItem("param" ) ).attributes;
-				
-				// STEP 1. Populate data in "Search" form
-				
-				for( var i in clientSearch )
-				{
-					var attributeId = clientSearch[i].attribute;
-					var value = clientSearch[i].value;
-					var field = me.searchClientFormTag.find("[attribute='" + attributeId + "']");
-	
-					if( field.attr("isDate") == "true" )
-					{
-						value = Util.formatDate_LocalDisplayDate( value );
-					}
-					field.val(value);
-				}
-				
-				// STEP 2. Search clients by criteria
-				
-				me.runSearchClients( function(){
-	
-					if( subPage ==  me.PAGE_SEARCH_EDIT_CLIENT )
-					{
-						var clientId = me.storageObj.getItem( "clientId" );
-						var eventId = me.storageObj.getItem( "eventId" );
-						
-						// STEP 3.1. Show "Edit Client" form
-						me.loadClientDetails( clientId, eventId );
-					}
-					else if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT )
-					{
-						// STEP 3.2. Show "Add Client" form
-						me.showAddClientForm();
-					}
-					
-				});
-			}
-		}
-	};
-	
-	
-	// ----------------------------------------------------------------------------
-	// Check if any Org Unit is selected. If no any Org Unit is selected, 
-	// the show dialog to ask user go to Settings to select an orgunit
-	// ----------------------------------------------------------------------------
-	
-	me.checkOrgunitSetting = function( exeFunc )
-	{
-		var orgUnit = me.orgUnitListTag.val();
-		if( orgUnit == "" || orgUnit === null )
-		{
-			var translatedText = me.translationObj.getTranslatedValueByKey( "settings_msg_selectOrgUnit" );
-			MsgManager.showDialogForm( translatedText );
-		}
-		else
-		{
-			exeFunc();
 		}
 		
-	}
+		
+		// STEP 2. Structure attGroups with attributes in memory
+
+		var attrGroups = me.metaData.attGroups.trackedEntityAttributeGroups;
+		var prgAttributes = me.metaData.programAttributes.programTrackedEntityAttributes;
+		me.attributeGroupList = me.generateAttributeGroupList( attrGroups, prgAttributes );
+		
+		// STEP 3. Generate forms
+		
+		me.createClientForm();
+		
+		me.clientDoBTag = me.addClientFormTag.find("[attribute='" + me.attr_DoB + "']");
+		me.clientDistrictOBTag = me.addClientFormTag.find("[attribute='" + me.attr_DistrictOB + "']");
+		me.clientLastNameTag = me.addClientFormTag.find("[attribute='" + me.attr_LastName + "']");
+		me.clientFirstNameTag = me.addClientFormTag.find("[attribute='" + me.attr_FirstName + "']");
+		me.clientBirthOrderTag = me.addClientFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
+		
+
+		me.resultTest1Tag = me.getDataElementField( me.de_Testing_ResultTest1 );
+		me.resultTest2Tag = me.getDataElementField( me.de_Testing_ResultTest2 );
+		me.resultTestParallel1Tag = me.getDataElementField( me.de_Testing_ResultParallel1 );
+		me.resultTestParallel2Tag = me.getDataElementField( me.de_Testing_ResultParallel2 );
+		me.resultTestResultSDBiolineTag = me.getDataElementField( me.de_Testing_ResultSDBioline );
+		me.resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
 	
+		
+		me.setUp_Events();		
+		me.addClientFormTabTag.tabs();
+	};
+	
+
 	// ----------------------------------------------------------------------------
 	// Set up Events
 	// ----------------------------------------------------------------------------
 	
 	me.setUp_Events = function()
 	{	
-		window.addEventListener('resize', me.setUp_FloatButton);
-		
-		me.setUp_Events_Menus();
-		
-		me.setUp_Events_SearchClientForm();
-		
 		me.setUp_Events_AddClientForm();
 
+		me.setUp_Events_ContactLogTab();	
+		
+		me.setUp_Events_ARTReferTab();
+			
 		me.setUp_Events_DataEntryForm();
 		
-		
-		// ------------------------------------------------------------------
-		// App Header event
-		// ------------------------------------------------------------------
-		
-		me.headerSettingsLinkTag.click(function(){
-			me.storageObj.addItem("page", me.PAGE_SETTINGS);
-			me.resetPageDisplay();
-			me.settingsDivTag.show("fast");
-		});
-		
-		// ------------------------------------------------------------------
-		// Settings form
-		// ------------------------------------------------------------------
-		
-		me.districtListTag.change(function(){
-			me.storageObj.addItem( me.storageObj.KEY_STORAGE_DISTRICT, me.districtListTag.val() );
-			me.storageObj.removeItem( me.storageObj.KEY_STORAGE_ORGUNIT );
-			if( me.districtListTag.val() != "" )
-			{
-				me.orgUnitSelectorChange();
-			}
-			else
-			{
-				me.orgUnitListTag.find("option").remove();
-				me.storageObj.removeItem( me.storageObj.KEY_STORAGE_ORGUNIT );
-			}
-			
-			me.populateOrgUnitNameInHeader();
-		});
-		
-		me.orgUnitListTag.change(function(){
-			var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_orgUnitSaved" );
-			me.storageObj.addItem( me.storageObj.KEY_STORAGE_ORGUNIT, me.orgUnitListTag.val() );	
-			me.populateOrgUnitNameInHeader();
-			MsgManager.msgAreaShow( tranlatedText, "SUCCESS");
-		});
-		
-		me.updateTransBtnTag.click( function(){
-			var message = me.translationObj.getTranslatedValueByKey( "settings_translation_msg_loading" );
-			MsgManager.appBlock( message );
-			me.translationObj.loadKeywords( function(){
-				me.translationObj.translatePage( function(){
-					MsgManager.appUnblock();
-				});
-			});
-		});
-		
-	};
-	
-	
-	// Add Events for [Menu]
-	
-	me.setUp_Events_Menus = function()
-	{
-		me.todayFULinkTag.click(function(e){
-			console.log("todayFULinkTag");
-			$('.overlay').click();
-			
-			me.checkOrgunitSetting( function(){
-				me.registerClientBtnTag.show();
-				me.listTodayFU();
-			});
-		});
-		
-		me.allFULinkTag.click(function(){
-			$('.overlay').click();
-			
-			me.checkOrgunitSetting( function(){
-				me.registerClientBtnTag.hide();
-				me.listAllCase();
-			});
-		});
-		
-		me.searchClientLinkTag.click(function(){
-			$('.overlay').click();
-			
-			me.checkOrgunitSetting( function(){
-				me.resetPageDisplay();
-				me.resetSearchClientForm();
-				me.showSearchClientForm();
-			});
-		});
-		
-		me.settingsLinkTag.click(function(){
-			me.storageObj.addItem("page", me.PAGE_SETTINGS);
-			me.resetPageDisplay();
-			me.settingsDivTag.show("fast");
-			$('.overlay').click();
-		});
-		
-		me.aboutLinkTag.click(function(){
-			$('.overlay').click();
-			
-			me.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.PAGE_ABOUT);
-				me.resetPageDisplay();
-				me.aboutDivTag.show("fast");
-			});
-		});
-		
-		me.moveToSettingLinkTag.click(function(){
-			me.resetPageDisplay();
-			me.settingsDivTag.show("fast");
-			$('.overlay').click();
-		});
-		
-		me.reportLinkTag .click(function(){
-			$('.overlay').click();
-			
-			me.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.PAGE_REPORT_PARAM);
-				me.resetPageDisplay();
-				me.getReport();
-			});
-		});
-		
-	};
-	
-	
-	// Add Events for [Search Client Form]
-	
-	me.setUp_Events_SearchClientForm = function()
-	{
-		// Open "Search/Add client" form from "Today Cases" list
-		
-		me.registerClientBtnTag.click(function(){
-			me.resetPageDisplay();
-			me.resetSearchClientForm();
-			me.showSearchClientForm();
-		});
-		
-		// Add Datepicker to date fields
-		
-		me.seachFormTag.find("[isDate='true']").each(function(){
-			Util.datePicker($(this), me.dateFormat );
-		});
-		
-		// Search Result buttons
-				
-		me.showAddNewClientFormTag.click( function(){
-			me.showAddClientForm();
-		});
-
-		me.backToSearchClientFormTag.click( function(){
-			me.resetPageDisplay();
-			me.showSearchClientForm();
-		});
-		
-		me.showTodayCaseTag.click( function(){
-			me.registerClientBtnTag.show();
-			me.listTodayFU();
-		});
-				
-		// Call [Search clients] function
-		
-		me.searchClientBtnTag.click(function(e){
-			e.preventDefault();
-			
-			var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "searchClient_msg_checkingData" );
-			MsgManager.appBlock( tranlatedMsg );
-			
-			var clientData = me.getArrayJsonData( "attribute", me.searchClientFormTag );
-			var requestData = { "attributes": clientData };
-			
-			if( requestData.attributes.length == 0 )
-			{
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
-				MsgManager.msgAreaShow( tranlatedText, "ERROR" );
-				alert( tranlatedText );
-				MsgManager.appUnblock();
-			}
-			else
-			{
-				MsgManager.msgAreaHide();
-				me.runSearchClients();
-			}
-			
-		});
-
-		me.seachFormTag.find("input,select").keyup(function(e){
-			if ( e.keyCode === 13 ) {
-				e.preventDefault();
-				me.runSearchClients();
-			}
-		});
-		
-		
-		// Validation for fields in [Search Client] form
-		
-		me.seachFormTag.find("input,select").change(function(){
-			
-			if( $(this).val() != "" )
-			{
-				MsgManager.msgAreaHide();
-			}
-		});
-		
-
-		// Validation for fields in [Add/Update Form] form
-		
-		me.addClientFormTag.find("input,select").change(function(e){
-			me.generateClientCUIC();
-		});
-		
-		me.setUp_validationCheck( me.seachFormTag.find( 'input,select' ) );
 	};
 	
 	
@@ -747,40 +307,30 @@ function ReferCoordinator( storageObj, translationObj )
 	
 	me.setUp_Events_AddClientForm = function()
 	{
+		
 		// -----------------------------------------------------------------------------------------
-		// [This Test] tab events
+		// [Client Details] tab 		
+
+		// Validation for fields in [Add/Update Form] form
+		
+		me.addClientFormTag.find("input,select").change(function(e){
+			me.generateClientCUIC();
+		});
+		
+		// Add [District] of [Contact Log] change event
+		var districtTag = me.getAttributeField( me.attr_Address3 );
+		districtTag.change( function(){
+			me.filterCouncilsByDistrict();
+		});
+		
 		
 		// Add [Date picker] for date field
 		
 		me.addClientFormTag.find("[isDate='true']").each(function(){
-			Util.datePicker($(this), me.dateFormat );
+			Util.datePicker($(this) );
 		});
 
-		// Back to [Search Client Result]
-		
-		me.backToSearchClientResultBtnTag.click(function(){
-			me.addClientFormDivTag.hide();
-			MsgManager.msgAreaHide();
-			me.selectOrgUnitWarningMsgTag.hide();
-			me.searchResultTbTag.show();
-			me.searchResultTag.show();
-		});
-		
-		// Back to [Current Cases]
-		
-		me.backToCaseListBtnTag.click(function(){
-			if( me.currentList == me.PAGE_TODAY_LIST )
-			{
-				me.registerClientBtnTag.show();
-				me.listTodayFU();
-			}
-			else if( me.currentList == me.PAGE_ALL_LIST )
-			{
-				me.registerClientBtnTag.hide();
-				me.listAllCase();
-			}
-		});
-		
+			
 		me.saveClientRegBtnTag.click(function(){
 			me.saveClient( me.addClientFormTag );
 		});
@@ -800,23 +350,23 @@ function ReferCoordinator( storageObj, translationObj )
 					me.validationObj.checkFormEntryTagsData( me.addClientFormTag );
 				}
 				
-				translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_clientRegForm_changesDiscarded" );
-				MsgManager.msgAreaShow( translatedText, "SUCCESS" );
+				var changesDiscardedMsg = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_clientRegForm_changesDiscarded" );
+				MsgManager.msgAreaShow( changesDiscardedMsg, "SUCCESS" );
 				
 			}
 			
 			return false;
 		});
 		
-		// Validation for INPUT fields
 		
-		me.thisTestDivTag.find("input,select").change(function(e){
-			me.setUp_DataEntryFormLogic( $(this).attr("dataelement") );			
-		});
-
+		// -----------------------------------------------------------------------------------------
+		// Add validation
 		me.setUp_validationCheck( me.addClientFormTag.find( 'input,select' ) );
 		
-		
+	};
+	
+	me.setUp_Events_ContactLogTab = function()
+	{
 		// -----------------------------------------------------------------------------------------
 		// [Register Contact Log] button events
 		
@@ -842,6 +392,7 @@ function ReferCoordinator( storageObj, translationObj )
 
 				if( me.showOpeningTag )
 				{
+					me.setARTLinkageStatusAttrValue();
 					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
 				}
 			} );
@@ -879,7 +430,7 @@ function ReferCoordinator( storageObj, translationObj )
 				"programStage": me.stage_ContactLog 
 				,"status": "COMPLETED"
 			};
-			jsonEvent.dataValues = me.getArrayJsonData( "dataElement", me.contactLogEventFormTag );
+			jsonEvent.dataValues = Util.getArrayJsonData( "dataElement", me.contactLogEventFormTag );
 			
 			me.execSaveEvent( jsonEvent, jsonClient.trackedEntityInstance, undefined, function( jsonData ){
 				me.contactLogEventFormTag.hide();
@@ -894,37 +445,13 @@ function ReferCoordinator( storageObj, translationObj )
 		
 		me.setUp_validationCheck( me.contactLogFormTag.find( 'input,select,textarea' ) );
 		
-
-		// -----------------------------------------------------------------------------------------
-		// [ART Refer Attribute Form] button events
-		
-		me.discardARTAttributeBtnTag.click(function(){
-			var translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_contactLogForm_discardChanges" );
-			var result = confirm( translatedText );			
-			if( result )
-			{
-				Util.resetForm( me.artAttributeFormTag );
-				var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
-				me.populateClientAttrValues( me.artAttributeFormTag, jsonClient );				
-
-				translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_contactLogForm_changesDiscarded" );
-				MsgManager.msgAreaShow( translatedText, "SUCCESS" );
-			}
-			
-			return false;
-		});
-		
-		me.saveARTAttributeBtnTag.click( function(){
-			me.saveClient( me.artAttributeFormTag );
-			
-			return false;
-		});
-		
-		
+	};
+	
+	me.setUp_Events_ARTReferTab = function()
+	{
 		// -----------------------------------------------------------------------------------------
 		// [ART Refer Open] button events
 		
-
 		me.discardARTOpenEventBtnTag.click( function(){
 			var translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_ARTEventForm_discardChanges" );
 			var result = confirm( translatedText );
@@ -935,8 +462,6 @@ function ReferCoordinator( storageObj, translationObj )
 				if( me.artReferOpenFormTag.attr("event") != undefined )
 				{
 					// Reset data
-//					var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
-//					me.populateClientAttrValues( me.artReferOpenFormTag, jsonClient );
 					var jsonEvent = JSON.parse( me.artReferOpenFormTag.attr("event") );
 					me.populateDataValuesInEntryForm( me.artReferOpenFormTag, jsonEvent );
 				}
@@ -971,24 +496,30 @@ function ReferCoordinator( storageObj, translationObj )
 				};
 			}
 						
-			jsonEvent.dataValues = me.getArrayJsonData( "dataElement", me.artReferOpenFormTag );
+			jsonEvent.dataValues = Util.getArrayJsonData( "dataElement", me.artReferOpenFormTag );
 			
 			me.execSaveEvent( jsonEvent, jsonClient.trackedEntityInstance, eventId, function( response ){
 				
 				// Set [event] attribute for [ART Refer Opening] Tab
 				me.artReferOpenFormTag.attr( "event", JSON.stringify( response ) );
 				
-				// Generate [Time Elapsed] attribute value for [ART Closure] form
-				me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( "00:00" );
+				me.setAndSaveARTLinkageStatusAttrValue( function(){
+					
+					// Generate [Time Elapsed] attribute value for [ART Closure] form
+					me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( "00:00" );
+					
+					var artClosureEvent = me.artReferCloseFormTag.attr("event");
+					if( artClosureEvent !== undefined )
+					{
+						artClosureEvent = JSON.parse( artClosureEvent );
+					}
+					me.populateTimeElapsed( response, artClosureEvent );
+					
+					me.artReferCloseFormTag.show();
+					
+					Util.disableForm( me.artReferOpenFormTag, true );
+				});
 				
-				var artClosureEvent = me.artReferCloseFormTag.attr("event");
-				if( artClosureEvent !== undefined )
-				{
-					artClosureEvent = JSON.parse( artClosureEvent );
-				}
-				me.populateTimeElapsed( response, artClosureEvent );
-				
-				me.artReferCloseFormTag.show();
 			});
 		
 
@@ -1043,9 +574,13 @@ function ReferCoordinator( storageObj, translationObj )
 				me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( timeElapsed );
 			}
 			
+			
+			me.setARTLinkageStatusAttrValue();
+			var jsonClient = me.getClientJsonData( me.artAttributeFormTag );
+			var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
+			
 			me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
-				Util.disableForm( me.thisTestDivTag, true );
-				
+				Util.disableForm( me.thisTestDivTag, true );				
 				me.showTabInClientForm( me.TAB_NAME_ART_REFER );
 			} );
 			
@@ -1060,6 +595,80 @@ function ReferCoordinator( storageObj, translationObj )
 	
 	me.setUp_Events_DataEntryForm = function()
 	{
+		// -----------------------------------------------------------------------------------------
+		// Set up events INPUT tags in [New test] form
+		
+		// Set up events for HIV Test input tags
+		me.getDataElementField( me.de_Testing_ResultTest1 ).change( function(){
+			var deId = $(this).attr("dataelement");
+			me.setUp_DataEntryHIVTestInputTagEvent( deId );	
+		});
+		
+		me.getDataElementField( me.de_Testing_ResultTest2 ).change( function(){
+			var deId = $(this).attr("dataelement");
+			me.setUp_DataEntryHIVTestInputTagEvent( deId );	
+		});
+		
+		me.getDataElementField( me.de_Testing_ResultParallel1 ).change( function(){
+			var deId = $(this).attr("dataelement");
+			me.setUp_DataEntryHIVTestInputTagEvent( deId );	
+		});
+		
+		me.getDataElementField( me.de_Testing_ResultParallel2 ).change( function(){
+			var deId = $(this).attr("dataelement");
+			me.setUp_DataEntryHIVTestInputTagEvent( deId );	
+		});
+		
+		me.getDataElementField( me.de_Testing_ResultSDBioline ).change( function(){
+			var deId = $(this).attr("dataelement");
+			me.setUp_DataEntryHIVTestInputTagEvent( deId );	
+		});
+		
+		// Client Type
+		me.getDataElementField( me.de_ClientType ).change( function(){
+			me.setUp_ClientTypeTagLogic();
+		});
+
+		// Partner CUIC option
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		partnerCUICOptTag.change( function(){
+			me.setUp_PartnerCUICOption();
+		});
+		
+		// Partner Knows HIV Status
+		me.getDataElementField( me.de_PartnerKnowsHIVStatus ).change( function(){
+			me.setUp_DataElementPartnerKnowHIVStatusLogic();
+		});
+		
+		// Final HIV Test result
+		me.getDataElementField( me.de_ClientType ).change( function(){
+			me.setUp_DataElementFinalHIVStatusLogic();
+		});
+		
+		// Referral offered
+		me.getDataElementField( me.de_Referral_Offered ).change( function(){
+			me.setUp_ReferralOfferedLogic();
+		});
+		
+		// TB Screening Conducted
+		me.getDataElementField( me.de_TBScreeningConducted ).change( function(){
+			me.setUp_DataElementTBScreeningConductedLogic();
+		});
+		
+		// Hide other reson fields for INPUT tags
+		me.getDataElementField( me.de_HIVTestChannel ).change( me.setUp_OtherReasonTagLogic );
+		me.getDataElementField( me.de_WhatMotivatedHIVTest ).change( me.setUp_OtherReasonTagLogic );
+		me.getDataElementField( me.de_Layer ).change( me.setUp_OtherReasonTagLogic );
+		
+		// BMI
+		me.getDataElementField( me.de_BMI ).change( function(){
+			me.setUp_DataElementBMI();
+		});
+		
+		// -----------------------------------------------------------------------------------------
+		// Set up events for buttons
+		
+		// Discard data
 		me.discardEventFormBtnTag.click( function(){
 			var translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_contactLogForm_discardChanges" );
 			var result = confirm( translatedText );			
@@ -1073,8 +682,8 @@ function ReferCoordinator( storageObj, translationObj )
 					me.populateDataValuesInEntryForm( me.addEventFormTag, jsonEvent );
 				}
 				
-				translatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_ARTEventForm_changesDiscarded" );
-				MsgManager.msgAreaShow( translatedText, "SUCCESS" );
+				var changesDiscardedMsg = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_ARTEventForm_changesDiscarded" );
+				MsgManager.msgAreaShow( changesDiscardedMsg, "SUCCESS" );
 			}
 			
 			return false;
@@ -1084,7 +693,9 @@ function ReferCoordinator( storageObj, translationObj )
 		me.saveEventBtnTag.click( function(){
 			
 			Util.disableTag( me.saveEventBtnTag, true );
-						
+					
+			// Get Json Event data
+			
 			var client = JSON.parse( me.addClientFormTabTag.attr("client") );
 			var event = me.addEventFormTag.attr("event");
 			
@@ -1095,18 +706,27 @@ function ReferCoordinator( storageObj, translationObj )
 				event = { "programStage": me.stage_HIVTesting };
 			}
 			
-			event.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag );
+			event.dataValues = Util.getArrayJsonData( "dataElement", me.thisTestDivTag );
 			
+			// Save Event
 			me.execSaveEvent(event, client.trackedEntityInstance, event.event, function( eventJson ){
 				
+				var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+				var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+				var partnerEventId = me.getDataElementField( me.de_PartnerEventId ).val();
+				if( partnerCUICOptTag.val() == "2" && partnerCUICTag.val() != "" && partnerEventId != undefined )
+				{
+					me.savePartnerCUIC();
+				}
+				
 				me.addEventFormTag.attr("event", JSON.stringify( eventJson ));
+				me.disableClientDetailsAndCUICAttrGroup( true );
 				
 				if( me.checkIfARTEvent( eventJson ) )
 				{
 					me.addClientFormTabTag.attr("artHIVTestingEvent", JSON.stringify( eventJson ));
 					me.showOpeningTag = false;
 				}
-				
 				me.checkAndShowARTReferTab( eventJson );
 			} );
 		});
@@ -1129,14 +749,6 @@ function ReferCoordinator( storageObj, translationObj )
 			}
 			
 		});
-		
-		// Add Logic for "HIV Test" in entry form
-		me.hideHIVTestLogicActionTag.change( function(){
-			me.storageObj.addItem( me.storageObj.KEY_STORAGE_HIDE_HIV_TEST_LOGIC_ACTION_FIELDS, me.hideHIVTestLogicActionTag.val() );
-
-			var translatedText = me.translationObj.getTranslatedValueByKey( "common_msg_settingsHideLogicActionFieldsSaved" );
-			MsgManager.msgAreaShow( translatedText, "SUCCESS" );
-		});
 
 		me.setUp_validationCheck( me.thisTestDivTag.find( 'input,select' ) );
 		
@@ -1144,6 +756,10 @@ function ReferCoordinator( storageObj, translationObj )
 		
 	};
 	
+	me.disableClientDetailsAndCUICAttrGroup = function( disabled )
+	{
+		Util.disableForm( me.addClientFormTag.find("tbody[groupid=" + me.attrGroup_ClientDetailsAndCUIC + "]" ), disabled );
+	};
 	
 	me.setUp_validationCheck = function( tags )
 	{
@@ -1153,69 +769,77 @@ function ReferCoordinator( storageObj, translationObj )
 	};
 
 	
-	me.setUp_FloatButton = function()
-	{
-		var width = $(window).width() - 80;
-		var height = $(window).height() - 120;
-		
-		
-		me.registerClientBtnTag.css({top: height, left: width, position:'fixed'});
-	};
-	
-	
 	// ----------------------------------------------------------------------------
 	// Add logic for data elements in [This Test] form
 	// ----------------------------------------------------------------------------
 	
-	me.setUp_DataEntryFormLogic = function( attrId )
-	{
-		if( attrId != undefined && eval( me.addClientFormTabTag.attr("addedLogic") ) )
-		{
-			// If "Result Test 1" value is "Positive", enable "Result Test 2"
-			if( attrId === me.de_Testing_ResultTest1 )
-			{
-				me.setUp_DataElementResultTest1Logic();
-			}
-			// If "Result Test 2" value is "Positive", enable "Result Parallel 2" 
-			else if( attrId === me.de_Testing_ResultTest2 )
-			{
-				me.setUp_DataElementResultTest2Logic();
-			}
-			// If the value of "Parallel 1" and "Parallel 2" are the same, "FinalResult" has value as "Parallel"
-			// If not, enable "SD Bioline" field
-			else if( attrId === me.de_Testing_ResultParallel1 || attrId === me.de_Testing_ResultParallel2 )
-			{
-				me.setUp_DataElementResultParallelLogic();				
-			}
-			// Fill "SD Bioline" value for "Final Result"
-			else if( attrId === me.de_Testing_ResultSDBioline )
-			{
-				var result = me.resultTestResultSDBiolineTag.val();
-				if( me.resultTestResultSDBiolineTag.val() == "Indeterminate out of stock" )
-				{
-					result = "Indeterminate";
-				}
-				me.resultFinalHIVStatusTag.val( result );
-				me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
-			}
-		}
-				
+	me.setUp_DataEntryFormInputTagEvent = function()
+	{		
+
+		// STEP 1. Hide all tbody and input in [New Test]
+		me.addEventFormTag.find("tbody[sectionid]").show();
+		me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
+			me.setHideLogicTag( $(this), false );
+		});
+		
+		// STEP 2. Setup logic fields in form
+		me.setUp_ClientTypeTagLogic();
 		me.setUp_DataElementPartnerKnowHIVStatusLogic();
 		me.setUp_DataElementFinalHIVStatusLogic();
 		me.setUp_ReferralOfferedLogic();
 		me.setUp_DataElementTBScreeningConductedLogic();
-		me.setUp_HIVTestChannelLogic();
-		me.setUp_WhatMotivatedHIVTest();
+		me.setUp_OtherReasonTagLogic();
 		me.setUp_DataElementBMI();
 		
-//		var artHIVTestingEvent =  me.addClientFormTabTag.attr("artHIVTestingEvent");
-//		if( artHIVTestingEvent != undefined )
-//		{
-//			artHIVTestingEvent = JSON.parse( artHIVTestingEvent );
-//		}
-//		me.checkAndShowARTReferTab( artHIVTestingEvent );
 	}; 
 	
+	
+	me.setUp_DataEntryHIVTestInputTagEvent = function( attrId )
+	{
+		var clientTypeTag = me.getDataElementField( me.de_ClientType );
+		
+		if( attrId != undefined && eval( me.addClientFormTabTag.attr("addedLogic") )  )
+		{
+			if(  clientTypeTag.val() !== "LS_SER3" )
+			{
+					
+				// If "Result Test 1" value is "Positive", enable "Result Test 2"
+				if( attrId === me.de_Testing_ResultTest1 )
+				{
+					me.setUp_DataElementResultTest1Logic();
+				}
+				// If "Result Test 2" value is "Positive", enable "Result Parallel 2" 
+				else if( attrId === me.de_Testing_ResultTest2 )
+				{
+					me.setUp_DataElementResultTest2Logic();
+				}
+				// If the value of "Parallel 1" and "Parallel 2" are the same, "FinalResult" has value as "Parallel"
+				// If not, enable "SD Bioline" field
+				else if( attrId === me.de_Testing_ResultParallel1 || attrId === me.de_Testing_ResultParallel2 )
+				{
+					me.setUp_DataElementResultParallelLogic();				
+				}
+				// Fill "SD Bioline" value for "Final Result"
+				else if( attrId === me.de_Testing_ResultSDBioline )
+				{
+					var result = me.resultTestResultSDBiolineTag.val();
+					if( me.resultTestResultSDBiolineTag.val() == "Indeterminate out of stock" )
+					{
+						result = "Indeterminate";
+					}
+					me.resultFinalHIVStatusTag.val( result );
+					me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
+				}
+				
+				// Generate [Couple Status] data value
+				me.generateCoupleStatusIfAny();
+			}
+			else
+			{
+				me.populateEQCPPTPassedVal();
+			}
+		}
+	};
 	
 	me.setUp_DataElementResultTest1Logic = function()
 	{
@@ -1343,8 +967,6 @@ function ReferCoordinator( storageObj, translationObj )
 		var resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
 		var testResultsGivenTag = me.getDataElementField( me.de_TestResultsGiven );
 		var previousKnowledgeHIVPositiveStatusTag = me.getDataElementField( me.de_PreviousKnowledgeHIVPositiveStatus );
-		var referralGivenPRePNegativeTag = me.getDataElementField( me.de_ReferralGivenPRePNegative );
-		var referralOfferedTag = me.getDataElementField( me.de_Referral_Offered );
 		
 		// Reset field [Previous knowledge of HIV+ status]
 		me.setHideLogicTag( previousKnowledgeHIVPositiveStatusTag.closest("tr"), true );
@@ -1352,14 +974,6 @@ function ReferCoordinator( storageObj, translationObj )
 		
 		// Reset field [testResultsGivenTag]
 		Util.disableTag( testResultsGivenTag, false );	
-		
-		// Reset [Referrals Out - PReP (HIV-)]
-		me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), true );
-		
-		// Reset [Referrals Out - ART]
-		me.setHideLogicTag( referralOfferedTag.closest("tr"), true );
-		me.removeMandatoryForField( referralOfferedTag );
-		
 		
 		if( resultFinalHIVStatusTag.val() === "Indeterminate" )
 		{
@@ -1374,28 +988,42 @@ function ReferCoordinator( storageObj, translationObj )
 				// Add mandatory for [Previous knowledge of HIV+ status]
 				me.addMandatoryForField( previousKnowledgeHIVPositiveStatusTag );
 				me.setHideLogicTag( previousKnowledgeHIVPositiveStatusTag.closest("tr"), false );
-				
-				// Show [Referrals Out - Referral(s) offered]
-				me.setHideLogicTag( referralOfferedTag.closest("tr"), false );
-				me.addMandatoryForField( referralOfferedTag );
-			}
-			else
-			{
-				referralOfferedTag.val("");
 			}
 			
 		}
-		else if( resultFinalHIVStatusTag.val() === "Negative" )
-		{
-			if( referralOfferedTag.val() == "true" )
-			{
-				// Hide [Referrals Out - PReP (HIV-)]
-				me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), false );
-			}
-		}
 		
 	};
+		
+	// Generate [Couple Status] data value
+	me.generateCoupleStatusIfAny = function()
+	{
+		var clientTypeTag = me.getDataElementField( me.de_ClientType );
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		var partnerHIVTest = me.getDataElementField( me.de_partnerCUIC ).removeAttr( "lastHIVTest" );
+		var clientHIVTest = me.getDataElementField( me.de_FinalResult_HIVStatus ).val();
+		if( clientTypeTag.val() == "LS_SER2" && partnerCUICOptTag.val() == "2" && partnerHIVTest != undefined && clientHIVTest != "" )
+		{
+			var coupleStatusTag = me.getDataElementField( me.de_CoupleStatus );
+			
+			if( partnerHIVTest == clientHIVTest )
+			{
+				if( clientHIVTest == "Positive" )
+				{
+					coupleStatusTag.val( "CON" );
+				}
+				else if( clientHIVTest == "Negative" )
+				{
+					coupleStatusTag.val( "NEG" );
+				}
+			}
+			else
+			{
+				coupleStatusTag.val( "DIS" );
+			}
+		}
+	};
 	
+
 	me.setUp_ReferralOfferedLogic = function()
 	{
 		var referralOfferedTag = me.getDataElementField( me.de_Referral_Offered );
@@ -1405,6 +1033,11 @@ function ReferCoordinator( storageObj, translationObj )
 		var referralGivenFPTag = me.getDataElementField( me.de_ReferralGiven_FP );
 		var referralGivenVMMCTag = me.getDataElementField( me.de_ReferralGiven_VMMC );
 		var referralGivenARTTag = me.getDataElementField( me.de_ReferralGiven_ART );
+		var referralGivenDNAPCRTag = me.getDataElementField( me.de_ReferralGiven_DNAPCR ); 
+		var referralGivenPRePNegativeTag = me.getDataElementField( me.de_ReferralGivenPRePNegative );
+		
+		var resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
+		var genderTag = me.getAttributeField( me.attr_Sex );
 		
 		// Hidden all [Referral Given xxx]
 		me.setHideLogicTag( referralGivenSTITag.closest("tr"), true );
@@ -1412,25 +1045,35 @@ function ReferCoordinator( storageObj, translationObj )
 		me.setHideLogicTag( referralGivenFPTag.closest("tr"), true );
 		me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), true );
 		me.setHideLogicTag( referralGivenARTTag.closest("tr"), true );
+		me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), true );
+		me.setHideLogicTag( referralGivenDNAPCRTag.closest("tr"), true );
 		
 		
 		if( referralOfferedTag.val() == "true" )
 		{
 
-			me.setHideLogicTag( referralGivenSTITag.closest("tr"), false );
-			me.setHideLogicTag( referralGivenTBTag.closest("tr"), false );
-			me.setHideLogicTag( referralGivenFPTag.closest("tr"), false );
-			me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), false );
-			
-			if( testResultsGivenTag.val() == "true" )
+			if( resultFinalHIVStatusTag.val() == "Positive" )
 			{
-				me.setHideLogicTag( referralGivenARTTag.closest("tr"), false );
+				me.setHideLogicTag( referralGivenSTITag.closest("tr"), false );
+				me.setHideLogicTag( referralGivenTBTag.closest("tr"), false );
+				me.setHideLogicTag( referralGivenFPTag.closest("tr"), false );
+				me.setHideLogicTag( referralGivenDNAPCRTag.closest("tr"), false );
+				
+				if( testResultsGivenTag.val() == "true" )
+				{
+					me.setHideLogicTag( referralGivenARTTag.closest("tr"), false );
+				}
 			}
 			else
 			{
-				me.setHideLogicTag( referralGivenARTTag.closest("tr"), true );
-				referralGivenARTTag.prop("checked", false);
+				me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), false );
 			}
+			
+			if( genderTag.val() == "Male" )
+			{
+				me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), false );
+			}
+			
 		}
 		else
 		{
@@ -1439,6 +1082,7 @@ function ReferCoordinator( storageObj, translationObj )
 			referralGivenFPTag.prop("checked", false);
 			referralGivenVMMCTag.prop("checked", false);
 			referralGivenARTTag.prop("checked", false);
+			referralGivenDNAPCRTag.prop("checked", false);
 		}
 	};
 	
@@ -1458,10 +1102,11 @@ function ReferCoordinator( storageObj, translationObj )
 		}
 	};
 
-	me.setUp_HIVTestChannelLogic = function()
+	me.setUp_OtherReasonTagLogic = function()
 	{
+		// HIVTestChannel
 		var testChannelTag = me.getDataElementField( me.de_HIVTestChannel );
-		var otherReasonTag = me.getDataElementField( me.de_HIVTestChannel_OtherReason );
+		otherReasonTag = me.getDataElementField( me.de_HIVTestChannel_OtherReason );
 		if( testChannelTag.val() == "LS_CHA7" ) // [Other testing channel] Option
 		{
 			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
@@ -1471,12 +1116,10 @@ function ReferCoordinator( storageObj, translationObj )
 			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
 			otherReasonTag.val("");
 		}
-	};
-	
-	me.setUp_WhatMotivatedHIVTest = function()
-	{
+		
+		// whatMotivatedHIVTest
 		var whatMotivatedHIVTestTag = me.getDataElementField( me.de_WhatMotivatedHIVTest );
-		var otherReasonTag = me.getDataElementField( me.de_WhatMotivatedHIVTest_OtherReason );
+		otherReasonTag = me.getDataElementField( me.de_WhatMotivatedHIVTest_OtherReason );
 		if( whatMotivatedHIVTestTag.val() == "OTHER" ) // Other (specifiy)
 		{
 			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
@@ -1486,7 +1129,129 @@ function ReferCoordinator( storageObj, translationObj )
 			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
 			otherReasonTag.val("");
 		}
+		
+		// Layger
+		var layerTag = me.getDataElementField( me.de_Layer );
+		otherReasonTag = me.getDataElementField( me.de_Layer_OtherReason );
+		if( layerTag.val() == "LAY08" ) // Other (specifiy)
+		{
+			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
+		}
+		else
+		{
+			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
+			otherReasonTag.val("");
+		}
+
 	};
+		
+	me.setUp_ClientTypeTagLogic = function()
+	{
+		var clientTypeTag = me.getDataElementField( me.de_ClientType );
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		var coupleStatusTag = me.getDataElementField( me.de_CoupleStatus );
+		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
+		var resultTest1Tag = me.getDataElementField( me.de_Testing_ResultTest1 );
+		var resultTest2Tag = me.getDataElementField( me.de_Testing_ResultTest2 );
+		
+		// Hide [Client partner's CUIC - Option] && [Client partner's CUIC] fields
+		me.setHideLogicTag( partnerCUICOptTag, true );
+		me.setHideLogicTag( partnerCUICTag, true );
+		me.setHideLogicTag( coupleStatusTag, true );
+		me.setHideLogicTag( EQCPPTPassedTag, true );
+		
+		
+		// Individual
+		if( clientTypeTag.val() == "LS_SER1" )
+		{
+			partnerCUICOptTag.val("");
+			partnerCUICTag.val("");
+		}
+		// Couple test
+		else if( clientTypeTag.val() == "LS_SER2" )
+		{
+			
+			me.setHideLogicTag( partnerCUICOptTag, false );
+			me.setHideLogicTag( coupleStatusTag, false );
+			if( partnerCUICOptTag.val() == "" )
+			{
+				me.setHideLogicTag( partnerCUICTag, true ); 
+			}
+			else
+			{
+				me.setHideLogicTag( partnerCUICTag, false ); 
+			}
+		}
+		// EQC / PPT
+		else if( clientTypeTag.val() == "LS_SER3" )
+		{
+			partnerCUICOptTag.val("");
+			partnerCUICTag.val("");
+		
+			Util.disableTag( resultTest1Tag, false ); 
+			Util.disableTag( resultTest2Tag, false );
+			
+			// STEP 1. Hide all tbody and input in [New Test]
+			me.addEventFormTag.find("tbody[sectionid]").hide();
+			me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
+				me.setHideLogicTag( $(this), true );
+			});
+			
+			// STEP 2. Show [Client Type] field
+			var clientInfoTb = clientTypeTag.closest("tbody");
+			clientInfoTb.show();
+			me.setHideLogicTag( clientTypeTag, false );
+			
+			// STEP 2. Show [EQC / PPT Passed] field
+			clientInfoTb = EQCPPTPassedTag.closest("tbody");
+			clientInfoTb.show();
+			me.setHideLogicTag( EQCPPTPassedTag, false );
+			
+			// STEP 3. Hide all fields in [Today] section
+			var todayTestTb = resultTest1Tag.closest("tbody");
+			todayTestTb.show();
+			me.setHideLogicTag( resultTest1Tag, false );
+			me.setHideLogicTag( resultTest2Tag, false );
+			
+			me.addEventFormTag.find("tbody[sectionid].hideHeader").find("tr:not([header])").hide();
+			
+			me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
+				if( $(this).attr("dataelement") != me.de_ClientType 
+						&&  $(this).attr("dataelement") != me.de_EQCPPTPassed 
+						&& $(this).attr("dataelement") != me.de_Testing_ResultTest1 
+						&& $(this).attr("dataelement") != me.de_Testing_ResultTest2 )
+				{
+					 $(this).val("");
+				}
+			});
+						
+		}
+		
+	};
+	
+
+	// Set value for data element field [EQC/PPT Passed]
+	me.populateEQCPPTPassedVal = function()
+	{
+		
+		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
+		if( me.resultTest1Tag.val() != "" && me.resultTest2Tag.val() != "" )
+		{
+			if( me.resultTest1Tag.val() ==  me.resultTest2Tag.val() )
+			{
+				EQCPPTPassedTag.val("true");
+			}
+			else
+			{
+				EQCPPTPassedTag.val("false");
+			}
+		}
+		else
+		{
+			EQCPPTPassedTag.val("");
+		}
+	}
 	
 	me.setUp_DataElementBMI = function()
 	{
@@ -1503,6 +1268,63 @@ function ReferCoordinator( storageObj, translationObj )
 		
 		bmiTag.val( result );
 	};	
+	
+	me.setUp_PartnerCUICOption = function()
+	{
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		
+		
+		if( partnerCUICOptTag.val() != "" )
+		{
+			if( partnerCUICOptTag.val() == "2" )
+			{
+				// Generate data for [Partner CUIC]
+				me.populateParterCUIC();
+			}
+			else
+			{
+				me.checkAndShowCheckedIconForPartnerCUICTag();
+			}
+			me.setHideLogicTag( partnerCUICTag, false );
+		}
+		else
+		{
+			partnerCUICTag.val("");
+			me.setHideLogicTag( partnerCUICTag, true );
+		}
+	};
+	
+	me.setUp_ARTClosureForm = function()
+	{
+		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		var droppedReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
+		
+		if( closureLinkageOutcomeTag.val() == "" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				me.setHideLogicTag( $(this), true);
+			});
+		}
+		else if( closureLinkageOutcomeTag.val() == "SUCCESS" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				me.setHideLogicTag( $(this), false);
+			});
+			
+			me.setHideLogicTag( droppedReasonTag, true);
+		}
+		else if( closureLinkageOutcomeTag.val() == "DROPPED" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				me.setHideLogicTag( $(this), true);
+			});
+			
+			me.setHideLogicTag( droppedReasonTag, false);
+		}
+
+		me.setHideLogicTag( closureLinkageOutcomeTag, false);
+	};
 	
 	me.getDataElementField = function( deId )
 	{
@@ -1531,11 +1353,7 @@ function ReferCoordinator( storageObj, translationObj )
 	me.createClientForm = function()
 	{
 		me.createRegisterClientForm();
-		me.createSearchClientForm();
 		me.createDataEntryForm();
-		
-		// Remove the 'mandatory' SPAN from the Search table
-		me.seachFormTag.find("span.required").remove();
 		
 		// Remove header of [ART Attribute] form
 		me.artAttributeFormTag.find("tr[header]").remove();
@@ -1570,6 +1388,9 @@ function ReferCoordinator( storageObj, translationObj )
 		// Set Mandatory for [Consent to contact] field
 		var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
 		me.addMandatoryForField( consentToContactTag );
+		
+		// Hide Councils list in [Contact Log] attribute form
+		me.filterCouncilsByDistrict();
 	};
 
 	me.createAttributeClientForm = function( table, preFixGroupName, addHistoryDiv )
@@ -1621,7 +1442,7 @@ function ReferCoordinator( storageObj, translationObj )
 					
 					// STEP 3.2. Generate the input/select tag based on the valueType of attribute
 					
-					var inputTag = me.generateInputTag( attribute, "attribute" );
+					var inputTag = me.inputTagGeneration.generateInputTag( attribute, "attribute" );
 					
 					var inputColTag = $("<td colspan='2'></td>");
 					inputColTag.append( inputTag );
@@ -1721,33 +1542,6 @@ function ReferCoordinator( storageObj, translationObj )
 	};
 	
 	
-	// Create [Add Client] form with attribute-groups and program-attributes from server
-	
-	me.createSearchClientForm = function()
-	{
-		for( var i in me.searchClientAttributeIds )
-		{
-			var attrId = me.searchClientAttributeIds[i];
-			var inputTag = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']" );
-			var text = inputTag.closest("tr").find("td:first").html();
-			
-			var fieldTag = $("<div class='form-group'></div>");
-			fieldTag.append("<label for='" + attrId + "' class='col-sm-2 control-label' style='font-weight:300'>" + text + "</label>");
-			fieldTag.append( "<div class='col-sm-10'>" + inputTag.prop('outerHTML') + "</div>" );
-			me.seachFormTag.append( fieldTag );
-		}
-		
-		// Remove all of mandatory attribute for all fields
-		me.seachFormTag.find("input,select").removeAttr("mandatory");
-		me.validationObj.setUp_isNumberOnly_OlderBrowserSupport( me.seachFormTag );
-		
-		var dobTag = me.seachFormTag.find( "input[attribute='" + me.attr_DoB + "']" );
-		me.addDeleteBtnForDoBField( dobTag );
-		dobTag.css( "background-color", "white" );
-		dobTag.css( "border", "1px solid #ccc;" );
-	};	
-
-	
 	// Create [Data Entry form]
 	
 	me.createDataEntryForm = function()
@@ -1764,9 +1558,48 @@ function ReferCoordinator( storageObj, translationObj )
 		me.generateDataEntryFormTable( me.artReferOpenFormTag, me.stage_ARTReferralOpenning );
 		me.generateDataEntryFormTable( me.artReferCloseFormTag, me.stage_ARTReferralClosure );
 		
+		
+		// Set autocompleted for [Referral facility name] in [ART Opening] form
+		var referralFacilityNameTag = me.getDataElementField( me.de_ARTOpen_ReferralFacilityName );
+		Util.setAutoCompleteTag( referralFacilityNameTag );
+		
+//		// Set autocompleted for [Referral facility name] in [ART Closure] form
+//		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
+//		Util.setAutoCompleteTag( closeReferFacilityNameTag );
+		
+		
+		// Add details icon for Partner CUIC tag
+
+		var imgTag = $( "<span class='glyphicon glyphicon-ok form-control-feedback partnerDetails' style='color:green;padding-top: 8px;padding-right: 10px;'></span>"  );
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		partnerCUICTag.closest( "td" ).append( imgTag );
+		partnerCUICTag.closest( "td" ).css( "position", "relative" );
+		
+		// Set [Client partner Event UID] field hidden
+		var partnerEventIdTag = me.getDataElementField( me.de_PartnerEventId );
+		partnerEventIdTag.attr( "type", "hidden" );
+		partnerEventIdTag.closest("tr").find("td").hide();
+		
+		// Generate data elements for [Contact Log] event form
+		for( var i in me.contactLogDeList )
+		{
+			var psDE = me.contactLogDeList[i];
+			var deId = psDE.dataElement.id;
+			
+			var colTag = me.contactLogEventFormTag.find("[dataelementtag='" + deId + "']");
+			var inputTag = me.inputTagGeneration.generateInputTag( psDE.dataElement, "dataelement" );
+			colTag.append( inputTag );
+			
+			if( psDE.compulsory == "true" )
+			{
+				me.addMandatoryForField( inputTag );
+			}
+		}
+		
+		
 		// [Contact Log] event form - Add "DATE" picker for "Date" field
 		me.addContactLogEventFormTag.find("input[isDate='true']").each(function(){
-			Util.datePicker( $(this), me.dateFormat );
+			Util.datePicker( $(this) );
 		});
 		
 		
@@ -1780,15 +1613,22 @@ function ReferCoordinator( storageObj, translationObj )
 			me.addMandatoryForField( $(this) );
 		});
 		
+		// [[ART Closure] Linkage Status
+		
+		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		closureLinkageOutcomeTag.change( function(){
+			me.setUp_ARTClosureForm();
+			
+		});
 		
 		// STEP 2. Disable some DEs in form. Will add login for these DE in 'change' event
 		
-		var resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
-		var resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
-		var resultTestParallel1Tag = me.getDeField( me.de_Testing_ResultParallel1 );
-		var resultTestParallel2Tag = me.getDeField( me.de_Testing_ResultParallel2 );
-		var resultTestResultSDBiolineTag = me.getDeField( me.de_Testing_ResultSDBioline );
-		var resultFinalHIVStatusTag = me.getDeField( me.de_FinalResult_HIVStatus );
+		var resultTest1Tag = me.getDataElementField( me.de_Testing_ResultTest1 );
+		var resultTest2Tag = me.getDataElementField( me.de_Testing_ResultTest2 );
+		var resultTestParallel1Tag = me.getDataElementField( me.de_Testing_ResultParallel1 );
+		var resultTestParallel2Tag = me.getDataElementField( me.de_Testing_ResultParallel2 );
+		var resultTestResultSDBiolineTag = me.getDataElementField( me.de_Testing_ResultSDBioline );
+		var resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
 		
 		if( resultTest1Tag.length > 0 && resultTest2Tag.length > 0 && resultTestParallel1Tag.length > 0 
 				&& resultTestParallel2Tag.length > 0 && resultTestResultSDBiolineTag.length > 0 
@@ -1812,8 +1652,6 @@ function ReferCoordinator( storageObj, translationObj )
 		Util.disableTag( me.getDataElementField( me.de_Age ), true );
 		Util.disableTag( me.getDataElementField( me.de_BMI ), true );
 		
-		// Add logic validation for input fields
-		me.setUp_DataEntryFormLogic();
 	};
 
 
@@ -1846,6 +1684,7 @@ function ReferCoordinator( storageObj, translationObj )
 				imgTag.addClass('arrowDownImg');
 				imgTag.removeClass('arrowRightImg');
 				tbodyTag.find("tr:not([header])").show("fast");
+				tbodyTag.removeClass( "hideHeader" );
 				
 				tableTag.find("tr.actionBar").show();
 			}
@@ -1856,6 +1695,7 @@ function ReferCoordinator( storageObj, translationObj )
 				imgTag.removeClass('arrowDownImg');
 				imgTag.addClass('arrowRightImg');
 				tbodyTag.find("tr:not([header])").hide("fast");
+				tbodyTag.addClass( "hideHeader" );
 				
 				tbodyTag.addClass("separateTb");
 				tableTag.find("tr.actionBar").hide();
@@ -1872,7 +1712,7 @@ function ReferCoordinator( storageObj, translationObj )
 		
 		// Add [Delete] button for [Date Of Birth] field
 		var dobTag = me.getAttributeField( me.attr_DoB );
-		me.addDeleteBtnForDoBField( dobTag );
+		Util.addDeleteBtnForInputTag( dobTag );
 		
 		// Add [Min-Len] for [First name] and [Last name]
 		me.getAttributeField( me.attr_FirstName ).attr( "minlength", 2 );
@@ -1922,6 +1762,9 @@ function ReferCoordinator( storageObj, translationObj )
 		var keyPopulationTag = me.getAttributeField( me.attr_KeyPopulation );
 		var circumcisedTag = me.getDataElementField( me.de_circumcisedTag );
 		
+		var referralGivenVMMCTag = me.getDataElementField( me.de_ReferralGiven_VMMC );
+		var referralOfferedTag = me.getDataElementField( me.de_Referral_Offered );
+		
 		// Reset option values for attribute [Key Population]
 		keyPopulationTag.find("option[value='MSMSW']").hide();
 		keyPopulationTag.find("option[value='MSMNONSW']").hide();
@@ -1938,12 +1781,22 @@ function ReferCoordinator( storageObj, translationObj )
 			
 			// Hide data element [Circumcised]
 			me.setHideLogicTag( circumcisedTag.closest("tr"), true );
+			
+			// Hide [Referral to VMMC]
+			me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), true );
 		}
 		else if( sexTag.val() == "Male" ) // If Sex = Male, HIDE FSW
 		{
 			// Show option values [MSM] of attribute [Key Population]
 			keyPopulationTag.find("option[value='MSMSW']").show();
 			keyPopulationTag.find("option[value='MSMNONSW']").show();
+			
+			if( referralOfferedTag.val() == "true" )
+			{
+				// Hide [Referral to VMMC]
+				me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), false );
+			}
+			
 		}
 	}
 	
@@ -1994,31 +1847,6 @@ function ReferCoordinator( storageObj, translationObj )
 			me.setHideLogicTag( ppocvTag.closest("tr"), false );
 		}
 	};
-	
-	// Add [Delete] button for [Date Of Birth] field
-	me.addDeleteBtnForDoBField = function( dobTag )
-	{	
-		dobTag.addClass( "clearable x onX" );
-		dobTag.attr("readonly", true);
-	    dobTag.mousemove( function( e ){
-		    $(this)[me.tog(this.offsetWidth-25 < e.clientX-this.getBoundingClientRect().left)]('onX');   
-	    });
-	    
-	    dobTag.click( function( ev ){
-	    	if( $(this).hasClass("onX"))
-			{
-	    		ev.preventDefault();
-			    $(this).removeClass("onX").val('').change();
-			}
-	    	
-	    });
-	};
-		
-	me.tog = function(v)
-	{
-		return v ? 'addClass' : 'removeClass';
-	};
-	
 	
 	me.getAttributeField = function( attrId )
 	{
@@ -2104,6 +1932,7 @@ function ReferCoordinator( storageObj, translationObj )
 				imgTag.addClass('arrowDownImg');
 				imgTag.removeClass('arrowRightImg');
 				tbodyTag.find("tr:not([header])").show("fast");
+				tbodyTag.removeClass( "hideHeader" );
 			}
 			else
 			{
@@ -2112,6 +1941,7 @@ function ReferCoordinator( storageObj, translationObj )
 				imgTag.addClass('arrowRightImg');
 				tbodyTag.find("tr:not([header])").hide("fast");
 				tbodyTag.addClass("separateTb");
+				tbodyTag.addClass( "hideHeader" );
 			}
 			
 			// Hide all hideLogic fields
@@ -2206,14 +2036,23 @@ function ReferCoordinator( storageObj, translationObj )
 				
 				// STEP 3.2. Generate the input/select tag based on the valueType of attribute
 				
-				inputTag = me.generateInputTag( de, "dataelement" );
+				inputTag = me.inputTagGeneration.generateInputTag( de, "dataelement" );
 				
 				var inputColTag = $("<td colspan='2'></td>");
 				inputColTag.append( inputTag );
 				rowTag.append( inputColTag );
 				
 				// Add "DATE" picker for "Date" field
-				Util.datePicker( rowTag.find("input[isDate='true']"), me.dateFormat );
+				if( de == me.de_DueDate )
+				{
+					Util.dateFuturePicker( rowTag.find("input[isDate='true']") );
+				}
+				else
+				{
+					Util.datePicker( rowTag.find("input[isDate='true']") );
+				}
+				
+				
 				
 				tbody.append( rowTag );
 				
@@ -2227,18 +2066,26 @@ function ReferCoordinator( storageObj, translationObj )
 	
 	me.resetDataEntryForm = function()
 	{
+		me.setUp_DataEntryFormInputTagEvent();
+		
+		// Show all tbody and input in [New Test]
+		me.addEventFormTag.closest("tbody[sectionid]").show();
+		me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
+			me.setHideLogicTag( $(this), false );
+		});
+		
 		me.activeEventHeaderTag.hide();
 		
 		// Enable the form for entering data
 		me.disableDataEtryForm( false );
 		
 		// Add logic for [Data Entry form]
-		me.resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
-		me.resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
-		me.resultTestParallel1Tag = me.getDeField( me.de_Testing_ResultParallel1 );
-		me.resultTestParallel2Tag = me.getDeField( me.de_Testing_ResultParallel2 );
-		me.resultTestResultSDBiolineTag = me.getDeField( me.de_Testing_ResultSDBioline );
-		me.resultFinalHIVStatusTag = me.getDeField( me.de_FinalResult_HIVStatus );
+		me.resultTest1Tag = me.getDataElementField( me.de_Testing_ResultTest1 );
+		me.resultTest2Tag = me.getDataElementField( me.de_Testing_ResultTest2 );
+		me.resultTestParallel1Tag = me.getDataElementField( me.de_Testing_ResultParallel1 );
+		me.resultTestParallel2Tag = me.getDataElementField( me.de_Testing_ResultParallel2 );
+		me.resultTestResultSDBiolineTag = me.getDataElementField( me.de_Testing_ResultSDBioline );
+		me.resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
 		
 		me.removeMandatoryForField( me.resultTest2Tag );
 		me.removeMandatoryForField( me.resultTestParallel1Tag );
@@ -2261,6 +2108,17 @@ function ReferCoordinator( storageObj, translationObj )
 		me.resultTestResultSDBiolineTag.val("");
 		me.resultFinalHIVStatusTag.val("");
 		
+		
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		partnerCUICTag.attr( "readonly", true );
+		partnerCUICTag.val("");
+		
+		var coupleStatusTag = me.getDataElementField( me.de_CoupleStatus );
+		Util.disableTag( coupleStatusTag, true );
+		coupleStatusTag.val("");
+		
+		me.getDataElementField( me.de_PartnerEventId ).val("");
+		
 		// Reset values in the form
 		Util.resetForm( me.thisTestDivTag );
 		Util.resetForm( me.contactLogEventFormTag );
@@ -2276,7 +2134,14 @@ function ReferCoordinator( storageObj, translationObj )
 		me.contactLogFormTag.find("tbody[historyGroupId]").hide();
 		me.contactLogFormTag.find("tbody[historyGroupId]").find("td.historyInfo").html("");
 		me.contactLogFormTag.find("tbody[groupId]").show();
+		me.contactLogFormTag.find("tbody:last").show();
+		
+		
+		me.nextContactLogActionTbTag.hide();
 		me.contactLogEventFormTag.find("tbody:last").show();
+		me.contactLogEventHistoryTbTag.html("");
+		
+		
 		
 		// -- [Contact Log] event form
 		me.contactLogEventFormTag.find("input[type='text'],select").val("");
@@ -2292,15 +2157,37 @@ function ReferCoordinator( storageObj, translationObj )
 		me.setHideLogicTag( me.getDataElementField( me.de_PartnerHIVStatus ).closest("tr"), true );
 		me.setUp_InitDataValues();
 		me.showOpeningTag = false;
+		
+		// Hide fields in [AR Closure] form, except [Linkage outcome] field
+		me.artReferCloseFormTag.find("input,select").each(function(){
+			if( $(this).attr("dataelement") != me.de_ARTClosureLinkageOutcome )
+			{
+				me.setHideLogicTag( $(this), true);
+			}
+		});
+		
 	};
 	
 	me.resetClientForm = function()
 	{
+		me.disableClientDetailsAndCUICAttrGroup( false );
+		
+		// Disable [Client CUIC] field. The value of this attribute will be generated from another attribute values		
+		Util.disableTag( me.getAttributeField( me.attr_ClientCUIC ), true );
+		
 		me.addClientFormTabTag.removeAttr( "client" );
 		me.addClientFormTabTag.removeAttr( "artHIVTestingEvent" );
+		
 		me.addEventFormTag.removeAttr( "event" );
+		
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		partnerCUICTag.removeAttr("title" );
+		partnerCUICTag.removeAttr("lastHIVTest" );
+		partnerCUICTag.closest( "td" ).find( "span.partnerDetails" ).hide();
+		
 		me.artReferOpenFormTag.removeAttr( "event" );
 		me.artReferCloseFormTag.removeAttr( "event" );
+		
 		me.previousTestsTag.find("table").html("");
 		
 		// Empty fields from "This Test" tab
@@ -2308,671 +2195,6 @@ function ReferCoordinator( storageObj, translationObj )
 		me.clientAttributeDivTag.find("input[type='checkbox']").prop("checked", false);
 	};
 	
-	// ----------------------------------------------------------------------------
-	// Generate Input Tags
-	
-	me.generateInputTag = function( attribute, inputKey )
-	{
-		var inputTag = $( "<input type='text' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >" );
-		
-		if( attribute.optionSet !== undefined )
-		{
-			inputTag = me.generateOptionInputTag( attribute, inputKey );
-		}
-		else if( attribute.valueType === "BOOLEAN" )
-		{
-			inputTag = me.generateBoolInputTag( attribute, inputKey );
-		}
-		else if( attribute.valueType === "TRUE_ONLY" )
-		{
-			inputTag = "<input type='checkbox' class='form-control checkBox'  " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
-		}
-		else if( attribute.valueType === "NUMBER" || attribute.valueType === "INTEGER" 
-			|| attribute.valueType === "INTEGER_POSITIVE" || attribute.valueType === "INTEGER_NEGATIVE" 
-			|| attribute.valueType === "INTEGER_ZERO_OR_POSITIVE" )
-		{
-			inputTag = me.generateNumberInputTag( attribute, inputKey );
-		}
-//		else if( attribute.valueType === "LONG_TEXT" )
-//		{
-//			inputTag = "<textarea class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' ></textarea>";
-//		}
-		else if( attribute.valueType === "LETTER" )
-		{
-			inputTag = "<input type='text' letter='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
-		}
-		else if( attribute.valueType === "DATE" )
-		{
-			inputTag = "<input type='text' isDate='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
-		}
-		else if( attribute.valueType === "PHONE_NUMBER" )
-		{
-			inputTag = "<input type='text' phonenumber='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
-		}
-		
-		return inputTag;
-		
-	};
-	
-	me.generateOptionInputTag = function( attribute, inputKey )
-	{
-		var options = attribute.optionSet.options;
-		inputTag = $("<select class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>");
-		inputTag.append( "<option value=''>[Please select]</option>" );
-		for( var k in options )
-		{
-			var code = options[k].code;
-			var name = options[k].name;
-			inputTag.append( "<option value='" + code + "'>" + name + "</option>" );
-		}
-		
-		return inputTag;
-	};
-	
-	me.generateNumberInputTag = function( attribute, inputKey )
-	{
-		var inputTag;
-		
-		var type = "";
-		if( attribute.valueType === "NUMBER" )
-		{
-			type = "number='true'";
-		}	
-		else if( attribute.valueType === "INTEGER" )
-		{
-			type = "integer='true'";
-		}
-		else if( attribute.valueType === "INTEGER_POSITIVE" )
-		{
-			type = "integerPositive='true'";
-		}
-		else if( attribute.valueType === "INTEGER_NEGATIVE")
-		{
-			type = "integerNegative='true'";
-		}
-		else if( attribute.valueType === "INTEGER_ZERO_OR_POSITIVE"  )
-		{
-			type = "integerZeroPositive='true'";
-		}
-		
-		return $( "<input type='text' " + type + " class='form-control' " + inputKey + "='" + attribute.id + "'>" );;
-	};
-	
-	me.generateBoolInputTag = function( attribute, inputKey )
-	{
-		var inputTag = $( "<select class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "'>" );
-		inputTag.append( "<option value=''>[Please select]</option>" );
-		inputTag.append( "<option value='true'>Yes</option>" );
-		inputTag.append( "<option value='false'>No</option>" );
-		
-		return inputTag;
-	};
-	
-	
-	// ----------------------------------------------------------------------------
-	// Initialize data for the HTML page
-	// ----------------------------------------------------------------------------
-	
-	// Load user information
-	
-	me.loadCurrentUserInfo = function()
-	{
-		$.ajax({
-			type: "GET"
-			,url: "../login"
-			,dataType: "json"
-            ,contentType: "application/json;charset=utf-8"
-			,success: function( jsonData ) 
-			{
-				me.loginUsername = jsonData.loginUsername;
-				me.userFullNameTag.html( jsonData.fullName );
-				me.dhisServerTag.html( jsonData.dhisServer );
-				me.userInfoLoaded = true;
-				me.checkAndLoadDataAfterInit();
-			},
-			error: function(a,b,c)
-			{
-				console.log("ERROR");
-			}
-		});
-	}
-	
-	
-	// Load sections of program, program-attributes, attribute-groups and orgUnit List
-	
-	me.loadMetadata = function()
-	{
-		$.ajax({
-			type: "POST"
-			,url: "../metaData/all"
-			,dataType: "json"
-            ,contentType: "application/json;charset=utf-8"
-			,success: function( jsonData ) 
-			{
-				// STEP 1. Save the sectionList in memory
-				
-				me.sectionList = jsonData.sections.programStages;
-				me.catOptionComboList = jsonData.catOptions.categoryOptions;				
-				
-				
-				// STEP 2. Structure attGroups with attributes in memory
-
-				var attrGroups = jsonData.attGroups.trackedEntityAttributeGroups;
-				var prgAttributes = jsonData.programAttributes.programTrackedEntityAttributes;
-				me.attributeGroupList = me.generateAttributeGroupList( attrGroups, prgAttributes );
-				
-				
-				// STEP 3. Populate orgunit list in 'Settings'
-				
-				me.districtListTag.append("<option value=''>[Please select]</option>");
-				for( var i in jsonData.districts.organisationUnits )
-				{
-					var orgUnit = jsonData.districts.organisationUnits[i];
-					me.districtListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
-				}
-
-				me.districtListTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_DISTRICT ) );
-				me.loadOrgUnitList();
-				
-				me.metadataLoaded = true;
-				me.checkAndLoadDataAfterInit();
-			},
-			error: function(a,b,c)
-			{
-				console.log("ERROR");
-			}
-		});
-	};
-	
-	me.loadOrgUnitList = function()
-	{
-		me.populateOrgUnitList( function(){
-			me.orgUnitListLoaded = true;
-			me.checkAndLoadDataAfterInit();
-		});
-	};
-	
-	me.orgUnitSelectorChange = function()
-	{
-		var district = me.districtListTag.val();
-		
-		if( district !== "" )
-		{
-			me.populateOrgUnitList();
-		}
-		
-	};
-	
-	me.populateOrgUnitList = function( exeFunc )
-	{
-		var district = me.districtListTag.val();
-		$.ajax({
-			type: "POST"
-			,url: "../metaData/ouList?districtId=" + district
-			,dataType: "json"
-            ,contentType: "application/json;charset=utf-8" 
-            ,beforeSend: function( xhr ) 
-            {
-            	me.orgUnitListTag.find("option").remove();
-            	me.loadingOuListImgTag.show();
-            }
-			,success: function( jsonData ) 
-			{
-				me.orgUnitListTag.append("<option value=''>[Please select]</option>");
-				for( var i in jsonData.organisationUnits )
-				{
-					var orgUnit = jsonData.organisationUnits[i];
-					me.orgUnitListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
-				}
-
-				me.orgUnitListTag.val( me.storageObj.getItem( me.storageObj.KEY_STORAGE_ORGUNIT ) );
-				me.populateOrgUnitNameInHeader();
-				
-				if( exeFunc ) exeFunc();
-			}
-		}).always( function( data ) {
-			me.loadingOuListImgTag.hide();
-			MsgManager.appUnblock();
-		});
-		
-	};
-	
-	me.populateOrgUnitNameInHeader = function()
-	{
-		var ouId = me.orgUnitListTag.val();
-		if( ouId == "" || ouId === null )
-		{
-			var translatedText = me.translationObj.getTranslatedValueByKey( "app_headerNoOrguit" );
-			me.headerOrgUnitTag.html( "[" + translatedText + "]" );
-			me.headerOrgUnitTag.css( "color", "red" );
-		}
-		else
-		{
-			me.headerOrgUnitTag.html( me.orgUnitListTag.find("option:selected").text() );
-			me.headerOrgUnitTag.css( "color", "" );
-		}
-	};
-	
-	// Populate data and Setup events for components in HTML page
-	
-	me.checkAndLoadDataAfterInit = function()
-	{
-		if( me.userInfoLoaded && me.metadataLoaded && me.orgUnitListLoaded )
-		{
-			me.createClientForm();
-			me.searchDoBTag = me.seachFormTag.find("[attribute='" + me.attr_DoB + "']");
-			me.searchDistrictOBTag = me.seachFormTag.find("[attribute='" + me.attr_DistrictOB + "']");
-			me.searchLastNameTag = me.seachFormTag.find("[attribute='" + me.attr_LastName + "']");
-			me.searchFirstNameTag = me.seachFormTag.find("[attribute='" + me.attr_FirstName + "']");
-			me.searchBirthOrderTag = me.seachFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
-			
-			me.clientDoBTag = me.addClientFormTag.find("[attribute='" + me.attr_DoB + "']");
-			me.clientDistrictOBTag = me.addClientFormTag.find("[attribute='" + me.attr_DistrictOB + "']");
-			me.clientLastNameTag = me.addClientFormTag.find("[attribute='" + me.attr_LastName + "']");
-			me.clientFirstNameTag = me.addClientFormTag.find("[attribute='" + me.attr_FirstName + "']");
-			me.clientBirthOrderTag = me.addClientFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
-			
-
-			me.resultTest1Tag = me.getDeField( me.de_Testing_ResultTest1 );
-			me.resultTest2Tag = me.getDeField( me.de_Testing_ResultTest2 );
-			me.resultTestParallel1Tag = me.getDeField( me.de_Testing_ResultParallel1 );
-			me.resultTestParallel2Tag = me.getDeField( me.de_Testing_ResultParallel2 );
-			me.resultTestResultSDBiolineTag = me.getDeField( me.de_Testing_ResultSDBioline );
-			me.resultFinalHIVStatusTag = me.getDeField( me.de_FinalResult_HIVStatus );
-		
-			
-			me.setUp_Events();		
-			me.setUp_FloatButton();		
-			me.addClientFormTabTag.tabs();
-			
-			var page = me.storageObj.getItem( "page" );
-			if( page == "" )
-			{
-				me.listTodayFU();
-			}
-			else
-			{
-				me.loadPageWithParam();
-			}	
-		}
-	};
-	
-	// -------------------------------------------------------------------
-	// Load list of cases
-	// -------------------------------------------------------------------
-	
-	me.listTodayFU = function( exeFunc )
-	{
-		me.currentList = me.PAGE_TODAY_LIST;
-		me.storageObj.addItem( "page", me.PAGE_TODAY_LIST );
-		me.storageObj.removeItem( "subPage" );		
-		
-		me.todayFUDateTag.html( Util.formatDate_LastNDate(0) );
-		me.listCases( "../event/todayFU", function( list )
-		{
-			me.populateTodayFU( list );
-			if( exeFunc !== undefined ) exeFunc();
-
-			// Show table			
-			MsgManager.appUnblock();
-			me.todayCaseTblTag.show();
-			me.todayFUListTag.show("fast");
-		} );
-	}
-		
-	me.listAllCase = function( exeFunc )
-	{
-		me.currentList = me.PAGE_ALL_LIST;
-		me.storageObj.addItem("page", me.PAGE_ALL_LIST);
-		me.storageObj.removeItem( "subPage" );
-		
-		me.listCases( "../event/allFU", function( list ){
-			me.populateAllFUData( list )
-			
-			if( exeFunc !== undefined ) exeFunc();
-
-			// Show table	
-			MsgManager.appUnblock();
-			me.allFUTblTag.show();
-			me.allFUListTag.show("fast");
-		} );
-	};
-		
-	me.listCases = function( url, exeFunc )
-	{
-		me.storageObj.removeItem("param" );
-		
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
-		
-		me.resetPageDisplay();
-		
-		MsgManager.appBlock( tranlatedText + " ..." );
-		
-		Commons.checkSession( function( isInSession ) 
-		{
-			if( isInSession ) 
-			{
-				$.ajax(
-					{
-						type: "POST"
-						,url: url
-						,dataType: "json"
-			            ,contentType: "application/json;charset=utf-8"
-						,success: function( response ) 
-						{
-							exeFunc( response.rows );
-						}
-						,error: function(response)
-						{
-							console.log(response);
-						}
-					});
-			} 
-			else {
-				me.showExpireSessionMessage();					
-			}
-		});	
-		
-	};
-	
-	me.populateTodayFU = function( list )
-	{		
-		var tbodyTag = me.todayCaseTblTag.find("tbody");
-		tbodyTag.find("tr").remove();
-		
-		if( list.length > 0 )
-		{
-			for( var i in list )
-			{
-				var event = list[i];
-				
-				var clientId = event[0];
-				var eventId = event[1];
-				var eventDate = event[2];
-				var council = event[5];
-				var facilityRefer = event[6];
-				var cuic = event[3];
-				var lastAction = event[7];
-				var referStatus = event[4];
-				
-				eventDate = ( eventDate !== undefined ) ? eventDate : "";
-				var eventDateStr = eventDate;
-				if( eventDate !== "" )
-				{
-					eventDateStr = Util.formatTimeInDateTime( eventDate );
-				}
-
-				var eventKey = eventDate.substring(11, 19).split(":").join("");
-				
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
-				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
-				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
-				rowTag.append( "<td>" + council + "</td>" );
-				rowTag.append( "<td>" + facilityRefer + "</td>" );
-				rowTag.append( "<td>" + cuic + "</td>" );
-				rowTag.append( "<td>" + lastAction + "</td>" );
-				rowTag.append( "<td>" + referStatus + "</td>" );
-				
-				me.addEventForRowInList(rowTag);
-				
-				tbodyTag.append( rowTag );
-			}
-			
-		}
-		
-		// Sortable		
-		me.sortTable( me.todayCaseTblTag );
-		
-		me.todayFUNumberTag.html( me.todayCaseTblTag.find("tbody tr").length );
-	}
-
-	me.populateAllFUData = function( list )
-	{	
-		var tbodyTag = me.allFUTblTag.find("tbody");
-		tbodyTag.find("tr").remove();
-		
-		if( list.length > 0 )
-		{
-			for( var i in list )
-			{
-				var event = list[i];
-				
-				var clientId = event[0];
-				var eventId = event[1];
-				var eventDate = event[2];
-				
-				var council = event[5];
-				var facilityRefer = event[6];
-				var cuic = event[3];
-				var daySinceDiagnosis = event[11];
-				var lastAction = event[7];
-				var lastActionDate = ( event[8] !== "" ) ? Util.formatDate_DisplayDate( event[8] ): "";
-				var nextAction = event[9];
-				var nextActionDate =( event[10] !== "" ) ? Util.formatDate_DisplayDate( event[10] ): "";
-				
-				eventDate = ( eventDate !== undefined ) ? eventDate : "";
-				var eventDateStr = eventDate;
-				if( eventDate !== "" )
-				{
-					eventDateStr = Util.formatDate_DisplayDate( eventDate );
-				}
-
-				var eventKey = eventDate.substring(11, 19).split(":").join("");
-				
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
-				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
-				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
-				rowTag.append( "<td>" + council + "</td>" );
-				rowTag.append( "<td>" + facilityRefer + "</td>" );
-				rowTag.append( "<td>" + cuic + "</td>" );
-				rowTag.append( "<td>" + daySinceDiagnosis + "</td>" );
-				rowTag.append( "<td>" + lastAction + "<br> " + lastActionDate + "</td>" );
-				rowTag.append( "<td>" + nextAction + "<br>" + nextActionDate + "</td>" );
-				
-				me.addEventForRowInList(rowTag);
-				
-				tbodyTag.append( rowTag );
-			}
-			
-		}
-		
-		// Sortable
-		me.sortTable( me.allFUTblTag );
-		
-		me.allFUNumberTag.html( me.allFUTblTag.find("tbody tr").length );
-	}
-	
-	me.sortTable = function( tableTag )
-	{
-		// Sortable
-		var sorted = eval( tableTag.attr("sorted") );
-		if( tableTag.find("tbody tr").length > 0  )
-		{
-			var sortingList = { 'sortList': [[0,1]] };
-				
-			( sorted ) ? tableTag.trigger( "updateAll", [ sortingList, function() {} ] ) : tableTag.tablesorter( sortingList );
-
-			tableTag.attr( "sorted", "true" );
-		}
-	};
-	
-	
-	me.addEventForRowInList = function(rowTag)
-	{
-		rowTag.css("cursor", "pointer");
-		rowTag.click( function(){
-			me.backToSearchClientResultBtnTag.hide();
-			me.backToCaseListBtnTag.show();
-			var clientId = rowTag.attr("clientId");
-			var eventId = rowTag.attr("eventId");
-			
-			me.resetPageDisplay();
-			me.loadClientDetails( clientId, eventId, function(){
-				me.addClientFormDivTag.show();
-			} );
-		});
-	};
-	
-	
-	
-	// ---------------------------------------------------------------------------------------------------------------
-	// Search Client
-	// ---------------------------------------------------------------------------------------------------------------
-	
-	me.runSearchClients = function( exeFunc )
-	{
-		if( me.validationObj.checkFormEntryTagsData( me.searchClientFormTag ) )
-		{
-			Commons.checkSession( function( isInSession ) {
-				if ( isInSession ) {
-					var clientData = me.getArrayJsonData( "attribute", me.searchClientFormTag );
-					var requestData = {
-						"attributes": clientData
-					};
-					
-					if( requestData.attributes.length > 0 )
-					{
-						me.searchResultTbTag.find("tbody").html("");
-						me.backToSearchClientResultBtnTag.show();
-						me.backToCaseListBtnTag.hide();
-						
-						me.searchClients( requestData, event, function( searchResult ){
-							var searchCriteria = me.getSearchCriteria( me.searchClientFormTag );
-							me.searchMatchResultKeyTag.html( searchCriteria );
-							
-							var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_add" );
-							me.searchResultKeyTag.html( tranlatedText + " " + searchCriteria );
-							
-							var clientList = searchResult.rows;
-							if( clientList.length > 0 )
-							{
-								me.populateSearchClientData( searchResult );
-								me.highlightSearchMatches();
-								me.showSearchClientTableResult();
-							}
-							else
-							{
-								me.showSearchClientNoResult();
-							}
-							
-							if( exeFunc !== undefined ) exeFunc();
-						} );
-						
-					}
-					else if( requestData.attributes.length == 0 )
-					{
-						var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_validation_requiredValueInOneField" );
-						alert( tranlatedText );
-					}
-				} else {
-					me.showExpireSessionMessage();					
-				}
-			});
-		}
-		
-	};
-	
-	
-	me.populateSearchClientData = function( searchResult )
-	{
-		var clientList = searchResult.rows;		
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_rowTooltip" );
-		
-		for( var i in clientList )
-		{
-			var client = clientList[i];
-			var clientId = client[0];
-			var firstName = client[1].trim();
-			var lastName = client[2].trim();
-			
-			var dob = client[3].trim();
-			dob = ( dob != "" ) ? Util.formatDate_LocalDisplayDate( dob ) : "";
-			
-			var district = client[4].trim();
-			if( district != "" ) {
-				var optionText = me.searchClientFormTag.find("[attribute='" + me.attr_DistrictOB + "'] option[value='" + district + "']").text();
-				district = ( optionText == "" ) ? district :  optionText;
-			}
-			
-			var birthOrder = client[5].trim();
-			if( birthOrder != "" ) {
-				var optionText = me.searchClientFormTag.find("[attribute='" + me.attr_BirthOrder + "'] option[value='" + birthOrder + "']").text();
-				birthOrder = ( optionText == "" ) ? birthOrder :  optionText;
-			}
-			
-			var adquisition = client[6].trim();
-			adquisition = ( adquisition != "" ) ? Util.formatDate_DisplayDate( adquisition ) : "";
-			var lastTestNS = client[7].trim();
-			lastTestNS = ( lastTestNS != "" ) ? Util.formatDate_DisplayDate( lastTestNS ) : "";
-			
-			var rowTag = $("<tr title='" + tranlatedText + "' clientId='" + clientId + "'></tr>");
-			rowTag.append( "<td>" + firstName + "</td>" );
-			rowTag.append( "<td>" + lastName + "</td>" );
-			rowTag.append( "<td>" + dob + "</td>" );
-			rowTag.append( "<td>" + district + "</td>" );
-			rowTag.append( "<td>" + birthOrder + "</td>" );
-			rowTag.append( "<td>" + adquisition + "</td>" ); // The create date is the enrollement date
-			rowTag.append( "<td>" + lastTestNS + "</td>" ); // The latest event date
-			
-			
-			// -------------------------------------------------------------------
-			// Add [Click] event for row
-			// -------------------------------------------------------------------
-
-			me.addEventForSearchResultRow( rowTag );
-			
-			me.searchResultTbTag.find("tbody").append( rowTag );
-		}
-		
-	};
-	
-	me.highlightSearchMatches = function()
-	{
-		me.searchClientFormTag.find("input,select").each( function(){
-			var value = $(this).val().toLowerCase();
-			var colIdx = 0;
-			if( value != "" )
-			{
-				var attributeId = $(this).attr( "attribute" );
-				
-				if( attributeId === me.attr_FirstName ){
-					colIdx = 1;
-				}
-				else if( attributeId === me.attr_LastName ){
-					colIdx = 2;
-				}
-				else if( attributeId === me.attr_DoB ){
-					colIdx = 3;
-				}
-				else if( attributeId === me.attr_DistrictOB ){
-					colIdx = 4;
-					value = $(this).find("option:selected").text().toLowerCase();
-				}
-				else if( attributeId === me.attr_BirthOrder ){
-					colIdx = 5;
-					value = $(this).find("option:selected").text().toLowerCase();
-				}
-				
-				me.searchResultTbTag.find('td:nth-child(' + colIdx + ')').each( function(){
-					var colTag = $(this);
-					if( colTag.html().toLowerCase().indexOf( value ) >= 0 )
-					{
-						var html = Util.highlightWords( colTag.html(), value );
-						colTag.html( html );
-					}
-				});
-			}
-		});
-	};
-	
-	// Add [Click] event for each row in search result
-	
-	me.addEventForSearchResultRow = function( rowTag )
-	{
-		rowTag.click(function(){
-			me.loadClientDetails( rowTag.attr("clientId") );
-		});	
-	};
 	
 	// Load [Client details] when a row in search result is clicked
 	
@@ -3010,36 +2232,7 @@ function ReferCoordinator( storageObj, translationObj )
 		});
 		
 	};
-	
-	me.searchClients = function( jsonQuery, event, exeFunc )
-	{
-		$.ajax(
-			{
-				type: "POST"
-				,url: "../client/search"
-				,dataType: "json"
-				,data: JSON.stringify( jsonQuery )
-	            ,contentType: "application/json;charset=utf-8"
-	            ,beforeSend: function( xhr ) {
-	        		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_msg_searching" );
-					MsgManager.appBlock( tranlatedText + " ..." );
-	            }
-				,success: function( response ) 
-				{
-					me.storageObj.addItem("page", me.PAGE_SEARCH_CLIENT_RESULT);
-					me.storageObj.addItem("param", JSON.stringify( jsonQuery ) );
-					exeFunc( response );
-				}
-				,error: function(response)
-				{
-					alert(response);
-					console.log(response);
-				}
-			}).always( function( data ) {
-				MsgManager.appUnblock();
-			});
-	};
-	
+
 	
 	// ---------------------------------------------------------------------------------------------------------------
 	// Client Registration
@@ -3049,7 +2242,7 @@ function ReferCoordinator( storageObj, translationObj )
 	
 	me.getClientJsonData = function( formTag )
 	{
-		var attributeData = me.getArrayJsonData( "attribute", formTag );
+		var attributeData = Util.getArrayJsonData( "attribute", formTag );
 		
 		var clientData = me.addClientFormTabTag.attr( "client" );
 		if( clientData !== undefined ) 
@@ -3082,7 +2275,7 @@ function ReferCoordinator( storageObj, translationObj )
 	{
 		// STEP 1. Get client & event JSON data from attribute of the tab
 		
-		var attributeData = me.getArrayJsonData( "attribute", me.addClientFormTag );
+		var attributeData = Util.getArrayJsonData( "attribute", me.addClientFormTag );
 		var clientId = "";
 		
 		var clientData = me.addClientFormTabTag.attr( "client" );
@@ -3128,8 +2321,12 @@ function ReferCoordinator( storageObj, translationObj )
 							,data: JSON.stringify( me.getClientJsonData( formTag ) )
 				            ,contentType: "application/json;charset=utf-8"
 			            	,beforeSend: function( xhr ) {
-				        		var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingClient" );
-								MsgManager.appBlock( tranlatedText + " ..." );
+			            		if( showSuccessMsg )
+		            			{
+			            			var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_savingClient" );
+									MsgManager.appBlock( tranlatedText + " ..." );
+		            			}
+				        		
 				            }
 							,success: function( response ) 
 							{
@@ -3236,6 +2433,47 @@ function ReferCoordinator( storageObj, translationObj )
 		
 	};
 	
+	me.savePartnerCUIC = function()
+	{
+		Commons.checkSession( function( isInSession ) 
+		{
+			if( isInSession ) 
+			{
+				var partnerCUIC = me.getAttributeField( me.attr_ClientCUIC ).val();
+				var partnerEventId = me.getDataElementField( me.de_PartnerEventId ).val();
+				var clientEventId = JSON.parse( me.addEventFormTag.attr( "event" ) ).event;
+				var coupleStatus = me.getDataElementField( me.de_CoupleStatus ).val();
+				
+				$.ajax(
+					{
+						type: "POST"
+						,url: "../event/savePartnerCUIC?partnerEventId=" + partnerEventId + "&partnerCUIC=" + partnerCUIC + "&eventId=" + clientEventId + "&coupleStatus=" + coupleStatus
+						,dataType: "json"
+			            ,contentType: "application/json;charset=utf-8"
+			            ,beforeSend: function()
+			            {
+			            	var translatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_updatingPartnerCUIC" );
+			            	MsgManager.appBlock( translatedText );
+			            }
+						,success: function( response ) 
+						{
+							tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_updatedPartnerCUIC" );
+							MsgManager.msgAreaShow( tranlatedText, "SUCCESS" );	
+						}
+						,error: function(response)
+						{
+							console.log(response);
+						}
+					}).always( function( data ) {
+						MsgManager.appUnblock();
+					});
+			} 
+			else {
+				me.showExpireSessionMessage();					
+			}
+		});	
+	}
+	
 	me.saveClientAndEvent = function( formTag, stageId, exeFunc )
 	{
 		// Save [ART Referral status] attributes
@@ -3257,7 +2495,7 @@ function ReferCoordinator( storageObj, translationObj )
 				};
 			}
 						
-			jsonEvent.dataValues = me.getArrayJsonData( "dataElement", formTag );
+			jsonEvent.dataValues = Util.getArrayJsonData( "dataElement", formTag );
 			
 			me.execSaveEvent( jsonEvent, jsonClient.trackedEntityInstance, eventId, function( response ){
 				
@@ -3270,6 +2508,43 @@ function ReferCoordinator( storageObj, translationObj )
 		}, undefined, false );
 	};
 	
+	me.setAndSaveARTLinkageStatusAttrValue = function( exeFunc )
+	{
+		me.setARTLinkageStatusAttrValue();
+		
+		me.saveClient( me.artAttributeFormTag, function(){
+			var linkageStatusFieldTag = me.getAttributeField( me.attr_LinkageStatus );
+			me.linkageStatusLableTag.html( linkageStatusFieldTag.find("option:selected").text() );
+			if( exeFunc != undefined ) exeFunc();
+		}, undefined, true );
+	};
+	
+	me.setARTLinkageStatusAttrValue = function()
+	{
+		var artOpeningEvent = me.artReferOpenFormTag.attr("event");
+		var artClosureEvent = me.artReferCloseFormTag.attr("event");
+		
+
+		var linkageStatusFieldTag = me.getAttributeField( me.attr_LinkageStatus );
+		
+		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		
+		if( artOpeningEvent != undefined && artClosureEvent == undefined )
+		{
+			linkageStatusFieldTag.val( "PENDING" );
+		}
+		else if( artClosureEvent != undefined )
+		{
+			linkageStatusFieldTag.val( closureLinkageOutcomeTag.val() );
+		}
+		
+		var value = linkageStatusFieldTag.find("option:selected").val();
+		
+		var noneStatusStr = me.translationObj.getTranslatedValueByKey( "artRefer_tab_msg_statusNone" );
+		value = ( value != "" ) ? linkageStatusFieldTag.find("option:selected").text() : "[" + noneStatusStr + "]";
+		me.linkageStatusLableTag.html( value );
+	};
+	
 	me.saveClientAfter = function( response, exeFunc, groupId, showSuccessMsg )
 	{
 		// STEP 1. Set the client as attribute for the form. 
@@ -3280,31 +2555,41 @@ function ReferCoordinator( storageObj, translationObj )
 		
 		me.generateAddClientFormHeader();
 
-		
 		// STEP 3. Disable [Complete Event] button
 		
 		Util.disableTag( me.completedEventBtnTag, true );
 		
-		// STEP 3. Display [This Test] Tab if the "status" mode is "Add Client"
+		// STEP 4. Display [This Test] Tab if the "status" mode is "Add Client"
 		
-		if( me.saveClientRegBtnTag.attr("status") == "add" )
+		var firstName = me.getAttributeValue( response, me.attr_FirstName );
+		var surName = me.getAttributeValue( response, me.attr_LastName );
+		if( me.saveClientRegBtnTag.attr("status") == "add"  )
 		{
-			me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+			if( firstName != "EQC" && ( surName != "POS" || surName != "NEG" ) )
+			{
+				me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+			}
+			else
+			{
+				// Set client Type as [EQC / PPT]
+				me.checkAndSetClientTypeValue( response );
+			}
+			
 			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
-//			me.addContactLogEventDivTag.hide();
 		}
 		
-		// STEP 3. Set the status "Update" for [Client Form]
+		// STEP 5. Set the status "Update" for [Client Form]
 		
 		me.saveClientRegBtnTag.attr("status", "update");
 		
 		
-		// STEP 3. Set data values based on client attribute values
+		// STEP 6. Set data values based on client attribute values
 		me.setUp_InitDataValues();
+		
 		
 		if( exeFunc !== undefined ) exeFunc(groupId);
 		
-		// STEP 8. Unblock form
+		// STEP 7. Unblock form
 		
 		if( showSuccessMsg == undefined || showSuccessMsg )
 		{
@@ -3315,9 +2600,68 @@ function ReferCoordinator( storageObj, translationObj )
 		}
 	};
 	
+	me.checkAndSetClientTypeValue = function( jsonClient )
+	{
+		var clientTypeTag = me.getDataElementField( me.de_ClientType );
+		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
+		
+		
+		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName );
+		var surName = me.getAttributeValue( jsonClient, me.attr_LastName );
+		
+		if( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )
+		{
+			clientTypeTag.find("option").show()
+			clientTypeTag.val("LS_SER3");
+			Util.disableTag( clientTypeTag, true );
+			Util.disableTag( EQCPPTPassedTag, true );
+			
+			me.hideTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+			me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
+		}
+		else
+		{
+			clientTypeTag.find("option[value='LS_SER3']").hide();
+			
+			Util.disableTag( EQCPPTPassedTag, false );
+			
+			var dob = me.getAttributeValue( jsonClient, me.attr_DoB );
+			if( dob != "" ){
+				var age = me.calculateAge( dob );
+				if( age < 8 )
+				{
+					// ASSIGN [Individual Test] value for data element [Client type]
+					clientTypeTag.val( "LS_SER1" );
+					Util.disableTag( clientTypeTag, true );
+				}
+			}
+			else
+			{
+				Util.disableTag( clientTypeTag, false );
+			}
+		}
+	};
+	
+	me.getAttributeValue = function( jsonClient, attrId )
+	{
+		var attributes = jsonClient.attributes;
+		var found = Util.findItemFromList( attributes, "attribute", attrId );
+		return ( found !== undefined ) ? found.value : "";
+	};
+	
 	
 	me.setUp_InitDataValues = function()
 	{
+		me.setUp_ClientRegistrationFormDataLogic();
+		
+		// Set [EQC] type
+		var jsonClient = me.addClientFormTabTag.attr( "client" );
+		if( jsonClient!= undefined )
+		{
+			jsonClient = JSON.parse( jsonClient );
+			me.checkAndSetClientTypeValue( jsonClient );
+		}
+		
 		var dobTag = me.getAttributeField( me.attr_DoB );
 		var age = "";
 		if( dobTag.val() != "" ){
@@ -3338,9 +2682,9 @@ function ReferCoordinator( storageObj, translationObj )
 		var numberSexualPartnersLast6MonthTag = me.getDataElementField( me.de_NumberSexualPartnersLast6Month );
 		if( dobTag.val() != "" && age < 8 )
 		{
-			// ASSIGN [Individual Test] value for data element [Client type]
-			clientTypeTag.val( "LS_SER1" );
-			Util.disableTag( clientTypeTag, true );
+			// Hide [Client partner's CUIC - Option] && [Client partner's CUIC] fields
+			me.setHideLogicTag( me.getDataElementField( me.de_partnerCUICOpt ), true );
+			me.setHideLogicTag( me.getDataElementField( me.de_partnerCUIC ), true );
 			
 			// Hide [Partner knows HIV status]
 			partnerKnowsHIVStatusTag.val("");
@@ -3353,7 +2697,10 @@ function ReferCoordinator( storageObj, translationObj )
 		else
 		{
 			// Enable data element [Client type]
-			Util.disableTag( clientTypeTag, false );
+			if( clientTypeTag.val() == "" )
+			{
+				Util.disableTag( clientTypeTag, false );
+			}
 			
 			// Show [Partner knows HIV status]
 			me.setHideLogicTag( partnerKnowsHIVStatusTag.closest("tr"), false );
@@ -3361,6 +2708,9 @@ function ReferCoordinator( storageObj, translationObj )
 			// Show [Number of sexual partners last 6 months]
 			me.setHideLogicTag( numberSexualPartnersLast6MonthTag.closest("tr"), false );
 		}
+		
+		// --------------------------------------------------------------------------
+		me.setUp_DataEntryFormInputTagEvent();
 	};
 	
 	me.addErrorSpanToField = function( inputTag, errorMsg )
@@ -3517,6 +2867,7 @@ function ReferCoordinator( storageObj, translationObj )
 					me.activeEventHeaderTag.show();
 					
 					Util.disableTag( me.completedEventBtnTag, false );
+					me.disableClientDetailsAndCUICAttrGroup( true );
 
 					// STEP 4. Unblock form
 					var translateMsg = "";
@@ -3577,7 +2928,7 @@ function ReferCoordinator( storageObj, translationObj )
 		// Update status of event
 		
 		event.status = "COMPLETED";	
-		event.dataValues = me.getArrayJsonData( "dataElement", me.thisTestDivTag );
+		event.dataValues = Util.getArrayJsonData( "dataElement", me.thisTestDivTag );
 		
 		me.execSaveEvent( event, undefined, eventId, function(){
 
@@ -3614,7 +2965,7 @@ function ReferCoordinator( storageObj, translationObj )
 				artClosureEvent = JSON.parse( artClosureEvent );
 			}
 			
-			me.setUp_ContactLogAndARTRefTab( event, [] );
+			me.populateDataValueForContactLogAndARTRefTab( event, [] );
 			
 			if( exeFunc !== undefined ) exeFunc();
 			
@@ -3647,38 +2998,6 @@ function ReferCoordinator( storageObj, translationObj )
 		}
 	};
 	
-	me.resetPageDisplay = function()
-	{
-		me.mainContentTags.hide();
-		$("span.errorMsg").remove();
-	};
-	
-	me.showSearchClientForm = function()
-	{	
-		me.storageObj.addItem("page", me.PAGE_SEARCH_PARAM);
-		
-		me.searchResultTag.find("span.labelOpt").css("font-size","");		
-		me.searchClientFormTag.show("fast");
-	};
-	
-	me.resetSearchClientForm = function()
-	{
-		me.searchResultTag.find("span.labelOpt").css("font-size","");
-		me.searchResultTag.find("input:radio:checked").attr("checked", false );
-		me.searchClientFormTag.find("input,select").val("");
-	};
-	
-	me.showSearchClientTableResult = function()
-	{
-		me.searchClientFormTag.hide();
-		
-		me.searchResultTbTag.css( "cursor", "pointer" );
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_optionTitle" );
-		me.searchResultHeaderTag.html( tranlatedText );
-
-		me.searchResultTbTag.show();
-		me.searchResultTag.show("fast");
-	};
 	
 	
 	// -------------------------------------------------------------------------------------------------
@@ -3693,7 +3012,7 @@ function ReferCoordinator( storageObj, translationObj )
 	{
 		me.storageObj.addItem("subPage", me.PAGE_SEARCH_ADD_CLIENT);
 		
-		me.resetPageDisplay();
+		Util.resetPageDisplay();
 		me.saveClientRegBtnTag.attr("status", "add" );
 		me.resetClientForm();
 		me.resetDataEntryForm();
@@ -3707,7 +3026,7 @@ function ReferCoordinator( storageObj, translationObj )
 		me.addClientFormDivTag.find(".headerList").html(tranlatedText);
 		
 		// Populate values from Search form to Add client form
-		me.seachFormTag.find("input[attribute],select[attribute]").each(function(){
+		me.mainPage.searchClientManagement.seachAddClientFormTag.find("input[attribute],select[attribute]").each(function(){
 			var attrId = $(this).attr("attribute");
 			var value = $(this).val();
 			var field = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']");
@@ -3753,27 +3072,13 @@ function ReferCoordinator( storageObj, translationObj )
 		// STEP 2. Reset te TAB
 		me.resetClientForm();
 		me.resetDataEntryForm();
-		me.searchResultTbTag.hide();
-		me.searchResultTag.hide();
-		me.searchClientFormTag.hide();
+		me.mainPage.searchClientManagement.searchResultTbTag.hide();
+		me.mainPage.searchClientManagement.searchResultTag.hide();
+		me.mainPage.searchClientManagement.searchClientFormTag.hide();
 		
 		
 		// ------------------------------------------------------------------------------------------------
-		// [Client Attribute] TAB
-		
-		// STEP 3. Populate Client Registration data		
-		me.addClientFormTabTag.attr( "client", JSON.stringify( data.client ) );
-		me.populateClientAttrValues( me.addClientFormTabTag, data.client );	
-
-		// STEP 4. Init logic for attribute fields based on attribute values
-		me.setUp_ClientRegistrationFormDataLogic();
-
-		// STEP 5. Create header for [Update client] form
-		me.generateAddClientFormHeader();
-		
-
-		// ------------------------------------------------------------------------------------------------
-		// STEP 6. Get events
+		// STEP 3. Get events
 		
 		var events = data.events.events;
 		var activeHIVTestingEvent;
@@ -3832,24 +3137,48 @@ function ReferCoordinator( storageObj, translationObj )
 			me.addClientFormTabTag.attr( "artHIVTestingEvent", JSON.stringify( artHIVTestingEvent ) );
 		}
 		
+
+		// ------------------------------------------------------------------------------------------------
+		// [Client Attribute] TAB
+		
+		// STEP 4. Populate Client Registration data		
+		me.addClientFormTabTag.attr( "client", JSON.stringify( data.client ) );
+		me.populateClientAttrValues( me.addClientFormTabTag, data.client );
+		me.filterCouncilsByDistrict();
+		
+		// STEP 5. Init logic for attribute fields based on attribute values
+		me.setUp_ClientRegistrationFormDataLogic();
+
+		// STEP 6. Create header for [Update client] form
+		me.generateAddClientFormHeader();
+		
+		// STEP 7. Lock for if there is any HIV Testing event existed
+		var lockClientForm = ( completedHIVTestingEvents.lenght > 0 || activeHIVTestingEvent != undefined );
+		if( lockClientForm )
+		{
+			me.disableClientDetailsAndCUICAttrGroup( true );
+		}
+
+		
+		
 		// ---------------------------------------------------------------------------------------
 		// Set up HIV Testing event data
 		
-		// STEP 7. Set up data in "Previous Test" tab
+		// STEP 8. Set up data in "Previous Test" tab
 		me.setUp_DataInPreviousTestTab( completedHIVTestingEvents, selectedEventId );
 
-		// STEP 8. Set up data in "This Test" tab
-		me.setUp_DataInThisTestTab( activeHIVTestingEvent );
-
+		// STEP 9. Set up data in "This Test" tab
+		me.setUp_DataInThisTestTab( activeHIVTestingEvent, data.partner );
+		
 		// ---------------------------------------------------------------------------------------
-		// STEP 9. Set up data in "Contact Log" tab and "ART Refer" tab
+		// STEP 10. Set up data in "Contact Log" tab and "ART Refer" tab
 		
 		// Set up data in "Contact Log" tab and "ART Refer" tab
-		me.setUp_ContactLogAndARTRefTab( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent );
+		me.populateDataValueForContactLogAndARTRefTab( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent );
 		me.checkAndShowARTReferTab( artHIVTestingEvent );
 		
 		// ---------------------------------------------------------------------------------------
-		// STEP 10. Show [This Test] / [Previous Test] tab if there is a "seleted event id"
+		// STEP 11. Show [This Test] / [Previous Test] tab if there is a "seleted event id"
 		
 		if( selectedEventId !== undefined )
 		{
@@ -3868,7 +3197,7 @@ function ReferCoordinator( storageObj, translationObj )
 		}
 		
 		// ---------------------------------------------------------------------------------------
-		// STEP 11. Show form
+		// STEP 12. Show form
 		// ---------------------------------------------------------------------------------------
 				
 		me.addClientFormDivTag.show("fast");
@@ -3878,7 +3207,7 @@ function ReferCoordinator( storageObj, translationObj )
 	me.checkIfARTEvent = function( event )
 	{
 		var artValue = me.getEventDataValue( event, me.de_ReferralGiven_ART );
-		return( artValue == "true" );fsdfasdf
+		return( artValue == "true" );
 	};
 	
 	me.populateClientAttrValues = function( formTag, client )
@@ -3902,9 +3231,19 @@ function ReferCoordinator( storageObj, translationObj )
 			me.setValueForInputTag( $(this), value );
 				
 		});
-		
+
 	};
-	
+
+	me.checkAndShowCheckedIconForPartnerCUICTag = function()
+	{
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		if( partnerCUICTag.val() != "" ){
+			partnerCUICTag.closest( "td" ).find( "span.partnerDetails" ).show();
+		}
+		else {
+			partnerCUICTag.closest( "td" ).find( "span.partnerDetails" ).hide();
+		}
+	};
 	
 	me.setValueForInputTag = function( inputTag, value )
 	{
@@ -3926,7 +3265,7 @@ function ReferCoordinator( storageObj, translationObj )
 	// ---------------------------------------------------------------------------------------
 	// Setup "Contact Log" TAB
 	
-	me.setUp_ContactLogAndARTRefTab = function( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent )
+	me.populateDataValueForContactLogAndARTRefTab = function( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent )
 	{		
 		// STEP 0. Show/Hide history of [Contact log] attribute form
 		var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
@@ -3937,7 +3276,8 @@ function ReferCoordinator( storageObj, translationObj )
 		
 	 	// STEP 1. Populate [Contact Log Event] data( history data )
 		me.populateContactLogEventListHistory( contactLogEvents );
-			
+		
+		
 		// STEP 2. Populate data for [Client referred to ART]
 		if( artHIVTestingEvent != undefined )
 		{
@@ -3948,6 +3288,8 @@ function ReferCoordinator( storageObj, translationObj )
  		// Generate [Time elapse] in header of [ART Ref.] form AND in [ART Closure] form
  		me.populateTimeElapsed( artOpeningEvent, artClosureEvent );
  		
+ 		// Set [inkageStatus] info
+ 		me.setARTLinkageStatusAttrValue();
  		
 		// STEP 3. Populate data for [ART Refer. Opening] form
 		if( artOpeningEvent !== undefined )
@@ -3958,6 +3300,11 @@ function ReferCoordinator( storageObj, translationObj )
 			me.populateDataValuesInEntryForm( me.artReferOpenFormTag, artOpeningEvent );
 		}
 		
+		// Set value for autocomple input tag
+		var referralFacilityNameTag = me.getDataElementField( me.de_ARTOpen_ReferralFacilityName );
+		referralFacilityNameTag.closest( "td" ).find("input").val( referralFacilityNameTag.find("option:selected").text() );
+		
+		
 		// STEP 4. Set event data for [ART Refer. Closure] form
 		if( artClosureEvent !== undefined )
 		{
@@ -3966,6 +3313,14 @@ function ReferCoordinator( storageObj, translationObj )
 			// Populate event data
 			me.populateDataValuesInEntryForm( me.artReferCloseFormTag, artClosureEvent );
 		}
+
+		// Set value for autocomple input tag
+		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
+		closeReferFacilityNameTag.closest( "td" ).find("input").val( closeReferFacilityNameTag.find("option:selected").text() );
+		
+		
+		// Set up [ART Closure] form
+		me.setUp_ARTClosureForm();
 		
 	};
 	
@@ -4007,44 +3362,56 @@ function ReferCoordinator( storageObj, translationObj )
 	{
 		me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
 		
-		if( eventData != undefined )
-		{	
-			// STEP 0. Show [ART Refer] Tab
-			me.showTabInClientForm( me.TAB_NAME_ART_REFER );
-			
-			if( eventData != undefined )
+		var jsonClient = JSON.parse( me.addClientFormTabTag.attr( "client" ) );
+		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName );
+		var surName = me.getAttributeValue( jsonClient, me.attr_LastName );
+		if( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )
+		{
+			me.hideTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+			me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
+		}
+		else if( eventData != undefined )
+		{
+			// STEP 1. Check IF Final status is positive 
+			// 		AND results are received 
+			//		AND Referral to ART is given, apply the logic the [Contact Log] and [ART Refer] Tabs
+			// ( create ART referral opening event,
+			//	 move to contact log tab to force user to complete data points 
+			// 	 and move to ART referral tab )
+			var artValue = me.getEventDataValue( eventData, me.de_ReferralGiven_ART );
+			var finalHIVTestValue = me.getEventDataValue( eventData, me.de_FinalResult_HIVStatus );
+			var testResultGivenValue = me.getEventDataValue( eventData, me.de_TestResultsGiven );
+
+			if( finalHIVTestValue == "Positive" && artValue == "true" && testResultGivenValue == "true" )
 			{
-				// STEP 1. Check IF Final status is positive 
-				// 		AND results are received 
-				//		AND Referral to ART is given, apply the logic the [Contact Log] and [ART Refer] Tabs
-				// ( create ART referral opening event,
-				//	 move to contact log tab to force user to complete data points 
-				// 	 and move to ART referral tab )
-				var artValue = me.getEventDataValue( eventData, me.de_ReferralGiven_ART );
-				var finalHIVTestValue = me.getEventDataValue( eventData, me.de_FinalResult_HIVStatus );
-				var testResultGivenValue = me.getEventDataValue( eventData, me.de_TestResultsGiven );
-	
-				if( finalHIVTestValue == "Positive" && artValue == "true" && testResultGivenValue == "true" )
+				// STEP 2. Force user to enter data for [Contact Log] attribute values
+				var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
+				if( consentToContactTag.val() != "" )
 				{
-					// STEP 2. Force user to enter data for [Contact Log] attribute values
 					me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
-					
-					// STEP 3. Show [ART Opening] tab
-					me.showOpeningTag = true;
+					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
 				}
+				else
+				{
+					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
+					me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+				}
+				
+				// STEP 3. Show [ART Opening] tab
+				me.showOpeningTag = true;
 			}
-			
-			// Show [ART Closure] form only when there is one [ART Opening] event
-			if( me.artReferOpenFormTag.attr("event") != undefined )
-			{
-				me.artReferCloseFormTag.show();
-				Util.disableForm( me.artReferOpenFormTag, true );
-			}
-			else
-			{
-				Util.disableForm( me.artReferOpenFormTag, false );
-				me.artReferCloseFormTag.hide();
-			}
+		}
+		
+		// Show [ART Closure] form only when there is one [ART Opening] event
+		if( me.artReferOpenFormTag.attr("event") != undefined )
+		{
+			me.artReferCloseFormTag.show();
+			Util.disableForm( me.artReferOpenFormTag, true );
+		}
+		else
+		{
+			Util.disableForm( me.artReferOpenFormTag, false );
+			me.artReferCloseFormTag.hide();
 		}
 	};
 	
@@ -4077,23 +3444,28 @@ function ReferCoordinator( storageObj, translationObj )
 		
 		if( groupId == "TTTT4Ll5TdV" ) // Attribute Group [LS LOG 2 - Contact Details]
 		{
-			var contactPhoneNumberTag = me.getAttributeField( me.attr_ContactPhoneNumber );
+			var contactPhoneNumber = me.getAttributeField( me.attr_ContactPhoneNumber ).val();
 		
-			var restrictionsContactingTag  = me.getAttributeField( me.attr_RestrictionsContacting );
-			var address1Tag = me.getAttributeField( me.attr_Address1 );
-			var address2Tag = me.getAttributeField( me.attr_Address2 );
-			var address3Tag = me.getAttributeField( me.attr_Address3 );
-			var address4Tag = me.getAttributeField( me.attr_Address4 );
-			var address5Tag = me.getAttributeField( me.attr_Address5 );
+			var restrictionsContacting  = me.getAttributeField( me.attr_RestrictionsContacting ).val();
+			restrictionsContacting = ( restrictionsContacting != "" ) ? " - Restrictions: " +  restrictionsContacting : "";
 			
-			if( contactPhoneNumberTag.val() != "" )
-			{
-				var restrictionsVal = restrictionsContactingTag.val();
-				restrictionsVal = ( restrictionsVal != "" ) ? " - Restrictions: " +  restrictionsVal : "";
-				historyTag.append("<p><span class='glyphicon glyphicon-earphone'></span> " + contactPhoneNumberTag.val() + restrictionsVal + "</p>");
-			}
+			var address1 = me.getAttributeField( me.attr_Address1 ).val();
+			address1 = me.getDisplayNameByAttributeValue( me.attr_Address1, address1 );
 			
-			historyTag.append("<p><span class='glyphicon glyphicon-list-alt'></span> " + address1Tag.val() + "<br>Landmark: " + address2Tag.val() + "<br>" + address3Tag.val() + ", " + address4Tag.val() + ", " + address5Tag.val() + "</p>");
+			var address2 = me.getAttributeField( me.attr_Address2 ).val();
+			address2 = me.getDisplayNameByAttributeValue( me.attr_Address2, address2 );
+			
+			var address3 = me.getAttributeField( me.attr_Address3 ).val();
+			address3 = me.getDisplayNameByAttributeValue( me.attr_Address3, address3 );
+			
+			var address4 = me.getAttributeField( me.attr_Address4 ).val();
+			address4 = me.getDisplayNameByAttributeValue( me.attr_Address4, address4 );
+			
+			var address5 = me.getAttributeField( me.attr_Address5 ).val();
+			address5 = me.getDisplayNameByAttributeValue( me.attr_Address5, address5 );
+						
+			historyTag.append("<p><span class='glyphicon glyphicon-earphone'></span> " + contactPhoneNumber + restrictionsContacting + "</p>");
+			historyTag.append("<p><span class='glyphicon glyphicon-list-alt'></span> " + address1 + "<br>Landmark: " + address2 + "<br>" + address3 + ", " + address4 + ", " + address5 + "</p>");
 		}
 		else if( groupId == "CqBvWGKEKLP" ) // Attribute Group [LS LOG 3 - Next of kin]
 		{
@@ -4136,25 +3508,26 @@ function ReferCoordinator( storageObj, translationObj )
 			
 			if( deId == me.de_TypeOfContact )
 			{
-				typeOfContact = value;
+				typeOfContact = me.getDisplayNameByDataValue( deId, value );
 			}
 			else if( deId == me.de_Outcome )
 			{
-				outcome = value;
+				outcome = me.getDisplayNameByDataValue( deId, value );
 			}
 			else if( deId == me.de_NextAction )
 			{
-				nextAction = value;
+				nextAction = me.getDisplayNameByDataValue( deId, value );
 			}
 			else if( deId == me.de_DueDate )
 			{
-				dueDate = value;
+				dueDate = me.getDisplayNameByDataValue( deId, value );
 			}
 			else if( deId == me.de_Comments )
 			{
-				comments = value;
+				comments = me.getDisplayNameByDataValue( deId, value );
 			}
 		}
+		
 		
 		// Add history
 		var tbody = $("<tbody></tbody");
@@ -4181,6 +3554,27 @@ function ReferCoordinator( storageObj, translationObj )
 		}
 	};
 	
+	me.getDisplayNameByDataValue = function( deId, value )
+	{
+		var tag = me.getDataElementField( deId );
+		if( tag.prop( "tagName" ) == 'SELECT'  )
+		{
+			value = tag.find("option[value='" + value + "']").text();
+		}
+		
+		return value;
+	}
+
+	me.getDisplayNameByAttributeValue = function( attrId, value )
+	{
+		var tag = me.getAttributeField( attrId );
+		if( tag.prop( "tagName" ) == 'SELECT'  )
+		{
+			value = tag.find("option[value='" + value + "']").text();
+		}
+		
+		return value;
+	}
 	
 	// ---------------------------------------------------------------------------------------
 	// Setup data in "This Test" TAB
@@ -4256,7 +3650,7 @@ function ReferCoordinator( storageObj, translationObj )
 	// Setup data in "This Test" TAB
 	// ---------------------------------------------------------------------------------------
 	
-	me.setUp_DataInThisTestTab = function( activeEvent )
+	me.setUp_DataInThisTestTab = function( activeEvent, partnerData )
 	{	
 		me.addEventFormTag.attr( "event", JSON.stringify( activeEvent ) );
 		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
@@ -4294,10 +3688,33 @@ function ReferCoordinator( storageObj, translationObj )
 		
 		Util.disableTag( me.getDataElementField( me.de_Age ), true );
 		Util.disableTag( me.getDataElementField( me.de_BMI ), true );
+		
 
-		// Add logic validation for input fields
-		me.setUp_DataEntryFormLogic();
+		me.checkAndShowCheckedIconForPartnerCUICTag();
+		me.setUp_PartnerInfor( partnerData );
+
 	};
+	
+	me.setUp_PartnerInfor = function( partnerData )
+	{
+		if( partnerData != undefined )
+		{
+			var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+			var rows = partnerData.rows;
+			if( rows.length == 1 )
+			{
+				var partnerCUICVal = rows[0][3];
+				partnerCUICTag.val( partnerCUICVal );
+				partnerCUICTag.attr("lastHIVTest", rows[0][6] );
+
+				var partnerEventId = rows[0][0];
+				me.getDataElementField( me.de_PartnerEventId ).val( partnerEventId );
+				
+				var partnerDetails = rows[0][4] + " " + rows[0][5] + " (" + rows[0][6] + ")";
+				partnerCUICTag.attr( "title", partnerDetails );
+			}
+		}
+	}
 	
 	// Check if the logged counsellor if this counsellor is the person who created the active event
 	// If logged counsellor is a person who create the active event, then allow to edit data event
@@ -4317,18 +3734,14 @@ function ReferCoordinator( storageObj, translationObj )
 			{
 				catOptionName = searchLoggedCounsellor.name;
 				
-				if( me.loginUsername === searchLoggedCounsellor.code )
+				if( me.mainPage.settingsManagement.loginUsername === searchLoggedCounsellor.code )
 				{
 					me.disableDataEtryForm( false );
-					me.saveEventBtnTag.show();
-					me.completedEventBtnTag.show();
 					me.activeEventHeaderTag.css( "color","gray" );
 				}
 				else
 				{
 					me.disableDataEtryForm( true );
-//					me.saveEventBtnTag.hide();
-//					me.completedEventBtnTag.hide();
 					
 					me.activeEventHeaderTag.css( "color","tomato" );
 				}
@@ -4419,7 +3832,7 @@ function ReferCoordinator( storageObj, translationObj )
 				me.setUp_DataElementResultTest1Logic();
 			}
 			
-		}	
+		}
 	};
 	
 	// Create a tbody with sections of programs. This one is used for generating history of events of a client
@@ -4557,117 +3970,6 @@ function ReferCoordinator( storageObj, translationObj )
 
 	};
 	
-	// Show the result after searching clients
-	
-	me.showSearchClientNoResult = function()
-	{
-		me.searchClientFormTag.hide();
-		me.searchResultTbTag.hide();
-		
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_noClientFound" );		
-		me.searchResultHeaderTag.html( tranlatedText );
-		
-		me.searchResultTag.show("fast");
-	};
-	
-	// Generate JSON data in client form / event form
-	
-	me.getArrayJsonData = function( key, formTag, isGetEmptyValue )
-	{
-		var jsonData = [];
-		formTag.find("input[" + key + "],select[" + key + "],textarea[" + key + "]").each(function(){
-			var item = $(this);
-			var attrId = item.attr(key);
-			var value = item.val();
-			if( item.attr("type") == "checkbox" )
-			{
-				if( item.prop("checked") )
-				{
-					value = "true";
-				}
-				else
-				{
-					value = "";
-				}
-			}
-			else if( item.tagName == "TEXTAREA" )
-			{
-				value = item.html();
-			}
-			
-			if( value !== "" )
-			{
-				if( item.attr("isDate") !== undefined && item.attr("isDate") == "true" && value != "" )
-				{
-					value = Util.formatDate_DbDate( value );
-				}
-				
-				var data = {};
-				data[key] = attrId;
-				data["value"] = value;
-				
-				jsonData.push(data);
-			}		
-		});
-		
-		return jsonData;
-	};
-	
-	
-	// Generate a message based on Client search criteria
-	// Matches for [Med Rod, Measer, 10 Jan 2014, 01]
-	me.getSearchCriteria = function( formTag )
-	{
-		var searchCriteria = "";
-				
-		var firstName = me.searchFirstNameTag.val();
-		var lastName = me.searchLastNameTag.val();
-		var districtOfBirth = me.searchDistrictOBTag.find("option:selected").val();
-		var dob = me.searchDoBTag.val();
-		var birthOrder = me.searchBirthOrderTag.val();
-		
-		if( firstName != "" || lastName != "" ) {
-			searchCriteria += $.trim( firstName + " " + lastName ) + " ";
-		}
-		else
-		{
-			var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_client" );
-			searchCriteria += translatedText;
-		}
-		
-		
-		if( districtOfBirth != "" ) {
-			var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_bornAt" );
-			districtOfBirth = me.searchDistrictOBTag.find("option:selected").text();
-			searchCriteria +=  " " + translatedText + " " + districtOfBirth + " ";
-		}
-		
-		
-		if( dob != "" )
-		{
-			var translatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_on" );
-			searchCriteria += translatedText + " " + dob + " ";
-		}
-		
-
-		if( birthOrder != "" )
-		{
-			searchCriteria += " [" + birthOrder + "] ";
-		}
-		
-		return searchCriteria.substring( 0, searchCriteria.length - 1 );
-	};
-	
-
-	me.getDeField = function( deId )
-	{
-		return me.thisTestDivTag.find("[dataelement='" + deId + "']");
-	};
-	
-	me.getAttrField = function( attrId )
-	{
-		return me.addClientFormTabTag.find("[attribute='" + attrId + "']");
-	};
 	
 	// Generate 'Client CUIC' value
 	
@@ -4691,6 +3993,81 @@ function ReferCoordinator( storageObj, translationObj )
 		me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']").val( clientCUIC );
 	};
 	
+	me.populateParterCUIC = function()
+	{
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		if( partnerCUICTag.val() == "" )
+		{
+			Commons.checkSession( function( isInSession ) 
+					{
+						if( isInSession ) 
+						{
+							$.ajax(
+								{
+									type: "POST"
+									,url: "../event/findPartner?ouId=" + me.orgUnitListTag.val()
+									,dataType: "json"
+						            ,contentType: "application/json;charset=utf-8"
+						            ,beforeSend: function()
+						            {
+						            	var translatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_findingPartnerCUIC" );
+						            	MsgManager.appBlock( translatedText );
+						            }
+									,success: function( response ) 
+									{
+										var rows = response.rows;
+										me.setUp_PartnerInfor( response );
+										me.checkAndShowCheckedIconForPartnerCUICTag();
+									}
+									,error: function(response)
+									{
+										console.log(response);
+									}
+								}).always( function( data ) {
+									MsgManager.appUnblock();
+								});
+						} 
+						else {
+							me.showExpireSessionMessage();					
+						}
+					});	
+		}
+		
+		
+	}
+	
+	// Filter councils by selected district
+	me.filterCouncilsByDistrict = function()
+	{
+		var districtTag = me.getAttributeField( me.attr_Address3 );
+		var councilTag = me.getAttributeField( me.attr_Address4 );
+		var councilOptionsTag = councilTag.find("option");
+		councilOptionsTag.hide();
+		
+		if( districtTag.val() != "" )
+		{
+			if( districtTag.val() == "11" || districtTag.val() == "12" )
+			{
+				councilTag.find("option[value='NA']").show();
+			}
+			else
+			{
+				councilOptionsTag.each( function(){
+					var optionTag = $(this);
+					var key = "LS" + districtTag.val();
+					if( optionTag.val().indexOf( key ) == 0 )
+					{
+						optionTag.show();
+					}
+				});
+			}
+			
+			
+			"NA"
+		}
+	};
+
+
 	// Show/Hide a tab in Add/Update Client form
 	
 	me.hideTabInClientForm = function( tabName )
@@ -4726,134 +4103,10 @@ function ReferCoordinator( storageObj, translationObj )
 	};
 	
 	
-
-	// -------------------------------------------------------------------
-	// [Report]
-	// -------------------------------------------------------------------
-	
-	me.getReport = function()
-	{
-		Commons.checkSession( function( isInSession ) 
-		{
-			if( isInSession ) 
-			{
-				$.ajax(
-					{
-						type: "POST"
-						,url: "../event/report"
-						,dataType: "json"
-			            ,contentType: "application/json;charset=utf-8"
-			            ,beforeSend: function()
-			            {
-			            	var translatedText = me.translationObj.getTranslatedValueByKey( "report_msg_loadingReport" );
-			            	MsgManager.appBlock( translatedText );
-			            	
-			            	me.reportTblTag.hide();
-			            	me.reportTblTag.find("tbody td[dataelement]").html("");
-			            	me.reportParamDivTag.show();
-			            }
-						,success: function( response ) 
-						{
-							// STEP 1. Add analytic time
-							me.analyticTimeTag.html(response.analyticsTime);
-							
-							// --------------------------------------------------------------------
-							// Generate report
-							// --------------------------------------------------------------------
-							
-							// STEP 2. Get the currentPeriod and period which Yesterday is winthin
-							var curPeriod = Util.getCurrentWeekPeriod();
-							var yesterdayPeriod = Util.getYesterdayPeriod();
-							
-							var last4WeeksData = [];
-							
-							var data = response.report.rows;
-							for( var i in data )
-							{
-								var deId = data[i][0];
-								var value = eval( data[i][3] );
-								var peId = data[i][1];
-								
-								// STEP 3. Set "This Week" data
-								if( peId == curPeriod ) {
-									me.setDataInReportCell( me.reportName_AllClient,deId, "thisWeek", value );
-								}
-
-								
-								// STEP 4. Set "Yesterday" data
-								// In some cases, yesterday and current date have the same period
-								if( peId == yesterdayPeriod ) {
-									// Check the Yesterday period and calculate value
-									if( value != "" ){
-										value = value / 5;
-										value = value.toFixed( 2 );
-
-										me.setDataInReportCell( me.reportName_AllClient, deId, "yesterday", value );
-									}
-								}
-									
-								// STEP 5. Calculate "Last 4 Week" data
-								if( peId != curPeriod && peId != yesterdayPeriod )	// Get last4Weeks values
-								{
-									var last4WeekData = last4WeeksData[deId];
-									if( last4WeekData !== undefined )
-									{
-										last4WeekData = eval( last4WeekData ) + value;
-										last4WeeksData[deId] = last4WeekData;
-									}
-									else
-									{
-										last4WeeksData[deId] = value;
-									}
-								}
-								
-							}
-							
-							// STEP 6. Set values for "Last 4 weeks" column							
-							me.setDataInReportCell( me.reportName_AllClient, me.de_Tested, "last4weeks", last4WeeksData[me.de_Tested] );
-							me.setDataInReportCell( me.reportName_AllClient, me.de_Target, "last4weeks", last4WeeksData[me.de_Target] );
-							me.setDataInReportCell( me.reportName_AllClient, me.de_achieved, "last4weeks", last4WeeksData[me.de_achieved] );
-							
-							me.reportTblTag.show();
-						}
-						,error: function(response)
-						{
-							console.log(response);
-						}
-					}).always( function( data ) {
-						MsgManager.appUnblock();
-					});
-			} 
-			else {
-				me.showExpireSessionMessage();					
-			}
-		});	
-	};
-
-	me.setDataInReportCell = function( clazzTableName, deId, peId, value )
-	{
-		var colTag = me.reportTblTag.find("tbody." + clazzTableName ).find("td[dataelement='" + deId + "'][period='" + peId + "']");
-		colTag.html( value );
-		
-		if( deId == me.de_achieved )
-		{
-			if( value >= 80 ){ // Green
-				colTag.append( " <img src='../images/green.png'>");
-			}
-			else if( value >= 80 ){ // Yellow
-				colTag.append( " <img src='../images/yellow.png'>");
-			}
-			else { // Red
-				colTag.append( " <img src='../images/red.png'>");
-			}
-		}
-	};
-	
-	// -------------------------------------------------------------------
-	// RUN Init method
-	// -------------------------------------------------------------------
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// RUN Init methods
+	// ---------------------------------------------------------------------------------------------------------------------------
 	
 	me.init();
-	
 }
 

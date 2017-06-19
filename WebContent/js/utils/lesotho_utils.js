@@ -48,14 +48,38 @@ Util.disableTag = function( tag, isDisable )
 	}
 };
 
+//Add [Delete] button for input field
+Util.addDeleteBtnForInputTag = function( inputTag )
+{	
+	inputTag.addClass( "clearable x onX" );
+	inputTag.attr("readonly", true);
+    inputTag.mousemove( function( e ){
+	    $(this)[Util.tog(this.offsetWidth-25 < e.clientX-this.getBoundingClientRect().left)]('onX');   
+    });
+    
+    inputTag.click( function( ev ){
+    	if( $(this).hasClass("onX"))
+		{
+    		ev.preventDefault();
+		    $(this).removeClass("onX").val('').change();
+		}
+    	
+    });
+};
+	
+Util.tog = function(v)
+{
+	return v ? 'addClass' : 'removeClass';
+};
+
+
 Util.setAutoCompleteTag = function( selectTag )
 {
-//	var mySource = [];
-//	selectTag.children("option").map(function() {
-//	   mySource.push( { "label": $(this).text(), "value": $(this).val() } );
-//	});
-	
 	selectTag.hide();
+	
+	// Remove the [Please select] option
+	selectTag.find("option[value='']").remove();
+	
     selected = selectTag.children(":selected");
     var value = selected.val() ? selected.val() : "";
     var text = selected.text() ? selected.text() : "";
@@ -164,6 +188,51 @@ Util.resetPageDisplay = function()
 	$("div.mainContent").hide();
 	$("span.errorMsg").remove();
 };
+
+
+// Generate JSON data in client form / event form
+
+Util.getArrayJsonData = function( key, formTag, isGetEmptyValue )
+{
+	var jsonData = [];
+	formTag.find("input[" + key + "],select[" + key + "],textarea[" + key + "]").each(function(){
+		var item = $(this);
+		var attrId = item.attr(key);
+		var value = item.val();
+		if( item.attr("type") == "checkbox" )
+		{
+			if( item.prop("checked") )
+			{
+				value = "true";
+			}
+			else
+			{
+				value = "";
+			}
+		}
+		else if( item.tagName == "TEXTAREA" )
+		{
+			value = item.html();
+		}
+		
+		if( value !== "" )
+		{
+			if( item.attr("isDate") !== undefined && item.attr("isDate") == "true" && value != "" )
+			{
+				value = Util.formatDate_DbDate( value );
+			}
+			
+			var data = {};
+			data[key] = attrId;
+			data["value"] = value;
+			
+			jsonData.push(data);
+		}		
+	});
+	
+	return jsonData;
+};
+
 
 //-------------------------------------------------------------------
 // Utils - List
@@ -472,10 +541,10 @@ Util.getTimeElapsed = function( date1, date2 )
 	return noHours + ":" + noSeconds;
 };
 
-Util.datePicker = function( dateTag, dateFormat )
+Util.datePicker = function( dateTag )
 {
 	dateTag.datepicker({
-		dateFormat: dateFormat,
+		dateFormat: Commons.dateFormat,
 		changeMonth: true,
 		changeYear: true,
 		showOn: 'both',
@@ -488,10 +557,10 @@ Util.datePicker = function( dateTag, dateFormat )
 };
 
 
-Util.dateFuturePicker = function( dateTag, dateFormat )
+Util.dateFuturePicker = function( dateTag )
 {
 	dateTag.datepicker({
-		dateFormat: dateFormat,
+		dateFormat: Commons.dateFormat,
 		changeMonth: true,
 		changeYear: true,
 		showOn: 'both',
@@ -503,10 +572,10 @@ Util.dateFuturePicker = function( dateTag, dateFormat )
 };
 
 
-Util.dateTimePicker = function( dateTag, dateFormat )
+Util.dateTimePicker = function( dateTag )
 {
 	dateTag.appendDtpicker({
-		dateFormat: dateFormat
+		dateFormat: Commons.dateFormat
 	});
 };
 

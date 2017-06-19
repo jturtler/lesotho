@@ -40,7 +40,11 @@
 <script src="../js/utils/lesotho_validation.js"></script>
 <script src="../js/utils/lesotho_menu.js"></script>
 <script src="../js/utils/lesotho_commons.js"></script>
-<script src="../js/referCoordinator.js"></script>
+<script src="../js/coordinator.js"></script>
+<script src="../js/app/coordinatorListManagement.js"></script>
+<script src="../js/app/settingsManagement.js"></script>
+<script src="../js/app/clientFormManagement.js"></script>
+
 
 </head>
 <body>
@@ -185,13 +189,13 @@
 				<!-- Search and Create Client FORM -->
 				
 				<div id="searchClientForm" style="display:none;" class="mainContent">
-		  			<h4 class="headerList" keyword="referCoordinator_searchClient_headerTitle">Search positive client</h4>
+		  			<h4 class="headerList" keyword="searchClient_headerTitle">Search/Create client</h4>
 		  			
 		  			<div class="shadow">
-			  			<form class="form-horizontal" id="seachForm" style="padding-top:20px;padding-right:10px;"></form>
+			  			<form class="form-horizontal" id="seachAddClientForm" style="padding-top:20px;padding-right:10px;"></form>
 						
 						<div style="text-align:center;margin-bottom:10px;">
-							<button class="btn btn-default actionBtn" id="searchClientBtn" keyword="referCoordinator_searchClient_btn_search">Search</button>
+							<button class="btn btn-default actionBtn" id="searchClientBtn" keyword="searchClient_btn_search">Search/Create</button>
 		  				</div>
 	  				</div>
 	  				
@@ -199,19 +203,19 @@
 				
 				<div id="searchResult" style="display:none;" class="mainContent">
 				
-					<h4 class="headerList"><span keyword="referCoordinator_msg_searchCriteria">Matches for</span> <span id="searchMatchResultKey"></span></h4>
+					<h4 class="headerList"><span keyword="searchResult_msg_searchCriteria">Matches for</span> <span id="searchMatchResultKey"></span></h4>
 					
 					<div class="scroll-div">
 						<table class='table table-hover table-striped listTable tablesorter' id="searchResultTb">
 							<thead>
 								<tr style='background-color:#cfe2f3;'>
-									<th keyword="referCoordinator_searchClient_result_tableHeader_firstName">First Name</th>
-									<th keyword="referCoordinator_searchClient_result_tableHeader_surname">Surname</th>
-									<th keyword="referCoordinator_searchClient_result_tableHeader_dob">DoB</th>
-									<th keyword="referCoordinator_searchClient_result_tableHeader_districtOfBirth">District o B</th>
-									<th keyword="referCoordinator_searchClient_result_tableHeader_birthOrder">Birth Order</th>
-									<th keyword="referCoordinator_searchClient_result_tableHeader_adquisition">Adquisition</th>
-									<th keyword="referCoordinator_searchClient_result_tableHeader_lastTestNS">Last test NS</th>
+									<th keyword="searchClient_result_tableHeader_firstName">First Name</th>
+									<th keyword="searchClient_result_tableHeader_surname">Surname</th>
+									<th keyword="searchClient_result_tableHeader_dob">DoB</th>
+									<th keyword="searchClient_result_tableHeader_districtOfBirth">District o B</th>
+									<th keyword="searchClient_result_tableHeader_birthOrder">Birth Order</th>
+									<th keyword="searchClient_result_tableHeader_adquisition">Adquisition</th>
+									<th keyword="searchClient_result_tableHeader_lastTestNS">Last test NS</th>
 								</tr>
 							</thead>
 							<tbody></tbody>
@@ -219,13 +223,12 @@
 					</div>
 					
 					<div id="searchResultOptions" >
-						<p><span id="searchResultHeader" keyword="referCoordinator_searchClient_result_optionTitle" class="searchOptMsg">Select a client from from above or</span> <span id="searchResultKey"  class="searchOptMsg"></span><p> 
-						<button id="backToSearchClientForm" keyword="referCoordinator_searchClient_result_btn_backToSearch" class="btn btn-default actionBtn">Back to search</button>
-						<button id="showTodayCase" keyword="referCoordinator_searchClient_result_btn_todayFollowUp" class="btn btn-default actionBtn">Today's Follow-up</button>
+						<p><span id="searchResultHeader" keyword="searchClient_result_optionTitle" class="searchOptMsg">Select a client from from above or</span> <span id="searchResultKey"  class="searchOptMsg"></span><p> 
+						<button id="showAddNewClientForm" keyword="searchClient_result_btn_addClient" class="btn btn-default actionBtn">Add a client</button>
+						<button id="backToSearchClientForm" keyword="searchClient_result_btn_backToSearch" class="btn btn-default actionBtn">Back to search</button>
+						<button id="showTodayCase" keyword="searchClient_result_btn_todayCases" class="btn btn-default actionBtn">Today's Cases</button>
 					</div>
 				</div>
-				
-					
 				
 					
 				<div id="addClientFormDiv" style="display:none;" class="mainContent">	
@@ -345,19 +348,19 @@
 										
 										<tr>
 											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_typeOfContact">Type of contact</td>
-											<td><input class="form-control" type="text" dataelement="wzM3bUiPowS"></td>
+											<td dataelementtag="wzM3bUiPowS"></td>
 											<td keyword="contactLogForm_tab_eventForm_header_outcome">Outcome</td>
-											<td colspan="2"><input class="form-control" type="text" dataelement="hjpNXAyZ0cm"></td>
+											<td colspan="2" dataelementtag="hjpNXAyZ0cm"></td>
 										</tr>
 										<tr>
 											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_nextAction">Next action</td>
-											<td><input type="text" class="form-control" dataelement="mcgzEFh5IV8"></td>
+											<td dataelementtag="mcgzEFh5IV8"></td>
 											<td keyword="contactLogForm_tab_eventForm_header_dueDate">Due date</td>
-											<td colspan="2"><input type="text" class="form-control" isDate="true" dataelement="HcBFZsCt8Sy"></td>
+											<td colspan="2" dataelementtag="HcBFZsCt8Sy"></td>
 										</tr>
 										<tr>
 											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_comments">Comments</td>
-											<td colspan="4"><textarea class="form-control" style="width:100%;height:45px;" type="text" dataelement="HaauwE6JkEs"></textarea></td>
+											<td colspan="4" dataelementtag="HaauwE6JkEs"></textarea></td>
 										</tr>
 										
 										<!--  Action buttons -->
@@ -383,29 +386,17 @@
 							
 						<div id="artReferDiv">
 							
-							<table class="table activeBar" id="artEventInfoTb" style="margin:0px;">
+							<table class="table activeBar" id="artEventInfoTb" >
 								<tbody>
 									<tr>
-										<th colspan="2">Client referred to ART on: <span style="font-weight:normal;" class="dateClientReferredARTOn"></span></th>
-										<th colspan="2"><div style="float:right;">Time elapsed: <span style="font-weight:normal;" class="timeClientReferredARTOn"></span></div>
+										<th colspan="2"><span keyword="artRefer_tab_msg_clientReferredToARTOn">Client referred to ART on</span>: <span style="font-weight:normal;" class="dateClientReferredARTOn"></span></th>
+										<th><span keyword="artRefer_tab_msg_status">Status</span>: <span style="font-weight:normal;" id="linkageStatus"></span></th>
+										<th colspan="2"><div style="float:right;"> <span keyword="artRefer_tab_msg_timeElapsed">Time elapsed</span>: <span style="font-weight:normal;" class="timeClientReferredARTOn"></span></div>
 									</tr>
 								</tbody>
 							</table>
-							<table id="artAttributeForm" class="table activeBar previousTestTb" >
-								
-								<!--  Action buttons -->
-								<tr class="actionBar">
-									<th style="width:20px;background-color: #d6c388 !important;">
-										<button style="background-color:#d6c388 !IMPORTANT;" id="discardARTAttributeBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
-									</th>
-									<th colspan="2" style="background-color: #d6c388 !important;">
-										<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
-										<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
-									</th>
-									<th style="width:20px;background-color: #d6c388 !important;">
-										<button style="background-color:#d6c388 !IMPORTANT;" id="saveARTAttributeBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
-									</th>						
-								</tr>
+							
+							<table id="artAttributeForm" class="table activeBar previousTestTb" style="display:none;">
 							</table>
 							
 							
@@ -627,7 +618,7 @@
 			MsgManager.appUnblock();
 			
 			new Menu();
-			new ReferCoordinator( new Storage(), translationObj );
+			new Coordinator( new Storage(), translationObj );
 		});
 		
 		
