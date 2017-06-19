@@ -192,6 +192,7 @@ function SearchClientManagement( _mainPage, _metaData, _searchType )
 		
 	};	
 
+	
 	// ---------------------------------------------------------------------------------------------------------------
 	// Search Client
 	// ---------------------------------------------------------------------------------------------------------------
@@ -379,7 +380,17 @@ function SearchClientManagement( _mainPage, _metaData, _searchType )
 			});
 	};
 	
+	
+	me.getAttributeField = function( attrId )
+	{
+		return me.seachAddClientFormTag.find("[attribute='" + attrId + "']");
+	};
+	
 
+	// ---------------------------------------------------------------------------------------------------------------
+	// Show/Hide form
+	// ---------------------------------------------------------------------------------------------------------------
+	
 	me.showSearchClientForm = function()
 	{	
 		me.storageObj.addItem("page", me.PAGE_SEARCH_PARAM);
@@ -387,7 +398,32 @@ function SearchClientManagement( _mainPage, _metaData, _searchType )
 		me.searchResultTag.find("span.labelOpt").css("font-size","");		
 		me.searchClientFormTag.show("fast");
 	};
+
+	me.resetSearchClientForm = function()
+	{
+		me.searchResultTag.find("span.labelOpt").css("font-size","");
+		me.searchResultTag.find("input:radio:checked").attr("checked", false );
+		me.searchClientFormTag.find("input,select").val("");
+	};
 	
+	
+	me.showSearchClientTableResult = function()
+	{
+		me.searchClientFormTag.hide();
+		
+		me.searchResultTbTag.css( "cursor", "pointer" );
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_optionTitle" );
+		me.searchResultHeaderTag.html( tranlatedText );
+
+		me.searchResultTbTag.show();
+		me.searchResultTag.show("fast");
+	};
+	
+	
+	// ---------------------------------------------------------------------------------------------------------------
+	// Search messages
+	// ---------------------------------------------------------------------------------------------------------------
+
 	// Generate a message based on Client search criteria
 	// Matches for [Med Rod, Measer, 10 Jan 2014, 01]
 	me.getSearchCriteria = function( formTag )
@@ -432,12 +468,6 @@ function SearchClientManagement( _mainPage, _metaData, _searchType )
 	};
 	
 	
-	me.getAttributeField = function( attrId )
-	{
-		return me.seachAddClientFormTag.find("[attribute='" + attrId + "']");
-	};
-	
-
 	// Show the result after searching clients
 	
 	me.showSearchClientNoResult = function()
@@ -451,25 +481,6 @@ function SearchClientManagement( _mainPage, _metaData, _searchType )
 		me.searchResultTag.show("fast");
 	};
 
-	me.resetSearchClientForm = function()
-	{
-		me.searchResultTag.find("span.labelOpt").css("font-size","");
-		me.searchResultTag.find("input:radio:checked").attr("checked", false );
-		me.searchClientFormTag.find("input,select").val("");
-	};
-	
-	
-	me.showSearchClientTableResult = function()
-	{
-		me.searchClientFormTag.hide();
-		
-		me.searchResultTbTag.css( "cursor", "pointer" );
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_optionTitle" );
-		me.searchResultHeaderTag.html( tranlatedText );
-
-		me.searchResultTbTag.show();
-		me.searchResultTag.show("fast");
-	};
 	
 	// ----------------------------------------------------------------------------
 	// RUN Init method

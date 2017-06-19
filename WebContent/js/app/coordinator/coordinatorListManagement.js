@@ -44,25 +44,6 @@ function CoordinatorListManagement( _mainPage )
 		me.setUp_FloatButton();
 		window.addEventListener( "resize", me.setUp_FloatButton );
 		
-		me.todayFULinkTag.click(function(e){
-			console.log("todayFULinkTag");
-			$('.overlay').click();
-			
-			me.settingsManagement.checkOrgunitSetting( function(){
-				me.registerClientBtnTag.show();
-				me.listTodayCases();
-			});
-		});
-		
-		me.allFULinkTag.click(function(){
-			$('.overlay').click();
-			
-			me.settingsManagement.checkOrgunitSetting( function(){
-				me.registerClientBtnTag.hide();
-				me.listAllCase();
-			});
-		});
-		
 		// Back to [Current Cases]
 		
 		me.backToCaseListBtnTag.click(function(){
@@ -74,7 +55,7 @@ function CoordinatorListManagement( _mainPage )
 			else if( me.mainPage.currentList == me.mainPage.PAGE_ALL_FU_LIST )
 			{
 				me.registerClientBtnTag.hide();
-				me.listPreviousCases();
+				me.listAllCase();
 			}
 		});
 		
@@ -84,11 +65,18 @@ function CoordinatorListManagement( _mainPage )
 		
 		me.registerClientBtnTag.click(function(){
 			Util.resetPageDisplay();
-			me.clientFormManagement.resetSearchClientForm();
-			me.clientFormManagement.showSearchClientForm();
+			me.mainPage.clientFormManagement.resetSearchClientForm();
+			me.mainPage.clientFormManagement.showSearchClientForm();
 		});
 	};
-	
+
+	me.setUp_FloatButton = function()
+	{
+		var width = $(window).width() - 80;
+		var height = $(window).height() - 120;
+		
+		me.registerClientBtnTag.css({top: height, left: width, position:'fixed'});
+	};
 	
 	// -------------------------------------------------------------------
 	// Load list of cases
@@ -96,8 +84,8 @@ function CoordinatorListManagement( _mainPage )
 	
 	me.listTodayCases = function( exeFunc )
 	{
-		me.currentList = me.PAGE_TODAY_LIST;
-		me.storageObj.addItem( "page", me.PAGE_TODAY_LIST );
+		me.mainPage.setCurrentPage( me.mainPage.PAGE_TODAY_FU_LIST );
+		me.storageObj.addItem( "page", me.PAGE_TODAY_FU_LIST );
 		me.storageObj.removeItem( "subPage" );		
 		
 		me.todayFUDateTag.html( Util.formatDate_LastNDate(0) );
@@ -115,8 +103,8 @@ function CoordinatorListManagement( _mainPage )
 		
 	me.listAllCase = function( exeFunc )
 	{
-		me.currentList = me.PAGE_ALL_LIST;
-		me.storageObj.addItem("page", me.PAGE_ALL_LIST);
+		me.mainPage.setCurrentPage( me.mainPage.PAGE_ALL_FU_LIST );
+		me.storageObj.addItem("page", me.PAGE_ALL_FU_LIST);
 		me.storageObj.removeItem( "subPage" );
 		
 		me.listCases( "../event/allFU", function( list ){
@@ -294,17 +282,22 @@ function CoordinatorListManagement( _mainPage )
 	{
 		rowTag.css("cursor", "pointer");
 		rowTag.click( function(){
-			me.clientFormManagement.backToSearchClientResultBtnTag.hide();
+			me.mainPage.searchClientManagement.backToSearchClientResultBtnTag.hide();
 			me.backToCaseListBtnTag.show();
 			var clientId = rowTag.attr("clientId");
 			var eventId = rowTag.attr("eventId");
 			
 			Util.resetPageDisplay();
-			me.loadClientDetails( clientId, eventId, function(){
-				me.addClientFormDivTag.show();
+			me.mainPage.clientFormManagement.loadClientDetails( clientId, eventId, function(){
+				me.mainPage.clientFormManagement.addClientFormDivTag.show();
 			} );
 		});
 	};
 	
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// RUN init method
+	// ---------------------------------------------------------------------------------------------------------------------------
+	
+	me.init();
 	
 }
