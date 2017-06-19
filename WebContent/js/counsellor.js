@@ -277,6 +277,12 @@ function Counsellor( storageObj, translationObj )
 		{
 			me.settingsManagement.aboutDivTag.show("fast");
 		}
+		else
+		{
+			me.listManagement.listTodayCases(function(){
+				me.loadSearchSubPage( me.todayCaseTblTag );
+			});
+		}
 		
 	};
 	
@@ -342,9 +348,6 @@ function Counsellor( storageObj, translationObj )
 	
 	me.checkAndLoadDataAfterInit = function( metaData )
 	{
-//		me.clientFormManagement.checkAndLoadDataAfterInit( metaData );
-//		me.searchClientManagement.createSearchClientForm();
-		
 		var page = me.storageObj.getItem( "page" );
 		if( page == "" )
 		{

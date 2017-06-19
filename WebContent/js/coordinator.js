@@ -252,6 +252,12 @@ function Coordinator( storageObj, translationObj )
 		{
 			me.settingsManagement.aboutDivTag.show("fast");
 		}
+		else
+		{
+			me.listManagement.listTodayCases(function(){
+				me.loadSearchSubPage( me.todayCaseTblTag );
+			});
+		}
 		
 	};
 	
