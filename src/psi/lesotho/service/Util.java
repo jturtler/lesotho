@@ -88,11 +88,16 @@ public final class Util
     public static final String KEY_METADATA_OULIST = "ouList";
     public static final String KEY_SAVE_EVENT = "save"; 
     public static final String KEY_GET_EVENT_DETAILS = "details";
-    public static final String KEY_GET_REPORT = "report";
+    public static final String KEY_GET_COUNSELLOR_REPORT = "counsellorReport";
+    public static final String KEY_GET_COORDINATOR_REPORT = "coordinatorReport";
     
     public static final String KEY_FIND_PARTNER = "findPartner";
-    public static final String KEY_SAVE_PARTNER_CUIC = "savePartnerCUIC";    
+    public static final String KEY_SAVE_PARTNER_CUIC = "savePartnerCUIC"; 
     
+
+    public static final String KEY_SEARCH_TYPE = "searchType";  
+    public static final String KEY_SEARCHTYPE_ALL = "all";
+    public static final String KEY_SEARCHTYPE_POSITIVE = "positive"; 
     
 
 

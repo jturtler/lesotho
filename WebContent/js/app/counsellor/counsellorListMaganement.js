@@ -8,6 +8,7 @@ function CounsellorListMaganement( _mainPage  )
 	me.translationObj = me.mainPage.translationObj;
 	me.clientFormManagement = me.mainPage.clientFormManagement;
 	
+	
 	// Today cases
 	me.todayCaseListTag = $("#todayCaseList");
 	me.todayCaseTblTag = $("#todayCaseTbl");
@@ -15,7 +16,6 @@ function CounsellorListMaganement( _mainPage  )
 	me.todayCaseFooterTag = $("#todayCaseFooter");
 	me.todayCaseNumberTag = $("#todayCaseNumber");
 	me.registerClientBtnTag = $("#registerClientBtn");
-	
 	
 	
 	// Previous cases

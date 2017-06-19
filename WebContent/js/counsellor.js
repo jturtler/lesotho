@@ -70,7 +70,7 @@ function Counsellor( storageObj, translationObj )
 		
 		me.settingsManagement = new SettingsManagement( me, function( metaData ){
 			me.clientFormManagement = new ClientFormManagement( me, metaData );
-			me.searchClientManagement = new SearchClientManagement( me, metaData );
+			me.searchClientManagement = new SearchClientManagement( me, metaData, "all" );
 			me.listManagement = new CounsellorListMaganement( me );
 			me.reportManagement = new CounsellorReportManagement( me );
 			me.checkAndLoadDataAfterInit();

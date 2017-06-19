@@ -1,10 +1,11 @@
 
-function SearchClientManagement( _mainPage, _metaData )
+function SearchClientManagement( _mainPage, _metaData, _searchType )
 {
 	var me = this;
 	
 	me.mainPage = _mainPage;
 	me.metaData = _metaData;
+	me.searchType = _searchType;
 	me.storageObj = me.mainPage.storageObj;
 	me.translationObj = me.mainPage.translationObj;
 	me.validationObj = me.mainPage.validationObj;
@@ -57,9 +58,9 @@ function SearchClientManagement( _mainPage, _metaData )
 		// Back to [Search Client Result]
 		
 		me.backToSearchClientResultBtnTag.click(function(){
-			me.addClientFormDivTag.hide();
 			MsgManager.msgAreaHide();
-			me.selectOrgUnitWarningMsgTag.hide();
+			me.mainPage.clientFormManagement.addClientFormDivTag.hide();
+			me.mainPage.clientFormManagement.selectOrgUnitWarningMsgTag.hide();
 			me.searchResultTbTag.show();
 			me.searchResultTag.show();
 		});
@@ -82,7 +83,7 @@ function SearchClientManagement( _mainPage, _metaData )
 		});
 		
 		me.showTodayCaseTag.click( function(){
-			me.listManagement.listTodayCases();
+			me.mainPage.listManagement.listTodayCases();
 		});
 				
 		// Call [Search clients] function
@@ -354,7 +355,7 @@ function SearchClientManagement( _mainPage, _metaData )
 		$.ajax(
 			{
 				type: "POST"
-				,url: "../client/search"
+				,url: "../client/search?searchType=" + me.searchType
 				,dataType: "json"
 				,data: JSON.stringify( jsonQuery )
 	            ,contentType: "application/json;charset=utf-8"

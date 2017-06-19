@@ -42,7 +42,17 @@ public class ClientController
                 if ( key.equals( Util.KEY_SEARCH_CASES ) )
                 {
                     JSONObject receivedData = Util.getJsonFromInputStream( request.getInputStream() );
-                    responseInfo = ClientController.searchClients( request, receivedData );
+                   
+                    String searchType = request.getParameter( "searchType" );
+                    
+                    if( searchType.equals( Util.KEY_SEARCHTYPE_ALL ) )
+                    {
+                        responseInfo = ClientController.searchClients( request, receivedData );
+                    }
+                    else if( searchType.equals( Util.KEY_SEARCHTYPE_POSITIVE ) )
+                    {
+                        responseInfo = ClientController.searchPositiveClients( request, receivedData );
+                    }
                 }
                 // STEP 2.2. Get All events of an client
                 else if ( key.equals( Util.KEY_CLIENT_DETAILS ) )
@@ -106,7 +116,7 @@ public class ClientController
                         
                         responseInfo.output = output.toString();
                     }
-                } 
+                }
             }
 
             // STEP 3. Send back the messages
@@ -136,6 +146,24 @@ public class ClientController
         {
             String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
             String url = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/zPJW0n6mymH/data.json?" + condition;
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
+        }
+        catch ( Exception ex )
+        {
+            ex.printStackTrace();
+        }
+
+        return responseInfo;
+    }
+
+    private static ResponseInfo searchPositiveClients( HttpServletRequest request, JSONObject jsonData )
+        throws UnsupportedEncodingException, ServletException, IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+        try
+        {
+            String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
+            String url = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/aUc8BV6Ipmu/data.json?" + condition;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )

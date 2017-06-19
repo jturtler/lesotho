@@ -142,10 +142,33 @@ public class EventController
                         }
                     }
                 } 
-                // Load report
-                else if ( key.equals( Util.KEY_GET_REPORT ) )
+                // Load counsellor report
+                else if ( key.equals( Util.KEY_GET_COUNSELLOR_REPORT ) )
                 {
-                    responseInfo = EventController.getReport( loginUsername );
+                    responseInfo = EventController.getCounsellorReport( loginUsername );
+                    String output = "\"report\":" + responseInfo.output + "";
+                    
+                    if( responseInfo.responseCode == 200 )
+                    {
+                        ResponseInfo responseInfo_AnalyticsTime = EventController.getAnalyticsTime();
+                        if( responseInfo_AnalyticsTime.responseCode == 200 )
+                        {
+                                JSONObject analyticsTime = new JSONObject( responseInfo_AnalyticsTime.output );
+                                String time = analyticsTime.getString( "intervalSinceLastAnalyticsTableSuccess" );
+                                time = time.replace("s", "seconds");
+                                time = time.replace("m", "minutes");
+                                time = time.replace("h", "hours");                                                              
+                                
+                                output += ",\"analyticsTime\":\"" + time + "\"";
+                        }
+                    }
+                    
+                    responseInfo.output = "{" + output + "}";
+                }
+                // Load coordinator report
+                else if ( key.equals( Util.KEY_GET_COORDINATOR_REPORT ) )
+                {
+                    responseInfo = EventController.getCoordinatorReport( loginUsername );
                     String output = "\"report\":" + responseInfo.output + "";
                     
                     if( responseInfo.responseCode == 200 )
@@ -359,7 +382,7 @@ public class EventController
         return code;
     }
     
-    private static ResponseInfo getReport( String loginUsername )
+    private static ResponseInfo getCounsellorReport( String loginUsername )
     {
         ResponseInfo responseInfo = new ResponseInfo();
         
@@ -394,7 +417,7 @@ public class EventController
         {
             try
             {
-                String url = Util.LOCATION_DHIS_SERVER + "/api/analytics/events/aggregate/KDgzpKX3h2S.json?stage=gmBozy0KAMC&dimension=ou:FvUGp8I75zV&dimension=pe:THIS_WEEK;LAST_12_MONTHS&dimension=mYdfuRItatP:IN%3APENDING%3BSUCCESS&outputType=EVENT&displayProperty=SHORTNAME";
+                String url = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:AUu3Q2cTOxt;R8zCCZYPVjm;gO8DpAzJsDp&dimension=pe:THIS_FINANCIAL_YEAR;THIS_MONTH;THIS_QUARTER;THIS_WEEK&filter=ou:" + Util.ROOT_ORGTUNIT_LESOTHO + "&filter=" + Util.USER_CATEGORY_ID + ":" + catOptionComboId + "&displayProperty=SHORTNAME";
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
             }
             catch ( Exception ex )

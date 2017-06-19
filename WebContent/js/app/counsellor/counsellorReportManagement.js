@@ -49,7 +49,7 @@ function CounsellorReportManagement( mainPage )
 				$.ajax(
 					{
 						type: "POST"
-						,url: "../event/report"
+						,url: "../event/counsellorReport"
 						,dataType: "json"
 			            ,contentType: "application/json;charset=utf-8"
 			            ,beforeSend: function()

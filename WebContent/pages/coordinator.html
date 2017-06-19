@@ -41,9 +41,12 @@
 <script src="../js/utils/lesotho_menu.js"></script>
 <script src="../js/utils/lesotho_commons.js"></script>
 <script src="../js/coordinator.js"></script>
-<script src="../js/app/coordinatorListManagement.js"></script>
+<script src="../js/app/inputTagGeneration.js"></script>
+<script src="../js/app/coordinator/coordinatorListManagement.js"></script>
 <script src="../js/app/settingsManagement.js"></script>
 <script src="../js/app/clientFormManagement.js"></script>
+<script src="../js/app/coordinator/coordinatorReportManagement.js"></script>
+<script src="../js/app/searchClientManagement.js"></script>
 
 
 </head>
@@ -525,31 +528,40 @@
 					<table id="reportTbl" sorted="false" class='table table-hover table-striped listTable' style="display:none;">
 						<thead>
 							<tr style="background-color:#cfe2f3">
+								<tr style="background-color:#cfe2f3">
 								<th>#</th>
-								<th keyword="referCoordinator_report_tableHeader_yesterday">Yesterday</th>
-								<th keyword="referCoordinator_report_tableHeader_last3Days">Last 3 Days</th>
-								<th keyword="referCoordinator_report_tableHeader_thisWeek">This Week</th>
-								<th keyword="referCoordinator_report_tableHeader_last4weeks">Last 4 weeks</th>
+								<th keyword="report_tableHeader_thisWeek">This week</th>
+								<th keyword="report_tableHeader_thisMonth">This month</th>
+								<th keyword="report_tableHeader_thisQuarterly">This quarterly</th>
+								<th keyword="report_tableHeader_thisFinancialYear">This financial year (Oct to Sep)</th>
+							</tr>
 							</tr>
 						</thead>
 						
-						<tbody class="artReferrals">
+						<tbody class="successfulLinkages">
 							<tr>
-								<td colspan='4' class="note" keyword="referCoordinator_report_rowTitle_header_ARTReferrals">ART Referrals</td>
+								<td colspan='5' class="note" keyword="referCoordinator_report_rowTitle_header_successfulLinkages">Successful Linkages</td>
+							</tr>
+						    <tr>
+								<td style="background-color:#f9f9f9 ;text-align:left;" keyword="report_coordinator_rowTitle_achieved">Achieved (%)</td>
+								<td dataelement="AUu3Q2cTOxt" period="thisWeek"><span class="value"></span> <span class="trafficLight" style="font-size:14.0pt;"></span></td>
+								<td dataelement="AUu3Q2cTOxt" period="thisMonth"><span class="value"></span> <span class="trafficLight" style="font-size:14.0pt;"></span></td>
+								<td dataelement="AUu3Q2cTOxt" period="thisQuarterly"><span class="value"></span> <span class="trafficLight" style="font-size:14.0pt;"></span></td>
+								<td dataelement="AUu3Q2cTOxt" period="thisFinancialYear"><span class="value"></span> <span class="trafficLight" style="font-size:14.0pt;"></span></td>
 							</tr>
 							<tr>
-								<td style="background-color:#f9f9f9 ;text-align:left;" keyword="referCoordinator_report_rowTitle_clientUpdated">Client Updated</td>
-								<td dataelement="I2oytRXksKN" period="yesterday"></td>
-								<td dataelement="I2oytRXksKN" period="last3Days"></td>
-								<td dataelement="I2oytRXksKN" period="thisWeek"></td>
-								<td dataelement="I2oytRXksKN" period="last4weeks"></td>
+								<td style="background-color:#f9f9f9 ;text-align:left;" keyword="report_coordinator_rowTitle_tested">ART Enrollment Confirmed</td>
+								<td dataelement="gO8DpAzJsDp" period="thisWeek"><span class="value"></span></td>
+								<td dataelement="gO8DpAzJsDp" period="thisMonth"><span class="value"></span></td>
+								<td dataelement="gO8DpAzJsDp" period="thisQuarterly"><span class="value"></span></td>
+								<td dataelement="gO8DpAzJsDp" period="thisFinancialYear"><span class="value"></span></td>
 							</tr>
 							<tr>
-								<td style="font-weight:bold;" keyword="referCoordinator_report_rowTitle_successfulLinkages">Successful Linkages</td>
-								<td dataelement="rcVLQsClLUa" period="yesterday"></td>
-								<td dataelement="I2oytRXksKN" period="last3Days"></td>
-								<td dataelement="rcVLQsClLUa" period="thisWeek"></td>
-								<td dataelement="rcVLQsClLUa" period="last4weeks"></td>
+								<td style="background-color:#f9f9f9 ;text-align:left;" keyword="report_coordinator_rowTitle_target">Target</td>
+								<td dataelement="R8zCCZYPVjm" period="thisWeek"><span class="value"></span></td>
+								<td dataelement="R8zCCZYPVjm" period="thisMonth"><span class="value"></span></td>
+								<td dataelement="R8zCCZYPVjm" period="thisQuarterly"><span class="value"></span></td>
+								<td dataelement="R8zCCZYPVjm" period="thisFinancialYear"><span class="value"></span></td>
 							</tr>
 						</tbody>
 					</table>

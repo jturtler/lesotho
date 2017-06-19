@@ -15,13 +15,11 @@ function Coordinator( storageObj, translationObj )
 	me.translationObj = translationObj;
 	me.validationObj;
 	
-	me.dateFormat = "dd M yy";
-	me.dateTimeFormat = "YYYY-MM-DD HH:mm";
-	
 	me.settingsManagement;
 	me.listManagement;
 	me.clientFormManagement;
 	me.reportManagement;
+	me.inputTagGeneration;
 	
 	me.todayFULinkTag = $("#todayFULink");
 	me.allFULinkTag = $("#allFULink");
@@ -57,17 +55,19 @@ function Coordinator( storageObj, translationObj )
 	me.init = function()
 	{
 		MsgManager.initialSetup();		
+		me.validationObj = new Validation( me.translationObj );	
 		me.setUp_Events();
 		
 		
 		me.settingsManagement = new SettingsManagement( me, function( metaData ){
 			me.clientFormManagement = new ClientFormManagement( me, metaData );
-			
+			me.searchClientManagement = new SearchClientManagement( me, metaData, "positive" );
 			me.listManagement = new CoordinatorListManagement( me );
-//			me.reportManagement = new CounsellorReportManagement( me );
+			me.reportManagement = new CoordinatorReportManagement( me );
 			me.checkAndLoadDataAfterInit();
 			
 		} );
+		
 	}
 
 	// Set current page
@@ -115,8 +115,8 @@ function Coordinator( storageObj, translationObj )
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
 				Util.resetPageDisplay();
-				me.clientFormManagement.resetSearchClientForm();
-				me.clientFormManagement.showSearchClientForm();
+				me.searchClientManagement.resetSearchClientForm();
+				me.searchClientManagement.showSearchClientForm();
 			});
 		});
 		

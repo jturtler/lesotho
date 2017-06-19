@@ -6,6 +6,7 @@ function CoordinatorListManagement( _mainPage )
 	me.storageObj = me.mainPage.storageObj;
 	me.translationObj = me.mainPage.translationObj;
 
+	me.clientFormManagement = me.mainPage.clientFormManagement;
 
 	// Today F/U
 	me.todayFUListTag = $("#todayFUList");
@@ -21,6 +22,8 @@ function CoordinatorListManagement( _mainPage )
 	me.allFUFooterTag = $("#allFUFooter");
 	me.allFUNumberTag = $("#allFUNumber");
 	
+
+	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Init method
@@ -63,21 +66,16 @@ function CoordinatorListManagement( _mainPage )
 		// Back to [Current Cases]
 		
 		me.backToCaseListBtnTag.click(function(){
-//			if( me.mainPage.currentList == me.mainPage.PAGE_TODAY_LIST )
-//			{
-//				me.registerClientBtnTag.show();
-//				me.listTodayCases();
-//			}
-//			else if( me.mainPage.currentList == me.mainPage.PAGE_PREVIOUS_LIST )
-//			{
-//				me.registerClientBtnTag.hide();
-//				me.listPreviousCases();
-//			}
-//			else if( me.mainPage.currentList == me.mainPage.PAGE_POSITIVE_LIST )
-//			{
-//				me.registerClientBtnTag.hide();
-//				me.listPositiveCases();
-//			}
+			if( me.mainPage.currentList == me.mainPage.PAGE_TODAY_FU_LIST )
+			{
+				me.registerClientBtnTag.show();
+				me.listTodayCases();
+			}
+			else if( me.mainPage.currentList == me.mainPage.PAGE_ALL_FU_LIST )
+			{
+				me.registerClientBtnTag.hide();
+				me.listPreviousCases();
+			}
 		});
 		
 		
@@ -86,8 +84,8 @@ function CoordinatorListManagement( _mainPage )
 		
 		me.registerClientBtnTag.click(function(){
 			Util.resetPageDisplay();
-			me.clientManagement.resetSearchClientForm();
-			me.clientManagement.showSearchClientForm();
+			me.clientFormManagement.resetSearchClientForm();
+			me.clientFormManagement.showSearchClientForm();
 		});
 	};
 	
@@ -296,7 +294,7 @@ function CoordinatorListManagement( _mainPage )
 	{
 		rowTag.css("cursor", "pointer");
 		rowTag.click( function(){
-			clientManagement.backToSearchClientResultBtnTag.hide();
+			me.clientFormManagement.backToSearchClientResultBtnTag.hide();
 			me.backToCaseListBtnTag.show();
 			var clientId = rowTag.attr("clientId");
 			var eventId = rowTag.attr("eventId");
