@@ -4,8 +4,9 @@ function Commons() {}
 Commons.VERSION = "v0.30";
 Commons.VERSION_DATE = "Jun 18 2017";
 
-Commons.dateFormat = "dd M yy";
+Commons.dateFormat = "DD MMM YYYY";
 Commons.dateTimeFormat = "YYYY-MM-DD HH:mm";
+Commons.monthYearFormat = "MMM YYYY";
 
 Commons.checkSession = function( returnFunc )
 {		

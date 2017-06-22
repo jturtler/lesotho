@@ -41,6 +41,10 @@ function InputTagGeneration( attribute )
 		{
 			inputTag = "<input type='text' phonenumber='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
 		}
+		else if( attribute.valueType === "LONG_TEXT" )
+		{
+			inputTag = "<textarea class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
+		}
 		
 		return inputTag;
 		

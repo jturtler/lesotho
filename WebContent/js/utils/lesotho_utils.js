@@ -48,31 +48,6 @@ Util.disableTag = function( tag, isDisable )
 	}
 };
 
-//Add [Delete] button for input field
-Util.addDeleteBtnForInputTag = function( inputTag )
-{	
-	inputTag.addClass( "clearable x onX" );
-	inputTag.attr("readonly", true);
-    inputTag.mousemove( function( e ){
-	    $(this)[Util.tog(this.offsetWidth-25 < e.clientX-this.getBoundingClientRect().left)]('onX');   
-    });
-    
-    inputTag.click( function( ev ){
-    	if( $(this).hasClass("onX"))
-		{
-    		ev.preventDefault();
-		    $(this).removeClass("onX").val('').change();
-		}
-    	
-    });
-};
-	
-Util.tog = function(v)
-{
-	return v ? 'addClass' : 'removeClass';
-};
-
-
 Util.setAutoCompleteTag = function( selectTag )
 {
 	selectTag.hide();
@@ -104,6 +79,7 @@ Util.setAutoCompleteTag = function( selectTag )
         },
         select: function ( event, ui ) {	
     	  ui.item.option.selected = true;
+    	  selectTag.change();
         },
         focus: function(event, ui) {
         	$(this).val(ui.item.label);
@@ -219,6 +195,11 @@ Util.getArrayJsonData = function( key, formTag, isGetEmptyValue )
 		{
 			if( item.attr("isDate") !== undefined && item.attr("isDate") == "true" && value != "" )
 			{
+				if( item.attr("isMonthYear") === "true" )
+				{
+					value = "01 " + value;
+				}
+				
 				value = Util.formatDate_DbDate( value );
 			}
 			
@@ -313,6 +294,20 @@ Util.formatNumber = function( value ){
 	}
 	
 	return value;
+};
+
+
+Util.calculateAge = function( birthDateStr )
+{
+	var today = new Date();
+    var birthDate = new Date( birthDateStr );
+    var age = today.getFullYear() - birthDate.getFullYear();
+    var m = today.getMonth() - birthDate.getMonth();
+    if ( m < 0 || ( m === 0 && today.getDate() < birthDate.getDate() ) ) 
+    {
+        age--;
+    }
+    return age;
 };
 
 
@@ -421,6 +416,20 @@ Util.formatDate_LocalDisplayDate = function( localDateStr )
 	var day = localDateStr.substring( 8, 10 );
 	
 	return day + " " + Util.MONTHS[month] + " " + year;
+};
+
+
+/** 
+ * dateStr : 2017-01-02
+ * Result : Jan 2017
+ * **/
+Util.formatDate_LocalDisplayMonthYear = function( localDateStr )
+{
+	var year = localDateStr.substring( 0, 4 );
+	var month = eval( localDateStr.substring( 5,7 ) ) - 1;
+	var day = localDateStr.substring( 8, 10 );
+	
+	return Util.MONTHS[month] + " " + year;
 };
 
 
@@ -541,42 +550,82 @@ Util.getTimeElapsed = function( date1, date2 )
 	return noHours + ":" + noSeconds;
 };
 
+Util.getMonthsBetweenDates = function( d1, d2 )
+{
+	var months;
+    months = ( d2.getFullYear() - d1.getFullYear() ) * 12;
+    months = months + d2.getMonth() - d1.getMonth();
+    return months <= 0 ? 0 : months;
+};
+
+Util.convertDateStrToObject = function( dateStr )
+{
+	var year = dateStr.substring( 0, 4 );
+	var month = eval( dateStr.substring( 5,7 ) ) - 1;
+	var day = eval( dateStr.substring( 8, 10 ) );
+	
+	return new Date( year, month, day );
+}
+
 Util.datePicker = function( dateTag )
 {
-	dateTag.datepicker({
-		dateFormat: Commons.dateFormat,
-		changeMonth: true,
-		changeYear: true,
-		showOn: 'both',
-		createButton: false,
-		constrainInput: true,
-		yearRange: "-100:+0",
-        maxDate: new Date()
-	});
+	dateTag.attr( "readonly", true );
+	dateTag.datetimepicker({
+		viewMode: 'years'
+        ,format: Commons.dateFormat
+        ,widgetPositioning: { 
+            vertical: 'bottom'
+        }
+		,maxDate: new Date()
+		,ignoreReadonly: true
+        ,showClear: true
+     });
 		  
 };
 
+Util.monthYearPicker = function( dateTag )
+{
+	dateTag.attr( "readonly", true );
+	dateTag.datetimepicker({
+		viewMode: 'years'
+        ,format: Commons.monthYearFormat
+        ,widgetPositioning: { 
+            vertical: 'bottom'
+        }
+		,maxDate: new Date()
+		,ignoreReadonly: true
+        ,showClear: true
+     });
+		  
+};
 
 Util.dateFuturePicker = function( dateTag )
 {
-	dateTag.datepicker({
-		dateFormat: Commons.dateFormat,
-		changeMonth: true,
-		changeYear: true,
-		showOn: 'both',
-		createButton: false,
-		constrainInput: true,
-		yearRange: "-100:+100"
-	});
-		  
+	dateTag.attr( "readonly", true );
+	dateTag.datetimepicker({
+		viewMode: 'years'
+        ,format: Commons.dateFormat
+        ,widgetPositioning: { 
+            vertical: 'bottom'
+        }
+		,ignoreReadonly: true
+	    ,showClear: true
+     });
 };
 
 
 Util.dateTimePicker = function( dateTag )
-{
-	dateTag.appendDtpicker({
-		dateFormat: Commons.dateFormat
-	});
+{	
+	dateTag.attr( "readonly", true );
+	dateTag.datetimepicker({
+		viewMode: 'years'
+        ,format: Commons.dateFormat
+        ,widgetPositioning: { 
+            vertical: 'bottom'
+        }
+		,ignoreReadonly: true
+	    ,showClear: true
+     });
 };
 
 

@@ -181,9 +181,7 @@ function SearchClientManagement( _mainPage, _metaData, _searchType )
 		me.validationObj.setUp_isNumberOnly_OlderBrowserSupport( me.seachAddClientFormTag );
 		
 		var dobTag = me.seachAddClientFormTag.find( "input[attribute='" + me.attr_DoB + "']" );
-		Util.addDeleteBtnForInputTag( dobTag );
-		dobTag.css( "background-color", "white" );
-		dobTag.css( "border", "1px solid #ccc;" );
+		dobTag.attr( "readonly", true );
 	
 
 		// Remove the 'mandatory' SPAN from the Search table

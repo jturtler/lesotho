@@ -30,6 +30,11 @@
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="../js/bootstrap/moment-with-locales.js"></script>
+<link rel="stylesheet" href="../js/bootstrap/bootstrap-datetimepicker.css">
+<script src="../js/bootstrap/bootstrap-datetimepicker.js"></script>
+
+
 <link rel="stylesheet" href="../css/jQuery/tablesorter/style.css" />
 <link type="text/css" rel="stylesheet" media="screen" href="../css/style.css" />
 
@@ -60,7 +65,7 @@
 			<!--  Counsellor Menu -->
 			
 			<ul class="nav sidebar-nav" >
-				<li class="sidebar-brand"><a data-toggle="offcanvasmenu" style="cursor: pointer;">PSI LS HTS</a></li>
+				<li class="sidebar-brand"><a data-toggle="offcanvasmenu" style="cursor: pointer;" keyword="app_header">PSI LS HTS</span>
 				
 				<li><a id="searchClientLink" href="#" keyword="menu_searchCreateClient">Search/Create Client</a></li>
 				<li role="separator" class="divider"></li>
@@ -543,7 +548,16 @@
 				<div id="reportParamDiv" class="mainContent" style="display:none">
 					<h4 class="headerList" keyword="report_headerTitle">Statistics</h4>
 					<table id="reportTbl" sorted="false" class='table listTable' style="display:none;">
-						<thead>
+						
+						<colgroup>
+								<col>
+							  	<col width="20%">
+							    <col width="20%">
+							    <col width="20%">
+							    <col width="20%">
+						  </colgroup>
+						  
+						  <thead>
 							<tr style="background-color:#cfe2f3">
 								<th>#</th>
 								<th keyword="report_tableHeader_thisWeek">This week</th>
@@ -615,10 +629,10 @@
 							</tr>
 							<tr>
 								<td style="background-color:#f9f9f9 ;text-align:left;" keyword="report_rowTitle_yield">Yield</td>
-								<td dataelement="sX8wCJQEm2l" period="thisWeek"><span class="value"></span></td>
-								<td dataelement="sX8wCJQEm2l" period="thisMonth"><span class="value"></span></td>
-								<td dataelement="sX8wCJQEm2l" period="thisQuarterly"><span class="value"></span></td>
-								<td dataelement="sX8wCJQEm2l" period="thisFinancialYear"><span class="value"></span></td>
+								<td dataelement="sX8wCJQEm2l" period="thisWeek"><span class="value"></span> <span class="trafficLight" style="font-size:14.0pt;"></span></td>
+								<td dataelement="sX8wCJQEm2l" period="thisMonth"><span class="value"></span> <span class="trafficLight" style="font-size:14.0pt;"></span></td>
+								<td dataelement="sX8wCJQEm2l" period="thisQuarterly"><span class="value"></span> <span class="trafficLight" style="font-size:14.0pt;"></span></td>
+								<td dataelement="sX8wCJQEm2l" period="thisFinancialYear"><span class="value"></span> <span class="trafficLight" style="font-size:14.0pt;"></span></td>
 							</tr>
 						</tbody>
 					</table>
