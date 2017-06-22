@@ -211,6 +211,7 @@ function ClientFormManagement( _mainPage, _metaData )
 
 	// [ART Closure] form
 	me.attr_ARTClosure_ReferralFacilityName = "LCLiPzJWVAb";
+	me.attr_ARTClosure_OtherSpecialFacilityName = "Ra1Deyvyrbm";
 	
 	
 	// Data Element Logic fields
@@ -1349,6 +1350,12 @@ function ClientFormManagement( _mainPage, _metaData )
 		}
 
 		me.setHideLogicTag( closureLinkageOutcomeTag, false);
+		
+
+		// Show/Hide [Other facility name]
+		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
+		var specialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
+		me.setHideLogicTag( specialOtherFacilityNameTag, !( closeReferFacilityNameTag.val() == "Other" ) );
 	};
 	
 	me.getDataElementField = function( deId )
@@ -1681,6 +1688,22 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.setUp_ARTClosureForm();
 			
 		});
+		
+
+		// Add event for [Referral facility name]
+		var closeReferralFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
+		var closeSpecialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
+		closeReferralFacilityNameTag.change(function(){
+			if( closeReferralFacilityNameTag.val() == "Other" )
+			{
+				me.setHideLogicTag( closeSpecialOtherFacilityNameTag, false ); 
+			}
+			else
+			{
+				me.setHideLogicTag( closeSpecialOtherFacilityNameTag, true ); 
+			}
+		});
+
 		
 		// STEP 2. Disable some DEs in form. Will add login for these DE in 'change' event
 		
@@ -2111,6 +2134,9 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	me.resetDataEntryForm = function()
 	{
+		// ---------------------------------------------------------------------
+		// [New Test] Tab
+		
 		me.setUp_DataEntryFormInputTagEvent();
 		
 		// Show all tbody and input in [New Test]
@@ -2163,7 +2189,9 @@ function ClientFormManagement( _mainPage, _metaData )
 		Util.resetForm( me.artReferCloseFormTag );
 		
 		
-		// Empty fields from "Contat Log" tab
+		// ---------------------------------------------------------------------
+		// [Contat Log] tab
+		
 		// -- [Contact Log Attribute] form
 		me.contactLogFormTag.find("input[type='text'],select").val("");
 		me.contactLogFormTag.find("input[type='checkbox']").prop("checked", false);
@@ -2173,38 +2201,48 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.contactLogFormTag.find("tbody[groupId]").show();
 		me.contactLogFormTag.find("tbody:last").show();
 		
-		
+		// Hide [Next Contact Log] infor
 		me.nextContactLogActionTbTag.hide();
+		
+		// Show the [Contact Log Event] form 
 		me.contactLogEventFormTag.find("tbody:last").show();
+		// Reset [Contact Log] history table
 		me.contactLogEventHistoryTbTag.html("");
 		
-		
-		// -- [Contact Log] event form
+		// Reset [Contact Log Event] form
 		me.contactLogEventFormTag.find("input[type='text'],select").val("");
 		me.contactLogEventFormTag.find("input[type='checkbox']").prop("checked", false);
 		me.contactLogEventFormTag.find( "span.errorMsg" ).remove();
 		
-		// check if there is any orgunit which is set
+		// Check if there is any orgunit which is set
 		me.showOrgUnitWarningMsg();	
 
-		
+		// Hide [Partner HIV Status]
 		me.setHideLogicTag( me.getDataElementField( me.de_PartnerHIVStatus ).closest("tr"), true );
+		
+		// Set init data values
 		me.setUp_InitDataValues();
 		me.showOpeningTag = false;
 		
-		// [ART Refer] Tab
+		
+		// ---------------------------------------------------------------------
+		// [Opening ART Refer] Tab
+		
 		var noneStatusStr = me.translationObj.getTranslatedValueByKey( "artRefer_tab_msg_statusNone" );
     	me.linkageStatusLableTag.html( "[" + noneStatusStr + "]" );
 		
-		// Reset values for fields in [AR Opening] form
+		// Reset values for fields
 		me.artReferOpenFormTag.find("input,select").each(function(){
 			$(this).val("");
 		});
 		
-		// Hide [If other, specify] facility name in [AR Opening] form
+		// Hide [If other, specify] facility name
 		var specialOtherFacilityNameTag = me.getDataElementField( me.de_ARTOpen_OtherSpecialFacilityName );
 		me.setHideLogicTag( specialOtherFacilityNameTag, true );
 		
+		
+		// ---------------------------------------------------------------------
+		// [Closure ART Refer] Tab
 		
 		// Hide fields in [AR Closure] form, except [Linkage outcome] field
 		me.artReferCloseFormTag.find("input,select").each(function(){
@@ -2214,6 +2252,10 @@ function ClientFormManagement( _mainPage, _metaData )
 			}
 			$(this).val("");
 		});
+
+		// Hide [If other, specify] facility name
+		var closeSpecialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
+		me.setHideLogicTag( closeSpecialOtherFacilityNameTag, true );
 		
 	};
 	
@@ -3268,7 +3310,11 @@ function ClientFormManagement( _mainPage, _metaData )
 			var value = me.getAttributeValue( client, attrId );
 			me.setValueForInputTag( $(this), value );
 		});
-
+		
+		// [Closure ART Refer] - Show/Hide [Other facility name]
+		var closeReferralFacilityNameTag = me.getDataElementField( me.attr_ARTClosure_ReferralFacilityName );
+		var closeSpecialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
+		me.setHideLogicTag( closeSpecialOtherFacilityNameTag, !( closeReferralFacilityNameTag.val() == "Other" ) );
 	};
 
 	me.checkAndShowCheckedIconForPartnerCUICTag = function()
@@ -3307,23 +3353,30 @@ function ClientFormManagement( _mainPage, _metaData )
 		}	
 	};
 	
-	// ---------------------------------------------------------------------------------------
+	
+	// -------------------------------------------------------------------------
 	// Setup "Contact Log" TAB
 	
 	me.populateDataValueForContactLogAndARTRefTab = function( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent )
 	{		
-		// STEP 0. Show/Hide history of [Contact log] attribute form
+		// ---------------------------------------------------------------------
+		// [Contact log]
+		
+		// History form
 		var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
 		if( consentToContactTag.val() != "" )
 		{
 			me.showAttrContactLogHistory();
 		}
 		
-	 	// STEP 1. Populate [Contact Log Event] data( history data )
+	 	// Populate [Contact Log Event] history data
 		me.populateContactLogEventListHistory( contactLogEvents );
 		
 		
-		// STEP 2. Populate data for [Client referred to ART]
+		// ---------------------------------------------------------------------
+		// [ART Refer] Tab
+		
+		// [Client referred to ART]
 		if( artHIVTestingEvent != undefined )
 		{
 			var eventDateStr = Util.formatDate_DisplayDate( artHIVTestingEvent.eventDate );
@@ -3333,15 +3386,17 @@ function ClientFormManagement( _mainPage, _metaData )
  		// Generate [Time elapse] in header of [ART Ref.] form AND in [ART Closure] form
  		me.populateTimeElapsed( artOpeningEvent, artClosureEvent );
  		
- 		// Set [inkageStatus] info
+ 		// Set [Linkage Status] info
  		me.setARTLinkageStatusAttrValue();
  		
-		// STEP 3. Populate data for [ART Refer. Opening] form
+		
+ 		// ---------------------------------------------------------------------
+		// [Opening ART Refer]
+ 		
+		// Populate data
 		if( artOpeningEvent !== undefined )
 		{
 			me.artReferOpenFormTag.attr("event", JSON.stringify( artOpeningEvent ) );
-			
-			// Populate event data
 			me.populateDataValuesInEntryForm( me.artReferOpenFormTag, artOpeningEvent );
 		}
 		
@@ -3349,20 +3404,25 @@ function ClientFormManagement( _mainPage, _metaData )
 		var referralFacilityNameTag = me.getDataElementField( me.de_ARTOpen_ReferralFacilityName );
 		referralFacilityNameTag.closest( "td" ).find("input").val( referralFacilityNameTag.find("option:selected").text() );
 		
+		// Show/Hide [Other facility name]
+		var openReferFacilityNameTag = me.getDataElementField( me.de_ARTOpen_ReferralFacilityName);
+		var specialOtherFacilityNameTag = me.getDataElementField( me.de_ARTOpen_OtherSpecialFacilityName );
+		me.setHideLogicTag( specialOtherFacilityNameTag, !( openReferFacilityNameTag.val() == "Other" ) );
 		
-		// STEP 4. Set event data for [ART Refer. Closure] form
+		
+		// ---------------------------------------------------------------------
+		// [Closure ART Refer]
+ 		
+		// Populate data
 		if( artClosureEvent !== undefined )
 		{
 			me.artReferCloseFormTag.attr("event", JSON.stringify( artClosureEvent ) );
-			
-			// Populate event data
 			me.populateDataValuesInEntryForm( me.artReferCloseFormTag, artClosureEvent );
 		}
 
 		// Set value for autocomple input tag
 		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
 		closeReferFacilityNameTag.closest( "td" ).find("input").val( closeReferFacilityNameTag.find("option:selected").text() );
-		
 		
 		// Set up [ART Closure] form
 		me.setUp_ARTClosureForm();
@@ -3731,11 +3791,6 @@ function ClientFormManagement( _mainPage, _metaData )
 		// Set data values based on client attribute values
 		me.setUp_InitDataValues();
 		
-//		Util.disableTag( me.getDataElementField( me.de_Age ), true );
-//		Util.disableTag( me.getDataElementField( me.de_BMI ), true );
-//		Util.disableTag( me.getDataElementField( me.de_TimeSinceLastTest ), true );
-		
-
 		// --------------------------------------------------------------------------
 		// Init [Time since last test in months]
 		
