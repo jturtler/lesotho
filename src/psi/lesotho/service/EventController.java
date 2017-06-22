@@ -52,9 +52,12 @@ public class EventController
     private static String URL_QUERY_GET_PARTNER_BY_EVENTID = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/aZX9hTaN0aj/data.json?var=partnerEventId:" + EventController.PARAM_EVENT_ID; 
     
     
-    private static String URL_QUERY_FUCASE_BY_TIME = Util.LOCATION_DHIS_SERVER
+    private static String URL_QUERY_FUCASE_BY_USERNAME = Util.LOCATION_DHIS_SERVER
         + "/api/sqlViews/llbPbszABjd/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
         + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.STAGE_ID;
+
+    private static String URL_QUERY_FUCASE_ALL = Util.LOCATION_DHIS_SERVER
+        + "/api/sqlViews/I8xOsd6qfyh/data.json?var=stageId:" + Util.STAGE_ID;
     
 
     
@@ -644,13 +647,12 @@ public class EventController
             String curDate = Util.getCurrentDate();
             String tomorrow = Util.getXLastDate( -1 );
 
-            String requestUrl = EventController.URL_QUERY_FUCASE_BY_TIME;
+            String requestUrl = EventController.URL_QUERY_FUCASE_BY_USERNAME;
             requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
             requestUrl = requestUrl.replace( PARAM_START_DATE, curDate );
             requestUrl = requestUrl.replace( PARAM_END_DATE, tomorrow );
 
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
-
         }
         catch ( Exception ex )
         {
@@ -667,16 +669,8 @@ public class EventController
 
         try
         {
-            String startDate = "1000-01-01";
-            String tomorrow = Util.getXLastDate( -1 );
-
-            String requestUrl = EventController.URL_QUERY_FUCASE_BY_TIME;
-            requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
-            requestUrl = requestUrl.replace( PARAM_START_DATE, startDate );
-            requestUrl = requestUrl.replace( PARAM_END_DATE, tomorrow );
-
+            String requestUrl = EventController.URL_QUERY_FUCASE_ALL;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
-
         }
         catch ( Exception ex )
         {

@@ -166,6 +166,15 @@ Util.resetPageDisplay = function()
 };
 
 
+Util.getCheckedInputValues = function( formTag )
+{
+	var checkedVals = formTag.find('input:checkbox:checked').map(function() {
+	    return this.value;
+	}).get();
+	
+	return checkedVals;
+};
+
 // Generate JSON data in client form / event form
 
 Util.getArrayJsonData = function( key, formTag, isGetEmptyValue )

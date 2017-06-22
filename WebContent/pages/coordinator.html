@@ -34,6 +34,10 @@
 <link rel="stylesheet" href="../js/bootstrap/bootstrap-datetimepicker.css">
 <script src="../js/bootstrap/bootstrap-datetimepicker.js"></script>
 
+<link rel="stylesheet" href="../css/jQuery/tablesorter/style.css" />
+<link type="text/css" rel="stylesheet" media="screen" href="../css/style.css" />
+
+
 <script src="../js/utils/lesotho_utils.js"></script>
 <script src="../js/utils/lesotho_storage.js"></script>
 <script src="../js/utils/lesotho_translation.js" type="text/javascript"></script>
@@ -90,7 +94,7 @@
             	</button>
 				<span id="headerText" style="left: 50px;">PI LS HTS</span>
 				<div class="headerRightSideControls">
-					<span keyword="page_headerTitle_counsellor">Counsellor</span>: <span name="userFullName"></span>
+					<span keyword="page_headerTitle_referralCoordinator">Referral Coordinator</span>: <span name="userFullName"></span>
 					<span class='saperate'> | </span> <span id="headerOrgUnit"></span> <a href="#" id="headerSettingsLink" style="padding-left:5px;"><img src="../images/settings.png"></a>
 				</div>
 			</div>
@@ -135,7 +139,7 @@
 								<th keyword="todayFU_tableHeader_councilOfResidence">Council of Residence</th>
 								<th keyword="todayFU_tableHeader_facilityReferredTo">Facility Referred to</th>
 								<th keyword="todayFU_tableHeader_cuic">CUIC</th>
-								<th keyword="todayFU_tableHeader_lastAction">Last Action</th>
+								<th keyword="todayFU_tableHeader_nextAction">Next Action</th>
 								<th keyword="todayFU_tableHeader_referralStatus">Referral Status</th>
 							</tr>
 						</thead>
@@ -157,26 +161,64 @@
 				 	
 					<h4 class="headerList"><span id="headerList" keyword="allFU_headerTitle">Clients followed-up for ART Referral</span></h4>
 				    
-				    <table class="table">
-				    	<tr>
-				    		<td><span keyword="allFU_filterBy">Filter by</span>:</td>
-				    		<td>
-				    			<div class="checkbox">
-								  <label><input type="checkbox" value=""> <span keyword="allFU_filterBy_placeOfResidence">Place of Residence</span></label></label>
-								</div>
-							</td>
-				    		<td>
-				    			<div class="checkbox">
-								  <label><input type="checkbox" value=""> <span keyword="allFU_filterBy_facilityReferredTo">Facility Referred to</span></label></label>
-								</div>
-				    		</td>
-				    	</tr>
-				    </table>
+				    <fieldset style="padding:10px; border:1px solid silver; margin-bottom:10px;">
+					    <table style="width: 100%;">
+					    	<tr>
+					    		<th><span keyword="allFU_filterByOptions" style="vertical-align: middle;">Options</span>:</th>
+					    		<td>
+					    			<div class="checkbox">
+									  <label><input type="checkbox" id="filterCurUserCasesChk"> <span keyword="allFU_filterByOptions_onlyShowMyCases">Only show my cases</span></label></label>
+									</div>
+								</td>
+								<td>
+					    			<div class="checkbox">
+									  <label><input type="checkbox" id="filterClosedCasesChk"> <span keyword="allFU_filterByOptions_showClosedCases">Show close cases</span></label></label>
+									</div>
+								</td>
+					    	</tr>
+					    	<tr>
+					    		<th><span keyword="allFU_filterBy"  style="vertical-align: middle;">Filter by</span>:</th>
+					    		<td>
+					    			<div class="checkbox">
+									  <label><input type="checkbox" value="placeOfResidenceChk"> <span keyword="allFU_filterBy_placeOfResidence">Place of Residence</span></label></label>
+									</div>
+								</td>
+					    		<td>
+					    			<div class="checkbox">
+									  <label><input type="checkbox" value=""> <span keyword="allFU_filterBy_facilityReferredTo">Facility Referred to</span></label></label>
+									</div>
+					    		</td>
+					    	</tr>
+					    	
+					    </table>
+					    
+					    <!-- Filter by District/Council -->
+					    <table style="width: 100%;">
+					    	<col width="50%"/>
+					    	<col width="50%"/>
+					    	
+					    	<tr style="background-color:#dedede; height:35px;">
+					    		<th keyword="allFU_filterBy_district">District</td>
+					    		<th keyword="allFU_filterBy_council">Council</td>
+					    	</tr>
+					    	
+					    	<tbody>
+					    		<tr>
+					    			<td style="vertical-align: top;"><div style="overflow: auto;height: 280px;"><table id="districtFilterTb"  style="width:100%"></table></div></td>
+					    			<td style="vertical-align: top;"><div style="overflow: auto;height: 280px;"><table id="councilFilterTb" style="width:100%"></table></div></td>
+					    		</tr>
+					    	</tbody>
+					    </table>
 				    
+				    </fieldset>
+				    
+				    <!-- List all cases -->
 					<table id="allFUTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
 						<thead>
 							<tr style="background-color:#cfe2f3">
-								<th keyword="allFU_tableHeader_date">Date</th>
+								<th keyword="allFU_tableHeader_date" style="display:none;">Date</th>
+								<th keyword="allFU_tableHeader_username" style="display:none;">Contact Log Event Username</th>
+								<th keyword="allFU_tableHeader_closureARTEventId" style="display:none;">Closure ART Event Id</th>
 								<th keyword="allFU_tableHeader_councilOfResidence">Council of Residence</th>
 								<th keyword="allFU_tableHeader_facilityReferredTo">Facility Referred to</th>
 								<th keyword="allFU_tableHeader_cuic">CUIC</th>

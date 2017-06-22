@@ -1,11 +1,11 @@
 
-function SearchClientManagement( _mainPage, _metaData, _searchType )
+function SearchClientManagement( _mainPage, _metaData, _appPage )
 {
 	var me = this;
 	
 	me.mainPage = _mainPage;
 	me.metaData = _metaData;
-	me.searchType = _searchType;
+	me.appPage = _appPage;
 	me.storageObj = me.mainPage.storageObj;
 	me.translationObj = me.mainPage.translationObj;
 	me.validationObj = me.mainPage.validationObj;
@@ -46,6 +46,13 @@ function SearchClientManagement( _mainPage, _metaData, _searchType )
 		me.createSearchClientForm();
 		
 		me.setUp_Events();
+		
+		// Not allow coordinator to add a new client
+		if( me.appPage == Commons.APPPAGE_COORDINATOR )
+		{
+			me.searchResultKeyTag.hide();
+			me.showAddNewClientFormTag.hide();
+		}
 		
 	};
 	
@@ -351,10 +358,12 @@ function SearchClientManagement( _mainPage, _metaData, _searchType )
 	
 	me.searchClients = function( jsonQuery, event, exeFunc )
 	{
+		var searchKey = ( me.appPage == Commons.APPPAGE_COORDINATOR ) ? "positive" : "all";
+		
 		$.ajax(
 			{
 				type: "POST"
-				,url: "../client/search?searchType=" + me.searchType
+				,url: "../client/search?searchType=" + searchKey
 				,dataType: "json"
 				,data: JSON.stringify( jsonQuery )
 	            ,contentType: "application/json;charset=utf-8"

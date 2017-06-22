@@ -34,7 +34,13 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.headerRightSideControlsTag = $("div.headerRightSideControls");
 	me.mainContentTags = $("div.mainContent");
 	
+	me.attr_District = "qynN2cqRe71";
+	me.attr_Council = "NLNTtpbT3c5";
+	
 	me.metaData;
+	me.filterDistricts;
+	me.filterCouncils;
+	
 	
 	me.userInfoLoaded = false;
 	me.metadataLoaded = false;
@@ -218,6 +224,29 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 			,success: function( jsonData ) 
 			{
 				me.metaData = jsonData;
+				
+				// Look for option values of District/Council for filtering
+				var attrGroups = jsonData.attGroups.trackedEntityAttributeGroups;
+				for( var i in attrGroups )
+				{
+						
+					var attributeList = attrGroups[i].trackedEntityAttributes;
+					for( var j in attributeList )
+					{
+						
+						// STEP 2.1. Check if attribute in the groups exists in program-attribute
+						
+						if( attributeList[j].id === me.attr_District )
+						{
+							me.filterDistricts = attributeList[j].optionSet.options;
+						}
+						else if( attributeList[j].id === me.attr_Council )
+						{
+							me.filterCouncils = attributeList[j].optionSet.options;
+						}
+					}
+				}
+				
 				
 				// Populate orgunit list in 'Settings'
 				

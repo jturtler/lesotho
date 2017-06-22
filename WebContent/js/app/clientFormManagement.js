@@ -2220,8 +2220,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		// Hide [Partner HIV Status]
 		me.setHideLogicTag( me.getDataElementField( me.de_PartnerHIVStatus ).closest("tr"), true );
 		
-		// Set init data values
-		me.setUp_InitDataValues();
+//		// Set init data values
+//		me.setUp_InitDataValues();
 		me.showOpeningTag = false;
 		
 		
@@ -2802,6 +2802,34 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		
 		// --------------------------------------------------------------------------
+		// Init [Time since last test in months]
+		
+		var timeSinceLastTestTag = me.getDataElementField( me.de_TimeSinceLastTest );
+		if( timeSinceLastTestTag.val() == "" )
+		{
+			var prevHIVTestDate = "";
+			var latestHIVTestEvent = me.previousTestsTag.find("table").find("tbody[eventid]:first");
+			var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
+			if( latestHIVTestEvent.length > 0 )
+			{
+				prevHIVTestDate = latestHIVTestEvent.attr("eventDate");
+				prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
+			}
+			else if( jsonClient != undefined )
+			{
+				prevHIVTestDate = me.getAttributeValue( jsonClient, me.attr_DateLastHIVTest );
+				prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
+			}
+			
+			if( prevHIVTestDate != "" )
+			{
+				var noMonth = Util.getMonthsBetweenDates( Util.convertDateStrToObject( prevHIVTestDate ), new Date() );
+				timeSinceLastTestTag.val( noMonth );
+			}
+		}
+
+		
+		// --------------------------------------------------------------------------
 		
 		me.setUp_DataEntryFormInputTagEvent();
 	};
@@ -3253,7 +3281,6 @@ function ClientFormManagement( _mainPage, _metaData )
 		}
 
 		
-		
 		// ---------------------------------------------------------------------------------------
 		// Set up HIV Testing event data
 		
@@ -3489,8 +3516,9 @@ function ClientFormManagement( _mainPage, _metaData )
 
 			if( finalHIVTestValue == "Positive" && artValue == "true" && testResultGivenValue == "true" )
 			{
-				// STEP 2. Force user to enter data for [Contact Log] attribute values
 				var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
+				
+				// STEP 2. For [Coordinator] 
 				if( consentToContactTag.val() != "" )
 				{
 					me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
@@ -3791,33 +3819,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		// Set data values based on client attribute values
 		me.setUp_InitDataValues();
 		
-		// --------------------------------------------------------------------------
-		// Init [Time since last test in months]
 		
-		var timeSinceLastTestTag = me.getDataElementField( me.de_TimeSinceLastTest );
-		if( timeSinceLastTestTag.val() == "" )
-		{
-			var prevHIVTestDate = "";
-			var latestHIVTestEvent = me.previousTestsTag.find("table").find("tbody[eventid]:first");
-			var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
-			if( latestHIVTestEvent.length > 0 )
-			{
-				prevHIVTestDate = latestHIVTestEvent.attr("eventDate");
-				prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
-			}
-			else if( jsonClient != undefined )
-			{
-				prevHIVTestDate = me.getAttributeValue( jsonClient, me.attr_DateLastHIVTest );
-				prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
-			}
-			
-			if( prevHIVTestDate != "" )
-			{
-				var noMonth = Util.getMonthsBetweenDates( Util.convertDateStrToObject( prevHIVTestDate ), new Date() );
-				timeSinceLastTestTag.val( noMonth );
-			}
-		}
-
 		me.checkAndShowCheckedIconForPartnerCUICTag();
 		me.setUp_PartnerInfor( partnerData );
 
@@ -4189,9 +4191,6 @@ function ClientFormManagement( _mainPage, _metaData )
 					}
 				});
 			}
-			
-			
-			"NA"
 		}
 	};
 

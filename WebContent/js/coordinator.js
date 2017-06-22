@@ -61,7 +61,7 @@ function Coordinator( storageObj, translationObj )
 		
 		me.settingsManagement = new SettingsManagement( me, function( metaData ){
 			me.clientFormManagement = new ClientFormManagement( me, metaData );
-			me.searchClientManagement = new SearchClientManagement( me, metaData, "positive" );
+			me.searchClientManagement = new SearchClientManagement( me, metaData, Commons.APPPAGE_COORDINATOR );
 			me.listManagement = new CoordinatorListManagement( me );
 			me.reportManagement = new CoordinatorReportManagement( me );
 			me.checkAndLoadDataAfterInit();
@@ -322,7 +322,7 @@ function Coordinator( storageObj, translationObj )
 	// Populate data and Setup events for components in HTML page
 	
 	me.checkAndLoadDataAfterInit = function()
-	{
+	{	
 		var page = me.storageObj.getItem( "page" );
 		if( page == "" )
 		{
