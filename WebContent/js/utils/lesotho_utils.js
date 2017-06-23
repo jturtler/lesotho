@@ -175,6 +175,15 @@ Util.getCheckedInputValues = function( formTag )
 	return checkedVals;
 };
 
+Util.getCheckedInputTexts = function( formTag )
+{
+	var checkedTexts = formTag.find('input:checkbox:checked').map(function() {
+	    return $(this).closest("tr").find("td:first").html();
+	}).get();
+	
+	return checkedTexts;
+};
+
 // Generate JSON data in client form / event form
 
 Util.getArrayJsonData = function( key, formTag, isGetEmptyValue )

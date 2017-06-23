@@ -30,12 +30,19 @@ function CoordinatorListManagement( _mainPage )
 	me.filterCurUserCasesChkTag = $("#filterCurUserCasesChk");
 	me.filterClosedCasesChkTag = $("#filterClosedCasesChk");
 	me.placeOfResidenceChkTag = $("#placeOfResidenceChk");
-	
+
+	me.ouFilterTbTag = $("#ouFilterTb");
+	me.ouFilterInforTag = $("#ouFilterInfor");
+	me.ouFilterHeaderTrTag = $("#ouFilterHeaderTr");
 	me.districtFilterTbTag = $("#districtFilterTb");
 	me.councilFilterTbTag = $("#councilFilterTb");
+	me.districtFilterInfoTag = $("#districtFilterInfo");
+	me.councilFilterInfoTag = $("#councilFilterInfo");
+	
 	
 
 	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
+	
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Init method
@@ -45,6 +52,7 @@ function CoordinatorListManagement( _mainPage )
 	{
 		me.createDistrictFilter();
 		me.createCouncilFilter();
+		me.setFilterDataInfo();
 		
 		me.setUp_Events();
 	};
@@ -94,7 +102,6 @@ function CoordinatorListManagement( _mainPage )
 		me.registerClientBtnTag.css({top: height, left: width, position:'fixed'});
 	};
 	
-
 	me.setUp_Events_Filter = function()
 	{
 		me.districtFilterTbTag.find("input").click( function(){
@@ -106,6 +113,33 @@ function CoordinatorListManagement( _mainPage )
 		me.filterCurUserCasesChkTag.click( me.filterEvents );
 		me.filterClosedCasesChkTag.click( me.filterEvents );
 		me.placeOfResidenceChkTag.click( me.filterEvents );
+		
+		
+		me.ouFilterHeaderTrTag.click( function(){
+			
+			var imgTag = me.ouFilterHeaderTrTag.find("img");
+			var closed = imgTag.hasClass("arrowRightImg");
+			
+			// Show the filter table
+			if( closed )
+			{
+				imgTag.attr( "src", "../images/down.gif" );
+				imgTag.addClass('arrowDownImg');
+				imgTag.removeClass('arrowRightImg');
+				me.ouFilterTbTag.show("fast");
+				me.ouFilterInforTag.hide();
+			}
+			// Hide the filter table
+			else
+			{
+				imgTag.attr( "src", "../images/tab_right.png" );
+				imgTag.removeClass('arrowDownImg');
+				imgTag.addClass('arrowRightImg');
+				me.ouFilterTbTag.hide();
+				me.setFilterDataInfo();
+				me.ouFilterInforTag.show("fast");
+			}
+		})
 	};
 	
 	
@@ -132,7 +166,7 @@ function CoordinatorListManagement( _mainPage )
 		var noneFilter = me.translationObj.getTranslatedValueByKey( "allFU_filterBy_ouNone" );
     	
 		var emptyRowTag = $( "<tr filter='none'></tr>" );
-		emptyRowTag.append( "<td>" + noneFilter + "</td>" );
+		emptyRowTag.append( "<td style='font-style:italic;'>[" + noneFilter + "]</td>" );
 		emptyRowTag.append( "<td></td>" );
 		me.councilFilterTbTag.append( emptyRowTag );
 		
@@ -178,6 +212,8 @@ function CoordinatorListManagement( _mainPage )
 		me.mainPage.setCurrentPage( me.mainPage.PAGE_ALL_FU_LIST );
 		me.storageObj.addItem("page", me.PAGE_ALL_FU_LIST);
 		me.storageObj.removeItem( "subPage" );
+		
+		me.resetOrgUnitFilter();
 		
 		me.listCases( "../event/allFU", function( list ){
 			me.populateAllFUData( list )
@@ -497,6 +533,46 @@ function CoordinatorListManagement( _mainPage )
 		me.councilFilterTbTag.find("tr").hide();
 		me.councilFilterTbTag.find("tr[filter='none']").show();
 	};
+	
+
+	me.setFilterDataInfo = function()
+	{
+		var districts = Util.getCheckedInputTexts( me.districtFilterTbTag );
+		var councils = Util.getCheckedInputTexts( me.councilFilterTbTag );
+		var noneFilter = "[" + me.translationObj.getTranslatedValueByKey( "allFU_filterBy_ouNone" ) + "]";
+		
+		me.districtFilterInfoTag.html( noneFilter );
+		me.councilFilterInfoTag.html( noneFilter );
+		
+		if( districts.length > 0 )
+		{
+			me.districtFilterInfoTag.html( districts.join("; ") );
+		}
+		
+		if( councils.length > 0 )
+		{
+			me.councilFilterInfoTag.html( councils.join("; ") );
+		}
+	};
+	
+	me.resetOrgUnitFilter = function()
+	{
+		me.filterCurUserCasesChkTag.prop("checked", false );
+		me.filterClosedCasesChkTag.prop("checked", false );
+		me.placeOfResidenceChkTag.prop("checked", false );
+		me.districtFilterTbTag.find('input:checkbox:checked').prop("checked", false );
+		me.councilFilterTbTag.find('input:checkbox:checked').prop("checked", false );
+		
+		// Collapse OU filter table
+		var imgTag = me.ouFilterHeaderTrTag.find("img");
+		imgTag.attr( "src", "../images/tab_right.png" );
+		imgTag.removeClass('arrowDownImg');
+		imgTag.addClass('arrowRightImg');
+		me.ouFilterTbTag.hide();
+		me.setFilterDataInfo();
+		me.ouFilterInforTag.show("fast");
+	};
+	
 	
 	// -------------------------------------------------------------------------
 	// RUN init method

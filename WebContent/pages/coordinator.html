@@ -155,57 +155,70 @@
 				</div>
 				
 				
+				<!-- ------------------------------------------------------- -->
 				<!-- All F/U -->
 				
 				<div id="allFUList" style="display:none;" class="mainContent">
 				 	
 					<h4 class="headerList"><span id="headerList" keyword="allFU_headerTitle">Clients followed-up for ART Referral</span></h4>
 				    
-				    <fieldset style="padding:10px; border:1px solid silver; margin-bottom:10px;">
+				    <fieldset style="padding:10px; border:1px solid silver; margin-bottom:15px;background-color: #f9f9f9;">
 					    <table style="width: 100%;">
 					    	<tr>
 					    		<th><span keyword="allFU_filterByOptions" style="vertical-align: middle;">Options</span>:</th>
 					    		<td>
-					    			<div class="checkbox">
-									  <label><input type="checkbox" id="filterCurUserCasesChk"> <span keyword="allFU_filterByOptions_onlyShowMyCases">Only show my cases</span></label></label>
+					    			<div>
+									  <label><input type="checkbox" id="filterCurUserCasesChk"> <span keyword="allFU_filterByOptions_onlyShowMyCases" style="font-weight:normal;">Only show my cases</span></label></label>
 									</div>
 								</td>
 								<td>
-					    			<div class="checkbox">
-									  <label><input type="checkbox" id="filterClosedCasesChk"> <span keyword="allFU_filterByOptions_showClosedCases">Show close cases</span></label></label>
+					    			<div>
+									  <label><input type="checkbox" id="filterClosedCasesChk"> <span keyword="allFU_filterByOptions_showClosedCases" style="font-weight:normal;">Show close cases</span></label></label>
 									</div>
 								</td>
 					    	</tr>
 					    	<tr>
 					    		<th><span keyword="allFU_filterBy"  style="vertical-align: middle;">Filter by</span>:</th>
 					    		<td>
-					    			<div class="checkbox">
-									  <label><input type="checkbox" value="placeOfResidenceChk"> <span keyword="allFU_filterBy_placeOfResidence">Place of Residence</span></label></label>
+					    			<div>
+									  <label><input type="radio" value="placeOfResidenceChk" checked> <span keyword="allFU_filterBy_placeOfResidence" style="font-weight:normal;">Place of Residence</span></label></label>
 									</div>
 								</td>
-					    		<td>
-					    			<div class="checkbox">
-									  <label><input type="checkbox" value=""> <span keyword="allFU_filterBy_facilityReferredTo">Facility Referred to</span></label></label>
+					    		<td style="display:none;">
+					    			<div>
+									  <label><input type="radio" value=""> <span keyword="allFU_filterBy_facilityReferredTo" style="font-weight:normal;">Facility Referred to</span></label></label>
 									</div>
 					    		</td>
 					    	</tr>
 					    	
 					    </table>
 					    
+					    
 					    <!-- Filter by District/Council -->
+					    
 					    <table style="width: 100%;">
 					    	<col width="50%"/>
 					    	<col width="50%"/>
 					    	
-					    	<tr style="background-color:#dedede; height:35px;">
-					    		<th keyword="allFU_filterBy_district">District</td>
+					    	<tr style="background-color:#dedede; height:35px;" id="ouFilterHeaderTr">
+					    		<th>
+					    			<img style="float:left" class="arrowRightImg" src="../images/tab_right.png">
+					    			<span keyword="allFU_filterBy_district">District</span>
+					    		</td>
 					    		<th keyword="allFU_filterBy_council">Council</td>
 					    	</tr>
 					    	
-					    	<tbody>
+					    	<tbody id="ouFilterTb" style="display:none;">
 					    		<tr>
 					    			<td style="vertical-align: top;"><div style="overflow: auto;height: 280px;"><table id="districtFilterTb"  style="width:100%"></table></div></td>
 					    			<td style="vertical-align: top;"><div style="overflow: auto;height: 280px;"><table id="councilFilterTb" style="width:100%"></table></div></td>
+					    		</tr>
+					    	</tbody>
+					    	
+					    	<tbody id="ouFilterInfor">
+					    		<tr>
+					    			<td id="districtFilterInfo" style="font-style:italic;"></td>
+					    			<td id="councilFilterInfo" style="font-style:italic;"></td>
 					    		</tr>
 					    	</tbody>
 					    </table>
@@ -236,7 +249,8 @@
 				</div>
 
 				<!--  END All F/U -->
-
+				<!-- ------------------------------------------------------- -->
+				
 				
 				
 				<!-- Search and Create Client FORM -->
