@@ -248,7 +248,7 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 						alert( tranlatedText );
 					}
 				} else {
-					me.showExpireSessionMessage();					
+					me.mainPage.settingsManagement.showExpireSessionMessage();					
 				}
 			});
 		}

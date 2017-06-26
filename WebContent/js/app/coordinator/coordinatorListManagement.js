@@ -87,8 +87,8 @@ function CoordinatorListManagement( _mainPage )
 		
 		me.registerClientBtnTag.click(function(){
 			Util.resetPageDisplay();
-			me.mainPage.clientFormManagement.resetSearchClientForm();
-			me.mainPage.clientFormManagement.showSearchClientForm();
+			me.mainPage.searchClientManagement.resetSearchClientForm();
+			me.mainPage.searchClientManagement.showSearchClientForm();
 		});
 		
 		me.setUp_Events_Filter();
@@ -544,13 +544,11 @@ function CoordinatorListManagement( _mainPage )
 		me.districtFilterInfoTag.html( noneFilter );
 		me.councilFilterInfoTag.html( noneFilter );
 		
-		if( districts.length > 0 )
-		{
+		if( districts.length > 0 ){
 			me.districtFilterInfoTag.html( districts.join("; ") );
 		}
 		
-		if( councils.length > 0 )
-		{
+		if( councils.length > 0 ){
 			me.councilFilterInfoTag.html( councils.join("; ") );
 		}
 	};

@@ -1,12 +1,4 @@
 
-// ---------------------------------------------------------------------------------------- 
-// CLEARABLE INPUT
-// ----------------------------------------------------------------------------------------
-
-/**
- * @param storageObj
- * @param translationObj
- */
 
 function ClientFormManagement( _mainPage, _metaData )
 {
@@ -345,7 +337,7 @@ function ClientFormManagement( _mainPage, _metaData )
 
 			
 		me.saveClientRegBtnTag.click(function(){
-			me.saveClient( me.addClientFormTag );
+			me.saveClient( me.addClientFormTag, undefined, undefined, true );
 		});
 		
 		me.discardClientRegFormBtnTag.click(function(){
@@ -518,14 +510,13 @@ function ClientFormManagement( _mainPage, _metaData )
 				
 				me.setAndSaveARTLinkageStatusAttrValue( function(){
 					
-					// Generate [Time Elapsed] attribute value for [ART Closure] form
-					me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( "00:00" );
-					
 					var artClosureEvent = me.artReferCloseFormTag.attr("event");
 					if( artClosureEvent !== undefined )
 					{
 						artClosureEvent = JSON.parse( artClosureEvent );
 					}
+					
+					// Generate [Time Elapsed] attribute value for [ART Closure] form
 					me.populateTimeElapsed( response, artClosureEvent );
 					
 					me.artReferCloseFormTag.show();
@@ -680,9 +671,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.getDataElementField( me.de_Layer ).change( me.setUp_OtherReasonTagLogic );
 		
 		// BMI
-		me.getDataElementField( me.de_BMI ).change( function(){
-			me.setUp_DataElementBMI();
-		});
+		me.getDataElementField( me.de_Height ).change( me.setUp_DataElementBMI );
+		me.getDataElementField( me.de_Weight ).change( me.setUp_DataElementBMI );
 		
 		// -----------------------------------------------------------------------------------------
 		// Set up events for buttons
@@ -1575,30 +1565,79 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	me.createDataEntryForm = function()
 	{
-		// STEP 0. Create the header for active event
+		// ---------------------------------------------------------------------
+		// STEP 0. Create the [Created by] message for active event
+		// ---------------------------------------------------------------------
 		
 		var translatedByText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_thisTest_msg_createdBy" );	
 		me.addEventFormTag.closest("form").prepend( "<div id='activeEventHeader' class='testMsg'>" + translatedByText + " '<span>" + me.userFullNameTag.html() + "</span>'</div>" );
 		
 		
-		// STEP 1. Create the [Entry form] table
+		// ---------------------------------------------------------------------
+		// STEP 1. Create the [Entry form] tables
+		// ---------------------------------------------------------------------
 		
 		me.generateDataEntryFormTable( me.addEventFormTag, me.stage_HIVTesting );
 		me.generateDataEntryFormTable( me.artReferOpenFormTag, me.stage_ARTReferralOpenning );
 		me.generateDataEntryFormTable( me.artReferCloseFormTag, me.stage_ARTReferralClosure );
 		
 		
-		// Add details icon for Partner CUIC tag
+		// ---------------------------------------------------------------------
+		// [New Test] Tab
+		// ---------------------------------------------------------------------
+		
+		// Set readonly for [auto-fill-data] fields
+		Util.readonlyTag( me.getDataElementField( me.de_partnerCUIC ), true );
+		Util.readonlyTag( me.getDataElementField( me.de_CoupleStatus ), true );
+		Util.readonlyTag( me.getDataElementField( me.de_Age ), true );
+		Util.readonlyTag( me.getDataElementField( me.de_BMI ), true );
+		Util.readonlyTag( me.getDataElementField( me.de_TimeSinceLastTest ), true );
+		
+		
+		// Disable some DEs in form. Will add logic for these DE by using 'change' event		
+		var resultTest1Tag = me.getDataElementField( me.de_Testing_ResultTest1 );
+		var resultTest2Tag = me.getDataElementField( me.de_Testing_ResultTest2 );
+		var resultTestParallel1Tag = me.getDataElementField( me.de_Testing_ResultParallel1 );
+		var resultTestParallel2Tag = me.getDataElementField( me.de_Testing_ResultParallel2 );
+		var resultTestResultSDBiolineTag = me.getDataElementField( me.de_Testing_ResultSDBioline );
+		var resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
+		
+		if( resultTest1Tag.length > 0 && resultTest2Tag.length > 0 && resultTestParallel1Tag.length > 0 
+				&& resultTestParallel2Tag.length > 0 && resultTestResultSDBiolineTag.length > 0 
+				&& resultFinalHIVStatusTag.length > 0 )
+		{
+			 me.addClientFormTabTag.attr("addedLogic", true );
 
+			 // Add "mandatory" validation for "Test 1" field
+			 
+			 me.addMandatoryForField( resultTest1Tag );
+
+			 Util.disableTag( resultFinalHIVStatusTag, true ); 
+			 me.addMandatoryForField( resultFinalHIVStatusTag );
+		}
+		else
+		{
+			me.addClientFormTabTag.attr("addedLogic", false );
+		}
+		
+		// ---------------------------------------------------------------------
+		// Partner information
+		
+		// Add details icon for Partner CUIC tag
 		var imgTag = $( "<span class='glyphicon glyphicon-ok form-control-feedback partnerDetails' style='color:green;padding-top: 8px;padding-right: 10px;'></span>"  );
 		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
 		partnerCUICTag.closest( "td" ).append( imgTag );
 		partnerCUICTag.closest( "td" ).css( "position", "relative" );
 		
-		// Set [Client partner Event UID] field hidden
+		// Set [Partner Event UID] field hidden
 		var partnerEventIdTag = me.getDataElementField( me.de_PartnerEventId );
 		partnerEventIdTag.attr( "type", "hidden" );
 		partnerEventIdTag.closest("tr").find("td").hide();
+		
+		
+		// ---------------------------------------------------------------------
+		// [Contact Log] tab
+		// ---------------------------------------------------------------------
 		
 		// Generate data elements for [Contact Log] event form
 		for( var i in me.contactLogDeList )
@@ -1617,7 +1656,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		}
 		
 		
-		// [Contact Log] event form - Add "DATE" picker for "Date" field
+		// Add "DATE" picker for "Date" field
 		me.addContactLogEventFormTag.find("input[isDate='true']").each(function(){
 			if( $(this).attr("dataelement") == me.de_DueDate )
 			{
@@ -1630,8 +1669,9 @@ function ClientFormManagement( _mainPage, _metaData )
 		});
 		
 		
-		// -------------------------------------------------------------------------------------------------
+		// ---------------------------------------------------------------------
 		// [ART Opening] form
+		// ---------------------------------------------------------------------
 		
 		// Set autocompleted for [Referral facility name]
 		var referralFacilityNameTag = me.getDataElementField( me.de_ARTOpen_ReferralFacilityName );
@@ -1660,8 +1700,10 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.addMandatoryForField( $(this) );
 		});
 		
-		// -------------------------------------------------------------------------------------------------
+		
+		// ---------------------------------------------------------------------
 		// [ART Closure] form
+		// ---------------------------------------------------------------------
 		
 		// Resolve [ART Closure] entry forms
 		me.mergeARTAttributeFormAndEntryForm( me.artReferCloseFormTag );
@@ -1674,13 +1716,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.artReferCloseFormTag.find("input[attribute],select[attribute]").each(function(){
 			me.addMandatoryForField( $(this) );
 		});
-		
-		
+				
 		//Add "DATE" picker for "Date" field
 		me.artReferCloseFormTag.find("input[isDate='true']").each(function(){
 			Util.datePicker( $(this) );
 		});
-		
 		
 		// Linkage Status event
 		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
@@ -1688,7 +1728,6 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.setUp_ARTClosureForm();
 			
 		});
-		
 
 		// Add event for [Referral facility name]
 		var closeReferralFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
@@ -1704,33 +1743,6 @@ function ClientFormManagement( _mainPage, _metaData )
 			}
 		});
 
-		
-		// STEP 2. Disable some DEs in form. Will add login for these DE in 'change' event
-		
-		var resultTest1Tag = me.getDataElementField( me.de_Testing_ResultTest1 );
-		var resultTest2Tag = me.getDataElementField( me.de_Testing_ResultTest2 );
-		var resultTestParallel1Tag = me.getDataElementField( me.de_Testing_ResultParallel1 );
-		var resultTestParallel2Tag = me.getDataElementField( me.de_Testing_ResultParallel2 );
-		var resultTestResultSDBiolineTag = me.getDataElementField( me.de_Testing_ResultSDBioline );
-		var resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
-		
-		if( resultTest1Tag.length > 0 && resultTest2Tag.length > 0 && resultTestParallel1Tag.length > 0 
-				&& resultTestParallel2Tag.length > 0 && resultTestResultSDBiolineTag.length > 0 
-				&& resultFinalHIVStatusTag.length > 0 )
-		{
-			 me.addClientFormTabTag.attr("addedLogic", true );
-
-			 // Add "mandatory" validation for "Test 1" field
-			 
-			 me.addMandatoryForField( resultTest1Tag );
-
-			 Util.disableTag( resultFinalHIVStatusTag, true ); 
-			 me.addMandatoryForField( resultFinalHIVStatusTag );
-		}
-		else
-		{
-			me.addClientFormTabTag.attr("addedLogic", false );
-		}
 		
 	};
 
@@ -2173,14 +2185,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		Util.disableTag( me.resultTestParallel2Tag, true );
 		Util.disableTag( me.resultTestResultSDBiolineTag, true );
 		Util.disableTag( me.resultFinalHIVStatusTag, true );
-		
-		Util.disableTag( me.getDataElementField( me.de_partnerCUIC ), true );
-		Util.disableTag( me.getDataElementField( me.de_CoupleStatus ), true );
-		Util.disableTag( me.getDataElementField( me.de_Age ), true );
-		Util.disableTag( me.getDataElementField( me.de_BMI ), true );
-		Util.disableTag( me.getDataElementField( me.de_TimeSinceLastTest ), true );
-		
-		
+				
 		// Reset values in the form
 		
 		Util.resetForm( me.thisTestDivTag );
@@ -2220,8 +2225,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		// Hide [Partner HIV Status]
 		me.setHideLogicTag( me.getDataElementField( me.de_PartnerHIVStatus ).closest("tr"), true );
 		
-//		// Set init data values
-//		me.setUp_InitDataValues();
+		// Set init data values
 		me.showOpeningTag = false;
 		
 		
@@ -2724,6 +2728,10 @@ function ClientFormManagement( _mainPage, _metaData )
 					// ASSIGN [Individual Test] value for data element [Client type]
 					clientTypeTag.val( "LS_SER1" );
 					Util.disableTag( clientTypeTag, true );
+				}
+				else
+				{
+					Util.disableTag( clientTypeTag, false );
 				}
 			}
 			else
@@ -3473,7 +3481,7 @@ function ClientFormManagement( _mainPage, _metaData )
  	 		me.artEventInfoTbTag.find("span.timeClientReferredARTOn").html( daysElapsed );
  	 		
  	 		// Generate [Time elapse] attribute value for [ART Closure] form
- 	 		var timeElapsed = Util.getTimeElapsed( openingEventDate, closureEventDate );
+ 	 		var timeElapsed = Util.getDaysElapsed( openingEventDate, closureEventDate );
  			me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( timeElapsed );
  		}
  		else

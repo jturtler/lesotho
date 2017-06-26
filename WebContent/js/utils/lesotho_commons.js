@@ -1,8 +1,8 @@
 
 function Commons() {}
 
-Commons.VERSION = "v0.31";
-Commons.VERSION_DATE = "Jun 23 2017";
+Commons.VERSION = "v0.32";
+Commons.VERSION_DATE = "Jun 26 2017";
 
 Commons.dateFormat = "DD MMM YYYY";
 Commons.dateTimeFormat = "YYYY-MM-DD HH:mm";

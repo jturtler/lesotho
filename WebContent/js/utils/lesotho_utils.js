@@ -38,7 +38,42 @@ Util.disableTag = function( tag, isDisable )
 			}
 			else
 			{
-				element.css( 'background-color', 'white' ).css( 'cursor', '' ).css( 'color', '' );;
+				element.css( 'background-color', 'white' ).css( 'cursor', '' ).css( 'color', '' );
+				if( element.prop( "tagName" ) == 'BUTTON' && element.find("span").length > 0  )
+				{
+					element.find("span").css( 'color', '' );
+				}
+			}
+		}
+	}
+};
+
+
+Util.readonlyTag = function( tag, isReadonly )
+{
+	
+	for( var i=0; i<tag.length; i++ )
+	{
+		var element = $(tag[i]);
+		if( element.prop( "tagName" ) == 'SELECT' || element.prop( "tagName" ) == 'INPUT' || element.prop( "tagName" ) == 'BUTTON' )
+		{
+			if( isReadonly )
+			{
+				tag.prop( 'readonly', isReadonly );
+				element.css( 'background-color', '#FAFAFA' ).css( 'cursor', 'auto' );
+				if( element.prop( "tagName" ) == 'BUTTON' && element.find("span").length > 0  )
+				{
+					element.find("span").css( 'color', 'gray' );
+				}
+				else
+				{
+					element.css( 'color', 'gray' );
+				}
+			}
+			else
+			{
+				tag.removeAttr( 'readonly' );
+				element.css( 'background-color', 'white' ).css( 'cursor', '' ).css( 'color', '' );
 				if( element.prop( "tagName" ) == 'BUTTON' && element.find("span").length > 0  )
 				{
 					element.find("span").css( 'color', '' );
@@ -554,6 +589,22 @@ Util.getDaysTimeElapsed = function( date1, date2 )
 	
 	return noDays + "d " + noHours + "h";
 };
+
+
+Util.getDaysElapsed = function( date1, date2 )
+{
+	var diff = date2.valueOf() - date1.valueOf();
+	var diffInHours = Math.floor( diff/1000/60/60 ); // Convert milliseconds to hours
+	
+	var noDays = Math.floor( diffInHours/24 );
+	noDays = ( noDays < 10 ) ? "0" + noDays : noDays;
+	
+	var noHours = diffInHours - ( 24 * noDays ); 
+//	noHours = ( noHours < 10 ) ? "0" + noHours : noHours;
+	
+	return noDays + "d";
+};
+
 
 Util.getTimeElapsed = function( date1, date2 )
 {

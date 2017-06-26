@@ -77,6 +77,9 @@ function LoginForm( storageObj, translationObj )
 			{
 				me.userNameTag.val( "TES001" ).css( 'background-color', '' );
 				me.passwordTag.val( '1234' ).css( 'background-color', '' );
+				
+				me.userNameTag.closest("div").find("errorMsg").remove();
+				me.passwordTag.closest("div").find("errorMsg").remove();
 			}
 			, 300 );				
 		});	
@@ -94,6 +97,9 @@ function LoginForm( storageObj, translationObj )
 			{
 				me.userNameTag.val( "TES002" ).css( 'background-color', '' );
 				me.passwordTag.val( '1234' ).css( 'background-color', '' );
+				
+				me.userNameTag.closest("div").find("errorMsg").remove();
+				me.passwordTag.closest("div").find("errorMsg").remove();
 			}
 			, 300 );				
 		});	
