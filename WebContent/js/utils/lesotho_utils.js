@@ -49,37 +49,13 @@ Util.disableTag = function( tag, isDisable )
 };
 
 
-Util.readonlyTag = function( tag, isReadonly )
+Util.readonlyTag = function( tag )
 {
-	
+	Util.disableTag( tag, true );
 	for( var i=0; i<tag.length; i++ )
 	{
 		var element = $(tag[i]);
-		if( element.prop( "tagName" ) == 'SELECT' || element.prop( "tagName" ) == 'INPUT' || element.prop( "tagName" ) == 'BUTTON' )
-		{
-			if( isReadonly )
-			{
-				tag.prop( 'readonly', isReadonly );
-				element.css( 'background-color', '#FAFAFA' ).css( 'cursor', 'auto' );
-				if( element.prop( "tagName" ) == 'BUTTON' && element.find("span").length > 0  )
-				{
-					element.find("span").css( 'color', 'gray' );
-				}
-				else
-				{
-					element.css( 'color', 'gray' );
-				}
-			}
-			else
-			{
-				tag.removeAttr( 'readonly' );
-				element.css( 'background-color', 'white' ).css( 'cursor', '' ).css( 'color', '' );
-				if( element.prop( "tagName" ) == 'BUTTON' && element.find("span").length > 0  )
-				{
-					element.find("span").css( 'color', '' );
-				}
-			}
-		}
+		element.attr( 'isReadOnly', true );
 	}
 };
 
@@ -182,7 +158,11 @@ Util.disableForm = function( tag, isDisable )
 {
 	var inputTags = tag.find("input,select,button");
 	inputTags.each( function(){
-		Util.disableTag( $(this), isDisable);
+		console.log($(this).closest("tr").find("td:first").html());
+		if( $(this).attr( 'isReadOnly' ) == undefined )
+		{
+			Util.disableTag( $(this), isDisable);
+		}
 	});
 }
 

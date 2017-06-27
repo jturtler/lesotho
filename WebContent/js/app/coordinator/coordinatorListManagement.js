@@ -24,6 +24,8 @@ function CoordinatorListManagement( _mainPage )
 	me.allFUTblTag = $("#allFUTbl");
 	me.allFUFooterTag = $("#allFUFooter");
 	me.allFUNumberTag = $("#allFUNumber");
+	me.refreshAllFUListTag = $("#refreshAllFUList");
+	me.loadingDivTag = $("#loadingDiv");
 	
 	// Filter
 	
@@ -50,6 +52,10 @@ function CoordinatorListManagement( _mainPage )
 	
 	me.init = function()
 	{
+		// Set title for Refresh icon in [All F/U] list
+		var refreshTitle = me.translationObj.getTranslatedValueByKey( "allFU_refreshIconTitle" );
+    	me.refreshAllFUListTag.attr( "title", refreshTitle );
+		
 		me.createDistrictFilter();
 		me.createCouncilFilter();
 		me.setFilterDataInfo();
@@ -82,7 +88,11 @@ function CoordinatorListManagement( _mainPage )
 			}
 		});
 		
-
+		// Refresh all F/U list
+		me.refreshAllFUListTag.click( function(){
+			me.reloadAllCases();
+		});
+		
 		// Open "Search/Add client" form from "Today Cases" list
 		
 		me.registerClientBtnTag.click(function(){
@@ -193,6 +203,10 @@ function CoordinatorListManagement( _mainPage )
 		me.mainPage.setCurrentPage( me.mainPage.PAGE_TODAY_FU_LIST );
 		me.storageObj.addItem( "page", me.PAGE_TODAY_FU_LIST );
 		me.storageObj.removeItem( "subPage" );		
+
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
+		Util.resetPageDisplay();
+		MsgManager.appBlock( tranlatedText + " ..." );
 		
 		me.todayFUDateTag.html( Util.formatDate_LastNDate(0) );
 		me.listCases( "../event/todayFU", function( list )
@@ -213,34 +227,27 @@ function CoordinatorListManagement( _mainPage )
 		me.storageObj.addItem("page", me.PAGE_ALL_FU_LIST);
 		me.storageObj.removeItem( "subPage" );
 		
-		me.resetOrgUnitFilter();
+		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
+		Util.resetPageDisplay();
+		MsgManager.appBlock( tranlatedText + " ..." );
 		
-		me.listCases( "../event/allFU", function( list ){
-			me.populateAllFUData( list )
-			
-			if( exeFunc !== undefined ) exeFunc();
+		me.loadingDivTag.hide();
+		me.reloadAllCases(function(){
 
 			// Show table	
 			MsgManager.appUnblock();
 			me.allFUTblTag.show();
 			me.allFUListTag.show("fast");
-		} );
+		});
 	};
 		
 	me.listCases = function( url, exeFunc )
 	{
 		me.storageObj.removeItem("param" );
-		
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
-		
-		Util.resetPageDisplay();
-		
-		MsgManager.appBlock( tranlatedText + " ..." );
-		
 		Commons.checkSession( function( isInSession ) 
 		{
 			if( isInSession ) 
-			{
+			{				
 				$.ajax(
 					{
 						type: "POST"
@@ -258,10 +265,25 @@ function CoordinatorListManagement( _mainPage )
 					});
 			} 
 			else {
-				me.showExpireSessionMessage();					
+				me.mainPage.settingsManagement.showExpireSessionMessage();					
 			}
 		});	
 		
+	};
+	
+	me.reloadAllCases = function( exeFunc )
+	{
+		me.loadingDivTag.show();
+		me.allFUTblTag.find("tbody tr").remove();
+		
+		me.listCases( "../event/allFU", function( list ){
+			me.populateAllFUData( list );			
+			me.filterEvents();
+			me.loadingDivTag.hide();
+			
+			if( exeFunc !== undefined ) exeFunc();
+
+		} );
 	};
 	
 	me.populateTodayFU = function( list )
@@ -341,9 +363,10 @@ function CoordinatorListManagement( _mainPage )
 				var eventId = event[1];
 				var eventDate = event[2];
 				var isClosureEvent = ( event[12] != "" ) ? "closed" : "opened";
-				var closureARTEventUsername = event[13];
+//				var closureARTEventUsername = event[13];
 				var contactLogEventUsername = event[14];
-				var username = "[" + closureARTEventUsername + "]-[" + closureARTEventUsername + "]";
+//				var username = "[" + closureARTEventUsername + "]-[" + closureARTEventUsername + "]";
+				var username = contactLogEventUsername;
 				
 				var councilNameAndCode = event[5];
 				var councilName = ( councilNameAndCode != "" ) ? councilNameAndCode.split("***")[0] : "";
@@ -551,24 +574,6 @@ function CoordinatorListManagement( _mainPage )
 		if( councils.length > 0 ){
 			me.councilFilterInfoTag.html( councils.join("; ") );
 		}
-	};
-	
-	me.resetOrgUnitFilter = function()
-	{
-		me.filterCurUserCasesChkTag.prop("checked", false );
-		me.filterClosedCasesChkTag.prop("checked", false );
-		me.placeOfResidenceChkTag.prop("checked", false );
-		me.districtFilterTbTag.find('input:checkbox:checked').prop("checked", false );
-		me.councilFilterTbTag.find('input:checkbox:checked').prop("checked", false );
-		
-		// Collapse OU filter table
-		var imgTag = me.ouFilterHeaderTrTag.find("img");
-		imgTag.attr( "src", "../images/tab_right.png" );
-		imgTag.removeClass('arrowDownImg');
-		imgTag.addClass('arrowRightImg');
-		me.ouFilterTbTag.hide();
-		me.setFilterDataInfo();
-		me.ouFilterInforTag.show("fast");
 	};
 	
 	

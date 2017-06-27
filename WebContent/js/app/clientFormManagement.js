@@ -650,13 +650,15 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.setUp_DataElementPartnerKnowHIVStatusLogic();
 		});
 		
-		// Final HIV Test result
-		me.getDataElementField( me.de_ClientType ).change( function(){
-			me.setUp_DataElementFinalHIVStatusLogic();
+		// Test results given
+		me.getDataElementField( me.de_TestResultsGiven ).change( function(){
+			me.setUp_logicEntryFormWithData();
+			me.setUp_ReferralOfferedLogic();
 		});
 		
 		// Referral offered
 		me.getDataElementField( me.de_Referral_Offered ).change( function(){
+			me.setUp_logicEntryFormWithData();
 			me.setUp_ReferralOfferedLogic();
 		});
 		
@@ -842,11 +844,16 @@ function ClientFormManagement( _mainPage, _metaData )
 				
 				// Generate [Couple Status] data value
 				me.generateCoupleStatusIfAny();
+				
+				// Show [If positive, did client disclose knowledge of previous HIV+ status] if final HIV test is Positive
+				me.setUp_DataElementFinalHIVStatusLogic();
 			}
 			else
 			{
 				me.populateEQCPPTPassedVal();
 			}
+			
+			me.setUp_ReferralOfferedLogic();
 		}
 	};
 	
@@ -992,13 +999,9 @@ function ClientFormManagement( _mainPage, _metaData )
 		}
 		else if( resultFinalHIVStatusTag.val() === "Positive" )
 		{
-			if( testResultsGivenTag.val() == "true" )
-			{
-				// Add mandatory for [Previous knowledge of HIV+ status]
-				me.addMandatoryForField( previousKnowledgeHIVPositiveStatusTag );
-				me.setHideLogicTag( previousKnowledgeHIVPositiveStatusTag.closest("tr"), false );
-			}
-			
+			// Add mandatory for [Previous knowledge of HIV+ status]
+			me.addMandatoryForField( previousKnowledgeHIVPositiveStatusTag );
+			me.setHideLogicTag( previousKnowledgeHIVPositiveStatusTag.closest("tr"), false );
 		}
 		
 	};
@@ -1013,8 +1016,12 @@ function ClientFormManagement( _mainPage, _metaData )
 		var coupleStatusTag = me.getDataElementField( me.de_CoupleStatus );
 		if( clientTypeTag.val() == "LS_SER2" && partnerCUICOptTag.val() == "2" && partnerHIVTest != undefined && clientHIVTest != "" )
 		{
-			
-			if( partnerHIVTest == clientHIVTest )
+			if( clientHIVTest != "Indeterminate" || clientHIVTest != "Indeterminate" || 
+				partnerHIVTest != "Indeterminate out of stock" || partnerHIVTest != "Indeterminate out of stock" )
+			{
+				coupleStatusTag.val( "IND" );
+			}
+			else if( partnerHIVTest == clientHIVTest )
 			{
 				if( clientHIVTest == "Positive" )
 				{
@@ -1064,20 +1071,17 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		if( referralOfferedTag.val() == "true" )
 		{
+			me.setHideLogicTag( referralGivenSTITag.closest("tr"), false );
+			me.setHideLogicTag( referralGivenTBTag.closest("tr"), false );
+			me.setHideLogicTag( referralGivenFPTag.closest("tr"), false );
+			me.setHideLogicTag( referralGivenDNAPCRTag.closest("tr"), false );
+			
 
-			if( resultFinalHIVStatusTag.val() == "Positive" )
+			if( resultFinalHIVStatusTag.val() == "Positive" && testResultsGivenTag.val() == "true" )
 			{
-				me.setHideLogicTag( referralGivenSTITag.closest("tr"), false );
-				me.setHideLogicTag( referralGivenTBTag.closest("tr"), false );
-				me.setHideLogicTag( referralGivenFPTag.closest("tr"), false );
-				me.setHideLogicTag( referralGivenDNAPCRTag.closest("tr"), false );
-				
-				if( testResultsGivenTag.val() == "true" )
-				{
-					me.setHideLogicTag( referralGivenARTTag.closest("tr"), false );
-				}
+				me.setHideLogicTag( referralGivenARTTag.closest("tr"), false );
 			}
-			else
+			else if( resultFinalHIVStatusTag.val() == "Negative" )
 			{
 				me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), false );
 			}
@@ -1086,7 +1090,6 @@ function ClientFormManagement( _mainPage, _metaData )
 			{
 				me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), false );
 			}
-			
 		}
 		else
 		{
@@ -1247,14 +1250,14 @@ function ClientFormManagement( _mainPage, _metaData )
 	// Set value for data element field [EQC/PPT Passed]
 	me.populateEQCPPTPassedVal = function()
 	{
-		var jsonClient = JSON.parse( me.addClientFormTag.attr("client") );
+		var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
 		var lastName = me.getAttributeValue( jsonClient, me.attr_LastName );
 		
 		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
 		if( me.resultTest1Tag.val() != "" && me.resultTest2Tag.val() != "" )
 		{
 			if( ( lastName == "POS" && me.resultTest1Tag.val() == "Positive" && me.resultTest1Tag.val() ==  me.resultTest2Tag.val() )
-					 || ( lastName == "NEG" && me.resultTest1Tag.val() == "Negative" && me.resultTest1Tag.val() ==  me.resultTest2Tag.val() ) )
+				 || ( lastName == "NEG" && me.resultTest1Tag.val() == "Negative" && me.resultTest1Tag.val() ==  me.resultTest2Tag.val() ) )
 			{
 				EQCPPTPassedTag.val("true");
 			}
@@ -1587,11 +1590,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		// ---------------------------------------------------------------------
 		
 		// Set readonly for [auto-fill-data] fields
-		Util.readonlyTag( me.getDataElementField( me.de_partnerCUIC ), true );
-		Util.readonlyTag( me.getDataElementField( me.de_CoupleStatus ), true );
-		Util.readonlyTag( me.getDataElementField( me.de_Age ), true );
-		Util.readonlyTag( me.getDataElementField( me.de_BMI ), true );
-		Util.readonlyTag( me.getDataElementField( me.de_TimeSinceLastTest ), true );
+		Util.readonlyTag( me.getDataElementField( me.de_partnerCUIC ) );
+		Util.readonlyTag( me.getDataElementField( me.de_CoupleStatus ) );
+		Util.readonlyTag( me.getDataElementField( me.de_Age ) );
+		Util.readonlyTag( me.getDataElementField( me.de_BMI ) );
+		Util.readonlyTag( me.getDataElementField( me.de_TimeSinceLastTest ) );
 		
 		
 		// Disable some DEs in form. Will add logic for these DE by using 'change' event		
@@ -1606,7 +1609,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				&& resultTestParallel2Tag.length > 0 && resultTestResultSDBiolineTag.length > 0 
 				&& resultFinalHIVStatusTag.length > 0 )
 		{
-			 me.addClientFormTabTag.attr("addedLogic", true );
+			 me.addClientFormTabTag.attr( "addedLogic", true );
 
 			 // Add "mandatory" validation for "Test 1" field
 			 
@@ -1716,7 +1719,10 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.artReferCloseFormTag.find("input[attribute],select[attribute]").each(function(){
 			me.addMandatoryForField( $(this) );
 		});
-				
+		
+		// Remove mandatory for attribute [Referral Facility Name] field
+		me.removeMandatoryForField( me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName ) );
+		
 		//Add "DATE" picker for "Date" field
 		me.artReferCloseFormTag.find("input[isDate='true']").each(function(){
 			Util.datePicker( $(this) );
@@ -1742,8 +1748,6 @@ function ClientFormManagement( _mainPage, _metaData )
 				me.setHideLogicTag( closeSpecialOtherFacilityNameTag, true ); 
 			}
 		});
-
-		
 	};
 
 
@@ -2163,28 +2167,38 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.disableDataEtryForm( false );
 		
 		// Add logic for [Data Entry form]
-		me.resultTest1Tag = me.getDataElementField( me.de_Testing_ResultTest1 );
-		me.resultTest2Tag = me.getDataElementField( me.de_Testing_ResultTest2 );
-		me.resultTestParallel1Tag = me.getDataElementField( me.de_Testing_ResultParallel1 );
-		me.resultTestParallel2Tag = me.getDataElementField( me.de_Testing_ResultParallel2 );
-		me.resultTestResultSDBiolineTag = me.getDataElementField( me.de_Testing_ResultSDBioline );
-		me.resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
+		var resultTest1Tag = me.getDataElementField( me.de_Testing_ResultTest1 );
+		var resultTest2Tag = me.getDataElementField( me.de_Testing_ResultTest2 );
+		var resultTestParallel1Tag = me.getDataElementField( me.de_Testing_ResultParallel1 );
+		var resultTestParallel2Tag = me.getDataElementField( me.de_Testing_ResultParallel2 );
+		var resultTestResultSDBiolineTag = me.getDataElementField( me.de_Testing_ResultSDBioline );
+		var resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
 		
-		me.removeMandatoryForField( me.resultTest2Tag );
-		me.removeMandatoryForField( me.resultTestParallel1Tag );
-		me.removeMandatoryForField( me.resultTestParallel2Tag );
-		me.removeMandatoryForField( me.resultTestResultSDBiolineTag );
+		me.removeMandatoryForField( resultTest2Tag );
+		me.removeMandatoryForField( resultTestParallel1Tag );
+		me.removeMandatoryForField( resultTestParallel2Tag );
+		me.removeMandatoryForField( resultTestResultSDBiolineTag );
 		me.hideHIVTestLogicActionFields();
 		
 		
 		// Disable some data element fields which data values are filled from client attribute values
 		
-		Util.disableTag( me.resultTest1Tag, false );
-		Util.disableTag( me.resultTest2Tag, true );
-		Util.disableTag( me.resultTestParallel1Tag, true );
-		Util.disableTag( me.resultTestParallel2Tag, true );
-		Util.disableTag( me.resultTestResultSDBiolineTag, true );
-		Util.disableTag( me.resultFinalHIVStatusTag, true );
+		Util.disableTag( resultTest1Tag, false );
+		Util.disableTag( resultTest2Tag, true );
+		Util.disableTag( resultTestParallel1Tag, true );
+		Util.disableTag( resultTestParallel2Tag, true );
+		Util.disableTag( resultTestResultSDBiolineTag, true );
+		Util.disableTag( resultFinalHIVStatusTag, true );
+		
+		resultTest1Tag.val("");
+		resultTest2Tag.val("");
+		resultTestParallel1Tag.val("");
+		resultTestParallel2Tag.val("");
+		resultTestResultSDBiolineTag.val("");
+		resultFinalHIVStatusTag.val("");
+		me.getDataElementField( me.de_partnerCUIC ).val("");
+		me.getDataElementField( me.de_TimeSinceLastTest ).val("");
+		
 				
 		// Reset values in the form
 		
@@ -2322,7 +2336,7 @@ function ClientFormManagement( _mainPage, _metaData )
 						MsgManager.appUnblock();
 					});
 			} else {
-				me.showExpireSessionMessage();					
+				me.mainPage.settingsManagement.showExpireSessionMessage();				
 			}
 		});
 		
@@ -2522,7 +2536,7 @@ function ClientFormManagement( _mainPage, _metaData )
 					alert( tranlatedText );
 				}
 			} else {
-				me.showExpireSessionMessage();					
+				me.mainPage.settingsManagement.showExpireSessionMessage();					
 			}
 		});
 		
@@ -2564,7 +2578,7 @@ function ClientFormManagement( _mainPage, _metaData )
 					});
 			} 
 			else {
-				me.showExpireSessionMessage();					
+				me.mainPage.settingsManagement.showExpireSessionMessage();					
 			}
 		});	
 	}
@@ -2820,7 +2834,7 @@ function ClientFormManagement( _mainPage, _metaData )
 			var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
 			if( latestHIVTestEvent.length > 0 )
 			{
-				prevHIVTestDate = latestHIVTestEvent.attr("eventDate");
+				prevHIVTestDate = latestHIVTestEvent.find("tr[header]").attr("eventDate");
 				prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
 			}
 			else if( jsonClient != undefined )
@@ -2956,7 +2970,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				}
 			}
 			else {
-				me.showExpireSessionMessage();					
+				me.mainPage.settingsManagement.showExpireSessionMessage();					
 			}
 		});
 		
@@ -3096,7 +3110,7 @@ function ClientFormManagement( _mainPage, _metaData )
 			
 			me.populateDataValueForContactLogAndARTRefTab( event, [] );
 			
-			if( exeFunc !== undefined ) exeFunc();
+			me.saveClientAfter( JSON.parse( me.addClientFormTabTag.attr("client") ), exeFunc, undefined, false );
 			
 		} );
 	
@@ -3927,7 +3941,8 @@ function ClientFormManagement( _mainPage, _metaData )
 				deId != me.de_Testing_ResultParallel1 && 
 				deId != me.de_Testing_ResultParallel2 && 
 				deId != me.de_Testing_ResultSDBioline &&
-				deId != me.de_FinalResult_HIVStatus )
+				deId != me.de_FinalResult_HIVStatus &&
+				$(this).attr( 'isReadOnly' ) == undefined )
 			{
 				Util.disableTag( $(this), disabled );
 			}
@@ -3988,12 +4003,18 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		var headerTag = $("<tr header='true' eventId='" + eventId + "' style='cursor:pointer;' eventDate='" + eventDate + "'></tr>");
 
+		var orgUnitName = event.orgUnitName;
+		if( orgUnitName == undefined )
+		{
+			orgUnitName = me.orgUnitListTag.find("option:selected").text();
+		}
+		
 		var url = 'event.html?eventid=' + eventId;
 		var onclickEvent="window.open(\"" + url + "\",\"Event Report\",\"width=400,height=500\");"
 		headerTag.append("<th colspan='2'>"
 				+ "<span class='headerInfor'> <img style='float:left' class='arrowRightImg showHide' src='../images/tab_right.png'> " 
 				+ Util.formatDate_DisplayDateTime( eventDate ) 
-				+ "<font class='saperate'> | </font>" + event.orgUnitName 
+				+ "<font class='saperate'> | </font>" + orgUnitName 
 				+ "<font class='saperate'> | </font>" + counsellor 
 				+ "<font class='saperate'> | </font>" + testResult + "</span>"
 				+ " <span style='float:right;'><a onclick='" + onclickEvent + "' href='#' > <img src='../images/print.png'></a></span></th>");
@@ -4166,7 +4187,7 @@ function ClientFormManagement( _mainPage, _metaData )
 								});
 						} 
 						else {
-							me.showExpireSessionMessage();					
+							me.mainPage.settingsManagement.showExpireSessionMessage();					
 						}
 					});	
 		}

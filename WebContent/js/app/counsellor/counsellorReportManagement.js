@@ -131,7 +131,7 @@ function CounsellorReportManagement( mainPage )
 					});
 			} 
 			else {
-				me.showExpireSessionMessage();					
+				me.mainPage.settingsManagement.showExpireSessionMessage();					
 			}
 		});	
 	};

@@ -92,7 +92,7 @@
 				<button type="button" class="btn btn-lg hamburger is-closed" data-toggle="offcanvas" >
             		<span class="glyphicon glyphicon-align-justify" style="color:#225588;"></span>
             	</button>
-				<span id="headerText" style="left: 50px;">PI LS HTS</span>
+				<span id="headerText" style="left: 50px;" keyword="app_header">PSI LS HTS</span>
 				<div class="headerRightSideControls">
 					<span keyword="page_headerTitle_referralCoordinator">Referral Coordinator</span>: <span name="userFullName"></span>
 					<span class='saperate'> | </span> <span id="headerOrgUnit"></span> <a href="#" id="headerSettingsLink" style="padding-left:5px;"><img src="../images/settings.png"></a>
@@ -160,7 +160,7 @@
 				
 				<div id="allFUList" style="display:none;" class="mainContent">
 				 	
-					<h4 class="headerList"><span id="headerList" keyword="allFU_headerTitle">Clients followed-up for ART Referral</span></h4>
+					<h4 class="headerList"><span id="headerList"><span keyword="allFU_headerTitle">Clients followed-up for ART Referral</span> <a id="refreshAllFUList"><img src="../images/refresh.png"></a></h4>
 				    
 				    <fieldset style="padding:10px; border:1px solid silver; margin-bottom:15px;background-color: #f9f9f9;">
 					    <table style="width: 100%;">
@@ -200,7 +200,7 @@
 					    	<col width="50%"/>
 					    	<col width="50%"/>
 					    	
-					    	<tr style="background-color:#dedede; height:35px;" id="ouFilterHeaderTr">
+					    	<tr style="background-color:#dedede; height:35px; cursor:pointer;" id="ouFilterHeaderTr">
 					    		<th>
 					    			<img style="float:left" class="arrowRightImg" src="../images/tab_right.png">
 					    			<span keyword="allFU_filterBy_district">District</span>
@@ -243,6 +243,11 @@
 						
 						<tbody></tbody>
 					</table>
+					
+					<div style="display:none;" id="loadingDiv">
+						<span keyword="allFU_loadingData" class="note">Loading</span>
+						<img src="../images/ajax-loader-bar.gif">
+					</div>
 					
 					<div id="allFUTblFooter" class="footerRightSideControls">*** <span keyword="allFU_footer_msg">Total clients filtered</span>: <span id="allFUNumber"></span> <span keyword="common_footer_msg_clients">clients</span></div>
 					
@@ -540,7 +545,7 @@
 							</td>
 						</tr>
 						
-						<tr>
+						<tr style="display:none;">
 							<td keyword="settings_rowHeader_hideFieldHIVTestLoginAction">Hide Fields "HIV Test" logic action</td>
 							<td>
 								<select id="hideHIVTestLogicAction" class="form-control" >

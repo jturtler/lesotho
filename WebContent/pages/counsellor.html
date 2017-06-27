@@ -65,7 +65,7 @@
 			<!--  Counsellor Menu -->
 			
 			<ul class="nav sidebar-nav" >
-				<li class="sidebar-brand"><a data-toggle="offcanvasmenu" style="cursor: pointer;" keyword="app_header">PSI LS HTS</span>
+				<li class="sidebar-brand"><a data-toggle="offcanvasmenu" style="cursor: pointer;" keyword="app_header">PSI LS HTS</a></li>
 				
 				<li><a id="searchClientLink" href="#" keyword="menu_searchCreateClient">Search/Create Client</a></li>
 				<li role="separator" class="divider"></li>
@@ -97,7 +97,7 @@
 				<button type="button" class="btn btn-lg hamburger is-closed" data-toggle="offcanvas" >
             		<span class="glyphicon glyphicon-align-justify" style="color:#225588;"></span>
             	</button>
-				<span id="headerText" style="left: 50px;">PI LS HTS</span>
+				<span id="headerText" style="left: 50px;" keyword="app_header">PSI LS HTS</span>
 				<div class="headerRightSideControls">
 					<span keyword="page_headerTitle_counsellor">Counsellor</span>: <span name="userFullName"></span>
 					<span class='saperate'> | </span> <span id="headerOrgUnit"></span> <a href="#" id="headerSettingsLink" style="padding-left:5px;"><img src="../images/settings.png"></a>
@@ -498,7 +498,7 @@
 							</td>
 						</tr>
 						
-						<tr>
+						<tr style="display:none;">
 							<td keyword="settings_rowHeader_hideFieldHIVTestLoginAction">Hide Fields "HIV Test" logic action</td>
 							<td>
 								<select id="hideHIVTestLogicAction" class="form-control" >
