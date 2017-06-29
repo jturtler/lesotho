@@ -443,7 +443,9 @@ function CoordinatorListManagement( _mainPage )
 				var councilNameAndCode = event[11];
 				var councilName = ( councilNameAndCode != "" ) ? councilNameAndCode.split("***")[0] : "";
 				var councilCode = ( councilNameAndCode != "" ) ? councilNameAndCode.split("***")[1] : "";
-				var facilityRefer = event[12];
+				var facilityNameAndCode = event[12];
+				var facilityName = ( facilityNameAndCode != "" ) ? facilityNameAndCode.split("***")[0] : "";
+				var facilityCode = ( facilityNameAndCode != "" ) ? facilityNameAndCode.split("***")[1] : "";
 				var otherFacilityName = event[13];
 				if( otherFacilityName != "" )
 				{
@@ -470,7 +472,7 @@ function CoordinatorListManagement( _mainPage )
 				rowTag.append( "<td style='display:none;' filter='" + contactLogEventUsername + "' >" + contactLogEventUsername + "</td>" );
 				rowTag.append( "<td style='display:none;' filter='" + isClosureEvent + "'></td>" );
 				rowTag.append( "<td filter='" + councilCode + "'>" + councilName + "</td>" );
-				rowTag.append( "<td>" + facilityRefer + "</td>" );
+				rowTag.append( "<td filter='" + facilityCode + "'>" + facilityName + "</td>" );
 				rowTag.append( "<td>" + cuic + "</td>" );
 				rowTag.append( "<td>" + daySinceDiagnosis + "</td>" );
 				rowTag.append( "<td>" + actions.lastAction.date + "<br> " + actions.lastAction.action + "</td>" );
@@ -617,7 +619,14 @@ function CoordinatorListManagement( _mainPage )
 		else
 		{
 			var districts = Util.getCheckedInputValues( me.districtFilterTbTag );
-			me.filterByColumnValues( 4, districts );
+			if( councils.length == 0 && me.placeOfResidenceChkTag.prop("checked") )
+			{
+				me.filterByColumnValues( 4, districts );
+			}
+			else if ( healthFacilities.length == 0 && me.facilityReferredToChkTag.prop("checked") )
+			{
+				me.filterByColumnValues( 5, districts );
+			}
 		}
 
 		me.allFUTblTag.find("tbody").show();

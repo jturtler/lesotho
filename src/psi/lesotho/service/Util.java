@@ -24,8 +24,8 @@ import org.json.JSONObject;
 
 public final class Util
 {
-    public static String LOCATION_DHIS_SERVER = "https://data.psi-mis.org";
-//  public static String LOCATION_DHIS_SERVER = "https://sandbox.psi-mis.org";
+//    public static String LOCATION_DHIS_SERVER = "https://data.psi-mis.org";
+  public static String LOCATION_DHIS_SERVER = "https://sandbox.psi-mis.org";
 //  public static String LOCATION_DHIS_SERVER = "https://james.psi-mis.org";
 //  public static String LOCATION_DHIS_SERVER = "http://localhost:8080/dhis";
     
@@ -100,13 +100,16 @@ public final class Util
     // UIDs
     // -------------------------------------------------------------------------
 
-    // https://data.psi-mis.org
-    public static final String ID_TRACKED_ENTITY = "XV3kldsZq0H";
+//    // https://data.psi-mis.org
+//    public static final String ID_TRACKED_ENTITY = "XV3kldsZq0H";
+    
+    // https://sandbox.psi-mis.org
+    public static final String ID_TRACKED_ENTITY = "MCPQUTHX1Ze";
+    
+    // Supper DHIS account
     public static String ACCESS_SERVER_USERNAME = "ls.webapp";
     public static String ACCESS_SERVER_PASSWORD = "Q57pAJ9V";
     
-//    // https://sandbox.psi-mis.org
-//    public static final String ID_TRACKED_ENTITY = "MCPQUTHX1Ze";
 //    public static String ACCESS_SERVER_USERNAME = "lesotho_superuser";
 //    public static String ACCESS_SERVER_PASSWORD = "ABCD1234";
     
