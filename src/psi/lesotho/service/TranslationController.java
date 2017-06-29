@@ -24,13 +24,10 @@ public class TranslationController
 
     private static final String DEFAULT_LANGUAGE = "en";
 
-    /**
-	 * 
-	 */
+    
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
-
         try
         {
             JSONObject responseData = new JSONObject();

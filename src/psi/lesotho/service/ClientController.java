@@ -2,7 +2,6 @@ package psi.lesotho.service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -10,7 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,12 +16,28 @@ import org.json.JSONObject;
 public class ClientController
     extends HttpServlet
 {
-
     private static final long serialVersionUID = -8009460801270486913L;
 
-    private static String TRACKED_ENTITY = "MCPQUTHX1Ze";
+    private static final String PARAM_CLIENT_ID = "@PARAM_CLIENT_ID";
     
-    private static ArrayList<String> searchVariables = new ArrayList<>(Arrays.asList( "mW2l3T2zL0N", "mUxDHgywnn2", "wSp6Q7QDMsk", "u57uh7lHwF8", "vTPYC9BXPNn" ));
+    private static ArrayList<String> searchVariables = new ArrayList<>(Arrays.asList( Util.ID_ATTR_FIRSTNAME, Util.ID_ATTR_LASTNAME
+            , Util.ID_ATTR_DOB, Util.ID_ATTR_DISTRICTOB, Util.ID_ATTR_BIRTHORDER ));
+    
+    // -------------------------------------------------------------------------
+    // URLs
+    // -------------------------------------------------------------------------
+    
+    private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_CLIENTS + "/data.json";
+    private static final String URL_QUERY_SEARCH_POSITIVE_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS + "/data.json";
+    private static final String URL_QUERY_CREATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances";
+    private static final String URL_QUERY_UPDATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID;
+    private static final String URL_QUERY_ENROLLMENT = Util.LOCATION_DHIS_SERVER + "/api/enrollments";
+    private static final String URL_QUERY_CLIENT_DETAILS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID + ".json?fields=*,attributes[attribute,value]";
+    
+        
+    // -------------------------------------------------------------------------
+    // POST method
+    // -------------------------------------------------------------------------
     
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
@@ -70,7 +84,7 @@ public class ClientController
                              
                             // STEP 2.2.1 Get active event
                             JSONArray eventList = responseInfo.data.getJSONArray( "events" );
-                            JSONObject activeHIVTestingEvent = EventController.getActiveEvent( eventList, Util.STAGE_ID );
+                            JSONObject activeHIVTestingEvent = EventController.getActiveEvent( eventList, Util.ID_STAGE );
                             String partnerEventId = EventController.getPartnerEventId( activeHIVTestingEvent );
                             if( partnerEventId != null )
                             {
@@ -145,7 +159,7 @@ public class ClientController
         try
         {
             String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
-            String url = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/zPJW0n6mymH/data.json?" + condition;
+            String url = ClientController.URL_QUERY_SEARCH_CLIENTS + "?" + condition;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -163,7 +177,7 @@ public class ClientController
         try
         {
             String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
-            String url = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/aUc8BV6Ipmu/data.json?" + condition;
+            String url = ClientController.URL_QUERY_SEARCH_POSITIVE_CLIENTS + "?" + condition;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -181,10 +195,10 @@ public class ClientController
 
         try
         {
-            receivedData.put( "trackedEntity", TRACKED_ENTITY );
+            receivedData.put( "trackedEntity", Util.ID_TRACKED_ENTITY );
             receivedData.put( "orgUnit", ouId );
             
-            String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances";
+            String requestUrl = ClientController.URL_QUERY_CREATE_CLIENT;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, receivedData, null );
 
             Util.processResponseMsg( responseInfo, "" );
@@ -208,7 +222,9 @@ public class ClientController
 
         try
         {
-            String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + clientId;
+            String requestUrl = ClientController.URL_QUERY_UPDATE_CLIENT + clientId;
+            requestUrl = requestUrl.replace( ClientController.PARAM_CLIENT_ID, clientId );
+            
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, receivedData, null );
   
             if( responseInfo.responseCode == 200 )
@@ -233,9 +249,9 @@ public class ClientController
 
         try
         {
-            JSONObject enrollmentJson = ClientController.getEnrollmentJson( clientId, Util.PROGRAM_ID, ouId );
+            JSONObject enrollmentJson = ClientController.getEnrollmentJson( clientId, Util.ID_PROGRAM, ouId );
 
-            String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/enrollments";
+            String requestUrl = ClientController.URL_QUERY_ENROLLMENT;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, enrollmentJson, null );
         }
         catch ( Exception ex )
@@ -251,7 +267,9 @@ public class ClientController
         ResponseInfo responseInfo = null;
         try
         {
-            String url = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + clientId + ".json?fields=*,attributes[attribute,value]";
+            String url = ClientController.URL_QUERY_CLIENT_DETAILS;
+            url = url.replace( ClientController.PARAM_CLIENT_ID, clientId );
+            
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )

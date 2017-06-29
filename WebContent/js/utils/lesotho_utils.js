@@ -158,7 +158,6 @@ Util.disableForm = function( tag, isDisable )
 {
 	var inputTags = tag.find("input,select,button");
 	inputTags.each( function(){
-		console.log($(this).closest("tr").find("td:first").html());
 		if( $(this).attr( 'isReadOnly' ) == undefined )
 		{
 			Util.disableTag( $(this), isDisable);
@@ -193,7 +192,7 @@ Util.getCheckedInputValues = function( formTag )
 Util.getCheckedInputTexts = function( formTag )
 {
 	var checkedTexts = formTag.find('input:checkbox:checked').map(function() {
-	    return $(this).closest("tr").find("td:first").html();
+	    return $(this).closest("tr").find("td:nth-child(2)").html();
 	}).get();
 	
 	return checkedTexts;
@@ -387,6 +386,19 @@ Util.DAYS = ["Sunday", "Monday", "Tuesday", "Webnesday", "Thursday", "Friday", "
 Util.MONTH_INDEXES = {"Jan" : "01", "Feb" : "02", "Mar" : "03", "Apr" : "04", "May" : "05", "Jun" : "06", "Jul" : "07", "Aug" : "08", "Sep" : "09", "Oct" : "10", "Nov" : "11", "Dec" : "12"};
 
 
+Util.getLastXDateFromDateStr = function( dateStr, noDays )
+{
+	var date = Util.convertUTCDateToLocalDate( dateStr );
+    date.setDate( date.getDate() - noDays );
+    
+    return date;
+};
+
+Util.formatDate_LastXDateFromDateStr = function( dateStr, noDays )
+{  
+    return Util.formatDateObj_DisplayDate( Util.getLastXDateFromDateStr( dateStr, noDays ) );
+};
+
 Util.getLastNDate = function( noDays )
 {
 	var date = new Date();
@@ -487,6 +499,21 @@ Util.formatDate_DisplayDateTime = function( dateStr )
 	minutes = ( minutes < 10 ) ? "0" + minutes : "" + minutes;
 	
 	return dayInMonth + " " + Util.MONTHS[month] + " " + year + " " + hours + ":" + minutes;
+};
+
+/** 
+ * dateObj : "2017-02-07T09:56:10.298"
+ * Result : 07 Feb 2017 09:56
+ * **/
+Util.formatDateObj_DisplayDate = function( dateObj )
+{	
+	var year = dateObj.getFullYear();
+	var month = dateObj.getMonth();
+	
+	var dayInMonth = dateObj.getDate();
+	dayInMonth = ( dayInMonth < 10 ) ? "0" + dayInMonth : dayInMonth;
+	
+	return dayInMonth + " " + Util.MONTHS[month] + " " + year;
 };
 
 /** 

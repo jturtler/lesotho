@@ -802,6 +802,11 @@ tr.actionBar th
 }
 
 
+.partnerInfo {
+    font-style: italic;
+    color: gray;
+    font-size: 11px;
+}
 
 
 

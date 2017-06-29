@@ -33,13 +33,55 @@ public final class Util
     public static String REQUEST_PARAM_USERNAME = "usr";
     public static String REQUEST_PARAM_PASSWORD = "pwd";
 
-    public static String KEY_FULLNAME = "fullName";
-    public static String KEY_LOGGED_SUCCESS = "logged";
-    public static String KEY_DHIS_SERVER = "dhisServer";
-    public static String KEY_LOGIN_USERNAME = "loginUsername";
-    public static String KEY_LOGIN_PASSWORD = "loginPassword";
-    public static String KEY_WORKER_ROLE = "workerRole";
+    // -------------------------------------------------------------------------
+    // Key words
+    // -------------------------------------------------------------------------
+    
+    // Login page
+    public static final String KEY_FULLNAME = "fullName";
+    public static final String KEY_LOGGED_SUCCESS = "logged";
+    public static final String KEY_DHIS_SERVER = "dhisServer";
+    public static final String KEY_LOGIN_USERNAME = "loginUsername";
+    public static final String KEY_LOGIN_PASSWORD = "loginPassword";
+    public static final String KEY_WORKER_ROLE = "workerRole";
 
+    // Meta data
+    public static final String KEY_METADATA_ALL = "all";
+    public static final String KEY_METADATA_DISTRICTLIST = "districtList";
+    public static final String KEY_METADATA_OULIST = "ouList";
+        
+    // -------------------------------------------------------------------------
+    // Retrieve data
+    
+    public static final String KEY_TODAY_CASES = "todayCases";
+    public static final String KEY_PREVIOUS_CASES = "previousCases";
+    public static final String KEY_POSITIVE_CASES = "positiveCases";
+    public static final String KEY_TODAY_FU = "todayFU";
+    public static final String KEY_ALL_FU = "allFU";
+    
+    // Search
+    public static final String KEY_SEARCH_CASES = "search"; 
+    public static final String KEY_SEARCH_TYPE = "searchType";  
+    public static final String KEY_SEARCHTYPE_ALL = "all";
+    public static final String KEY_SEARCHTYPE_POSITIVE = "positive"; 
+    public static final String KEY_CLIENT_DETAILS = "details";
+    public static final String KEY_FIND_PARTNER = "findPartner";
+    
+    public static final String KEY_GET_EVENT_DETAILS = "details";
+    
+    // Save data
+    public static final String KEY_SAVE_CLIENT = "save";    
+    public static final String KEY_SAVE_EVENT = "save"; 
+    public static final String KEY_SAVE_PARTNER_CUIC = "savePartnerCUIC"; 
+    
+    // Reports
+    public static final String KEY_GET_COUNSELLOR_REPORT = "counsellorReport";
+    public static final String KEY_GET_COORDINATOR_REPORT = "coordinatorReport";
+    
+    // Translation
+    public static String KEY_TRANSLATION_LIST = "keywordList";
+    public static String KEY_TRANSLATION_VERSION = "version";
+    
 
     public static String REQUEST_TYPE_GET = "GET";
     public static String REQUEST_TYPE_POST = "POST";
@@ -54,68 +96,62 @@ public final class Util
     public static String PAMAM_PARTNER_CUIC = "partnerCUIC";
     public static String PAMAM_COUPLE_STAUTS = "coupleStatus";
     
-    
+    // -------------------------------------------------------------------------
+    // UIDs
+    // -------------------------------------------------------------------------
+   
+    // Supper user
     public static String ACCESS_SERVER_USERNAME = "lesotho_superuser";
     public static String ACCESS_SERVER_PASSWORD = "ABCD1234";
     
+    // Translation Ids
+    // public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "98319"; // On Rodolfo account
+    // public static String KEY_TRANSLATION_VERSION_PROJECT_ID = "95765"; // On Rodolfo account
+    public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "102649"; // Tran account
+    public static String KEY_TRANSLATION_VERSION_PROJECT_ID = "102655"; // Tran account
     
+    // Orgunit Ids
     public static final String ROOT_ORGTUNIT = "FvUGp8I75zV";    
     public static final String ROOT_ORGTUNIT_LESOTHO = "vJNI6blhosr"; 
     public static final String REGISTER_DISTRICT_LEVEL = "4";
-    public static final String PROGRAM_ID = "KDgzpKX3h2S";
-    public static final String STAGE_ID = "lVglvBnE3TY";
+    
+    // Program Ids
+    public static final String ID_PROGRAM = "KDgzpKX3h2S";
+    public static final String ID_STAGE = "lVglvBnE3TY";
+    
+    // Category Ids
     public static final String USER_CATEGORY_ID = "qVl8p3w3fI5";
     public static final String USER_CATEGORY_PIN_ATRIBUTE_ID = "WgOzQa7KDTV";
     public static final String USER_CATEGORY_WORKER_ROLE_ATRIBUTE_ID = "aXv3j7whLvA";
     
+    // Attribute Ids
+    public static final String CLIENT_ATTR_ID_CUIC = "rw3W9pDCPb2";
+    public static final String ID_TRACKED_ENTITY = "MCPQUTHX1Ze";
+    public static final String ID_ATTR_FIRSTNAME = "R9Lw1uNtRuj";
+    public static final String ID_ATTR_LASTNAME = "TBt2a4Bq0Lx";
+    public static final String ID_ATTR_DOB = "BvsJfkddTgZ";
+    public static final String ID_ATTR_DISTRICTOB = "u57uh7lHwF8";
+    public static final String ID_ATTR_CLIENT_CUIC = "rw3W9pDCPb2";
+    public static final String ID_ATTR_BIRTHORDER ="vTPYC9BXPNn";
     
+    // DE Ids
     public static final String ID_DE_PARTNER_CUIC = "UYyCL2xz8Wz";
     public static final String ID_DE_PARTNER_EVENTID = "UV2AsoZJ7fw";
     public static final String ID_DE_COPUPLE_STATUS = "Umu8i2QXCZk";
     
-
-    public static final String CLIENT_ATTR_ID_CUIC = "zRA08XEYiSF";
+    // SQL Views
+    public static final String ID_SQLVIEW_LOAD_TODAY_CASE = "IdFgIYoRINL";
+    public static final String ID_SQLVIEW_LOAD_POSITIVE_CASE = "mayPuvHkJ7G";
+    public static final String ID_SQLVIEW_LOAD_FUCASE_BY_USERNAME = "llbPbszABjd";
+    public static final String ID_SQLVIEW_LOAD_FUCASE_ALL = "I8xOsd6qfyh";
     
-
-    public static final String KEY_TODAY_CASES = "todayCases";
-    public static final String KEY_PREVIOUS_CASES = "previousCases";
-    public static final String KEY_POSITIVE_CASES = "positiveCases";
-    public static final String KEY_SEARCH_CASES = "search";  
-    public static final String KEY_SAVE_CLIENT = "save";    
-    public static final String KEY_CLIENT_DETAILS = "details";
-    public static final String KEY_METADATA_ALL = "all";
-    public static final String KEY_METADATA_DISTRICTLIST = "districtList";
-    public static final String KEY_METADATA_OULIST = "ouList";
-    public static final String KEY_SAVE_EVENT = "save"; 
-    public static final String KEY_GET_EVENT_DETAILS = "details";
-    public static final String KEY_GET_COUNSELLOR_REPORT = "counsellorReport";
-    public static final String KEY_GET_COORDINATOR_REPORT = "coordinatorReport";
+    public static final String ID_SQLVIEW_SEARCH_CLIENTS = "zPJW0n6mymH";
+    public static final String ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS = "aUc8BV6Ipmu";
     
-    public static final String KEY_FIND_PARTNER = "findPartner";
-    public static final String KEY_SAVE_PARTNER_CUIC = "savePartnerCUIC"; 
-    
-
-    public static final String KEY_SEARCH_TYPE = "searchType";  
-    public static final String KEY_SEARCHTYPE_ALL = "all";
-    public static final String KEY_SEARCHTYPE_POSITIVE = "positive"; 
-    
-
-
-    public static final String KEY_TODAY_FU = "todayFU";
-    public static final String KEY_ALL_FU = "allFU";
-    
-
-//    public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "98319"; // On Rodolfo account
-//    public static String KEY_TRANSLATION_VERSION_PROJECT_ID = "95765"; // On Rodolfo account
-    public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "102649"; // Tran account
-    public static String KEY_TRANSLATION_VERSION_PROJECT_ID = "102655"; // Tran account
-    
-    public static String KEY_TRANSLATION_LIST = "keywordList";
-    public static String KEY_TRANSLATION_VERSION = "version";
+    public static final String ID_SQLVIEW_FIND_PARTNER = "SKI1rT5vA3m";
+    public static final String ID_SQLVIEW_FIND_PARTNER_BY_EVENTID = "aZX9hTaN0aj";
     
     
-    
-
     // --------------------------------------------------------------------------------------------------------------
     // HTTPS GET/POST/PUT request
     // --------------------------------------------------------------------------------------------------------------

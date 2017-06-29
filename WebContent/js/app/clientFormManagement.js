@@ -95,12 +95,18 @@ function ClientFormManagement( _mainPage, _metaData )
 	// [Register Attribute] Ids
 	me.attrGroup_ClientDetailsAndCUIC = "KgeLi7PFYxe";
 	
-	me.attr_FirstName = "mW2l3T2zL0N";
-	me.attr_LastName = "mUxDHgywnn2";
-	me.attr_DoB = "wSp6Q7QDMsk";
+//	me.attr_FirstName = "mW2l3T2zL0N";
+//	me.attr_LastName = "mUxDHgywnn2";
+//	me.attr_DoB = "wSp6Q7QDMsk";
+//	me.attr_ClientCUIC = "zRA08XEYiSF";
+	
+	me.attr_FirstName = "R9Lw1uNtRuj";
+	me.attr_LastName = "TBt2a4Bq0Lx";
+	me.attr_DoB = "BvsJfkddTgZ";
 	me.attr_DistrictOB = "u57uh7lHwF8";
-	me.attr_ClientCUIC = "zRA08XEYiSF";
+	me.attr_ClientCUIC = "rw3W9pDCPb2";
 	me.attr_BirthOrder ="vTPYC9BXPNn";
+	
 	me.attr_Adquisition = "";
 	me.attr_Last_TestNS = "";
 	me.attr_LastContact = "";
@@ -156,7 +162,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	me.de_ClientType = "RvYugZqBKoN";
 	me.de_CoupleStatus = "Umu8i2QXCZk";
 	me.de_partnerCUICOpt = "csHM60DUGkG";
-	me.de_partnerCUIC= "UYyCL2xz8Wz";
+	me.de_partnerCUIC = "UYyCL2xz8Wz";
 	me.de_PartnerEventId = "UV2AsoZJ7fw";
 	
 	me.de_EQCPPTPassed = "H61nmZKhACr";
@@ -690,7 +696,20 @@ function ClientFormManagement( _mainPage, _metaData )
 				if( me.addEventFormTag.attr("event") != undefined )
 				{
 					var jsonEvent = JSON.parse( me.addEventFormTag.attr("event") );
-					me.populateDataValuesInEntryForm( me.addEventFormTag, jsonEvent );
+					if( jsonEvent.status == "ACTIVE" )
+					{
+						me.populateDataValuesInEntryForm( me.addEventFormTag, jsonEvent );
+						
+						// Set data values based on client attribute values
+						me.setUp_InitDataValues();
+						
+						me.checkAndShowCheckedIconForPartnerCUICTag();
+						var partnerData = me.addEventFormTag.attr("partnerData");
+						if( partnerData != undefined )
+						{
+							me.setUp_PartnerInfor( JSON.parse( partnerData ) );
+						}
+					}
 				}
 				
 				var changesDiscardedMsg = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_ARTEventForm_changesDiscarded" );
@@ -752,8 +771,8 @@ function ClientFormManagement( _mainPage, _metaData )
 				MsgManager.appBlock( tranlatedText + " ..." );
 				
 				me.completeEvent(function(){
-					me.addClientFormTabTag.removeAttr( "eventId" );
-					me.addClientFormTabTag.removeAttr( "event" );
+					me.addEventFormTag.removeAttr( "eventId" );
+					me.addEventFormTag.removeAttr( "event" );
 				});
 				
 				return false;
@@ -1016,8 +1035,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		var coupleStatusTag = me.getDataElementField( me.de_CoupleStatus );
 		if( clientTypeTag.val() == "LS_SER2" && partnerCUICOptTag.val() == "2" && partnerHIVTest != undefined && clientHIVTest != "" )
 		{
-			if( clientHIVTest != "Indeterminate" || clientHIVTest != "Indeterminate" || 
-				partnerHIVTest != "Indeterminate out of stock" || partnerHIVTest != "Indeterminate out of stock" )
+			if( clientHIVTest == "Indeterminate" || clientHIVTest == "Indeterminate out of stock" ||
+				 partnerHIVTest == "Indeterminate" || partnerHIVTest == "Indeterminate out of stock" )
 			{
 				coupleStatusTag.val( "IND" );
 			}
@@ -1183,6 +1202,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		{
 			partnerCUICOptTag.val("");
 			partnerCUICTag.val("");
+			partnerCUICTag.closest( "td" ).find("span.partnerInfo").html("");
+			partnerCUICTag.closest( "td" ).find("span.partnerInfo").hide();
 		}
 		// Couple test
 		else if( clientTypeTag.val() == "LS_SER2" )
@@ -1292,7 +1313,6 @@ function ClientFormManagement( _mainPage, _metaData )
 	{
 		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
 		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
-		
 		
 		if( partnerCUICOptTag.val() != "" )
 		{
@@ -1631,6 +1651,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
 		partnerCUICTag.closest( "td" ).append( imgTag );
 		partnerCUICTag.closest( "td" ).css( "position", "relative" );
+		partnerCUICTag.closest( "td" ).append("<span style='display:none;' class='partnerInfo'></span>");
 		
 		// Set [Partner Event UID] field hidden
 		var partnerEventIdTag = me.getDataElementField( me.de_PartnerEventId );
@@ -2288,11 +2309,14 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.addClientFormTabTag.removeAttr( "artHIVTestingEvent" );
 		
 		me.addEventFormTag.removeAttr( "event" );
+		me.addEventFormTag.removeAttr( "partnerData" );
 		
 		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
 		partnerCUICTag.removeAttr("title" );
 		partnerCUICTag.removeAttr("lastHIVTest" );
 		partnerCUICTag.closest( "td" ).find( "span.partnerDetails" ).hide();
+		partnerCUICTag.closest( "td" ).find("span.partnerInfo").html("");
+		partnerCUICTag.closest( "td" ).find("span.partnerInfo").hide();
 		
 		me.artReferOpenFormTag.removeAttr( "event" );
 		me.artReferCloseFormTag.removeAttr( "event" );
@@ -3296,12 +3320,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.generateAddClientFormHeader();
 		
 		// STEP 7. Lock for if there is any HIV Testing event existed
-		var lockClientForm = ( completedHIVTestingEvents.lenght > 0 || activeHIVTestingEvent != undefined );
-		if( lockClientForm )
+		if( events.length > 0 )
 		{
 			me.disableClientDetailsAndCUICAttrGroup( true );
 		}
-
+		
 		
 		// ---------------------------------------------------------------------------------------
 		// Set up HIV Testing event data
@@ -3312,12 +3335,14 @@ function ClientFormManagement( _mainPage, _metaData )
 		// STEP 9. Set up data in "This Test" tab
 		me.setUp_DataInThisTestTab( activeHIVTestingEvent, data.partner );
 		
+		
 		// ---------------------------------------------------------------------------------------
 		// STEP 10. Set up data in "Contact Log" tab and "ART Refer" tab
 		
 		// Set up data in "Contact Log" tab and "ART Refer" tab
 		me.populateDataValueForContactLogAndARTRefTab( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent );
 		me.checkAndShowARTReferTab( artHIVTestingEvent );
+		
 		
 		// ---------------------------------------------------------------------------------------
 		// STEP 11. Show [This Test] / [Previous Test] tab if there is a "seleted event id"
@@ -3371,9 +3396,17 @@ function ClientFormManagement( _mainPage, _metaData )
 		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
 		if( partnerCUICTag.val() != "" ){
 			partnerCUICTag.closest( "td" ).find( "span.partnerDetails" ).show();
+			
+			if( partnerCUICTag.val() == "1" )
+			{
+				partnerCUICTag.closest( "td" ).find( "span.partnerInfo" ).hide();
+				partnerCUICTag.closest( "td" ).find( "span.partnerInfo" ).html("");
+			}
 		}
 		else {
 			partnerCUICTag.closest( "td" ).find( "span.partnerDetails" ).hide();
+			partnerCUICTag.closest( "td" ).find( "span.partnerInfo" ).hide();
+			partnerCUICTag.closest( "td" ).find( "span.partnerInfo" ).html("");
 		}
 	};
 	
@@ -3808,6 +3841,11 @@ function ClientFormManagement( _mainPage, _metaData )
 	me.setUp_DataInThisTestTab = function( activeEvent, partnerData )
 	{	
 		me.addEventFormTag.attr( "event", JSON.stringify( activeEvent ) );
+		if( partnerData!= undefined )
+		{
+			me.addEventFormTag.attr( "partnerData", JSON.stringify( partnerData ) );
+		}
+		
 		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 		
 		// Always show [Complete] button
@@ -3864,6 +3902,8 @@ function ClientFormManagement( _mainPage, _metaData )
 				
 				var partnerDetails = rows[0][4] + " " + rows[0][5] + " (" + rows[0][6] + ")";
 				partnerCUICTag.attr( "title", partnerDetails );
+				partnerCUICTag.closest( "td" ).find("span.partnerInfo").html( partnerDetails );
+				partnerCUICTag.closest( "td" ).find("span.partnerInfo").show();
 			}
 		}
 	}

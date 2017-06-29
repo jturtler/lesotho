@@ -34,6 +34,8 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.headerRightSideControlsTag = $("div.headerRightSideControls");
 	me.mainContentTags = $("div.mainContent");
 	
+	me.ARTReferralOpeningStage_Id = "OSpZnLBMVhr";
+	me.ARTReferralOpeningStage_Name = "";
 	me.attr_District = "qynN2cqRe71";
 	me.attr_Council = "NLNTtpbT3c5";
 	
@@ -244,6 +246,16 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 						{
 							me.filterCouncils = attributeList[j].optionSet.options;
 						}
+					}
+				}
+				
+				// Get [ART Opening] stage name
+				for( var i in jsonData.sections.programStages )
+				{
+					var stage = jsonData.sections.programStages[i];
+					if( stage.id == me.ARTReferralOpeningStage_Id )
+					{
+						me.ARTReferralOpeningStage_Name = stage.name;
 					}
 				}
 				

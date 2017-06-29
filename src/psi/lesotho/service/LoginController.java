@@ -15,12 +15,22 @@ import org.json.JSONObject;
 public class LoginController
     extends HttpServlet
 {
-
-    /** 
-	 * 
-	 */
     private static final long serialVersionUID = -302963909853738077L;
 
+    private static final String PARAM_LOGIN_USERNAME = "@PARAM_LOGIN_USERNAME";
+    
+    // -------------------------------------------------------------------------
+    // URLs
+    // -------------------------------------------------------------------------
+
+    private static String URL_QUERY_METADATA = Util.LOCATION_DHIS_SERVER
+        + "/api/categoryOptions.json?filter=code:eq:" + LoginController.PARAM_LOGIN_USERNAME + "&fields=displayName,categories[id],attributeValues";
+    
+    
+    // -------------------------------------------------------------------------
+    // GET/POST methods
+    // -------------------------------------------------------------------------
+    
     protected void doGet( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
@@ -117,9 +127,9 @@ public class LoginController
 
         try
         {
-           String requestUrl = Util.LOCATION_DHIS_SERVER
-                + "/api/categoryOptions.json?filter=code:eq:" + loginUsername + "&fields=displayName,categories[id],attributeValues";
-
+            String requestUrl = LoginController.URL_QUERY_METADATA;
+            requestUrl = requestUrl.replace( LoginController.PARAM_LOGIN_USERNAME, loginUsername );
+           
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
             
             if ( responseInfo.responseCode == 200 )

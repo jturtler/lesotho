@@ -9,58 +9,85 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import jdk.nashorn.internal.parser.JSONParser;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class EventController
     extends HttpServlet
 {
-    /**
-     * 
-     */
     private static final long serialVersionUID = -8009460801270486913L;
 
     private static String PARAM_USERNAME = "@PARAM_USERNAME";
     private static String PARAM_START_DATE = "@PARAM_START_DATE";
     private static String PARAM_END_DATE = "@PARAM_END_DATE";
+    private static String PARAM_CLIENT_ID = "@PARAM_CLIENT_ID";
     private static String PARAM_EVENT_ID = "@PARAM_EVENT_ID";
     private static String PARAM_ORGUNIT_ID = "@PARAM_ORGUNIT_ID";
+    private static String PARAM_CATEGORY_OPTION_COMBO_ID = "@PARAM_CATEGORY_OPTION_COMBO_ID";
+    // -------------------------------------------------------------------------
+    // URLs
+    // -------------------------------------------------------------------------
 
+    // Load meta data
+    private static String URL_QUERY_METADATA = Util.LOCATION_DHIS_SERVER
+        + "/api/programs/" + Util.ID_PROGRAM + ".json?fields=programStages[programStageDataElements[dataElement[id,optionSet[options[code,name]]]]],programTrackedEntityAttributes[trackedEntityAttribute[id,optionSet[options[code,name]]]";
+    
+    
+    // -------------------------------------------------------------------------
+    // Load list
+    
     private static String URL_QUERY_CASES_BY_TIME = Util.LOCATION_DHIS_SERVER
-        + "/api/sqlViews/IdFgIYoRINL/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
-        + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.STAGE_ID;
+        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_TODAY_CASE + "/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
+        + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.ID_STAGE;
 
     private static String URL_QUERY_POSITIVE_CASES = Util.LOCATION_DHIS_SERVER
-        + "/api/sqlViews/mayPuvHkJ7G/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
-        + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.STAGE_ID;
+        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_POSITIVE_CASE + "/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
+        + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.ID_STAGE;
+
+    private static String URL_QUERY_FUCASE_BY_USERNAME = Util.LOCATION_DHIS_SERVER
+        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_BY_USERNAME + "/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
+        + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.ID_STAGE;
+
+    private static String URL_QUERY_FUCASE_ALL = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_ALL + "/data.json?var=stageId:" + Util.ID_STAGE;
     
+    // -------------------------------------------------------------------------
+    // Event
+
+    private static String URL_QUERY_CREATE_EVENT = Util.LOCATION_DHIS_SERVER + "/api/events";
+    private static String URL_QUERY_UPDATE_EVENT = Util.LOCATION_DHIS_SERVER + "/api/events/" + EventController.PARAM_EVENT_ID;
+    private static String URL_QUERY_EVENTS_BY_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/events.json?ouMode=ACCESSIBLE&skipPaging=true&order=eventDate:DESC&trackedEntityInstance=" + EventController.PARAM_CLIENT_ID;
+    
+    // Load event details
     private static String URL_QUERY_EVENT_BY_ID = Util.LOCATION_DHIS_SERVER
         + "/api/events/" + EventController.PARAM_EVENT_ID + ".json";
-
-
-    private static String URL_QUERY_METADATA = Util.LOCATION_DHIS_SERVER
-        + "/api/programs/KDgzpKX3h2S.json?fields=programStages[programStageDataElements[dataElement[id,optionSet[options[code,name]]]]],programTrackedEntityAttributes[trackedEntityAttribute[id,optionSet[options[code,name]]]";
+    
+    // Load event orgUnit
     private static String URL_QUERY_ORGUNIT = Util.LOCATION_DHIS_SERVER
         + "/api/organisationUnits/" + PARAM_ORGUNIT_ID + ".json?fields=name,parent[name]";
-    
 
-    private static String URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/SKI1rT5vA3m/data.json?var=startDate:" + EventController.PARAM_START_DATE 
-        + "&var=stageId:" + Util.STAGE_ID + "&var=username:" + EventController.PARAM_USERNAME + "&var=ouId:KauEn2jKOk6&var=endDate:" + EventController.PARAM_END_DATE;
-    
-    private static String URL_QUERY_GET_PARTNER_BY_EVENTID = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/aZX9hTaN0aj/data.json?var=partnerEventId:" + EventController.PARAM_EVENT_ID; 
+    // Find partner details by event id
+    private static String URL_QUERY_GET_PARTNER_BY_EVENTID = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_FIND_PARTNER_BY_EVENTID + "/data.json?var=partnerEventId:" + EventController.PARAM_EVENT_ID; 
     
     
-    private static String URL_QUERY_FUCASE_BY_USERNAME = Util.LOCATION_DHIS_SERVER
-        + "/api/sqlViews/llbPbszABjd/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
-        + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.STAGE_ID;
-
-    private static String URL_QUERY_FUCASE_ALL = Util.LOCATION_DHIS_SERVER
-        + "/api/sqlViews/I8xOsd6qfyh/data.json?var=stageId:" + Util.STAGE_ID;
+    // -------------------------------------------------------------------------
+    // Client
     
-
+    // Find client partner information
+    private static String URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_FIND_PARTNER + "/data.json?var=startDate:" + EventController.PARAM_START_DATE 
+        + "&var=stageId:" + Util.ID_STAGE + "&var=username:" + EventController.PARAM_USERNAME + "&var=ouId:KauEn2jKOk6&var=endDate:" + EventController.PARAM_END_DATE;
     
+    
+    // -------------------------------------------------------------------------
+    // Report
+    
+    private static String URL_QUERY_COUNSELLOR_REPORT = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:KDgzpKX3h2S.QLMo6Kh3eVP;KDgzpKX3h2S.tUIkmIFMEDS;KXSdghPqhl6;LE7tDH8dfDV;rcVLQsClLUa;sNS1PQ1YNXA;sX8wCJQEm2l&dimension=pe:THIS_FINANCIAL_YEAR;THIS_MONTH;THIS_QUARTER;THIS_WEEK&filter=ou:" + Util.ROOT_ORGTUNIT_LESOTHO + "&filter=" + Util.USER_CATEGORY_ID + ":" + EventController.PARAM_CATEGORY_OPTION_COMBO_ID + "&skipMeta=false";
+    private static String URL_QUERY_COORDINATOR_REPORT = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:AUu3Q2cTOxt;R8zCCZYPVjm;gO8DpAzJsDp&dimension=pe:THIS_FINANCIAL_YEAR;THIS_MONTH;THIS_QUARTER;THIS_WEEK&filter=ou:" + Util.ROOT_ORGTUNIT_LESOTHO + "&filter=" + Util.USER_CATEGORY_ID + ":" + EventController.PARAM_CATEGORY_OPTION_COMBO_ID + "&displayProperty=SHORTNAME";
+    
+    
+   // -------------------------------------------------------------------------
+   // POST method
+   // -------------------------------------------------------------------------
+  
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
@@ -384,7 +411,7 @@ public class EventController
 
         return code;
     }
-    
+     
     private static ResponseInfo getCounsellorReport( String loginUsername )
     {
         ResponseInfo responseInfo = new ResponseInfo();
@@ -394,7 +421,8 @@ public class EventController
         {
             try
             {
-                String url = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:KDgzpKX3h2S.QLMo6Kh3eVP;KDgzpKX3h2S.tUIkmIFMEDS;KXSdghPqhl6;LE7tDH8dfDV;rcVLQsClLUa;sNS1PQ1YNXA;sX8wCJQEm2l&dimension=pe:THIS_FINANCIAL_YEAR;THIS_MONTH;THIS_QUARTER;THIS_WEEK&filter=ou:" + Util.ROOT_ORGTUNIT_LESOTHO + "&filter=" + Util.USER_CATEGORY_ID + ":" + catOptionComboId + "&skipMeta=false";
+                String url = EventController.URL_QUERY_COUNSELLOR_REPORT;
+                url = url.replace( EventController.PARAM_CATEGORY_OPTION_COMBO_ID, catOptionComboId );
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
             }
             catch ( Exception ex )
@@ -411,6 +439,7 @@ public class EventController
         return responseInfo;
     }
     
+  
     private static ResponseInfo getCoordinatorReport( String loginUsername )
     {
         ResponseInfo responseInfo = new ResponseInfo();
@@ -420,7 +449,8 @@ public class EventController
         {
             try
             {
-                String url = Util.LOCATION_DHIS_SERVER + "/api/25/analytics.json?dimension=dx:AUu3Q2cTOxt;R8zCCZYPVjm;gO8DpAzJsDp&dimension=pe:THIS_FINANCIAL_YEAR;THIS_MONTH;THIS_QUARTER;THIS_WEEK&filter=ou:" + Util.ROOT_ORGTUNIT_LESOTHO + "&filter=" + Util.USER_CATEGORY_ID + ":" + catOptionComboId + "&displayProperty=SHORTNAME";
+                String url = URL_QUERY_COORDINATOR_REPORT;
+                url = url.replace( EventController.PARAM_CATEGORY_OPTION_COMBO_ID, catOptionComboId );
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
             }
             catch ( Exception ex )
@@ -450,7 +480,7 @@ public class EventController
             {
                 JSONObject eventJson = EventController.composeJsonEvent( eventData, clientId, ouId, catOptionComboId );
                 
-                String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events";
+                String requestUrl = EventController.URL_QUERY_CREATE_EVENT;
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, eventJson, null );
 
                 if( responseInfo.responseCode == 200 )
@@ -475,7 +505,7 @@ public class EventController
 
         return responseInfo;
     }
-
+    
     public static ResponseInfo updateEvent( String eventId, JSONObject eventData, String loginUsername )
         throws IOException, Exception
     {
@@ -483,7 +513,8 @@ public class EventController
 
         try
         {
-            String requestUrl = Util.LOCATION_DHIS_SERVER + "/api/events/" + eventId;
+            String requestUrl = URL_QUERY_UPDATE_EVENT;
+            requestUrl = requestUrl.replace( EventController.PARAM_EVENT_ID, eventId );
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, eventData, null );
 
             if( responseInfo.responseCode == 200 )
@@ -500,7 +531,7 @@ public class EventController
 
         return responseInfo;
     }
-
+    
     public static ResponseInfo getEventsByClient( String clientId )
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
@@ -508,8 +539,8 @@ public class EventController
 
         try
         {
-            String requestUrl = Util.LOCATION_DHIS_SERVER
-                + "/api/events.json?ouMode=ACCESSIBLE&skipPaging=true&order=eventDate:DESC&trackedEntityInstance=" + clientId;
+            String requestUrl = EventController.URL_QUERY_EVENTS_BY_CLIENT;
+            requestUrl = requestUrl.replace( EventController.PARAM_CLIENT_ID, clientId );
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
         }
         catch ( Exception ex )
@@ -722,7 +753,7 @@ public class EventController
     private static JSONObject composeJsonEvent( JSONObject eventData, String teiId, String orgUnitId,
         String catOptionComboId )
     {
-        eventData.put( "program", Util.PROGRAM_ID );
+        eventData.put( "program", Util.ID_PROGRAM );
         eventData.put( "orgUnit", orgUnitId );
         eventData.put( "trackedEntityInstance", teiId );
         eventData.put( "eventDate", Util.getCurrentDateTime() );

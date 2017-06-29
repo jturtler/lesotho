@@ -26,13 +26,13 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 	me.backToSearchClientFormTag = $("#backToSearchClientForm");
 	me.showTodayCaseTag = $("#showTodayCase");
 	
-
-	me.attr_FirstName = "mW2l3T2zL0N";
-	me.attr_LastName = "mUxDHgywnn2";
-	me.attr_DoB = "wSp6Q7QDMsk";
-	me.attr_DistrictOB = "u57uh7lHwF8";
-	me.attr_BirthOrder ="vTPYC9BXPNn";
-	
+	// Ids
+	me.attr_DoB = me.mainPage.clientFormManagement.attr_DoB;
+	me.attr_DistrictOB = me.mainPage.clientFormManagement.attr_DistrictOB;
+	me.attr_FirstName = me.mainPage.clientFormManagement.attr_FirstName;
+	me.attr_LastName = me.mainPage.clientFormManagement.attr_LastName;
+	me.attr_BirthOrder = me.mainPage.clientFormManagement.attr_BirthOrder;
+	    
 	me.searchClientAttributeIds = [me.attr_DoB, me.attr_DistrictOB, me.attr_FirstName, me.attr_LastName, me.attr_BirthOrder];
 	
 	// ----------------------------------------------------------------------------
