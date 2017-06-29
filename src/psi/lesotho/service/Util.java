@@ -24,10 +24,10 @@ import org.json.JSONObject;
 
 public final class Util
 {
-
-//    public static String LOCATION_DHIS_SERVER = "http://localhost:8080/dhis";
-    public static String LOCATION_DHIS_SERVER = "https://sandbox.psi-mis.org";
-    //public static String LOCATION_DHIS_SERVER = "https://james.psi-mis.org";
+//    public static String LOCATION_DHIS_SERVER = "https://data.psi-mis.org";
+  public static String LOCATION_DHIS_SERVER = "https://sandbox.psi-mis.org";
+//  public static String LOCATION_DHIS_SERVER = "https://james.psi-mis.org";
+//  public static String LOCATION_DHIS_SERVER = "http://localhost:8080/dhis";
     
     
     public static String REQUEST_PARAM_USERNAME = "usr";
@@ -99,10 +99,17 @@ public final class Util
     // -------------------------------------------------------------------------
     // UIDs
     // -------------------------------------------------------------------------
-   
-    // Supper user
+
+//    // https://data.psi-mis.org
+//    public static final String ID_TRACKED_ENTITY = "XV3kldsZq0H";
+//    public static String ACCESS_SERVER_USERNAME = "ls.webapp";
+//    public static String ACCESS_SERVER_PASSWORD = "Q57pAJ9V";
+    
+    // https://sandbox.psi-mis.org
+    public static final String ID_TRACKED_ENTITY = "MCPQUTHX1Ze";
     public static String ACCESS_SERVER_USERNAME = "lesotho_superuser";
     public static String ACCESS_SERVER_PASSWORD = "ABCD1234";
+    
     
     // Translation Ids
     // public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "98319"; // On Rodolfo account
@@ -126,7 +133,6 @@ public final class Util
     
     // Attribute Ids
     public static final String CLIENT_ATTR_ID_CUIC = "rw3W9pDCPb2";
-    public static final String ID_TRACKED_ENTITY = "MCPQUTHX1Ze";
     public static final String ID_ATTR_FIRSTNAME = "R9Lw1uNtRuj";
     public static final String ID_ATTR_LASTNAME = "TBt2a4Bq0Lx";
     public static final String ID_ATTR_DOB = "BvsJfkddTgZ";

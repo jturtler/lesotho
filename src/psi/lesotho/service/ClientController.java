@@ -222,7 +222,7 @@ public class ClientController
 
         try
         {
-            String requestUrl = ClientController.URL_QUERY_UPDATE_CLIENT + clientId;
+            String requestUrl = ClientController.URL_QUERY_UPDATE_CLIENT;
             requestUrl = requestUrl.replace( ClientController.PARAM_CLIENT_ID, clientId );
             
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, receivedData, null );
