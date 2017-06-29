@@ -527,7 +527,7 @@ function CoordinatorListManagement( _mainPage )
 		// If [ART Referral - Opening] and [Contact Log] events existed, no [ART Referral - Closure]
 		// --> Last action : Last Contact Log event DATE, Last Contact Log event TYPE OF CONTACT
 		// --> Next action : Last Contact Log event DUE DATE, Last Contact Log event NEXT ACTION
-		else if( openingARTEventDate != "" && contactLogEventDate == "" && closureARTEventDate == "" )
+		else if( openingARTEventDate != "" && contactLogEventDate != "" && closureARTEventDate == "" )
 		{
 			lastActionDate = Util.formatDate_DisplayDate( contactLogEventDate );
 			lastActionName = contactLogEventContactType;
