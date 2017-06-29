@@ -95,11 +95,6 @@ function ClientFormManagement( _mainPage, _metaData )
 	// [Register Attribute] Ids
 	me.attrGroup_ClientDetailsAndCUIC = "KgeLi7PFYxe";
 	
-//	me.attr_FirstName = "mW2l3T2zL0N";
-//	me.attr_LastName = "mUxDHgywnn2";
-//	me.attr_DoB = "wSp6Q7QDMsk";
-//	me.attr_ClientCUIC = "zRA08XEYiSF";
-	
 	me.attr_FirstName = "R9Lw1uNtRuj";
 	me.attr_LastName = "TBt2a4Bq0Lx";
 	me.attr_DoB = "BvsJfkddTgZ";
