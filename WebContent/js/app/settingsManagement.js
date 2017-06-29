@@ -38,6 +38,7 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.ARTReferralOpeningStage_Name = "";
 	me.attr_District = "qynN2cqRe71";
 	me.attr_Council = "NLNTtpbT3c5";
+	me.attr_HealthFacilityProvidingART = "LCLiPzJWVAb";
 	
 	me.metaData;
 	me.filterDistricts;
@@ -245,6 +246,10 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 						else if( attributeList[j].id === me.attr_Council )
 						{
 							me.filterCouncils = attributeList[j].optionSet.options;
+						}
+						else if ( attributeList[j].id === me.attr_HealthFacilityProvidingART )
+						{
+							me.filterHealthFacilities = attributeList[j].optionSet.options;
 						}
 					}
 				}

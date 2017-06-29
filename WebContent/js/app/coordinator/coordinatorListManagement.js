@@ -10,6 +10,7 @@ function CoordinatorListManagement( _mainPage )
 
 	me.filterDistricts = me.mainPage.settingsManagement.filterDistricts;
 	me.filterCouncils = me.mainPage.settingsManagement.filterCouncils;
+	me.filterHealthFacilities = me.mainPage.settingsManagement.filterHealthFacilities;
 	
 	// Today F/U
 	me.todayFUListTag = $("#todayFUList");
@@ -32,12 +33,14 @@ function CoordinatorListManagement( _mainPage )
 	me.filterCurUserCasesChkTag = $("#filterCurUserCasesChk");
 	me.filterClosedCasesChkTag = $("#filterClosedCasesChk");
 	me.placeOfResidenceChkTag = $("#placeOfResidenceChk");
+	me.facilityReferredToChkTag = $("#facilityReferredToChk");
 
 	me.ouFilterTbTag = $("#ouFilterTb");
 	me.ouFilterInforTag = $("#ouFilterInfor");
 	me.ouFilterHeaderTrTag = $("#ouFilterHeaderTr");
 	me.districtFilterTbTag = $("#districtFilterTb");
 	me.councilFilterTbTag = $("#councilFilterTb");
+	me.healthFacilityFilterTbTag = $("#healthFacilityFilterTb");
 	me.districtFilterInfoTag = $("#districtFilterInfo");
 	me.councilFilterInfoTag = $("#councilFilterInfo");
 	
@@ -58,6 +61,7 @@ function CoordinatorListManagement( _mainPage )
 		
 		me.createDistrictFilter();
 		me.createCouncilFilter();
+		me.createHealthFacilitiesFilter();
 		me.setFilterDataInfo();
 		
 		me.setUp_Events();
@@ -116,14 +120,36 @@ function CoordinatorListManagement( _mainPage )
 	{
 		me.districtFilterTbTag.find("input").click( function(){
 			me.filterCouncilsByDistrict();
+			me.filterHealthFacilitiesByDistrict();
 			me.filterEvents();
 		});
 		
 		me.councilFilterTbTag.find("input").click( me.filterEvents );
+		me.healthFacilityFilterTbTag.find("input").click( me.filterEvents );
 		me.filterCurUserCasesChkTag.click( me.filterEvents );
 		me.filterClosedCasesChkTag.click( me.filterEvents );
-		me.placeOfResidenceChkTag.click( me.filterEvents );
 		
+		me.placeOfResidenceChkTag.click( function(){
+			var checked = me.placeOfResidenceChkTag.prop("checked");
+			if( checked )
+			{
+				me.healthFacilityFilterTbTag.find("input").prop("checked", false);
+				me.healthFacilityFilterTbTag.hide();
+				me.councilFilterTbTag.show();
+				me.filterEvents();
+			}
+		} );
+		
+		me.facilityReferredToChkTag.click( function(){
+			var checked = me.facilityReferredToChkTag.prop("checked");
+			if( checked )
+			{
+				me.councilFilterTbTag.find("input").prop("checked", false);
+				me.councilFilterTbTag.hide();
+				me.healthFacilityFilterTbTag.show();
+				me.filterEvents();
+			}
+		} );
 		
 		me.ouFilterHeaderTrTag.click( function(){
 			
@@ -192,7 +218,31 @@ function CoordinatorListManagement( _mainPage )
 		}
 		
 		me.showCouncilNoFilter();
-	}
+	};
+
+	me.createHealthFacilitiesFilter = function()
+	{
+		var noneFilter = me.translationObj.getTranslatedValueByKey( "allFU_filterBy_ouNone" );
+    	
+		var emptyRowTag = $( "<tr filter='none'></tr>" );
+		emptyRowTag.append( "<td style='font-style:italic;'>[" + noneFilter + "]</td>" );
+		emptyRowTag.append( "<td></td>" );
+		me.healthFacilityFilterTbTag.append( emptyRowTag );
+		
+		for( var i in me.filterHealthFacilities )
+		{
+			var name = me.filterHealthFacilities[i].name;
+			var code = me.filterHealthFacilities[i].code;
+			
+			var rowTag = $( "<tr filter='" + code + "' isChecked='false'></tr>" );
+			rowTag.append( "<td><input type='checkbox' value='" + code + "'</td>" );
+			rowTag.append( "<td>" + name + "</td>" );
+			me.healthFacilityFilterTbTag.append( rowTag );
+		}
+		
+		me.showHealthFacilityNoFilter();
+	};
+	
 	
 	// -------------------------------------------------------------------------
 	// Load list of cases
@@ -554,9 +604,15 @@ function CoordinatorListManagement( _mainPage )
 
 		// STEP 3. Filter by District/Council
 		var councils = Util.getCheckedInputValues( me.councilFilterTbTag );
+		var healthFacilities = Util.getCheckedInputValues( me.healthFacilityFilterTbTag );
+		
 		if( councils.length > 0 )
 		{
 			me.filterByColumnValues( 4, councils );
+		}
+		else if( healthFacilities.length > 0 )
+		{
+			me.filterByColumnValues( 5, healthFacilities );
 		}
 		else
 		{
@@ -633,12 +689,51 @@ function CoordinatorListManagement( _mainPage )
 		me.councilFilterTbTag.find("tr[isChecked='false']").find("input").prop("checked", false);
 	};
 
+	me.filterHealthFacilitiesByDistrict = function()
+	{
+		var districts = Util.getCheckedInputValues( me.districtFilterTbTag );
+		me.healthFacilityFilterTbTag.find("tr[filter]").hide();
+		me.healthFacilityFilterTbTag.find("tr[filter]").attr( "isChecked", false );
+		
+		if( districts.length > 0 )
+		{
+			for( var i in districts )
+			{	
+				var district = districts[i];
+				var key = "";
+				if( district == "LS11" || district == "LS12" )
+				{
+					key = "NA";
+				}
+				else
+				{
+					key = district;
+				}
+				
+				var healthFacilityTags = me.healthFacilityFilterTbTag.find("tr[filter^='" + key + "']")
+				healthFacilityTags.show();
+				healthFacilityTags.attr( "isChecked", true );
+			}
+		}
+		else
+		{
+			me.showHealthFacilityNoFilter();
+		}
+		
+		me.healthFacilityFilterTbTag.find("tr[isChecked='false']").find("input").prop("checked", false);
+	};
+	
 	me.showCouncilNoFilter = function()
 	{
 		me.councilFilterTbTag.find("tr").hide();
 		me.councilFilterTbTag.find("tr[filter='none']").show();
 	};
-	
+
+	me.showHealthFacilityNoFilter = function()
+	{
+		me.healthFacilityFilterTbTag.find("tr").hide();
+		me.healthFacilityFilterTbTag.find("tr[filter='none']").show();
+	};
 
 	me.setFilterDataInfo = function()
 	{

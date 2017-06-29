@@ -181,12 +181,12 @@
 					    		<th><span keyword="allFU_filterBy"  style="vertical-align: middle;">Filter by</span>:</th>
 					    		<td>
 					    			<div>
-									  <label><input type="radio" value="placeOfResidenceChk" checked> <span keyword="allFU_filterBy_placeOfResidence" style="font-weight:normal;">Place of Residence</span></label></label>
+									  <label><input type="radio" id="placeOfResidenceChk" checked name="filterOrgUnit"> <span keyword="allFU_filterBy_placeOfResidence" style="font-weight:normal;">Place of Residence</span></label></label>
 									</div>
 								</td>
-					    		<td style="display:none;">
+					    		<td>
 					    			<div>
-									  <label><input type="radio" value=""> <span keyword="allFU_filterBy_facilityReferredTo" style="font-weight:normal;">Facility Referred to</span></label></label>
+									  <label><input type="radio" id="facilityReferredToChk" name="filterOrgUnit"> <span keyword="allFU_filterBy_facilityReferredTo" style="font-weight:normal;">Facility Referred to</span></label></label>
 									</div>
 					    		</td>
 					    	</tr>
@@ -205,13 +205,19 @@
 					    			<img style="float:left" class="arrowRightImg" src="../images/tab_right.png">
 					    			<span keyword="allFU_filterBy_district">District</span>
 					    		</td>
-					    		<th keyword="allFU_filterBy_council">Council</td>
+					    		<th keyword="allFU_filterBy_councilFacility">Council/Facility</td>
+					    		<th keyword="allFU_filterBy_councilFacility" style="display:none;">Council/Facility</td>
 					    	</tr>
 					    	
 					    	<tbody id="ouFilterTb" style="display:none;">
 					    		<tr>
 					    			<td style="vertical-align: top;"><div style="overflow: auto;height: 280px;"><table id="districtFilterTb"  style="width:100%"></table></div></td>
-					    			<td style="vertical-align: top;"><div style="overflow: auto;height: 280px;"><table id="councilFilterTb" style="width:100%"></table></div></td>
+					    			<td style="vertical-align: top;">
+					    				<div style="overflow: auto;height: 280px;">
+					    					<table id="councilFilterTb" style="width:100%"></table>
+					    					<table id="healthFacilityFilterTb" style="width:100%;display:none;"></table>
+					    				</div>
+					    			</td>
 					    		</tr>
 					    	</tbody>
 					    	
