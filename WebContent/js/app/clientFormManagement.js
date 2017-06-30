@@ -1062,6 +1062,14 @@ function ClientFormManagement( _mainPage, _metaData )
 
 	me.setUp_ReferralOfferedLogic = function()
 	{
+		var jsonClient = me.addClientFormTabTag.attr("client");
+		var gender = "";
+		if( jsonClient != undefined )
+		{
+			jsonClient = JSON.parse( jsonClient );
+			gender = me.getAttributeValue( jsonClient, me.attr_Sex );
+		}
+		
 		var referralOfferedTag = me.getDataElementField( me.de_Referral_Offered );
 		var testResultsGivenTag = me.getDataElementField( me.de_TestResultsGiven );
 		var referralGivenSTITag = me.getDataElementField( me.de_ReferralGiven_STI );
@@ -1073,7 +1081,6 @@ function ClientFormManagement( _mainPage, _metaData )
 		var referralGivenPRePNegativeTag = me.getDataElementField( me.de_ReferralGivenPRePNegative );
 		
 		var resultFinalHIVStatusTag = me.getDataElementField( me.de_FinalResult_HIVStatus );
-		var genderTag = me.getAttributeField( me.attr_Sex );
 		
 		// Hidden all [Referral Given xxx]
 		me.setHideLogicTag( referralGivenSTITag.closest("tr"), true );
@@ -1102,7 +1109,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), false );
 			}
 			
-			if( genderTag.val() == "Male" )
+			if( gender == "Male" )
 			{
 				me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), false );
 			}
@@ -1847,10 +1854,21 @@ function ClientFormManagement( _mainPage, _metaData )
 		var sexTag = me.getAttributeField( me.attr_Sex );
 		sexTag.change( function(){
 			var keyPopulationTag = me.getAttributeField( me.attr_KeyPopulation );
-			var circumcisedTag = me.getDataElementField( me.de_circumcisedTag );
-			
 			keyPopulationTag.val("");
-			circumcisedTag.val("");
+			
+			// Only when data of client is saved, the data values of [New Test] get changed
+			var jsonClient = me.addClientFormTabTag.attr("client");
+			var gender = "";
+			if( jsonClient != undefined )
+			{
+				jsonClient = JSON.parse( jsonClient );
+				var gender = me.getAttributeValue( jsonClient, me.attr_Sex  );
+				if( gender == sexTag.val() )
+				{
+					var circumcisedTag = me.getDataElementField( me.de_circumcisedTag );
+					circumcisedTag.val("");
+				}
+			}
 			
 			me.setUp_ClientRegistrationFormLogic_sexField();
 		});
@@ -1875,8 +1893,8 @@ function ClientFormManagement( _mainPage, _metaData )
 	{
 		var sexTag = me.getAttributeField( me.attr_Sex );
 		var keyPopulationTag = me.getAttributeField( me.attr_KeyPopulation );
+
 		var circumcisedTag = me.getDataElementField( me.de_circumcisedTag );
-		
 		var referralGivenVMMCTag = me.getDataElementField( me.de_ReferralGiven_VMMC );
 		var referralOfferedTag = me.getDataElementField( me.de_Referral_Offered );
 		
@@ -1885,22 +1903,40 @@ function ClientFormManagement( _mainPage, _metaData )
 		keyPopulationTag.find("option[value='MSMNONSW']").hide();
 		keyPopulationTag.find("option[value='FSW']").hide();
 
-		// Reset data element [Circumcised]
-		me.setHideLogicTag( circumcisedTag.closest("tr"), circumcisedTag );
+		// Only when data of client is saved, the data values of [New Test] get changed
+		var jsonClient = me.addClientFormTabTag.attr("client");
+		var dataSaved = false;
+		if( jsonClient != undefined )
+		{
+			jsonClient = JSON.parse( jsonClient );
+			var gender = me.getAttributeValue( jsonClient, me.attr_Sex  );
+			if( gender == sexTag.val() )
+			{
+				dataSaved == true;
+			}
+		}
 		
+		if( dataSaved )
+		{
+			// Reset data element [Circumcised]
+			me.setHideLogicTag( circumcisedTag.closest("tr"), false );
+		}
 		
 		if( sexTag.val() == "Female" ) // If Sex = Female, 		
 		{
 			// Show option values [FSW] of attribute [Key Population]
 			keyPopulationTag.find("option[value='FSW']").show();
 			
-			// Hide data element [Circumcised]
-			me.setHideLogicTag( circumcisedTag.closest("tr"), true );
+			if( dataSaved )
+			{
+				// Hide data element [Circumcised]
+				me.setHideLogicTag( circumcisedTag.closest("tr"), true );
+				// Hide [Referral to VMMC]
+				me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), true );
+			}
 			
-			// Hide [Referral to VMMC]
-			me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), true );
 		}
-		else if( sexTag.val() == "Male" ) // If Sex = Male, HIDE FSW
+		else if( sexTag.val() == "Male" && dataSaved ) // If Sex = Male, HIDE FSW
 		{
 			// Show option values [MSM] of attribute [Key Population]
 			keyPopulationTag.find("option[value='MSMSW']").show();
@@ -2849,27 +2885,29 @@ function ClientFormManagement( _mainPage, _metaData )
 		// Init [Time since last test in months]
 		
 		var timeSinceLastTestTag = me.getDataElementField( me.de_TimeSinceLastTest );
-		if( timeSinceLastTestTag.val() == "" )
+		
+		var prevHIVTestDate = "";
+		var latestHIVTestEvent = me.previousTestsTag.find("table").find("tbody[eventid]:first");
+		var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
+		if( latestHIVTestEvent.length > 0 )
 		{
-			var prevHIVTestDate = "";
-			var latestHIVTestEvent = me.previousTestsTag.find("table").find("tbody[eventid]:first");
-			var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
-			if( latestHIVTestEvent.length > 0 )
-			{
-				prevHIVTestDate = latestHIVTestEvent.find("tr[header]").attr("eventDate");
-				prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
-			}
-			else if( jsonClient != undefined )
-			{
-				prevHIVTestDate = me.getAttributeValue( jsonClient, me.attr_DateLastHIVTest );
-				prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
-			}
-			
-			if( prevHIVTestDate != "" )
-			{
-				var noMonth = Util.getMonthsBetweenDates( Util.convertDateStrToObject( prevHIVTestDate ), new Date() );
-				timeSinceLastTestTag.val( noMonth );
-			}
+			prevHIVTestDate = latestHIVTestEvent.find("tr[header]").attr("eventDate");
+			prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
+		}
+		else if( jsonClient != undefined )
+		{
+			prevHIVTestDate = me.getAttributeValue( jsonClient, me.attr_DateLastHIVTest );
+			prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
+		}
+		
+		if( prevHIVTestDate != "" )
+		{
+			var noMonth = Util.getMonthsBetweenDates( Util.convertDateStrToObject( prevHIVTestDate ), new Date() );
+			timeSinceLastTestTag.val( noMonth );
+		}
+		else
+		{
+			timeSinceLastTestTag.val( "" );
 		}
 
 		

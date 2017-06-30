@@ -195,10 +195,12 @@ function LoginForm( storageObj, translationObj )
             }
 			,success: function( jsonData ) 
 			{
+				var districts = Util.sortByKey( jsonData.organisationUnits, "name" );
+				
 				me.districtListTag.append("<option value=''>[Please select]</option>");
-				for( var i in jsonData.organisationUnits )
+				for( var i in districts )
 				{
-					var orgUnit = jsonData.organisationUnits[i];
+					var orgUnit = districts[i];
 					me.districtListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
 				}
 
@@ -228,10 +230,12 @@ function LoginForm( storageObj, translationObj )
 	            }
 				,success: function( jsonData ) 
 				{
+					var orgUnits = Util.sortByKey( jsonData.organisationUnits, "name" );
+					
 					me.orgUnitListTag.append("<option value=''>[Please select]</option>");
-					for( var i in jsonData.organisationUnits )
+					for( var i in orgUnits )
 					{
-						var orgUnit = jsonData.organisationUnits[i];
+						var orgUnit = orgUnits[i];
 						me.orgUnitListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
 					}
 	

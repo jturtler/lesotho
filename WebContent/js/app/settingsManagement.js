@@ -172,10 +172,12 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
             }
 			,success: function( jsonData ) 
 			{
+				var orgUnits = Util.sortByKey( jsonData.organisationUnits, "name" );
+				
 				me.orgUnitListTag.append("<option value=''>[Please select]</option>");
-				for( var i in jsonData.organisationUnits )
+				for( var i in orgUnits )
 				{
-					var orgUnit = jsonData.organisationUnits[i];
+					var orgUnit = orgUnits[i];
 					me.orgUnitListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
 				}
 
@@ -230,28 +232,27 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 			{
 				me.metaData = jsonData;
 				
-				// Look for option values of District/Council for filtering
+				// Look for option values of Districts/Councils/Health facilities for filtering
 				var attrGroups = jsonData.attGroups.trackedEntityAttributeGroups;
 				for( var i in attrGroups )
-				{
-						
+				{	
 					var attributeList = attrGroups[i].trackedEntityAttributes;
 					for( var j in attributeList )
 					{
-						
-						// STEP 2.1. Check if attribute in the groups exists in program-attribute
-						
 						if( attributeList[j].id === me.attr_District )
 						{
 							me.filterDistricts = attributeList[j].optionSet.options;
+							me.filterDistricts = Util.sortByKey( me.filterDistricts, "name" );
 						}
 						else if( attributeList[j].id === me.attr_Council )
 						{
 							me.filterCouncils = attributeList[j].optionSet.options;
+							me.filterCouncils = Util.sortByKey( me.filterCouncils, "name" );
 						}
 						else if ( attributeList[j].id === me.attr_HealthFacilityProvidingART )
 						{
 							me.filterHealthFacilities = attributeList[j].optionSet.options;
+							me.filterHealthFacilities = Util.sortByKey( me.filterHealthFacilities, "name" );
 						}
 					}
 				}
@@ -277,11 +278,11 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 				
 				
 				// Populate orgunit list in 'Settings'
-				
+				var districts = Util.sortByKey( jsonData.districts.organisationUnits, "name" );
 				me.districtListTag.append("<option value=''>[Please select]</option>");
-				for( var i in jsonData.districts.organisationUnits )
+				for( var i in districts )
 				{
-					var orgUnit = jsonData.districts.organisationUnits[i];
+					var orgUnit = districts[i];
 					me.districtListTag.append("<option value='" + orgUnit.id + "'>" + orgUnit.name + "</option>");
 				}
 
@@ -302,7 +303,6 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	// ----------------------------------------------------------------------------
 	// Populate data
 	// ----------------------------------------------------------------------------
-
 	
 	me.populateOrgUnitList = function()
 	{
