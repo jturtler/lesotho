@@ -808,6 +808,16 @@ tr.actionBar th
     font-size: 11px;
 }
 
-
+input[type='checkbox']
+{
+	margin-left: 10px;
+    margin-right: 20px;
+}
+ 
+input[type='radio']
+{
+	margin-left: 10px;
+    margin-right: 20px;
+}   
 
 

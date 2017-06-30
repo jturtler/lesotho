@@ -39,10 +39,12 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.attr_District = "qynN2cqRe71";
 	me.attr_Council = "NLNTtpbT3c5";
 	me.attr_HealthFacilityProvidingART = "LCLiPzJWVAb";
+	me.attr_ClosureART_Status = "nOK8JcDWT9X";
 	
 	me.metaData;
 	me.filterDistricts;
 	me.filterCouncils;
+	me.closureARTStatus;
 	
 	
 	me.userInfoLoaded = false;
@@ -261,6 +263,15 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 					if( stage.id == me.ARTReferralOpeningStage_Id )
 					{
 						me.ARTReferralOpeningStage_Name = stage.name;
+					}
+					
+					var psDEs = stage.programStageDataElements;					
+					for( var j in psDEs )
+					{
+						if( psDEs[j].dataElement.id === me.attr_ClosureART_Status )
+						{
+							me.closureARTStatus = psDEs[j].dataElement.optionSet.options;
+						}
 					}
 				}
 				

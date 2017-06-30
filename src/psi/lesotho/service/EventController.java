@@ -48,7 +48,7 @@ public class EventController
         + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_BY_USERNAME + "/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
         + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.ID_STAGE;
 
-    private static String URL_QUERY_FUCASE_ALL = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_ALL + "/data.json?var=stageId:" + Util.ID_STAGE;
+    private static String URL_QUERY_FUCASE_ALL = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_ALL + "/data.json";
     
     // -------------------------------------------------------------------------
     // Event

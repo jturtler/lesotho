@@ -91,6 +91,8 @@ function ClientFormManagement( _mainPage, _metaData )
 	me.stage_ARTReferralOpenning = "OSpZnLBMVhr";
 	me.stage_ARTReferralClosure = "usEIFQODMxf";
 
+	me.section_TestingMaterial_Id = "SM7CTqPBbCX";
+
 	
 	// [Register Attribute] Ids
 	me.attrGroup_ClientDetailsAndCUIC = "KgeLi7PFYxe";
@@ -1225,10 +1227,11 @@ function ClientFormManagement( _mainPage, _metaData )
 			Util.disableTag( resultTest2Tag, false );
 			
 			// STEP 1. Hide all tbody and input in [New Test]
-			me.addEventFormTag.find("tbody[sectionid]").hide();
-			me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
+			me.addEventFormTag.find("tbody[sectionid!='" + me.section_TestingMaterial_Id + "']").hide();
+			me.addEventFormTag.find("tbody[sectionid!='" + me.section_TestingMaterial_Id + "']").find("input,select").each(function(){
 				me.setHideLogicTag( $(this), true );
 			});
+						
 			
 			// STEP 2. Show [Client Type] field
 			var clientInfoTb = clientTypeTag.closest("tbody");
