@@ -1679,7 +1679,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.addContactLogEventFormTag.find("input[isDate='true']").each(function(){
 			if( $(this).attr("dataelement") == me.de_DueDate )
 			{
-				Util.dateFuturePicker( $(this) );
+				Util.dateFutureOnlyPicker( $(this) );
 			}
 			else
 			{

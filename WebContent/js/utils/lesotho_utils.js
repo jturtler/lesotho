@@ -689,6 +689,21 @@ Util.dateFuturePicker = function( dateTag )
      });
 };
 
+Util.dateFutureOnlyPicker = function( dateTag )
+{
+	dateTag.attr( "readonly", true );
+	dateTag.datetimepicker({
+		viewMode: 'years'
+        ,format: Commons.dateFormat
+        ,widgetPositioning: { 
+            vertical: 'bottom'
+        }
+		,minDate: new Date()
+		,ignoreReadonly: true
+        ,showClear: true
+     });
+		  
+};
 
 Util.dateTimePicker = function( dateTag )
 {	
