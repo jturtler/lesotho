@@ -11,6 +11,7 @@ function CoordinatorListManagement( _mainPage )
 	me.filterDistricts = me.mainPage.settingsManagement.filterDistricts;
 	me.filterCouncils = me.mainPage.settingsManagement.filterCouncils;
 	me.filterHealthFacilities = me.mainPage.settingsManagement.filterHealthFacilities;
+	me.closureARTStatus = me.mainPage.settingsManagement.closureARTStatus;
 	
 	// Today F/U
 	me.todayFUListTag = $("#todayFUList");
@@ -45,8 +46,18 @@ function CoordinatorListManagement( _mainPage )
 	me.councilFilterInfoTag = $("#councilFilterInfo");
 	
 	
-
 	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
+	
+	// -------------------------------------------------------------------------
+	// IDs
+	// -------------------------------------------------------------------------
+	
+	me.de_ARTOpening_ReferralFacilityName  = 'E1KAxdya3y5';
+	me.de_ARTOpening_ReferralFacilityOther = 'CLclHLxzl9e';
+		
+	me.de_contactLog_lastActionName = "wzM3bUiPowS";
+	me.de_contactLog_nextActionName = "mcgzEFh5IV8";
+	me.de_contactLog_dueDate = "HcBFZsCt8Sy";
 	
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
@@ -191,8 +202,7 @@ function CoordinatorListManagement( _mainPage )
 			var code = "LS" + me.filterDistricts[i].code;
 			
 			var rowTag = $( "<tr></tr>" );
-			rowTag.append( "<td><input type='checkbox' value='" + code + "'</td>" );
-			rowTag.append( "<td>" + name + "</td>" );
+			rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'> " + name + "</label></td>" );
 			me.districtFilterTbTag.append( rowTag );
 		}
 	};
@@ -203,7 +213,6 @@ function CoordinatorListManagement( _mainPage )
     	
 		var emptyRowTag = $( "<tr filter='none'></tr>" );
 		emptyRowTag.append( "<td style='font-style:italic;'>[" + noneFilter + "]</td>" );
-		emptyRowTag.append( "<td></td>" );
 		me.councilFilterTbTag.append( emptyRowTag );
 		
 		for( var i in me.filterCouncils )
@@ -212,8 +221,7 @@ function CoordinatorListManagement( _mainPage )
 			var code = me.filterCouncils[i].code;
 			
 			var rowTag = $( "<tr filter='" + code + "' isChecked='false'></tr>" );
-			rowTag.append( "<td><input type='checkbox' value='" + code + "'</td>" );
-			rowTag.append( "<td>" + name + "</td>" );
+			rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'>" + name + "</label></td>" );
 			me.councilFilterTbTag.append( rowTag );
 		}
 		
@@ -226,7 +234,6 @@ function CoordinatorListManagement( _mainPage )
     	
 		var emptyRowTag = $( "<tr filter='none'></tr>" );
 		emptyRowTag.append( "<td style='font-style:italic;'>[" + noneFilter + "]</td>" );
-		emptyRowTag.append( "<td></td>" );
 		me.healthFacilityFilterTbTag.append( emptyRowTag );
 		
 		for( var i in me.filterHealthFacilities )
@@ -235,8 +242,8 @@ function CoordinatorListManagement( _mainPage )
 			var code = me.filterHealthFacilities[i].code;
 			
 			var rowTag = $( "<tr filter='" + code + "' isChecked='false'></tr>" );
-			rowTag.append( "<td><input type='checkbox' value='" + code + "'</td>" );
-			rowTag.append( "<td>" + name + "</td>" );
+			rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'> " + name + "</label></td>" );
+			rowTag.append( "<td></td>" );
 			me.healthFacilityFilterTbTag.append( rowTag );
 		}
 		
@@ -408,6 +415,215 @@ function CoordinatorListManagement( _mainPage )
 		
 		if( list.length > 0 )
 		{
+			var currentUsername = me.mainPage.settingsManagement.loginUsername;
+			
+			for( var i in list )
+			{
+				var clientData = list[i];
+				
+				var openingARTEvent = clientData[5];
+				if( openingARTEvent != "" )
+				{	
+					var hasCurrentUserEvent = false;
+					
+					// ---------------------------------------------------------
+					// [HIV Testing]
+					// ---------------------------------------------------------
+					
+					// Event date
+					var eventDate = clientData[0];
+					eventDateStr = Util.formatDate_DisplayDate( eventDate );
+					var eventKey = eventDate.substring(11, 19).split(":").join("");
+					
+					// Event Id && Day Since Diagnosis
+					var HIVTestingEvent = JSON.parse( clientData[1] );
+					var eventId = HIVTestingEvent.eventId;
+					var daySinceDiagnosis = parseInt( HIVTestingEvent.daySinceDiagnosis );
+					
+					
+					// ---------------------------------------------------------
+					// Client Info
+					// ---------------------------------------------------------
+					
+					var clientId = clientData[2];
+					var cuic = clientData[3];
+					
+					
+					// ---------------------------------------------------------
+					// Council code and name
+					// ---------------------------------------------------------
+					
+					var councilData = clientData[4];
+					var councilName = "";
+					var councilCode = "";
+					if( councilData!= "" )
+					{
+						councilData = JSON.parse( councilData );
+						councilName = councilData.name;
+						councilCode = councilData.code;
+					}
+
+					// ---------------------------------------------------------
+					// [ART Opening] event data
+					// ---------------------------------------------------------
+					
+					var openingARTEvent = JSON.parse( "[" + openingARTEvent + "]" );
+					var facilityName = "";
+					var facilityCode = "";
+					var latestEventId = openingARTEvent[0].eventId;
+					openingARTEventDate = openingARTEvent[0].eventDate;
+					var openingARTEventName = me.mainPage.settingsManagement.ARTReferralOpeningStage_Name;
+					
+					for( var i in openingARTEvent )
+					{
+						var event = openingARTEvent[i];
+						if( event.eventId == latestEventId )
+						{
+							if( event.deId == me.de_ARTOpening_ReferralFacilityName )
+							{
+								facilityCode = event.dataValue;
+							}
+							else if( event.deId == me.de_ARTOpening_ReferralFacilityOther )
+							{
+								facilityName = event.dataValue;
+							}
+						}
+						
+						// Check if current user has any event
+						if( event.username == currentUsername && !hasCurrentUserEvent )
+						{
+							hasCurrentUserEvent = true;
+						}
+					}
+					
+					if( facilityName == "" )
+					{
+						var searched = Util.findItemFromList( me.filterHealthFacilities, "code", facilityCode );
+						if( searched != undefined )
+						{
+							facilityName = searched.name;
+						}
+					}
+					
+					// ---------------------------------------------------------
+					// [Contact log] event data
+					// ---------------------------------------------------------
+					
+					var contactLogEvent = clientData[6];
+					var contactLogEventDate = "";
+					var contactLogEventContactType = "";
+					var contactLogDueDate = "";
+					var contactLogNextAction = "";
+					
+					if( contactLogEvent != "" )
+					{
+						contactLogEvent = JSON.parse( "[" + contactLogEvent + "]" );
+						var latestEventId = contactLogEvent[0].eventId;
+						contactLogEventDate = contactLogEvent[0].eventDate;
+						for( var i in contactLogEvent )
+						{
+							var event = contactLogEvent[i];
+							if( event.eventId == latestEventId )
+							{
+								if( event.deId = me.de_contactLog_lastActionName )
+								{
+									contactLogEventContactType = event.datavalue;
+								}
+								else if( event.deId = me.de_contactLog_nextActionName )
+								{
+									contactLogNextAction = event.datavalue;
+								}
+								else if( event.deId = me.de_contactLog_dueDate )
+								{
+									contactLogDueDate = event.datavalue;
+								}	
+							}
+							
+							// Check if current user has any event
+							if( event.username == currentUsername && !hasCurrentUserEvent )
+							{
+								hasCurrentUserEvent = true;
+							}
+						}
+						
+					}
+					
+					
+					// ---------------------------------------------------------
+					// [ART Closure] event
+					// ---------------------------------------------------------
+					
+					var closureARTEvent = clientData[7];
+					var isClosureEvent = false;
+					var closureARTEventDate = "";
+					var closureEventLinkageOutcome = "";
+					if( closureARTEvent != "" )
+					{
+						isClosureEvent = true;
+						closureARTEvent = JSON.parse( closureARTEvent );
+						closureARTEventDate = closureARTEvent.eventDate;
+						closureEventLinkageOutcome = closureARTEvent.datavalue;
+						var searched = Util.findItemFromList( me.closureARTStatus, "code", closureEventLinkageOutcome);
+						if( searched )
+						{
+							closureEventLinkageOutcome = searched.name;
+						}
+						
+						// Check if current user has any event
+						if( closureARTEvent.username == currentUsername && !hasCurrentUserEvent )
+						{
+							hasCurrentUserEvent = true;
+						}
+					}
+					
+					
+					// ---------------------------------------------------------
+					// Get Last action && Next action
+					// ---------------------------------------------------------
+					
+					var actions = me.getLastAction( contactLogEventDate, contactLogEventContactType
+							, contactLogDueDate, contactLogNextAction
+							, openingARTEventDate, openingARTEventName
+							, closureARTEventDate, closureEventLinkageOutcome );
+					
+					
+					// Populate data in table
+					var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
+					
+					var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
+					rowTag.append( "<td style='display:none;'><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
+					rowTag.append( "<td style='display:none;' filter='" + hasCurrentUserEvent + "' >Has current user event</td>" );
+					rowTag.append( "<td style='display:none;' filter='" + isClosureEvent + "'>Closure event</td>" );
+					rowTag.append( "<td filter='" + councilCode + "'>" + councilName + "</td>" );
+					rowTag.append( "<td filter='" + facilityCode + "'>" + facilityName + "</td>" );
+					rowTag.append( "<td>" + cuic + "</td>" );
+					rowTag.append( "<td>" + daySinceDiagnosis + "</td>" );
+					rowTag.append( "<td>" + actions.lastAction.date + "<br> " + actions.lastAction.action + "</td>" );
+					rowTag.append( "<td>" + actions.nextAction.date + "<br>" + actions.nextAction.action + "</td>" );
+					
+					me.addEventForRowInList(rowTag);
+					
+					tbodyTag.append( rowTag );
+				}
+			}
+			
+		}
+		
+		// Sortable
+		me.sortTable( me.allFUTblTag );
+		
+		me.allFUNumberTag.html( me.allFUTblTag.find("tbody").find("tr:visible").length );
+	};
+	
+	/*
+	me.populateAllFUData = function( list )
+	{	
+		me.allFUNumberTag.html( "0" );
+		var tbodyTag = me.allFUTblTag.find("tbody");
+		tbodyTag.find("tr").remove();
+		
+		if( list.length > 0 )
+		{
 			for( var i in list )
 			{
 				var event = list[i];
@@ -489,7 +705,7 @@ function CoordinatorListManagement( _mainPage )
 		me.sortTable( me.allFUTblTag );
 		
 		me.allFUNumberTag.html( me.allFUTblTag.find("tbody").find("tr:visible").length );
-	};
+	}; */
 	
 	me.getLastAction = function( contactLogEventDate, contactLogEventContactType
 			, contactLogDueDate, contactLogNextAction
@@ -594,13 +810,12 @@ function CoordinatorListManagement( _mainPage )
 		
 		if( me.filterCurUserCasesChkTag.prop("checked") )
 		{
-			var currentUsername = me.mainPage.settingsManagement.loginUsername;
-			me.filterByColumnValues( 2, [currentUsername] );
+			me.filterByColumnValues( 2, ["true"] );
 		}
 		
 		if( !me.filterClosedCasesChkTag.prop("checked") )
 		{
-			me.filterByColumnValues( 3, ["opened"] );
+			me.filterByColumnValues( 3, ["false"] );
 		}
 		
 
