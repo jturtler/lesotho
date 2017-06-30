@@ -192,7 +192,7 @@ Util.getCheckedInputValues = function( formTag )
 Util.getCheckedInputTexts = function( formTag )
 {
 	var checkedTexts = formTag.find('input:checkbox:checked').map(function() {
-	    return $(this).closest("tr").find("td:nth-child(2)").html();
+	    return $(this).closest("tr").find("td:nth-child(1)").find("span").html();
 	}).get();
 	
 	return checkedTexts;

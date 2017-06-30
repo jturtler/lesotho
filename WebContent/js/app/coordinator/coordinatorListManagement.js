@@ -148,6 +148,7 @@ function CoordinatorListManagement( _mainPage )
 				me.healthFacilityFilterTbTag.hide();
 				me.councilFilterTbTag.show();
 				me.filterEvents();
+				me.setFilterDataInfo();
 			}
 		} );
 		
@@ -159,6 +160,7 @@ function CoordinatorListManagement( _mainPage )
 				me.councilFilterTbTag.hide();
 				me.healthFacilityFilterTbTag.show();
 				me.filterEvents();
+				me.setFilterDataInfo();
 			}
 		} );
 		
@@ -202,7 +204,7 @@ function CoordinatorListManagement( _mainPage )
 			var code = "LS" + me.filterDistricts[i].code;
 			
 			var rowTag = $( "<tr></tr>" );
-			rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'> " + name + "</label></td>" );
+			rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'> <span>" + name + "</span></label></td>" );
 			me.districtFilterTbTag.append( rowTag );
 		}
 	};
@@ -221,7 +223,7 @@ function CoordinatorListManagement( _mainPage )
 			var code = me.filterCouncils[i].code;
 			
 			var rowTag = $( "<tr filter='" + code + "' isChecked='false'></tr>" );
-			rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'>" + name + "</label></td>" );
+			rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'> <span>" + name + "</span></label></td>" );
 			me.councilFilterTbTag.append( rowTag );
 		}
 		
@@ -242,7 +244,7 @@ function CoordinatorListManagement( _mainPage )
 			var code = me.filterHealthFacilities[i].code;
 			
 			var rowTag = $( "<tr filter='" + code + "' isChecked='false'></tr>" );
-			rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'> " + name + "</label></td>" );
+			rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'> <span>" + name + "</span></label></td>" );
 			rowTag.append( "<td></td>" );
 			me.healthFacilityFilterTbTag.append( rowTag );
 		}
@@ -614,98 +616,6 @@ function CoordinatorListManagement( _mainPage )
 		
 		me.allFUNumberTag.html( me.allFUTblTag.find("tbody").find("tr:visible").length );
 	};
-	
-	/*
-	me.populateAllFUData = function( list )
-	{	
-		me.allFUNumberTag.html( "0" );
-		var tbodyTag = me.allFUTblTag.find("tbody");
-		tbodyTag.find("tr").remove();
-		
-		if( list.length > 0 )
-		{
-			for( var i in list )
-			{
-				var event = list[i];
-				
-				var clientId = event[0];
-				
-				// [HIV Testing]
-				var eventId = event[1];
-				var eventDate = event[2];
-				var eventDateStr = eventDate;
-				if( eventDate !== "" )
-				{
-					eventDateStr = Util.formatDate_DisplayDate( eventDate );
-				}
-				var eventKey = eventDate.substring(11, 19).split(":").join("");
-				
-				var daySinceDiagnosis = event[3];
-				daySinceDiagnosis = ( daySinceDiagnosis != "" ) ? parseInt( daySinceDiagnosis ) : "";
-				
-				// TEI attribute values
-				var cuic = event[4];
-				
-				// [Contact Log]
-				var contactLogEventDate = event[5];
-				var contactLogEventContactType = event[6];
-				var contactLogDueDate = event[7];
-				var contactLogNextAction = event[8];
-				var contactLogEventUsername = event[9];
-				
-				// [ART Opening] event
-				var openingARTEventDate = event[10];
-				var openingARTEventName = me.mainPage.settingsManagement.ARTReferralOpeningStage_Name;
-				var councilNameAndCode = event[11];
-				var councilName = ( councilNameAndCode != "" ) ? councilNameAndCode.split("***")[0] : "";
-				var councilCode = ( councilNameAndCode != "" ) ? councilNameAndCode.split("***")[1] : "";
-				var facilityNameAndCode = event[12];
-				var facilityName = ( facilityNameAndCode != "" ) ? facilityNameAndCode.split("***")[0] : "";
-				var facilityCode = ( facilityNameAndCode != "" ) ? facilityNameAndCode.split("***")[1] : "";
-				var otherFacilityName = event[13];
-				if( otherFacilityName != "" )
-				{
-					facilityRefer = otherFacilityName;
-				}
-				
-				// [ART Closure] event
-				var closureARTEventDate = event[14];
-				var closureEventLinkageOutcome = event[15];
-				var closureARTEventUsername = event[16];
-				var isClosureEvent = ( closureARTEventDate != "" ) ? "closed" : "opened";
-				
-				var actions = me.getLastAction( contactLogEventDate, contactLogEventContactType
-						, contactLogDueDate, contactLogNextAction
-						, openingARTEventDate, openingARTEventName
-						, closureARTEventDate, closureEventLinkageOutcome );
-				
-				
-				// Populate data in table
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
-				
-				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
-				rowTag.append( "<td style='display:none;'><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
-				rowTag.append( "<td style='display:none;' filter='" + contactLogEventUsername + "' >" + contactLogEventUsername + "</td>" );
-				rowTag.append( "<td style='display:none;' filter='" + isClosureEvent + "'></td>" );
-				rowTag.append( "<td filter='" + councilCode + "'>" + councilName + "</td>" );
-				rowTag.append( "<td filter='" + facilityCode + "'>" + facilityName + "</td>" );
-				rowTag.append( "<td>" + cuic + "</td>" );
-				rowTag.append( "<td>" + daySinceDiagnosis + "</td>" );
-				rowTag.append( "<td>" + actions.lastAction.date + "<br> " + actions.lastAction.action + "</td>" );
-				rowTag.append( "<td>" + actions.nextAction.date + "<br>" + actions.nextAction.action + "</td>" );
-				
-				me.addEventForRowInList(rowTag);
-				
-				tbodyTag.append( rowTag );
-			}
-			
-		}
-		
-		// Sortable
-		me.sortTable( me.allFUTblTag );
-		
-		me.allFUNumberTag.html( me.allFUTblTag.find("tbody").find("tr:visible").length );
-	}; */
 	
 	me.getLastAction = function( contactLogEventDate, contactLogEventContactType
 			, contactLogDueDate, contactLogNextAction
