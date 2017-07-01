@@ -66,6 +66,9 @@ function ClientFormManagement( _mainPage, _metaData )
 	me.completedEventBtnTag = $("#completedEventBtn");	
 	me.updateClientBtnTag = $("[name='updateClientBtn']");
 	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
+
+	me.showEventSaveOptionDiaglogBtnTag = $("#showEventSaveOptionDiaglogBtn");
+	me.saveEventDialogFormTag = $("#saveEventDialogForm");
 	
 	
 	// [Settings]
@@ -716,10 +719,30 @@ function ClientFormManagement( _mainPage, _metaData )
 			return false;
 		});
 		
+
+		// Show Dialog to ask users if they want to save or complete the event
+		me.showEventSaveOptionDiaglogBtnTag.click( function(){
+			if( me.validationObj.checkFormEntryTagsData(me.thisTestDivTag) )
+			{
+				me.showDialogForSaveEvent();
+			}
+			else
+			{
+				Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, false );
+				MsgManager.appUnblock();
+				var tranlatedText = me.translationObj.getTranslatedValueByKey( "datatEntryForm_validation_checkErrorFields" );
+				alert( tranlatedText );
+			}
+			return false;
+		});
+		
+		
 		// Save an event
 		me.saveEventBtnTag.click( function(){
 			
-			Util.disableTag( me.saveEventBtnTag, true );
+			me.saveEventDialogFormTag.dialog( "close" );
+			
+			Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, true );
 					
 			// Get Json Event data
 			
@@ -760,6 +783,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				
 		// Complete an event
 		me.completedEventBtnTag.click(function(){
+			me.saveEventDialogFormTag.dialog( "close" );
 			var tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_aksForCompletingEvent" );
 			var result = confirm(tranlatedText);
 			if(result)
@@ -897,7 +921,7 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.resultTestParallel2Tag.val( "" );
 			me.resultTestResultSDBiolineTag.val( "" );
 			me.resultFinalHIVStatusTag.val( me.resultTest1Tag.val() );
-			me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
+			me.resultFinalHIVStatusTag.closest("td").find(".errorMsg").remove();
 			
 			Util.disableTag( me.resultTest2Tag, true );
 			Util.disableTag( me.resultTestParallel1Tag, true );
@@ -933,7 +957,7 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.resultTestParallel2Tag.val( "" );
 			me.resultTestResultSDBiolineTag.val( "" );
 			me.resultFinalHIVStatusTag.val( me.resultTest2Tag.val() );
-			me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
+			me.resultFinalHIVStatusTag.closest("td").find(".errorMsg").remove();
 			
 			Util.disableTag( me.resultTestParallel1Tag, true );
 			Util.disableTag( me.resultTestParallel2Tag, true );
@@ -961,7 +985,7 @@ function ClientFormManagement( _mainPage, _metaData )
 			{
 				me.resultTestResultSDBiolineTag.val( "" );
 				me.resultFinalHIVStatusTag.val( me.resultTestParallel1Tag.val() );
-				me.resultFinalHIVStatusTag.closest("td").find("errorMsg").remove();
+				me.resultFinalHIVStatusTag.closest("td").find(".errorMsg").remove();
 				
 				Util.disableTag( me.resultTestResultSDBiolineTag, true );
 				me.removeMandatoryForField( me.resultTestResultSDBiolineTag );
@@ -2722,11 +2746,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		me.generateAddClientFormHeader();
 
-		// STEP 3. Disable [Complete Event] button
 		
-		Util.disableTag( me.completedEventBtnTag, true );
-		
-		// STEP 4. Display [This Test] Tab if the "status" mode is "Add Client"
+		// STEP 3. Display [This Test] Tab if the "status" mode is "Add Client"
 		
 		var firstName = me.getAttributeValue( response, me.attr_FirstName );
 		var surName = me.getAttributeValue( response, me.attr_LastName );
@@ -2745,18 +2766,18 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 		}
 		
-		// STEP 5. Set the status "Update" for [Client Form]
+		// STEP 4. Set the status "Update" for [Client Form]
 		
 		me.saveClientRegBtnTag.attr("status", "update");
 		
 		
-		// STEP 6. Set data values based on client attribute values
+		// STEP 5. Set data values based on client attribute values
 		me.setUp_InitDataValues();
 		
 		
 		if( exeFunc !== undefined ) exeFunc(groupId);
 		
-		// STEP 7. Unblock form
+		// STEP 6. Unblock form
 		
 		if( showSuccessMsg == undefined || showSuccessMsg )
 		{
@@ -2954,6 +2975,29 @@ function ClientFormManagement( _mainPage, _metaData )
 	// Actions for event ( Create/Update, Complete events )
 	// ---------------------------------------------------------------------------------------------------------------
 	
+	me.showDialogForSaveEvent = function()
+	{
+		var titleTranslated = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_saveEventDialogTitle" );
+		var cancelTranslated = me.translationObj.getTranslatedValueByKey( "clientEntryForm_btn_cancel" );
+		
+		me.saveEventDialogFormTag.dialog({
+			title: titleTranslated
+			,maximize: true
+			,closable: true
+			,modal: true
+			,width: 535
+			,height: 215
+			,buttons: {
+				"Cancel": function () {
+					$(this).dialog("close");
+				}
+			}
+			,open: function() {
+	            $('.ui-dialog-buttonpane').find('button:contains("Cancel")').addClass('btn btn-info');
+	        }
+		}).show('fast' );
+	};
+	
 	me.getSaveEventURL = function( clientId, eventId )
 	{
 		var url = "../event/save?ouId=" + me.orgUnitListTag.val();
@@ -3023,7 +3067,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				}
 				else
 				{
-					Util.disableTag( me.saveEventBtnTag, false );
+					Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, false );
 					MsgManager.appUnblock();
 					var tranlatedText = me.translationObj.getTranslatedValueByKey( "datatEntryForm_validation_checkErrorFields" );
 					alert( tranlatedText );
@@ -3069,7 +3113,6 @@ function ClientFormManagement( _mainPage, _metaData )
 				{
 					me.activeEventHeaderTag.show();
 					
-					Util.disableTag( me.completedEventBtnTag, false );
 					me.disableClientDetailsAndCUICAttrGroup( true );
 
 					// STEP 4. Unblock form
@@ -3117,7 +3160,7 @@ function ClientFormManagement( _mainPage, _metaData )
 					
 				}
 			}).always( function( data ) {
-				Util.disableTag( me.saveEventBtnTag, false );
+				Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, false );
 			});
 		
 	};
@@ -3143,8 +3186,6 @@ function ClientFormManagement( _mainPage, _metaData )
 			// Reset data entry form
 			me.resetDataEntryForm();
 			
-			Util.disableTag( me.completedEventBtnTag, true );
-
 			// Show 'Save' event button AND show "This test" form
 			me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
 			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
@@ -3188,16 +3229,14 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.selectOrgUnitWarningMsgTag.show();
 			Util.disableTag( me.saveClientRegBtnTag, true );
 			Util.disableTag( me.updateClientBtnTag, true );
-			Util.disableTag( me.saveEventBtnTag, true );
-			Util.disableTag( me.completedEventBtnTag, true );
+			Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, true );
 		}
 		else
 		{
 			me.selectOrgUnitWarningMsgTag.hide();
 			Util.disableTag( me.saveClientRegBtnTag, false );
 			Util.disableTag( me.updateClientBtnTag, false );
-			Util.disableTag( me.saveEventBtnTag, false );
-			Util.disableTag( me.completedEventBtnTag, false );
+			Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, false );
 		}
 	};
 	
@@ -3884,28 +3923,16 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 		
-		// Always show [Complete] button
-		me.completedEventBtnTag.show();
 		
 		if( activeEvent !== undefined )
 		{	
 			me.activeEventHeaderTag.show();
 			
-			// when a client is just created, an empty event will be created which is used for retrieving client in a certain list
-			if( activeEvent.dataValues.length == 0 ){
-				Util.disableTag( me.completedEventBtnTag, true );
-			}
-			else{
-				Util.disableTag( me.completedEventBtnTag, false );
-			}
-			
 			// Populate event data
 			me.populateDataValuesInEntryForm( me.addClientFormTabTag, activeEvent );
 		}
 		else
-		{
-			Util.disableTag( me.completedEventBtnTag, true );
-						
+		{			
 			me.activeEventHeaderTag.hide();
 		}
 		
@@ -3984,9 +4011,6 @@ function ClientFormManagement( _mainPage, _metaData )
 		else
 		{
 			me.activeEventHeaderTag.hide();
-			me.saveEventBtnTag.show();
-			me.completedEventBtnTag.show();
-			Util.disableTag( me.completedEventBtnTag, true );
 		}
 		
 		me.activeEventHeaderTag.find("span").html( catOptionName );

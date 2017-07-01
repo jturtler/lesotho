@@ -315,10 +315,8 @@
 												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
 												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
 											</th>
-											<th style="width:100px;">
-												<button id="saveEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
-												<span style="color:#d6d2d2;"> | </span>
-												<button id="completedEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-saved"></span></button>
+											<th style="width:20px;">
+												<button id="showEventSaveOptionDiaglogBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
 											</th>						
 										</tr>
 									</tbody>
@@ -471,10 +469,29 @@
 					<div class="form-group" style="text-align:center;">
 						<br>
 						<button class="btn btn-default actionBtn" name="backToSearchClientResultBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
-						<button class="btn btn-default actionBtn" name="backToCaseListBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
+						<button class="btn btn-lg btn-info actionBtn" name="backToCaseListBtn" keyword="dataEntryForm_tab_btn_back">Back</button>
 					</div>
 						
 		  		</div>	
+				
+				
+				<!-- Dialog to ask users if they want to complete event OR just want to save and edit later -->
+				
+				<div id="saveEventDialogForm" style="display:none;">
+					<table>
+						<tr>
+							<td keyword="contactLogForm_msg_askToSaveEvent" style="border-top:0px;">Do you want to save event and continue later ?</td>
+							<td style="border-top:0px;"><button class="btn btn-success" keyword="contactLogForm_btn_yes" id="saveEventBtn">Yes</button></td>
+						</tr>
+						<tr>
+							<td colspan="2" keyword="contactLogForm_msg_or" style="text-align:center;font-size:15px;border-top:0px;">Or</td>
+						</tr>
+						<tr>
+							<td keyword="contactLogForm_msg_askToCompletedEvent" style="border-top:0px;">Do you want to complete event and create a new one ?</td>
+							<td style="border-top:0px;"><button class="btn btn-success" keyword="contactLogForm_btn_yes" id="completedEventBtn">Yes</button></td>
+						</tr>
+					</table>
+				</div>
 				
 				<!-- END Search and Create Client  -->
 				
