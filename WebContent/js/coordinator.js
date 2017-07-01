@@ -34,19 +34,8 @@ function Coordinator( storageObj, translationObj )
 	// [Client Registration] form	
 	me.moveToSettingLinkTag = $("#moveToSettingLink");
 	
-	
 	me.currentList = "";
-	me.PAGE_TODAY_FU_LIST = "todayFUList";
-	me.PAGE_ALL_FU_LIST = "allFUList";
-	me.PAGE_SEARCH_PARAM = "searchParam";
-	me.PAGE_SEARCH_CLIENT_RESULT = "searchClientResult";
-	me.PAGE_SEARCH_ADD_CLIENT = "searchAddClient";
-	me.PAGE_SEARCH_EDIT_CLIENT = "searchEditClient";
-	me.PAGE_COMSUMABLES = "Consumables";
-	me.PAGE_REPORT_PARAM = "reportParam";
-	me.PAGE_SETTINGS = "settings";
-	me.PAGE_ABOUT = "about";
-	
+
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Init methods
@@ -115,13 +104,17 @@ function Coordinator( storageObj, translationObj )
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
 				Util.resetPageDisplay();
+
+				me.storageObj.removeItem("clientId");
+				me.storageObj.removeItem("eventId");
+				
 				me.searchClientManagement.resetSearchClientForm();
 				me.searchClientManagement.showSearchClientForm();
 			});
 		});
 		
 		me.settingsLinkTag.click(function(){
-			me.storageObj.addItem("page", me.PAGE_SETTINGS);
+			me.storageObj.addItem("page", me.mainPage.settingsManagement.PAGE_SETTINGS);
 			Util.resetPageDisplay();
 			me.settingsManagement.settingsDivTag.show("fast");
 			$('.overlay').click();
@@ -131,7 +124,7 @@ function Coordinator( storageObj, translationObj )
 			$('.overlay').click();
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.PAGE_ABOUT);
+				me.storageObj.addItem("page", me.mainPage.settingsManagement.PAGE_ABOUT);
 				Util.resetPageDisplay();
 				me.settingsManagement.aboutDivTag.show("fast");
 			});
@@ -147,7 +140,7 @@ function Coordinator( storageObj, translationObj )
 			$('.overlay').click();
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.PAGE_REPORT_PARAM);
+				me.storageObj.addItem("page", me.mainPage.settingsManagement.PAGE_REPORT_PARAM);
 				Util.resetPageDisplay();
 				me.reportManagement.getReport();
 			});
@@ -210,61 +203,56 @@ function Coordinator( storageObj, translationObj )
 		MsgManager.appUnblock();
 		
 		var page = me.storageObj.getItem( "page" );
-		if( page == me.PAGE_TODAY_LIST )
+		var subPage = me.storageObj.getItem( "subPage" );
+		
+		if( page == me.settingsManagement.PAGE_TODAY_FU_LIST )
 		{
-			me.listManagement.listTodayCases(function(){
-				me.loadSearchSubPage( me.todayCaseTblTag );
+			me.listManagement.listTodayCases( function(){
+				me.loadSearchSubPage( me.listManagement.todayCaseTblTag, subPage );
 			});
 		}
-		else if( page == me.PAGE_PREVIOUS_LIST )
+		else if( page == me.settingsManagement.PAGE_ALL_FU_LIST )
 		{
-			me.listManagement.listPreviousCases(function(){
-				me.loadSearchSubPage( me.previousCaseTblTag );
+			me.listManagement.listAllCase( function(){
+				me.loadSearchSubPage( me.listManagement.allFUTblTag, subPage );
 			});
 		}
-		else if( page == me.PAGE_POSITIVE_LIST )
+		else if( page == me.settingsManagement.PAGE_SEARCH_PARAM )
 		{
-			me.listManagement.listPositiveCases(function(){
-				me.loadSearchSubPage( me.positiveCaseTblTag );
-			});
+			me.searchClientManagement.showSearchClientForm();
 		}
-		else if( page == me.PAGE_SEARCH_PARAM )
+		else if( page == me.settingsManagement.PAGE_SEARCH_CLIENT_RESULT )
 		{
-			me.clientFormManagement.showSearchClientForm();
+			me.loadSearchSubPage( me.searchResultTbTag, subPage );			
 		}
-		else if( page == me.PAGE_SEARCH_CLIENT_RESULT )
-		{
-			me.loadSearchSubPage( me.searchResultTbTag );			
-		}
-		else if( page == me.PAGE_COMSUMABLES )
+		else if( page == me.settingsManagement.PAGE_COMSUMABLES )
 		{
 			me.consumablesDivTag.show("fast");
 		}
-		else if( page == me.PAGE_REPORT_PARAM )
+		else if( page == me.settingsManagement.PAGE_REPORT_PARAM )
 		{
 			me.reportManagement.getReport();
 		}
-		else if( page == me.PAGE_SETTINGS )
+		else if( page == me.settingsManagement.PAGE_SETTINGS )
 		{
 			me.settingsManagement.settingsDivTag.show("fast");
 		}
-		else if( page == me.PAGE_ABOUT )
+		else if( page == me.settingsManagement.PAGE_ABOUT )
 		{
 			me.settingsManagement.aboutDivTag.show("fast");
 		}
 		else
 		{
 			me.listManagement.listTodayCases(function(){
-				me.loadSearchSubPage( me.todayCaseTblTag );
+				me.loadSearchSubPage( me.todayCaseTblTag, subPage );
 			});
 		}
 		
 	};
 	
-	me.loadSearchSubPage = function( tableTag )
+	me.loadSearchSubPage = function( tableTag, subPage )
 	{
-		var subPage = me.storageObj.getItem( "subPage" );
-		if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
+		if( subPage ==  me.settingsManagement.PAGE_SEARCH_ADD_CLIENT || subPage == me.settingsManagement.PAGE_SEARCH_EDIT_CLIENT )
 		{
 			// If [Client Form] was called from a list ( Today list, Previous list, Positive list ),
 			// look for the row in table list with the clientId and eventId to call [Click] event of the row
@@ -273,7 +261,7 @@ function Coordinator( storageObj, translationObj )
 				var clientId = me.storageObj.getItem( "clientId" );
 				var eventId = me.storageObj.getItem( "eventId" );
 				
-				var rowTag = tableTag.find("table").find("tr[clientId='" + clientId + "'][eventId='" + eventId + "']");
+				var rowTag = tableTag.find("tr[clientId='" + clientId + "'][eventId='" + eventId + "']");
 				rowTag.click();
 			}
 			else
@@ -299,18 +287,18 @@ function Coordinator( storageObj, translationObj )
 				
 				me.runSearchClients( function(){
 	
-					if( subPage ==  me.PAGE_SEARCH_EDIT_CLIENT )
+					if( subPage ==  me.settingsManagement.PAGE_SEARCH_EDIT_CLIENT )
 					{
 						var clientId = me.storageObj.getItem( "clientId" );
 						var eventId = me.storageObj.getItem( "eventId" );
 						
 						// STEP 3.1. Show "Edit Client" form
-						me.loadClientDetails( clientId, eventId );
+						me.clientFormManagement.loadClientDetails( clientId, eventId );
 					}
-					else if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT )
+					else if( subPage ==  me.settingsManagement.PAGE_SEARCH_ADD_CLIENT )
 					{
 						// STEP 3.2. Show "Add Client" form
-						me.showAddClientForm();
+						me.clientFormManagement.showAddClientForm();
 					}
 					
 				});

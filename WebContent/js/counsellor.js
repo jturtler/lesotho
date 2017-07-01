@@ -19,6 +19,7 @@ function Counsellor( storageObj, translationObj )
 	me.listManagement;
 	me.clientFormManagement;
 	me.reportManagement;
+	me.searchClientManagement;
 	
 	me.dateFormat = "dd M yy";
 	me.dateTimeFormat = "YYYY-MM-DD HH:mm";
@@ -43,19 +44,7 @@ function Counsellor( storageObj, translationObj )
 	// [Consumables]
 	me.consumablesDivTag = $("#consumablesDiv");
 	
-	me.currentList = "";
-	me.PAGE_TODAY_LIST = "todayList";
-	me.PAGE_PREVIOUS_LIST = "previousList";
-	me.PAGE_POSITIVE_LIST = "positiveList";
-	me.PAGE_SEARCH_PARAM = "searchParam";
-	me.PAGE_SEARCH_CLIENT_RESULT = "searchClientResult";
-	me.PAGE_SEARCH_ADD_CLIENT = "searchAddClient";
-	me.PAGE_SEARCH_EDIT_CLIENT = "searchEditClient";
-	me.PAGE_COMSUMABLES = "Consumables";
-	me.PAGE_REPORT_PARAM = "reportParam";
-	me.PAGE_SETTINGS = "settings";
-	me.PAGE_ABOUT = "about";
-	
+	me.currentList = "";	
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Init methods
@@ -130,13 +119,17 @@ function Counsellor( storageObj, translationObj )
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
 				Util.resetPageDisplay();
+
+				me.storageObj.removeItem("clientId");
+				me.storageObj.removeItem("eventId");
+				
 				me.searchClientManagement.resetSearchClientForm();
 				me.searchClientManagement.showSearchClientForm();
 			});
 		});
 		
 		me.settingsLinkTag.click(function(){
-			me.storageObj.addItem("page", me.PAGE_SETTINGS);
+			me.storageObj.addItem("page", me.settingsManagement.PAGE_SETTINGS);
 			Util.resetPageDisplay();
 			me.settingsManagement.settingsDivTag.show("fast");
 			$('.overlay').click();
@@ -146,7 +139,7 @@ function Counsellor( storageObj, translationObj )
 			$('.overlay').click();
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.PAGE_ABOUT);
+				me.storageObj.addItem("page", me.settingsManagement.PAGE_ABOUT);
 				Util.resetPageDisplay();
 				me.settingsManagement.aboutDivTag.show("fast");
 			});
@@ -162,7 +155,7 @@ function Counsellor( storageObj, translationObj )
 			$('.overlay').click();
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.PAGE_COMSUMABLES);
+				me.storageObj.addItem("page", me.settingsManagement.PAGE_COMSUMABLES);
 				Util.resetPageDisplay();
 				me.consumablesDivTag.show("fast");
 			});
@@ -172,7 +165,7 @@ function Counsellor( storageObj, translationObj )
 			$('.overlay').click();
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.PAGE_REPORT_PARAM);
+				me.storageObj.addItem("page", me.settingsManagement.PAGE_REPORT_PARAM);
 				Util.resetPageDisplay();
 				me.reportManagement.getReport();
 			});
@@ -235,61 +228,62 @@ function Counsellor( storageObj, translationObj )
 		MsgManager.appUnblock();
 		
 		var page = me.storageObj.getItem( "page" );
-		if( page == me.PAGE_TODAY_LIST )
+		var subPage = me.storageObj.getItem( "subPage" );
+		
+		if( page == me.settingsManagement.PAGE_TODAY_LIST )
 		{
-			me.listManagement.listTodayCases(function(){
-				me.loadSearchSubPage( me.todayCaseTblTag );
+			me.listManagement.listTodayCases( function(){
+				me.loadSearchSubPage( me.listManagement.todayCaseTblTag, subPage );
 			});
 		}
-		else if( page == me.PAGE_PREVIOUS_LIST )
+		else if( page == me.settingsManagement.PAGE_PREVIOUS_LIST )
 		{
-			me.listManagement.listPreviousCases(function(){
-				me.loadSearchSubPage( me.previousCaseTblTag );
+			me.listManagement.listPreviousCases( function(){
+				me.loadSearchSubPage( me.listManagement.previousCaseTblTag, subPage );
 			});
 		}
-		else if( page == me.PAGE_POSITIVE_LIST )
+		else if( page == me.settingsManagement.PAGE_POSITIVE_LIST )
 		{
-			me.listManagement.listPositiveCases(function(){
-				me.loadSearchSubPage( me.positiveCaseTblTag );
+			me.listManagement.listPositiveCases( function(){
+				me.loadSearchSubPage( me.listManagement.positiveCaseTblTag, subPage );
 			});
 		}
-		else if( page == me.PAGE_SEARCH_PARAM )
+		else if( page == me.settingsManagement.PAGE_SEARCH_PARAM )
 		{
-			me.clientFormManagement.showSearchClientForm();
+			me.searchClientManagement.showSearchClientForm();
 		}
-		else if( page == me.PAGE_SEARCH_CLIENT_RESULT )
+		else if( page == me.settingsManagement.PAGE_SEARCH_CLIENT_RESULT )
 		{
-			me.loadSearchSubPage( me.searchResultTbTag );			
+			me.loadSearchSubPage( me.searchResultTbTag, subPage );			
 		}
-		else if( page == me.PAGE_COMSUMABLES )
+		else if( page == me.settingsManagement.PAGE_COMSUMABLES )
 		{
 			me.consumablesDivTag.show("fast");
 		}
-		else if( page == me.PAGE_REPORT_PARAM )
+		else if( page == me.settingsManagement.PAGE_REPORT_PARAM )
 		{
 			me.reportManagement.getReport();
 		}
-		else if( page == me.PAGE_SETTINGS )
+		else if( page == me.settingsManagement.PAGE_SETTINGS )
 		{
 			me.settingsManagement.settingsDivTag.show("fast");
 		}
-		else if( page == me.PAGE_ABOUT )
+		else if( page == me.settingsManagement.PAGE_ABOUT )
 		{
 			me.settingsManagement.aboutDivTag.show("fast");
 		}
 		else
 		{
 			me.listManagement.listTodayCases(function(){
-				me.loadSearchSubPage( me.todayCaseTblTag );
+				me.loadSearchSubPage( me.todayCaseTblTag, subPage );
 			});
 		}
 		
 	};
 	
-	me.loadSearchSubPage = function( tableTag )
+	me.loadSearchSubPage = function( tableTag, subPage )
 	{
-		var subPage = me.storageObj.getItem( "subPage" );
-		if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT || subPage == me.PAGE_SEARCH_EDIT_CLIENT )
+		if( subPage ==  me.settingsManagement.PAGE_SEARCH_ADD_CLIENT || subPage == me.settingsManagement.PAGE_SEARCH_EDIT_CLIENT )
 		{
 			// If [Client Form] was called from a list ( Today list, Previous list, Positive list ),
 			// look for the row in table list with the clientId and eventId to call [Click] event of the row
@@ -298,7 +292,7 @@ function Counsellor( storageObj, translationObj )
 				var clientId = me.storageObj.getItem( "clientId" );
 				var eventId = me.storageObj.getItem( "eventId" );
 				
-				var rowTag = tableTag.find("table").find("tr[clientId='" + clientId + "'][eventId='" + eventId + "']");
+				var rowTag = tableTag.find("tr[clientId='" + clientId + "'][eventId='" + eventId + "']");
 				rowTag.click();
 			}
 			else
@@ -311,7 +305,7 @@ function Counsellor( storageObj, translationObj )
 				{
 					var attributeId = clientSearch[i].attribute;
 					var value = clientSearch[i].value;
-					var field = me.searchClientFormTag.find("[attribute='" + attributeId + "']");
+					var field = me.searchClientManagement.searchClientFormTag.find("[attribute='" + attributeId + "']");
 	
 					if( field.attr("isDate") == "true" )
 					{
@@ -322,27 +316,28 @@ function Counsellor( storageObj, translationObj )
 				
 				// STEP 2. Search clients by criteria
 				
-				me.runSearchClients( function(){
+				me.searchClientManagement.runSearchClients( function(){
 	
-					if( subPage ==  me.PAGE_SEARCH_EDIT_CLIENT )
+					if( subPage == me.settingsManagement.PAGE_SEARCH_EDIT_CLIENT )
 					{
 						var clientId = me.storageObj.getItem( "clientId" );
 						var eventId = me.storageObj.getItem( "eventId" );
 						
 						// STEP 3.1. Show "Edit Client" form
-						me.loadClientDetails( clientId, eventId );
+						me.clientFormManagement.loadClientDetails( clientId, eventId );
+						
 					}
-					else if( subPage ==  me.PAGE_SEARCH_ADD_CLIENT )
+					else if( subPage == me.settingsManagement.PAGE_SEARCH_ADD_CLIENT )
 					{
 						// STEP 3.2. Show "Add Client" form
-						me.showAddClientForm();
+						me.clientFormManagement.showAddClientForm();
 					}
 					
 				});
 			}
 		}
 	};
-
+	
 
 	// Populate data and Setup events for components in HTML page
 	

@@ -38,7 +38,6 @@ function CounsellorListMaganement( _mainPage  )
 	// Init method
 	// ---------------------------------------------------------------------------------------------------------------------------
 	
-	
 	me.init = function()
 	{
 		me.setUp_Events();
@@ -74,14 +73,17 @@ function CounsellorListMaganement( _mainPage  )
 			}
 		});
 		
-		
 
 		// Open "Search/Add client" form from "Today Cases" list
 		
 		me.registerClientBtnTag.click(function(){
 			Util.resetPageDisplay();
-			me.clientFormManagement.resetSearchClientForm();
-			me.clientFormManagement.showSearchClientForm();
+
+			me.storageObj.removeItem("clientId");
+			me.storageObj.removeItem("eventId");
+			
+			me.mainPage.searchClientManagement.resetSearchClientForm();
+			me.mainPage.searchClientManagement.showSearchClientForm();
 		});
 	};
 
@@ -101,20 +103,21 @@ function CounsellorListMaganement( _mainPage  )
 	{
 		me.mainPage.registerClientBtnTag.show();
 		
-		me.mainPage.setCurrentPage( me.mainPage.PAGE_TODAY_LIST );
-		me.storageObj.addItem( "page", me.mainPage.PAGE_TODAY_LIST );
+		me.mainPage.setCurrentPage( me.mainPage.settingsManagement.PAGE_TODAY_LIST );
+		me.storageObj.addItem( "page", me.mainPage.settingsManagement.PAGE_TODAY_LIST );
 		me.storageObj.removeItem( "subPage" );		
 		
 		me.listDateTag.html( Util.formatDate_LastNDate(0) );
 		me.listCases( "../event/todayCases", function( list )
 		{
 			me.populateTodayCaseData( list );
-			if( exeFunc !== undefined ) exeFunc();
-
-			// Show table			
-			MsgManager.appUnblock();
 			me.todayCaseTblTag.show();
 			me.todayCaseListTag.show("fast");
+			
+			if( exeFunc !== undefined ) exeFunc();
+			
+			// Show table			
+			MsgManager.appUnblock();
 		} );
 	}
 		
@@ -122,19 +125,19 @@ function CounsellorListMaganement( _mainPage  )
 	{
 		me.registerClientBtnTag.hide();
 	
-		me.mainPage.setCurrentPage( me.mainPage.PAGE_PREVIOUS_LIST );
-		me.storageObj.addItem("page", me.mainPage.PAGE_PREVIOUS_LIST);
+		me.mainPage.setCurrentPage( me.mainPage.settingsManagement.PAGE_PREVIOUS_LIST );
+		me.storageObj.addItem( "page", me.mainPage.settingsManagement.PAGE_PREVIOUS_LIST );
 		me.storageObj.removeItem( "subPage" );
 		
 		me.listCases( "../event/previousCases", function( list ){
-			me.populatePreviousCaseData( list )
-			
-			if( exeFunc !== undefined ) exeFunc();
-
-			// Show table	
-			MsgManager.appUnblock();
+			me.populatePreviousCaseData( list );
 			me.previousCaseTblTag.show();
 			me.previousCaseListTag.show("fast");
+			
+			if( exeFunc !== undefined ) exeFunc();
+			
+			// Show table	
+			MsgManager.appUnblock();
 		} );
 	}
 	
@@ -142,19 +145,19 @@ function CounsellorListMaganement( _mainPage  )
 	{
 		me.registerClientBtnTag.hide();
 		
-		me.mainPage.setCurrentPage( me.mainPage.PAGE_POSITIVE_LIST );
-		me.storageObj.addItem("page", me.mainPage.PAGE_POSITIVE_LIST);
+		me.mainPage.setCurrentPage( me.mainPage.settingsManagement.PAGE_POSITIVE_LIST );
+		me.storageObj.addItem( "page", me.mainPage.settingsManagement.PAGE_POSITIVE_LIST );
 		me.storageObj.removeItem( "subPage" );
 		
 		me.listCases( "../event/positiveCases", function( list ){
 			me.populatePositiveCaseData( list );
-			
-			if( exeFunc !== undefined ) exeFunc();
-			
-			// Show table	
-			MsgManager.appUnblock();
 			me.positiveCaseTblTag.show();
 			me.positiveCaseListTag.show("fast");
+			
+			if( exeFunc !== undefined ) exeFunc();
+						
+			// Show table	
+			MsgManager.appUnblock();
 		} );
 	}
 
@@ -366,7 +369,7 @@ function CounsellorListMaganement( _mainPage  )
 	};
 	
 	// Set up event for rows in table - Show Client Details when a row is clicked
-	me.addEventForRowInList = function(rowTag)
+	me.addEventForRowInList = function( rowTag )
 	{
 		rowTag.css("cursor", "pointer");
 		rowTag.click( function(){

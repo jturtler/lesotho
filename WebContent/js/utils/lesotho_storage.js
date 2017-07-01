@@ -9,7 +9,7 @@ function Storage()
 	me.addItem = function( key, value )
 	{
 		me.removeItem( key );
-		if (typeof(Storage) !== "undefined") { // if (typeof value === "object") {
+		if ( typeof(Storage) !== "undefined" ) { // if (typeof value === "object") {
 		    localStorage.setItem( key, value );
 		    console.log("The selected language is saved.");
 		} else {

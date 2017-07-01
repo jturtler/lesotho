@@ -5,13 +5,13 @@ function CoordinatorListManagement( _mainPage )
 	me.mainPage = _mainPage;
 	me.storageObj = me.mainPage.storageObj;
 	me.translationObj = me.mainPage.translationObj;
-
 	me.clientFormManagement = me.mainPage.clientFormManagement;
+	me.settingsManagement = me.mainPage.settingsManagement;
 
-	me.filterDistricts = me.mainPage.settingsManagement.filterDistricts;
-	me.filterCouncils = me.mainPage.settingsManagement.filterCouncils;
-	me.filterHealthFacilities = me.mainPage.settingsManagement.filterHealthFacilities;
-	me.closureARTStatus = me.mainPage.settingsManagement.closureARTStatus;
+	me.filterDistricts = me.settingsManagement.filterDistricts;
+	me.filterCouncils = me.settingsManagement.filterCouncils;
+	me.filterHealthFacilities = me.settingsManagement.filterHealthFacilities;
+	me.closureARTStatus = me.settingsManagement.closureARTStatus;
 	
 	// Today F/U
 	me.todayFUListTag = $("#todayFUList");
@@ -112,6 +112,10 @@ function CoordinatorListManagement( _mainPage )
 		
 		me.registerClientBtnTag.click(function(){
 			Util.resetPageDisplay();
+			
+			me.storageObj.removeItem("clientId");
+			me.storageObj.removeItem("eventId");
+			
 			me.mainPage.searchClientManagement.resetSearchClientForm();
 			me.mainPage.searchClientManagement.showSearchClientForm();
 		});
@@ -259,10 +263,10 @@ function CoordinatorListManagement( _mainPage )
 	
 	me.listTodayCases = function( exeFunc )
 	{
-		me.mainPage.setCurrentPage( me.mainPage.PAGE_TODAY_FU_LIST );
-		me.storageObj.addItem( "page", me.PAGE_TODAY_FU_LIST );
+		me.mainPage.setCurrentPage( me.settingsManagement.PAGE_TODAY_FU_LIST );
+		me.storageObj.addItem( "page", me.mainPage.settingsManagement.PAGE_TODAY_FU_LIST );
 		me.storageObj.removeItem( "subPage" );		
-
+		
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
 		Util.resetPageDisplay();
 		MsgManager.appBlock( tranlatedText + " ..." );
@@ -271,20 +275,21 @@ function CoordinatorListManagement( _mainPage )
 		me.listCases( "../event/todayFU", function( list )
 		{
 			me.populateTodayFU( list );
-			if( exeFunc !== undefined ) exeFunc();
-
-			// Show table			
-			MsgManager.appUnblock();
 			me.todayCaseTblTag.show();
 			me.todayFUListTag.show("fast");
+			
+			if( exeFunc !== undefined ) exeFunc();
+			
+			// Show table			
+			MsgManager.appUnblock();
 		} );
 	}
 		
 	me.listAllCase = function( exeFunc )
 	{
-		me.mainPage.setCurrentPage( me.mainPage.PAGE_ALL_FU_LIST );
-		me.storageObj.addItem("page", me.PAGE_ALL_FU_LIST);
-		me.storageObj.removeItem( "subPage" );
+		me.mainPage.setCurrentPage( me.settingsManagement.PAGE_ALL_FU_LIST );
+		me.storageObj.addItem( "page", me.mainPage.settingsManagement.PAGE_ALL_FU_LIST );
+		me.storageObj.removeItem( "subPage" );		
 		
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
 		Util.resetPageDisplay();
@@ -292,11 +297,13 @@ function CoordinatorListManagement( _mainPage )
 		
 		me.loadingDivTag.hide();
 		me.reloadAllCases( function(){
-
-			// Show table	
-			MsgManager.appUnblock();
 			me.allFUTblTag.show();
 			me.allFUListTag.show("fast");
+			
+			if( exeFunc !== undefined ) exeFunc();
+			
+			// Show table	
+			MsgManager.appUnblock();
 			
 			me.allFUNumberTag.html( me.allFUTblTag.find("tbody").find("tr:visible").length );
 		});
@@ -326,7 +333,7 @@ function CoordinatorListManagement( _mainPage )
 					});
 			} 
 			else {
-				me.mainPage.settingsManagement.showExpireSessionMessage();					
+				me.settingsManagement.showExpireSessionMessage();					
 			}
 		});	
 		
@@ -417,7 +424,7 @@ function CoordinatorListManagement( _mainPage )
 		
 		if( list.length > 0 )
 		{
-			var currentUsername = me.mainPage.settingsManagement.loginUsername;
+			var currentUsername = me.settingsManagement.loginUsername;
 			
 			for( var i in list )
 			{
@@ -474,7 +481,7 @@ function CoordinatorListManagement( _mainPage )
 					var facilityCode = "";
 					var latestEventId = openingARTEvent[0].eventId;
 					openingARTEventDate = openingARTEvent[0].eventDate;
-					var openingARTEventName = me.mainPage.settingsManagement.ARTReferralOpeningStage_Name;
+					var openingARTEventName = me.settingsManagement.ARTReferralOpeningStage_Name;
 					
 					for( var i in openingARTEvent )
 					{

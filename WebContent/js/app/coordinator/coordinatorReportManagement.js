@@ -6,13 +6,11 @@ function CoordinatorReportManagement( mainPage )
 	me.mainPage = mainPage;
 	me.storageObj = me.mainPage.storageObj;
 	me.translationObj = me.mainPage.translationObj;
-
 	
 	// [Report]
 	me.reportParamDivTag = $("#reportParamDiv");
 	me.reportTblTag = $("#reportTbl");
 	me.analyticTimeTag = $("#analyticTime");
-	
 	
 	//[Ids]
 

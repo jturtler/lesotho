@@ -373,7 +373,7 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 	            }
 				,success: function( response ) 
 				{
-					me.storageObj.addItem("page", me.PAGE_SEARCH_CLIENT_RESULT);
+					me.storageObj.addItem("page", me.mainPage.settingsManagement.PAGE_SEARCH_CLIENT_RESULT);
 					me.storageObj.addItem("param", JSON.stringify( jsonQuery ) );
 					exeFunc( response );
 				}
@@ -400,8 +400,7 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 	
 	me.showSearchClientForm = function()
 	{	
-		me.storageObj.addItem("page", me.PAGE_SEARCH_PARAM);
-		
+		me.storageObj.addItem("page", me.mainPage.settingsManagement.PAGE_SEARCH_PARAM);
 		me.searchResultTag.find("span.labelOpt").css("font-size","");		
 		me.searchClientFormTag.show("fast");
 	};

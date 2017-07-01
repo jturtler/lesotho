@@ -1258,9 +1258,15 @@ function ClientFormManagement( _mainPage, _metaData )
 			Util.disableTag( resultTest2Tag, false );
 			
 			// STEP 1. Hide all tbody and input in [New Test]
-			me.addEventFormTag.find("tbody[sectionid!='" + me.section_TestingMaterial_Id + "']").hide();
-			me.addEventFormTag.find("tbody[sectionid!='" + me.section_TestingMaterial_Id + "']").find("input,select").each(function(){
+			me.addEventFormTag.find("tbody[sectionid]").hide();
+			me.addEventFormTag.find("tbody[sectionid]").find("input,select").each(function(){
 				me.setHideLogicTag( $(this), true );
+			});
+			
+			// Show [Testing Material] section in [New Test]
+			me.addEventFormTag.find("tbody[sectionid='" + me.section_TestingMaterial_Id + "']").show();
+			me.addEventFormTag.find("tbody[sectionid='" + me.section_TestingMaterial_Id + "']").find("input,select").each(function(){
+				me.setHideLogicTag( $(this), false );
 			});
 						
 			
@@ -1291,7 +1297,13 @@ function ClientFormManagement( _mainPage, _metaData )
 					 $(this).val("");
 				}
 			});
-						
+			
+			// Reset data of [Testing Material] section in [New Test]
+			me.addEventFormTag.find("tbody[sectionid='" + me.section_TestingMaterial_Id + "']").find("input,select").each(function(){
+				$(this).val("");
+			});
+			// Show header [Testing Material]
+			me.addEventFormTag.find("tbody[sectionid='" + me.section_TestingMaterial_Id + "']").find("tr[header]").show();
 		}
 		
 	};
@@ -1832,7 +1844,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				tbodyTag.find("tr:not([header])").show("fast");
 				tbodyTag.removeClass( "hideHeader" );
 				
-				tableTag.find("tr.actionBar").show();
+				tbodyTag.find("tr.actionBar").show();
 			}
 			// Hide the selected event
 			else
@@ -1844,7 +1856,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				tbodyTag.addClass( "hideHeader" );
 				
 				tbodyTag.addClass("separateTb");
-				tableTag.find("tr.actionBar").hide();
+				tbodyTag.find("tr.actionBar").hide();
 			}
 			
 		});
@@ -3252,7 +3264,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	me.showAddClientForm = function()
 	{
-		me.storageObj.addItem("subPage", me.PAGE_SEARCH_ADD_CLIENT);
+		me.storageObj.addItem("subPage", me.mainPage.settingsManagement.PAGE_SEARCH_ADD_CLIENT );
 		
 		Util.resetPageDisplay();
 		me.saveClientRegBtnTag.attr("status", "add" );
@@ -3306,7 +3318,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	me.showUpdateClientForm = function( data, selectedEventId )
 	{
-		me.storageObj.addItem( "subPage", me.PAGE_SEARCH_EDIT_CLIENT );
+		me.storageObj.addItem( "subPage", me.mainPage.settingsManagement.PAGE_SEARCH_EDIT_CLIENT );
 
 		// STEP 1. Update the status of client ( "add"/ "update" )
 		me.saveClientRegBtnTag.attr("status", "update" );

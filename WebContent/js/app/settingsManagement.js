@@ -45,12 +45,26 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.filterDistricts;
 	me.filterCouncils;
 	me.closureARTStatus;
-	
-	
+		
 	me.userInfoLoaded = false;
 	me.metadataLoaded = false;
 	me.orgUnitListLoaded = false;
 
+	me.PAGE_TODAY_LIST = "todayList";
+	me.PAGE_PREVIOUS_LIST = "previousList";
+	me.PAGE_POSITIVE_LIST = "positiveList";
+	me.PAGE_TODAY_FU_LIST = "todayFUList";
+	me.PAGE_ALL_FU_LIST = "allFUList";
+	me.PAGE_SEARCH_PARAM = "searchParam";
+	me.PAGE_SEARCH_CLIENT_RESULT = "searchClientResult";
+	me.PAGE_SEARCH_ADD_CLIENT = "searchAddClient";
+	me.PAGE_SEARCH_EDIT_CLIENT = "searchEditClient";
+	me.PAGE_COMSUMABLES = "Consumables";
+	me.PAGE_REPORT_PARAM = "reportParam";
+	me.PAGE_SETTINGS = "settings";
+	me.PAGE_ABOUT = "about";
+
+	
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Init methods
 	// ---------------------------------------------------------------------------------------------------------------------------
