@@ -226,13 +226,25 @@ function CounsellorListMaganement( _mainPage  )
 				var cuic = event[4];
 				var ouName = event[6];
 				
+				
+				var resultColor = "";
+				var eventStatus = event[7];
+				var hasContactData = ( event[8] == 5 );
+				var hasOpenARTEvent = ( event[9] != "" );
+				var event = eventStatus;
+				if( eventStatus != "COMPLETED" && deResult1 == "Positive" && ( !hasContactData || !hasOpenARTEvent ) )
+				{
+					event = "ACTIVE";
+				}
+				resultColor = ( event == "COMPLETED" ) ? "green" : "red"; 
+				
+				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
 				var eventDateStr = eventDate;
 				if( eventDate !== "" )
 				{
 					eventDateStr = Util.formatTimeInDateTime( eventDate );
 				}
-
 				var eventKey = eventDate.substring(11, 19).split(":").join("");
 				
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
@@ -240,7 +252,7 @@ function CounsellorListMaganement( _mainPage  )
 				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
 				rowTag.append( "<td>" + cuic + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
-				rowTag.append( "<td>" + deResult1 + "</td>" );
+				rowTag.append( "<td style='color:" + resultColor + "'>" + deResult1 + "</td>"  );
 				
 				me.addEventForRowInList(rowTag);
 				
