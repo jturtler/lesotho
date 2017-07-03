@@ -1548,9 +1548,9 @@ function ClientFormManagement( _mainPage, _metaData )
 				{
 					// Add Action bar for each section
 					var actionTag = $("<tr class='actionBar' style='display:none;'></tr>");
-					actionTag.append("<th style='width:20px;'><button class='discardBtn imgBtn'><span class='glyphicon glyphicon-ban-circle'></span></button></th>");
+					actionTag.append("<th style='width:20px;' class='actionCell'><button class='discardBtn imgBtn'><span class='glyphicon glyphicon-ban-circle'></span></button></th>");
 					actionTag.append("<th colspan='2'><span style='float:left;'>" + translatedDiscardChanges + "</span><span style='float:right;'>" + translatedSaveChanges + "</span></th>");
-					actionTag.append("<th style='width:20px;'><button class='saveBtn imgBtn'><span class='glyphicon glyphicon-floppy-disk'></span></button></th>");	
+					actionTag.append("<th style='width:20px;' class='actionCell'><button class='saveBtn imgBtn'><span class='glyphicon glyphicon-floppy-disk'></span></button></th>");	
 					tbody.append( actionTag );
 				}
 				
