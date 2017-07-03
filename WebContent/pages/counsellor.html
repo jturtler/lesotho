@@ -477,18 +477,33 @@
 				
 				<!-- Dialog to ask users if they want to complete event OR just want to save and edit later -->
 				
-				<div id="saveEventDialogForm" style="display:none;">
-					<table>
+				<div id="saveEventDialogForm" style="display:none;justify-content: center;">
+					<table class="actionTable">
+						<col width="32%">
+						<col width="1%">
+						<col width="32%">
+						<col width="1%">
+						<col width="32%">
+						<col width="1%">
 						<tr>
-							<td keyword="contactLogForm_msg_askToSaveEvent" style="border-top:0px;">Do you want to save event and continue later ?</td>
-							<td style="border-top:0px;"><button class="btn btn-success" keyword="contactLogForm_btn_yes" id="saveEventBtn">Yes</button></td>
-						</tr>
-						<tr>
-							<td colspan="2" keyword="contactLogForm_msg_or" style="text-align:center;font-size:15px;border-top:0px;">Or</td>
-						</tr>
-						<tr>
-							<td keyword="contactLogForm_msg_askToCompletedEvent" style="border-top:0px;">Do you want to complete event and create a new one ?</td>
-							<td style="border-top:0px;"><button class="btn btn-success" keyword="contactLogForm_btn_yes" id="completedEventBtn">Yes</button></td>
+							<td id="saveEventBtn">
+								<span keyword="contactLogForm_msg_askToSaveEvent">Save (open for edit)</span><br>
+								<div class="btn saveEventBtn" style="color:green;"><span class="glyphicon glyphicon-ok"></span></div>
+							</td>
+							
+							<td style="background-color:white;border: 0px;">&nbsp;</td>
+							
+							<td id="completedEventBtn">
+								<span keyword="contactLogForm_msg_askToCompletedEvent">Save and lock</span><br>
+								<div class="btn saveEventBtn" style="color:gray;"><span class="glyphicon glyphicon-lock"></span></div>
+							</td>
+							
+							<td style="background-color:white;border: 0px;">&nbsp;</td>
+							
+							<td id="cancelEventBtn">
+								<span keyword="contactLogForm_msg_cancelSavingEvent" ></span><br>
+								<div class="btn saveEventBtn" style="color:red;"><span class="glyphicon glyphicon-remove"></span></div>
+							</td>
 						</tr>
 					</table>
 				</div>

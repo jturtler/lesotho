@@ -64,6 +64,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	me.discardEventFormBtnTag = $("#discardEventFormBtn");
 	me.saveEventBtnTag = $("#saveEventBtn");
 	me.completedEventBtnTag = $("#completedEventBtn");	
+	me.cancelEventBtnTag = $("#cancelEventBtn");
 	me.updateClientBtnTag = $("[name='updateClientBtn']");
 	me.hideHIVTestLogicActionTag = $("#hideHIVTestLogicAction");
 
@@ -800,6 +801,10 @@ function ClientFormManagement( _mainPage, _metaData )
 			}
 			
 		});
+		
+		me.cancelEventBtnTag.click(function(){
+			me.saveEventDialogFormTag.dialog("close");
+		});
 
 		me.setUp_validationCheck( me.thisTestDivTag.find( 'input,select' ) );
 		
@@ -817,6 +822,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		tags.change( function() {
 			me.validationObj.checkValidations( $(this) );
 		});
+		
+		tags.on('dp.change', function(e){ 
+			me.validationObj.checkValidations( $(this) );
+		});
+		
 	};
 
 	
@@ -2025,7 +2035,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				
 		// If [age > 17], HIDE attribute [PP OVC]
 		var ppocvTag = me.getAttributeField( me.attr_PPOVC );
-		if( dobTag.val() != "" && age > 17 )
+		if( age > 17 )
 		{
 			me.setHideLogicTag( ppocvTag.closest("tr"), true );
 		}
@@ -2997,16 +3007,9 @@ function ClientFormManagement( _mainPage, _metaData )
 			,maximize: true
 			,closable: true
 			,modal: true
-			,width: 535
-			,height: 215
-			,buttons: {
-				"Cancel": function () {
-					$(this).dialog("close");
-				}
-			}
-			,open: function() {
-	            $('.ui-dialog-buttonpane').find('button:contains("Cancel")').addClass('btn btn-info');
-	        }
+			,resizable: false
+			,width: 555
+			,height: 170
 		}).show('fast' );
 	};
 	

@@ -186,7 +186,7 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
             }
 			,success: function( jsonData ) 
 			{
-				var orgUnits = Util.sortByKey( jsonData.organisationUnits, "name" );
+				var orgUnits = Util.sortByKey( jsonData.organisationUnits, "code" );
 				
 				me.orgUnitListTag.append("<option value=''>[Please select]</option>");
 				for( var i in orgUnits )
@@ -256,17 +256,17 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 						if( attributeList[j].id === me.attr_District )
 						{
 							me.filterDistricts = attributeList[j].optionSet.options;
-							me.filterDistricts = Util.sortByKey( me.filterDistricts, "name" );
+							me.filterDistricts = Util.sortByKey( me.filterDistricts, "code" );
 						}
 						else if( attributeList[j].id === me.attr_Council )
 						{
 							me.filterCouncils = attributeList[j].optionSet.options;
-							me.filterCouncils = Util.sortByKey( me.filterCouncils, "name" );
+							me.filterCouncils = Util.sortByKey( me.filterCouncils, "code" );
 						}
 						else if ( attributeList[j].id === me.attr_HealthFacilityProvidingART )
 						{
 							me.filterHealthFacilities = attributeList[j].optionSet.options;
-							me.filterHealthFacilities = Util.sortByKey( me.filterHealthFacilities, "name" );
+							me.filterHealthFacilities = Util.sortByKey( me.filterHealthFacilities, "code" );
 						}
 					}
 				}
@@ -292,7 +292,7 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 				
 				
 				// Populate orgunit list in 'Settings'
-				var districts = Util.sortByKey( jsonData.districts.organisationUnits, "name" );
+				var districts = Util.sortByKey( jsonData.districts.organisationUnits, "code" );
 				me.districtListTag.append("<option value=''>[Please select]</option>");
 				for( var i in districts )
 				{
@@ -387,7 +387,7 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 		}
 		
 	};
-	
+
 	// ===========================================================================================================================
 	// RUN Init methods
 	// ===========================================================================================================================

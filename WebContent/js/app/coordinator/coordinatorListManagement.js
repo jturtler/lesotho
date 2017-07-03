@@ -91,12 +91,12 @@ function CoordinatorListManagement( _mainPage )
 		// Back to [Current Cases]
 		
 		me.backToCaseListBtnTag.click(function(){
-			if( me.mainPage.currentList == me.mainPage.PAGE_TODAY_FU_LIST )
+			if( me.mainPage.currentList == me.mainPage.settingsManagement.PAGE_TODAY_FU_LIST )
 			{
 				me.registerClientBtnTag.show();
 				me.listTodayCases();
 			}
-			else if( me.mainPage.currentList == me.mainPage.PAGE_ALL_FU_LIST )
+			else if( me.mainPage.currentList == me.mainPage.settingsManagement.PAGE_ALL_FU_LIST )
 			{
 				me.registerClientBtnTag.hide();
 				me.listAllCase();

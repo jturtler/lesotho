@@ -195,7 +195,7 @@ function LoginForm( storageObj, translationObj )
             }
 			,success: function( jsonData ) 
 			{
-				var districts = Util.sortByKey( jsonData.organisationUnits, "name" );
+				var districts = Util.sortByKey( jsonData.organisationUnits, "code" );
 				
 				me.districtListTag.append("<option value=''>[Please select]</option>");
 				for( var i in districts )
@@ -230,7 +230,7 @@ function LoginForm( storageObj, translationObj )
 	            }
 				,success: function( jsonData ) 
 				{
-					var orgUnits = Util.sortByKey( jsonData.organisationUnits, "name" );
+					var orgUnits = Util.sortByKey( jsonData.organisationUnits, "code" );
 					
 					me.orgUnitListTag.append("<option value=''>[Please select]</option>");
 					for( var i in orgUnits )

@@ -662,7 +662,11 @@ Util.datePicker = function( dateTag )
 		,ignoreReadonly: true
         ,showClear: true
      });
-		  
+	 
+	dateTag.on('dp.change', function(e){ 
+		dateTag.change();
+	})
+	
 };
 
 Util.monthYearPicker = function( dateTag )
@@ -678,7 +682,10 @@ Util.monthYearPicker = function( dateTag )
 		,ignoreReadonly: true
         ,showClear: true
      });
-		  
+		 
+	dateTag.on('dp.change', function(e){ 
+		dateTag.change();
+	})
 };
 
 Util.dateFuturePicker = function( dateTag )
@@ -693,6 +700,10 @@ Util.dateFuturePicker = function( dateTag )
 		,ignoreReadonly: true
 	    ,showClear: true
      });
+	
+	dateTag.on('dp.change', function(e){ 
+		dateTag.change();
+	})
 };
 
 Util.dateFutureOnlyPicker = function( dateTag )
@@ -708,6 +719,10 @@ Util.dateFutureOnlyPicker = function( dateTag )
 		,ignoreReadonly: true
         ,showClear: true
      });
+	
+	dateTag.on('dp.change', function(e){ 
+		dateTag.change();
+	})
 		  
 };
 
@@ -723,6 +738,10 @@ Util.dateTimePicker = function( dateTag )
 		,ignoreReadonly: true
 	    ,showClear: true
      });
+	
+	dateTag.on('dp.change', function(e){ 
+		dateTag.change();
+	})
 };
 
 

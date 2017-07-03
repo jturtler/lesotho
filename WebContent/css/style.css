@@ -820,3 +820,25 @@ button
     background-color: #f2f2f2 !IMPORTANT;
 }
 
+.actionTable
+{
+	width: 100%;
+}
+
+.actionTable td
+{
+	padding: 10px;
+	border: 1px solid #dddddd;
+	text-align: center;
+	background-color: #f2f2f2;
+}
+
+.actionTable td:hover {
+	background: #e6e5e5;
+	cursor:pointer;
+}
+
+.actionTable div span
+{
+	font-size: 25px;
+}

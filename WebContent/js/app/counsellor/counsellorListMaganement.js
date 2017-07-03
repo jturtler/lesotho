@@ -7,6 +7,7 @@ function CounsellorListMaganement( _mainPage  )
 	me.storageObj = me.mainPage.storageObj;
 	me.translationObj = me.mainPage.translationObj;
 	me.clientFormManagement = me.mainPage.clientFormManagement;
+	me.settingsManagement = me.mainPage.settingsManagement;
 	
 	
 	// Today cases
@@ -56,17 +57,17 @@ function CounsellorListMaganement( _mainPage  )
 		// Back to [Current Cases]
 		
 		me.backToCaseListBtnTag.click(function(){
-			if( me.mainPage.currentList == me.mainPage.PAGE_TODAY_LIST )
+			if( me.mainPage.currentList == me.mainPage.settingsManagement.PAGE_TODAY_LIST )
 			{
 				me.registerClientBtnTag.show();
 				me.listTodayCases();
 			}
-			else if( me.mainPage.currentList == me.mainPage.PAGE_PREVIOUS_LIST )
+			else if( me.mainPage.currentList == me.mainPage.settingsManagement.PAGE_PREVIOUS_LIST )
 			{
 				me.registerClientBtnTag.hide();
 				me.listPreviousCases();
 			}
-			else if( me.mainPage.currentList == me.mainPage.PAGE_POSITIVE_LIST )
+			else if( me.mainPage.currentList == me.mainPage.settingsManagement.PAGE_POSITIVE_LIST )
 			{
 				me.registerClientBtnTag.hide();
 				me.listPositiveCases();
