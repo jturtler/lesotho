@@ -137,6 +137,24 @@
 				 	
 					<h4 class="headerList"><span id="headerList" keyword="todayCases_headerTitle"></span> - <span id="listDate"></span></h4>
 				    
+				    <table class="table" width="100%" style="margin-top: 10px;background-color: #fff7e4;font-size: 12px;margin-bottom: 20px;">
+				    	   <tr>
+						        <td colspan="2" class="note" style="background-color: #fff7e4;">*** <span keyword="todaylist_note_noteMsg">Note</span></td>
+						    </tr>
+						    <tr>
+				    			<td><span class="glyphicon glyphicon-lock"></span></td>
+				    			<td keyword="todaylist_note_eventStatus">In red if the test has not been completed, in green if it has been completed</td>
+				    		</tr>
+					    	<tr>
+					    		<td><span class="glyphicon glyphicon-user"></span></td>
+					    		<td keyword="todaylist_note_positiveContactLogExist">For Positives only, in red if the Contact Log form have not been completed; in green if it has been completed</td>
+					    	</tr>
+					    	<tr>
+					    		<td><span class="glyphicon glyphicon-plus"></span></td>
+					    		<td keyword="todaylist_note_positiveARTOpeningEventExist">For Positives only, in red if the ART Referral Opening event does not exist, green if it does</td>
+					    	</tr>
+				    </table>
+				    
 					<table id="todayCaseTbl" sorted="false" class='table table-hover table-striped listTable tablesorter'>
 						<thead>
 							<tr style="background-color:#cfe2f3">

@@ -249,7 +249,8 @@ function CounsellorListMaganement( _mainPage  )
 				
 									
 				//For Positives only, in red if the Referral Opening event does not exist, green if it does
-				resultColor = ( artValue && hasOpenARTEvent ) ? "red" : "green"; 
+				// resultColor = ( artValue && hasOpenARTEvent ) ? "green" : "red"; 
+				resultColor = ( hasOpenARTEvent ) ? "green" : "red"; 
 				testResultTag.append("<span class='glyphicon glyphicon-plus' style='color:" + resultColor + ";padding-left:5px;'></span>");
 				
 				
