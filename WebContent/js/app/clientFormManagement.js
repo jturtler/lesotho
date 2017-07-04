@@ -314,7 +314,6 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	me.setUp_Events_AddClientForm = function()
 	{
-		
 		// -----------------------------------------------------------------------------------------
 		// [Client Details] tab 		
 
@@ -406,6 +405,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.saveContactLogBtnTag.click(function(){
 			me.saveClient( me.contactLogFormTag, function(){
 				me.showAttrContactLogHistory();
+				me.hideIconInTab( me.TAB_NAME_CONTACT_LOG );
 
 				if( me.showOpeningTag )
 				{
@@ -532,6 +532,8 @@ function ClientFormManagement( _mainPage, _metaData )
 					me.populateTimeElapsed( response, artClosureEvent );
 					
 					me.artReferCloseFormTag.show();
+					
+					me.hideIconInTab( me.TAB_NAME_ART_REFER );
 					
 					Util.disableForm( me.artReferOpenFormTag, true );
 				});
@@ -777,6 +779,9 @@ function ClientFormManagement( _mainPage, _metaData )
 				
 				me.addEventFormTag.attr("event", JSON.stringify( eventJson ));
 				me.disableClientDetailsAndCUICAttrGroup( true );
+				
+				// Show the icon [red] icon on [New Test] if any
+				me.showIconInTab( me.TAB_NAME_THIS_TEST );
 				
 				if( me.checkIfARTEvent( eventJson ) )
 				{
@@ -2279,6 +2284,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		// ---------------------------------------------------------------------
 		// [New Test] Tab
 		
+		me.hideIconInTab( me.TAB_NAME_THIS_TEST );
 		me.setUp_DataEntryFormInputTagEvent();
 		
 		// Show all tbody and input in [New Test]
@@ -2333,9 +2339,45 @@ function ClientFormManagement( _mainPage, _metaData )
 		Util.resetForm( me.artReferOpenFormTag );
 		Util.resetForm( me.artReferCloseFormTag );
 		
+	};
+	
+	me.resetClientForm = function()
+	{
+		// ---------------------------------------------------------------------
+		// [Client Information] tab
+		
+		me.disableClientDetailsAndCUICAttrGroup( false );
+		
+		// Disable [Client CUIC] field. The value of this attribute will be generated from another attribute values		
+		Util.disableTag( me.getAttributeField( me.attr_ClientCUIC ), true );
+		
+		me.addClientFormTabTag.removeAttr( "client" );
+		me.addClientFormTabTag.removeAttr( "artHIVTestingEvent" );
+		
+		me.addEventFormTag.removeAttr( "event" );
+		me.addEventFormTag.removeAttr( "partnerData" );
+		
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		partnerCUICTag.removeAttr("title" );
+		partnerCUICTag.removeAttr("lastHIVTest" );
+		partnerCUICTag.closest( "td" ).find( "span.partnerDetails" ).hide();
+		partnerCUICTag.closest( "td" ).find("span.partnerInfo").html("");
+		partnerCUICTag.closest( "td" ).find("span.partnerInfo").hide();
+		
+		me.artReferOpenFormTag.removeAttr( "event" );
+		me.artReferCloseFormTag.removeAttr( "event" );
+		
+		me.previousTestsTag.find("table").html("");
+		
+		// Empty fields from "This Test" tab
+		me.clientAttributeDivTag.find("input[type='text'],select").val("");
+		me.clientAttributeDivTag.find("input[type='checkbox']").prop("checked", false);
+		
 		
 		// ---------------------------------------------------------------------
 		// [Contat Log] tab
+
+		me.showIconInTab( me.TAB_NAME_CONTACT_LOG );
 		
 		// -- [Contact Log Attribute] form
 		me.contactLogFormTag.find("input[type='text'],select").val("");
@@ -2371,6 +2413,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		// ---------------------------------------------------------------------
 		// [Opening ART Refer] Tab
+
+		me.showIconInTab( me.TAB_NAME_ART_REFER );
 		
 		var noneStatusStr = me.translationObj.getTranslatedValueByKey( "artRefer_tab_msg_statusNone" );
     	me.linkageStatusLableTag.html( "[" + noneStatusStr + "]" );
@@ -2400,37 +2444,6 @@ function ClientFormManagement( _mainPage, _metaData )
 		// Hide [If other, specify] facility name
 		var closeSpecialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
 		me.setHideLogicTag( closeSpecialOtherFacilityNameTag, true );
-		
-	};
-	
-	me.resetClientForm = function()
-	{
-		me.disableClientDetailsAndCUICAttrGroup( false );
-		
-		// Disable [Client CUIC] field. The value of this attribute will be generated from another attribute values		
-		Util.disableTag( me.getAttributeField( me.attr_ClientCUIC ), true );
-		
-		me.addClientFormTabTag.removeAttr( "client" );
-		me.addClientFormTabTag.removeAttr( "artHIVTestingEvent" );
-		
-		me.addEventFormTag.removeAttr( "event" );
-		me.addEventFormTag.removeAttr( "partnerData" );
-		
-		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
-		partnerCUICTag.removeAttr("title" );
-		partnerCUICTag.removeAttr("lastHIVTest" );
-		partnerCUICTag.closest( "td" ).find( "span.partnerDetails" ).hide();
-		partnerCUICTag.closest( "td" ).find("span.partnerInfo").html("");
-		partnerCUICTag.closest( "td" ).find("span.partnerInfo").hide();
-		
-		me.artReferOpenFormTag.removeAttr( "event" );
-		me.artReferCloseFormTag.removeAttr( "event" );
-		
-		me.previousTestsTag.find("table").html("");
-		
-		// Empty fields from "This Test" tab
-		me.clientAttributeDivTag.find("input[type='text'],select").val("");
-		me.clientAttributeDivTag.find("input[type='checkbox']").prop("checked", false);
 	};
 	
 	
@@ -2568,7 +2581,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				            }
 							,success: function( response ) 
 							{
-								me.saveClientAfter( response, exeFunc, groupId, showSuccessMsg );								
+								me.saveClientAfter( response, exeFunc, groupId, showSuccessMsg );							
 							}
 							,error: function( response )
 							{
@@ -3230,7 +3243,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		me.execSaveEvent( event, trackedEntityInstanceId, eventId, function( jsonEvent ){
 
-			// Create empty table and populate data for this event
+			// Add completed event in [Previous Test] tab
 			
 			var tbody = me.createAndPopulateDataInEntryForm( jsonEvent, me.stage_HIVTesting );
 			me.previousTestsTag.find("table").prepend( tbody );
@@ -3248,6 +3261,8 @@ function ClientFormManagement( _mainPage, _metaData )
 				me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
 			}
 			
+			// Hide [red] icon on [New Test] if any
+			me.hideIconInTab( me.TAB_NAME_THIS_TEST );
 			
 			// Set [event] attribute for [This test] Tab
 			me.addEventFormTag.attr( "event", JSON.stringify( jsonEvent ) );
@@ -3458,7 +3473,6 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.disableClientDetailsAndCUICAttrGroup( true );
 		}
 		
-		
 		// ---------------------------------------------------------------------------------------
 		// Set up HIV Testing event data
 		
@@ -3590,6 +3604,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		if( showHistory )
 		{
 			me.showAttrContactLogHistory();
+			me.hideIconInTab( me.TAB_NAME_CONTACT_LOG );
+		}
+		else
+		{
+			me.showIconInTab( me.TAB_NAME_CONTACT_LOG );
 		}
 		
 	 	// Populate [Contact Log Event] history data
@@ -3689,6 +3708,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	me.checkAndShowARTReferTab = function( eventData )
 	{
 		me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
+		me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
 		
 		var jsonClient = JSON.parse( me.addClientFormTabTag.attr( "client" ) );
 		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
@@ -3736,10 +3756,12 @@ function ClientFormManagement( _mainPage, _metaData )
 		{
 			me.artReferCloseFormTag.show();
 			Util.disableForm( me.artReferOpenFormTag, true );
+			me.hideIconInTab( me.TAB_NAME_ART_REFER );
 		}
 		else
 		{
 			Util.disableForm( me.artReferOpenFormTag, false );
+			me.showIconInTab( me.TAB_NAME_ART_REFER );
 			me.artReferCloseFormTag.hide();
 		}
 	};
@@ -3998,17 +4020,21 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 		
-		
 		if( activeEvent !== undefined )
 		{	
 			me.activeEventHeaderTag.show();
 			
 			// Populate event data
 			me.populateDataValuesInEntryForm( me.addClientFormTabTag, activeEvent );
+			
+			// Show red icon which means the event is not COMPLETED
+			me.showIconInTab( me.TAB_NAME_THIS_TEST );
 		}
 		else
 		{			
 			me.activeEventHeaderTag.hide();
+			// Show red icon which means the event is not COMPLETED
+			me.hideIconInTab( me.TAB_NAME_THIS_TEST );
 		}
 		
 		// Set up if Data Entry Form can be editable
@@ -4406,7 +4432,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.addClientFormTabTag.find("a[href='#" + tabName + "']").closest("li").hide();
 		me.addClientFormTabTag.find('#' + tabName).hide();
 	}
-	
+	;
 	me.showTabInClientForm = function( tabName )
 	{
 		var tabHeader = me.addClientFormTabTag.find("a[href='#" + tabName + "']").closest("li");
@@ -4418,8 +4444,19 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		// Move to the top of form
 		window.scrollTo(0, 0);
-	}
+	};
 	
+	me.showIconInTab = function( tabName )
+	{
+		var tabHeader = me.addClientFormTabTag.find("a[href='#" + tabName + "']").closest("li");
+		tabHeader.find("span.tabIcon" ).show();
+	};
+	
+	me.hideIconInTab = function( tabName )
+	{
+		var tabHeader = me.addClientFormTabTag.find("a[href='#" + tabName + "']").closest("li");
+		tabHeader.find("span.tabIcon" ).hide();
+	};
 
 	me.showExpireSessionMessage = function()
 	{
