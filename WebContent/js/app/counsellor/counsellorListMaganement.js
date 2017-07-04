@@ -227,18 +227,36 @@ function CounsellorListMaganement( _mainPage  )
 				var ouName = event[6];
 				
 				
-				var resultColor = "";
+				// -------------------------------------------------------------
+				// Set status icon
+				// -------------------------------------------------------------
+
+				var testResultTag = $( "<td>" + deResult1 + "</td>" );
+				
 				var eventStatus = event[7];
 				var hasContactData = ( event[8] == 5 );
 				var hasOpenARTEvent = ( event[9] != "" );
-				var event = eventStatus;
-				if( eventStatus != "COMPLETED" && deResult1 == "Positive" && ( !hasContactData || !hasOpenARTEvent ) )
-				{
-					event = "ACTIVE";
-				}
-				resultColor = ( event == "COMPLETED" ) ? "green" : "red"; 
+				var artValue = ( event[10] == "true" );
 				
 				
+				//For both Negative and Positive, in red if the test has not been completed, in green if it has been completed
+				var statusColor = ( eventStatus == "COMPLETED" ) ? "green" : "red"; 
+				testResultTag.append("<span class='glyphicon glyphicon-lock' style='color:" + statusColor + ";padding-left:5px;'></span>");
+			
+				//For Positives only, in red if the mandatory fields in Contact Log - LS LOG 1 and LS LOG 2 have not been completed, if it has been: green
+				resultColor = ( hasContactData ) ? "green" : "red"; 
+				testResultTag.append("<span class='glyphicon glyphicon-user' style='color:" + resultColor + ";padding-left:5px;'></span>");
+				
+									
+				//For Positives only, in red if the Referral Opening event does not exist, green if it does
+				resultColor = ( artValue && hasOpenARTEvent ) ? "red" : "green"; 
+				testResultTag.append("<span class='glyphicon glyphicon-plus' style='color:" + resultColor + ";padding-left:5px;'></span>");
+				
+				
+				// -------------------------------------------------------------
+				// Event date
+				// -------------------------------------------------------------
+							
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
 				var eventDateStr = eventDate;
 				if( eventDate !== "" )
@@ -252,7 +270,7 @@ function CounsellorListMaganement( _mainPage  )
 				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
 				rowTag.append( "<td>" + cuic + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
-				rowTag.append( "<td style='color:" + resultColor + "'>" + deResult1 + "</td>"  );
+				rowTag.append( testResultTag );
 				
 				me.addEventForRowInList(rowTag);
 				

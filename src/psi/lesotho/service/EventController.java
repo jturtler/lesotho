@@ -74,7 +74,7 @@ public class EventController
     
     // Find client partner information
     private static String URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_FIND_PARTNER + "/data.json?var=startDate:" + EventController.PARAM_START_DATE 
-        + "&var=stageId:" + Util.ID_STAGE + "&var=username:" + EventController.PARAM_USERNAME + "&var=ouId:KauEn2jKOk6&var=endDate:" + EventController.PARAM_END_DATE;
+        + "&var=stageId:" + Util.ID_STAGE + "&var=username:" + EventController.PARAM_USERNAME + "&var=ouId:" + EventController.PARAM_ORGUNIT_ID + "&var=endDate:" + EventController.PARAM_END_DATE;
     
     
     // -------------------------------------------------------------------------
