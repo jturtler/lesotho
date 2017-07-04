@@ -126,7 +126,11 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	// [Contact Log] Ids
 	me.attr_ConsentToContact = "ZQiKIaeOKv4"; // Set this one mandatory for Contact Log
-	me.attr_ConsentToVisit = "W8Odb9UqA15";
+	me.attr_ContactDetails_phoneNumber = "C1twCsH0rjI"; 
+	me.attr_ContactDetails_District = "qynN2cqRe71"; 
+	me.attr_ContactDetails_Council = "NLNTtpbT3c5";
+	me.attr_NextOfKin_ConsenToContact = "VRUFmF5tE7b";
+	
 	
 	me.attr_ContactPhoneNumber = "C1twCsH0rjI";
 	me.attr_RestrictionsContacting  = "z78Y1qdewNQ";
@@ -1479,8 +1483,12 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.createAttributeClientForm( me.artReferCloseFormTag, "LSHTC_ARTClosure_G1", false );
 		
 		// Set Mandatory for [Consent to contact] field
-		var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
-		me.addMandatoryForField( consentToContactTag );
+		me.addMandatoryForField( me.getAttributeField( me.attr_ConsentToContact ) );
+		me.addMandatoryForField( me.getAttributeField( me.attr_ContactDetails_phoneNumber ) );
+		me.addMandatoryForField( me.getAttributeField( me.attr_ContactDetails_District ) );
+		me.addMandatoryForField( me.getAttributeField( me.attr_ContactDetails_Council ) );
+		me.addMandatoryForField( me.getAttributeField( me.attr_NextOfKin_ConsenToContact ) );
+		
 		
 		// Hide Councils list in [Contact Log] attribute form
 		me.filterCouncilsByDistrict();
@@ -3182,8 +3190,29 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	me.completeEvent = function( exeFunc )
 	{
-		var event = JSON.parse( me.addEventFormTag.attr( "event" ) );
-		var eventId = event.event;
+		var event = me.addEventFormTag.attr( "event" );
+		var eventId;
+		var trackedEntityInstanceId;
+		if( event != undefined )
+		{
+			event = JSON.parse( me.addEventFormTag.attr( "event" ) );
+			eventId = event.event;
+		}
+		else
+		{
+			var client = JSON.parse( me.addClientFormTabTag.attr("client") );
+			var event = me.addEventFormTag.attr("event");
+			
+			if( event !== undefined ){
+				event = JSON.parse( event );
+			}
+			else{
+				event = { "programStage": me.stage_HIVTesting };
+			}
+			
+			// Save Event
+			trackedEntityInstanceId = client.trackedEntityInstance;
+		}
 		
 		
 		// Update status of event
@@ -3191,11 +3220,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		event.status = "COMPLETED";	
 		event.dataValues = Util.getArrayJsonData( "dataElement", me.thisTestDivTag );
 		
-		me.execSaveEvent( event, undefined, eventId, function(){
+		me.execSaveEvent( event, trackedEntityInstanceId, eventId, function( jsonEvent ){
 
 			// Create empty table and populate data for this event
 			
-			var tbody = me.createAndPopulateDataInEntryForm( event, me.stage_HIVTesting );
+			var tbody = me.createAndPopulateDataInEntryForm( jsonEvent, me.stage_HIVTesting );
 			me.previousTestsTag.find("table").prepend( tbody );
 			
 			// Reset data entry form
@@ -3207,8 +3236,8 @@ function ClientFormManagement( _mainPage, _metaData )
 			
 			
 			// Set [event] attribute for [This test] Tab
-			me.addEventFormTag.attr( "event", JSON.stringify( event ) );
-			me.addClientFormTabTag.attr( "artHIVTestingEvent", JSON.stringify( event ) );
+			me.addEventFormTag.attr( "event", JSON.stringify( jsonEvent ) );
+			me.addClientFormTabTag.attr( "artHIVTestingEvent", JSON.stringify( jsonEvent ) );
 
 			
 			// Set up Event creating logic
@@ -3224,7 +3253,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				artClosureEvent = JSON.parse( artClosureEvent );
 			}
 			
-			me.populateDataValueForContactLogAndARTRefTab( event, [] );
+			me.populateDataValueForContactLogAndARTRefTab( jsonEvent, [] );
 			
 			me.saveClientAfter( JSON.parse( me.addClientFormTabTag.attr("client") ), exeFunc, undefined, false );
 			
@@ -3464,7 +3493,8 @@ function ClientFormManagement( _mainPage, _metaData )
 	me.checkIfARTEvent = function( event )
 	{
 		var artValue = me.getEventDataValue( event, me.de_ReferralGiven_ART );
-		return( artValue == "true" );
+		var hivTestingValue = me.getEventDataValue( event, me.de_FinalResult_HIVStatus );
+		return( artValue == "true" && hivTestingValue == "Positive" );
 	};
 	
 	me.populateClientAttrValues = function( formTag, client )
@@ -3535,8 +3565,15 @@ function ClientFormManagement( _mainPage, _metaData )
 		// [Contact log]
 		
 		// History form
-		var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
-		if( consentToContactTag.val() != "" )
+		var showHistory = true;
+		me.contactLogFormTag.find("input[mandatory='true'],select[mandatory='true']").each( function(){
+			if( $(this).val() == "" )
+			{
+				showHistory = false;
+			}
+		});
+		
+		if( showHistory )
 		{
 			me.showAttrContactLogHistory();
 		}
