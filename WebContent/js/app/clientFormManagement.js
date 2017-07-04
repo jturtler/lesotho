@@ -187,6 +187,7 @@ function ClientFormManagement( _mainPage, _metaData )
 
 	me.de_HIVTestChannel = "quOYwc0SOqD";
 	me.de_HIVTestChannel_OtherReason = "Tjw4iDAjyy6";
+	me.de_IndexLeadCUIC = "nSr0NMql5FW";
 	me.de_WhatMotivatedHIVTest = "vOrRzjpdQC6";
 	me.de_WhatMotivatedHIVTest_OtherReason = "GCl3ORKj1jC";
 	me.de_Layer = "fGSXGuPIEOy";
@@ -1184,14 +1185,23 @@ function ClientFormManagement( _mainPage, _metaData )
 		// HIVTestChannel
 		var testChannelTag = me.getDataElementField( me.de_HIVTestChannel );
 		otherReasonTag = me.getDataElementField( me.de_HIVTestChannel_OtherReason );
+		var deIndexLeadCUICTag = me.getDataElementField( me.de_IndexLeadCUIC );
 		if( testChannelTag.val() == "LS_CHA7" ) // [Other testing channel] Option
 		{
 			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
+			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), true );
+		}
+		else if( testChannelTag.val() == "LS_CHA4" ) // [Index] option
+		{
+			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), false );
+			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
 		}
 		else
 		{
 			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
+			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), true );
 			otherReasonTag.val("");
+			deIndexLeadCUICTag.val("");
 		}
 		
 		// whatMotivatedHIVTest
@@ -1492,6 +1502,9 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		// Hide Councils list in [Contact Log] attribute form
 		me.filterCouncilsByDistrict();
+		
+		// Add validation[EQC] for [First name]
+		me.getAttributeField( me.attr_FirstName ).attr( "valueNotAllow", "EQC" );
 	};
 
 	me.createAttributeClientForm = function( table, preFixGroupName, addHistoryDiv )
@@ -1504,13 +1517,15 @@ function ClientFormManagement( _mainPage, _metaData )
 			
 			if( group.code.indexOf( preFixGroupName ) == 0 )
 			{
+				var groupName = group.name.split("-")[1];
+				
 				// STEP 2. Populate attribute-group name
 				
 				var tbody = $("<tbody groupId='" + group.id + "'></tbody>");
 				
 				// Create header with group name
 				var headerTag = $("<tr header='true'></tr>");
-				headerTag.append("<th colspan='4' style='border-right:0px;'><img style='float:left' class='arrowDownImg showHide' src='../images/down.gif'> " + group.name + " <span style='display:none;float:right' class='saveMsg'>Save</span></th>" );
+				headerTag.append("<th colspan='4' style='border-right:0px;'><img style='float:left' class='arrowDownImg showHide' src='../images/down.gif'> " + groupName + " <span style='display:none;float:right' class='saveMsg'>Save</span></th>" );
 				tbody.append( headerTag );
 				
 				// Create header with group name
@@ -1800,9 +1815,6 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.addMandatoryForField( $(this) );
 		});
 		
-		// Remove mandatory for attribute [Referral Facility Name] field
-		me.removeMandatoryForField( me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName ) );
-		
 		//Add "DATE" picker for "Date" field
 		me.artReferCloseFormTag.find("input[isDate='true']").each(function(){
 			Util.datePicker( $(this) );
@@ -1903,8 +1915,13 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.setUp_ClientRegistrationFormLogic_Age();
 	}
 	
+	
 	me.setUp_Events_ClientRegistrationFormDataLogic = function()
 	{
+		// ---------------------------------------------------------------------
+		// Set up event for [Sex] field
+		// ---------------------------------------------------------------------
+		
 		var sexTag = me.getAttributeField( me.attr_Sex );
 		sexTag.change( function(){
 			var keyPopulationTag = me.getAttributeField( me.attr_KeyPopulation );
@@ -2779,8 +2796,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		// STEP 3. Display [This Test] Tab if the "status" mode is "Add Client"
 		
-		var firstName = me.getAttributeValue( response, me.attr_FirstName );
-		var surName = me.getAttributeValue( response, me.attr_LastName );
+		var firstName = me.getAttributeValue( response, me.attr_FirstName ).toUpperCase();
+		var surName = me.getAttributeValue( response, me.attr_LastName ).toUpperCase();
 		if( me.saveClientRegBtnTag.attr("status") == "add"  )
 		{
 			if( firstName != "EQC" && ( surName != "POS" || surName != "NEG" ) )
@@ -2824,8 +2841,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
 		
 		
-		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName );
-		var surName = me.getAttributeValue( jsonClient, me.attr_LastName );
+		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
+		var surName = me.getAttributeValue( jsonClient, me.attr_LastName ).toUpperCase();
 		
 		if( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )
 		{
@@ -3191,6 +3208,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	me.completeEvent = function( exeFunc )
 	{
 		var event = me.addEventFormTag.attr( "event" );
+		var client = JSON.parse( me.addClientFormTabTag.attr("client") );
 		var eventId;
 		var trackedEntityInstanceId;
 		if( event != undefined )
@@ -3200,17 +3218,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		}
 		else
 		{
-			var client = JSON.parse( me.addClientFormTabTag.attr("client") );
-			var event = me.addEventFormTag.attr("event");
-			
-			if( event !== undefined ){
-				event = JSON.parse( event );
-			}
-			else{
-				event = { "programStage": me.stage_HIVTesting };
-			}
-			
-			// Save Event
+			event = { "programStage": me.stage_HIVTesting };
 			trackedEntityInstanceId = client.trackedEntityInstance;
 		}
 		
@@ -3231,8 +3239,14 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.resetDataEntryForm();
 			
 			// Show 'Save' event button AND show "This test" form
-			me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
+			var firstName = me.getAttributeValue( client, me.attr_FirstName ).toUpperCase();
+			
 			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
+			if( firstName != "EQC"  )
+			{
+				me.showTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
+				me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
+			}
 			
 			
 			// Set [event] attribute for [This test] Tab
@@ -3677,8 +3691,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.hideTabInClientForm( me.TAB_NAME_ART_REFER );
 		
 		var jsonClient = JSON.parse( me.addClientFormTabTag.attr( "client" ) );
-		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName );
-		var surName = me.getAttributeValue( jsonClient, me.attr_LastName );
+		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
+		var surName = me.getAttributeValue( jsonClient, me.attr_LastName ).toUpperCase();
 		if( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )
 		{
 			me.hideTabInClientForm( me.TAB_NAME_CONTACT_LOG );
@@ -3897,16 +3911,25 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	me.setUp_DataInPreviousTestTab = function( events, selectedEventId )
 	{
-		for( var i=0; i<events.length; i++ )
+		var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
+		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
+		if( firstName != "EQC" )
 		{
-			var event = events[i];
+			for( var i=0; i<events.length; i++ )
+			{
+				var event = events[i];
+				
+				// STEP 2.2. Create tbody for the event and populate data values of an event				
+				var tbody = me.createAndPopulateDataInEntryForm( event, me.stage_HIVTesting );
+				me.previousTestsTag.find("table").append( tbody );
+			}
 			
-			// STEP 2.2. Create tbody for the event and populate data values of an event				
-			var tbody = me.createAndPopulateDataInEntryForm( event, me.stage_HIVTesting );
-			me.previousTestsTag.find("table").append( tbody );
+			me.checkAndDisplayPreviousTestTab( selectedEventId );
 		}
-		
-		me.checkAndDisplayPreviousTestTab( selectedEventId );
+		else
+		{
+			me.hideTabInClientForm( me.TAB_NAME_PREVIOUS_TEST );
+		}
 	};
 	
 	
