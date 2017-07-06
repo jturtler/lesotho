@@ -484,7 +484,11 @@ function CoordinatorListManagement( _mainPage )
 						councilName = councilData.name;
 						councilCode = councilData.code;
 					}
-
+					else
+					{
+						councilName = "<span class='glyphicon glyphicon-user' style='color:red;'></span>"
+					}
+					
 					// ---------------------------------------------------------
 					// [ART Opening] event data
 					// ---------------------------------------------------------
