@@ -243,15 +243,18 @@ function CounsellorListMaganement( _mainPage  )
 				var statusColor = ( eventStatus == "COMPLETED" ) ? "green" : "red"; 
 				testResultTag.append("<span class='glyphicon glyphicon-lock' style='color:" + statusColor + ";padding-left:5px;'></span>");
 			
-				//For Positives only, in red if the mandatory fields in Contact Log - LS LOG 1 and LS LOG 2 have not been completed, if it has been: green
-				resultColor = ( hasContactData ) ? "green" : "red"; 
-				testResultTag.append("<span class='glyphicon glyphicon-user' style='color:" + resultColor + ";padding-left:5px;'></span>");
-				
-									
-				//For Positives only, in red if the Referral Opening event does not exist, green if it does
-				// resultColor = ( artValue && hasOpenARTEvent ) ? "green" : "red"; 
-				resultColor = ( hasOpenARTEvent ) ? "green" : "red"; 
-				testResultTag.append("<span class='glyphicon glyphicon-plus' style='color:" + resultColor + ";padding-left:5px;'></span>");
+				if( deResult1 == "Positive" )
+				{	
+					//For Positives only, in red if the mandatory fields in Contact Log - LS LOG 1 and LS LOG 2 have not been completed, if it has been: green
+					resultColor = ( hasContactData ) ? "green" : "red"; 
+					testResultTag.append("<span class='glyphicon glyphicon-user' style='color:" + resultColor + ";padding-left:5px;'></span>");
+					
+										
+					//For Positives only, in red if the Referral Opening event does not exist, green if it does
+					// resultColor = ( artValue && hasOpenARTEvent ) ? "green" : "red"; 
+					resultColor = ( hasOpenARTEvent ) ? "green" : "red"; 
+					testResultTag.append("<span class='glyphicon glyphicon-plus' style='color:" + resultColor + ";padding-left:5px;'></span>");
+				}
 				
 				
 				// -------------------------------------------------------------

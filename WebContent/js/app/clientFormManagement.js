@@ -449,9 +449,10 @@ function ClientFormManagement( _mainPage, _metaData )
 			};
 			jsonEvent.dataValues = Util.getArrayJsonData( "dataElement", me.contactLogEventFormTag );
 			
-			me.execSaveEvent( jsonEvent, jsonClient.trackedEntityInstance, undefined, function( jsonData ){
+			me.execSaveEvent( me.contactLogEventFormTag, jsonEvent, jsonClient.trackedEntityInstance, undefined, function( jsonData ){
 				me.contactLogEventFormTag.hide();
 				me.populateContactLogEventHistory( jsonData );
+				me.populateNextContactLogActionBar( jsonData );
 				Util.disableTag( me.addContactLogEventBtnTag, false );
 			});
 			return false;
@@ -515,7 +516,7 @@ function ClientFormManagement( _mainPage, _metaData )
 						
 			jsonEvent.dataValues = Util.getArrayJsonData( "dataElement", me.artReferOpenFormTag );
 			
-			me.execSaveEvent( jsonEvent, jsonClient.trackedEntityInstance, eventId, function( response ){
+			me.execSaveEvent( me.artReferOpenFormTag, jsonEvent, jsonClient.trackedEntityInstance, eventId, function( response ){
 				
 				// Set [event] attribute for [ART Refer Opening] Tab
 				me.artReferOpenFormTag.attr( "event", JSON.stringify( response ) );
@@ -767,7 +768,7 @@ function ClientFormManagement( _mainPage, _metaData )
 			event.dataValues = Util.getArrayJsonData( "dataElement", me.thisTestDivTag );
 			
 			// Save Event
-			me.execSaveEvent(event, client.trackedEntityInstance, event.event, function( eventJson ){
+			me.execSaveEvent( me.thisTestDivTag, event, client.trackedEntityInstance, event.event, function( eventJson ){
 				
 				var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
 				var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
@@ -1752,7 +1753,7 @@ function ClientFormManagement( _mainPage, _metaData )
 			var inputTag = me.inputTagGeneration.generateInputTag( psDE.dataElement, "dataelement" );
 			colTag.append( inputTag );
 			
-			if( psDE.compulsory == "true" )
+			if( psDE.compulsory )
 			{
 				me.addMandatoryForField( inputTag );
 			}
@@ -2748,7 +2749,7 @@ function ClientFormManagement( _mainPage, _metaData )
 						
 			jsonEvent.dataValues = Util.getArrayJsonData( "dataElement", formTag );
 			
-			me.execSaveEvent( jsonEvent, jsonClient.trackedEntityInstance, eventId, function( response ){
+			me.execSaveEvent( formTag, jsonEvent, jsonClient.trackedEntityInstance, eventId, function( response ){
 				
 				// Set [event] attribute for [ART Refer Opening] Tab
 				formTag.attr( "event", JSON.stringify( response ) );
@@ -3090,14 +3091,14 @@ function ClientFormManagement( _mainPage, _metaData )
 		 
 	};
 	
-	me.execSaveEvent = function( jsonData, clientId, eventId, exeFunc )
+	me.execSaveEvent = function( formTag, jsonData, clientId, eventId, exeFunc )
 	{
 		Commons.checkSession( function( isInSession ) {
 			if ( isInSession ) {
 				var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_checkingData" );
 				MsgManager.appBlock( tranlatedMsg );
 				
-				if( me.validationObj.checkFormEntryTagsData(me.thisTestDivTag) )
+				if( me.validationObj.checkFormEntryTagsData( formTag ) )
 				{
 					if( eventId == undefined )
 					{
@@ -3241,7 +3242,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		event.status = "COMPLETED";	
 		event.dataValues = Util.getArrayJsonData( "dataElement", me.thisTestDivTag );
 		
-		me.execSaveEvent( event, trackedEntityInstanceId, eventId, function( jsonEvent ){
+		me.execSaveEvent( me.thisTestDivTag, event, trackedEntityInstanceId, eventId, function( jsonEvent ){
 
 			// Add completed event in [Previous Test] tab
 			
@@ -3434,7 +3435,9 @@ function ClientFormManagement( _mainPage, _metaData )
 			// Get [Contact Log] event
 			else if( event.programStage == me.stage_ContactLog )
 			{
-				contactLogEvents.push( event );
+				// Add event in begining of array, I need to convert [Contact Log] event array 
+				// so that the latest event will be displayed in the top of history
+				contactLogEvents.unshift( event );
 			}
 			// Get [ART Refer. Opening] event
 			else if( event.programStage == me.stage_ARTReferralOpenning )
@@ -3755,12 +3758,12 @@ function ClientFormManagement( _mainPage, _metaData )
 		if( me.artReferOpenFormTag.attr("event") != undefined )
 		{
 			me.artReferCloseFormTag.show();
-			Util.disableForm( me.artReferOpenFormTag, true );
+//			Util.disableForm( me.artReferOpenFormTag, true );
 			me.hideIconInTab( me.TAB_NAME_ART_REFER );
 		}
 		else
 		{
-			Util.disableForm( me.artReferOpenFormTag, false );
+//			Util.disableForm( me.artReferOpenFormTag, false );
 			me.showIconInTab( me.TAB_NAME_ART_REFER );
 			me.artReferCloseFormTag.hide();
 		}
@@ -3837,6 +3840,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		{
 			me.populateContactLogEventHistory( eventList[i] );
 		}
+		
+		if( eventList.length > 0 )
+		{
+			me.populateNextContactLogActionBar( eventList[eventList.length - 1] );
+		}
 	};
 	 
 	me.populateContactLogEventHistory = function( eventJson )
@@ -3880,29 +3888,87 @@ function ClientFormManagement( _mainPage, _metaData )
 		}
 		
 		
+		// ---------------------------------------------------------------------
 		// Add history
+		// ---------------------------------------------------------------------
+		
 		var tbody = $("<tbody></tbody");
 		
-		var headerTag = $("<tr></tr>");
+		// Header
+		var headerTag = $("<tr class='actionBar'></tr>");
 		headerTag.append("<th>Date: " + eventDate + "</th>");
 		headerTag.append("<th>Type: " + typeOfContact + "</th>");
 		headerTag.append("<th>Outcome: " + outcome + "</th>");
+		headerTag.append("<th class='actionCell' style='width:20px;'><button><span class='glyphicon glyphicon-pencil'></span></button></th>");
 		
+		// Add event for [Edit] button
+		me.setUp_Events_EditContactLogEvent( headerTag.find("button") );
+		
+		// Add event information in history table
 		var rowTag = $("<tr></tr>");
-		rowTag.append("<td colspan='3'>" + comments + "</td>");
+		rowTag.append("<td colspan='4'>" + comments + "</td>");
 		
 		tbody.append( headerTag );
 		tbody.append( rowTag );
 		me.contactLogEventHistoryTbTag.prepend( tbody );
+	};
+	
+	
+	me.populateNextContactLogActionBar = function( contactLogEvent )
+	{
+		var eventDate = "";
+		if( contactLogEvent.eventDate !== undefined ){
+			eventDate = Util.formatDate_DisplayDate( contactLogEvent.eventDate );
+		}
+		
+		var nextAction = "";
+		var nextActionCode = "";
+		var dueDate = "";
+		
+		var dataValues = contactLogEvent.dataValues;
+		for( var i in dataValues )
+		{
+			var deId = dataValues[i].dataElement;
+			var value = dataValues[i].value;
+			
+			if( deId == me.de_NextAction )
+			{
+				nextAction = me.getDisplayNameByDataValue( deId, value );
+				nextActionCode = value;
+			}
+			else if( deId == me.de_DueDate )
+			{
+				dueDate = me.getDisplayNameByDataValue( deId, value );
+			}
+		}
 		
 		// Add Next contact log
 		if( nextAction != "" )
 		{
 			me.nextContactLogActionTbTag.find("span.nextAction").html( nextAction );
+			
+			if( dueDate == "" )
+			{
+				var notSpecifiedText = me.translationObj.getTranslatedValueByKey( "contactLogEvent_msg_noneDueDate" );
+				dueDate = "[" + notSpecifiedText + "]";
+			}
+			 
 			me.nextContactLogActionTbTag.find("span.dueDate").html( dueDate );
 			
-			me.nextContactLogActionTbTag.show();
+			if( nextActionCode == "NONE" )
+			{
+				me.nextContactLogActionTbTag.hide();
+			}
+			else
+			{
+				me.nextContactLogActionTbTag.show();
+			}
 		}
+	};
+	
+	me.setUp_Events_EditContactLogEvent = function( editBtnTag )
+	{
+		
 	};
 	
 	me.getDisplayNameByDataValue = function( deId, value )

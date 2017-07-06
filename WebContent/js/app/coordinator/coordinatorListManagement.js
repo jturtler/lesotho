@@ -12,6 +12,7 @@ function CoordinatorListManagement( _mainPage )
 	me.filterCouncils = me.settingsManagement.filterCouncils;
 	me.filterHealthFacilities = me.settingsManagement.filterHealthFacilities;
 	me.closureARTStatus = me.settingsManagement.closureARTStatus;
+	me.contactLogTypeName = me.settingsManagement.contactLogTypeName;
 	
 	// Today F/U
 	me.todayFUListTag = $("#todayFUList");
@@ -153,6 +154,7 @@ function CoordinatorListManagement( _mainPage )
 				me.councilFilterTbTag.show();
 				me.filterEvents();
 				me.setFilterDataInfo();
+				me.districtFilterTbTag.find("tr.otherDistrict").hide();
 			}
 		} );
 		
@@ -165,6 +167,7 @@ function CoordinatorListManagement( _mainPage )
 				me.healthFacilityFilterTbTag.show();
 				me.filterEvents();
 				me.setFilterDataInfo();
+				me.districtFilterTbTag.find("tr.otherDistrict").show();
 			}
 		} );
 		
@@ -211,6 +214,13 @@ function CoordinatorListManagement( _mainPage )
 			rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'> <span>" + name + "</span></label></td>" );
 			me.districtFilterTbTag.append( rowTag );
 		}
+		
+		// Add [Other] option for district
+		var name = "Other";
+		var code = "Other";
+		var rowTag = $( "<tr class='otherDistrict' style='display:none;'></tr>" );
+		rowTag.append( "<td><label style='font-weight:normal;'><input type='checkbox' value='" + code + "'> <span>" + name + "</span></label></td>" );
+		me.districtFilterTbTag.append( rowTag );
 	};
 	
 	me.createCouncilFilter = function()
@@ -456,7 +466,10 @@ function CoordinatorListManagement( _mainPage )
 					
 					var clientId = clientData[2];
 					var cuic = clientData[3];
-					
+			if( clientId = 'y0LDz7bsJdU')
+				{
+				var dadf = 0;
+				}
 					
 					// ---------------------------------------------------------
 					// Council code and name
@@ -483,9 +496,9 @@ function CoordinatorListManagement( _mainPage )
 					openingARTEventDate = openingARTEvent[0].eventDate;
 					var openingARTEventName = me.settingsManagement.ARTReferralOpeningStage_Name;
 					
-					for( var i in openingARTEvent )
+					for( var j in openingARTEvent )
 					{
-						var event = openingARTEvent[i];
+						var event = openingARTEvent[j];
 						if( event.eventId == latestEventId )
 						{
 							if( event.deId == me.de_ARTOpening_ReferralFacilityName )
@@ -529,20 +542,30 @@ function CoordinatorListManagement( _mainPage )
 						contactLogEvent = JSON.parse( "[" + contactLogEvent + "]" );
 						var latestEventId = contactLogEvent[0].eventId;
 						contactLogEventDate = contactLogEvent[0].eventDate;
-						for( var i in contactLogEvent )
+						for( var j in contactLogEvent )
 						{
-							var event = contactLogEvent[i];
+							var event = contactLogEvent[j];
 							if( event.eventId == latestEventId )
 							{
-								if( event.deId = me.de_contactLog_lastActionName )
+								if( event.deId == me.de_contactLog_lastActionName )
 								{
 									contactLogEventContactType = event.datavalue;
+									var searched = Util.findItemFromList( me.contactLogTypeName, "code", contactLogEventContactType );
+									if( searched )
+									{
+										contactLogEventContactType = searched.name;
+									}
 								}
-								else if( event.deId = me.de_contactLog_nextActionName )
+								else if( event.deId == me.de_contactLog_nextActionName )
 								{
 									contactLogNextAction = event.datavalue;
+									var searched = Util.findItemFromList( me.contactLogTypeName, "code", contactLogNextAction );
+									if( searched )
+									{
+										contactLogNextAction = searched.name;
+									}
 								}
-								else if( event.deId = me.de_contactLog_dueDate )
+								else if( event.deId == me.de_contactLog_dueDate )
 								{
 									contactLogDueDate = event.datavalue;
 								}	
@@ -595,7 +618,12 @@ function CoordinatorListManagement( _mainPage )
 							, openingARTEventDate, openingARTEventName
 							, closureARTEventDate, closureEventLinkageOutcome );
 					
-					
+					var statusNextActionIcon = ""; 
+					if( actions.nextAction.statusColor != "" )
+					{
+						statusNextActionIcon = "<span class='glyphicon glyphicon-time' style='font-size: 22px;color:" + actions.nextAction.statusColor + "'></span>";
+					}
+						
 					// Populate data in table
 					var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
 					
@@ -608,7 +636,7 @@ function CoordinatorListManagement( _mainPage )
 					rowTag.append( "<td>" + cuic + "</td>" );
 					rowTag.append( "<td>" + daySinceDiagnosis + "</td>" );
 					rowTag.append( "<td>" + actions.lastAction.date + "<br> " + actions.lastAction.action + "</td>" );
-					rowTag.append( "<td>" + actions.nextAction.date + "<br>" + actions.nextAction.action + "</td>" );
+					rowTag.append( "<td>" + actions.nextAction.date + " " + statusNextActionIcon + "<br>" + actions.nextAction.action + "</td>" );
 					
 					me.addEventForRowInList(rowTag);
 					
@@ -623,7 +651,7 @@ function CoordinatorListManagement( _mainPage )
 		
 		me.allFUNumberTag.html( me.allFUTblTag.find("tbody").find("tr:visible").length );
 	};
-	
+		
 	me.getLastAction = function( contactLogEventDate, contactLogEventContactType
 			, contactLogDueDate, contactLogNextAction
 			, openingARTEventDate, openingARTEventName
@@ -633,6 +661,8 @@ function CoordinatorListManagement( _mainPage )
 		var lastActionName = "";
 		var nextActionDate = "";
 		var nextActionName = "";
+		var isClosed = false;
+		var dueDate = "";
 		
 		
 		// If [ART Referral - Opening] event existed, no [Contact Log] event, no [ART Referral - Closure]
@@ -640,9 +670,12 @@ function CoordinatorListManagement( _mainPage )
 		// --> Next action : ART Referral - Opening event DATE+7 Days, "Start follow-up"
 		if( openingARTEventDate != "" && contactLogEventDate == "" && closureARTEventDate == "" )
 		{
+			var dueDateObj = Util.getLastXDateFromDateStr( openingARTEventDate, -7 );
+			dueDate = Util.convertDateObjToStr( dueDateObj );
+			
 			lastActionDate = Util.formatDate_DisplayDate( openingARTEventDate );
 			lastActionName = openingARTEventName;
-			nextActionDate = Util.formatDate_LastXDateFromDateStr( openingARTEventDate, -7 );
+			nextActionDate = Util.formatDateObj_DisplayDate( dueDateObj );
 			nextActionName = me.translationObj.getTranslatedValueByKey( "allFU_startFollowUpAction" );
 		}
 		// If [ART Referral - Opening] and ART Referral - Closure] events existed
@@ -656,17 +689,29 @@ function CoordinatorListManagement( _mainPage )
 			lastActionName = closureEventLinkageOutcome;
 			nextActionDate = "";
 			nextActionName = "[" + tranlatedText + "]";
+			isClosed = true;
 		}
 		// If [ART Referral - Opening] and [Contact Log] events existed, no [ART Referral - Closure]
 		// --> Last action : Last Contact Log event DATE, Last Contact Log event TYPE OF CONTACT
 		// --> Next action : Last Contact Log event DUE DATE, Last Contact Log event NEXT ACTION
 		else if( openingARTEventDate != "" && contactLogEventDate != "" && closureARTEventDate == "" )
 		{
+			dueDate = contactLogDueDate;
+			var notSpecifiedText = me.translationObj.getTranslatedValueByKey( "contactLogEvent_msg_noneDueDate" );
+			var dueDateStr = "[" + notSpecifiedText + "]";
+			if( contactLogDueDate != "" )
+			{
+				dueDateStr = Util.formatDate_DisplayDate( contactLogDueDate );
+			}
+			
 			lastActionDate = Util.formatDate_DisplayDate( contactLogEventDate );
 			lastActionName = contactLogEventContactType;
-			nextActionDate = Util.formatDate_DisplayDate( contactLogDueDate );
+			nextActionDate = dueDateStr;
 			nextActionName = contactLogNextAction;
 		}
+
+		// Get status color of next action
+		var statusColor = me.generateDueDateIconStatusColor( dueDate );
 		
 		return {
 			"lastAction": {
@@ -676,8 +721,34 @@ function CoordinatorListManagement( _mainPage )
 			"nextAction": {
 				"date" : nextActionDate
 				,"action" : nextActionName
+				,"statusColor" : statusColor
 			}
 		};
+	};
+	
+	me.generateDueDateIconStatusColor = function( dueDateStr )
+	{
+		var statusColor = "";
+		if( dueDateStr != "" )
+		{
+			var dueDate = dueDateStr.substring( 0, 10 );		
+			var today = Util.convertDateObjToStr( new Date() );
+			
+			if( dueDate > today )
+			{
+				statusColor = "green";
+			}
+			else if( dueDate == today )
+			{
+				statusColor = "orange";
+			}
+			else
+			{
+				statusColor = "red";
+			}
+		}
+		
+		return statusColor;
 	};
 	
 	me.sortTable = function( tableTag )
