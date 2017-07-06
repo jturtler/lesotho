@@ -197,12 +197,15 @@
 					    <!-- Filter by District/Council -->
 					    
 					    <table style="width: 100%;">
-					    	<col width="50%"/>
-					    	<col width="50%"/>
+					    	<col width="3%"/>
+					    	<col width="48%"/>
+					    	<col width="48%"/>
 					    	
 					    	<tr style="background-color:#dedede; height:35px; cursor:pointer;" id="ouFilterHeaderTr">
 					    		<th>
 					    			<img style="float:left" class="arrowRightImg" src="../images/tab_right.png">
+					    		</th>
+					    		<th>
 					    			<span keyword="allFU_filterBy_district">District</span>
 					    		</td>
 					    		<th keyword="allFU_filterBy_councilFacility">Council/Facility</td>
@@ -211,7 +214,8 @@
 					    	
 					    	<tbody id="ouFilterTb" style="display:none;">
 					    		<tr>
-					    			<td style="vertical-align: top;"><div style="overflow:auto;height:335px;"><table id="districtFilterTb"  style="width:100%"></table></div></td>
+					    			<td></td>
+					    			<td style="vertical-align: top;"><div style="overflow:auto;height:355px;"><table id="districtFilterTb"  style="width:100%"></table></div></td>
 					    			<td style="vertical-align: top;">
 					    				<div style="overflow: auto;height: 335px;">
 					    					<table id="councilFilterTb" style="width:100%"></table>
@@ -223,6 +227,7 @@
 					    	
 					    	<tbody id="ouFilterInfor">
 					    		<tr>
+					    			<td></td>
 					    			<td id="districtFilterInfo" style="font-style:italic;"></td>
 					    			<td id="councilFilterInfo" style="font-style:italic;"></td>
 					    		</tr>
@@ -317,10 +322,9 @@
 						<ul>
 				    		<li><a href="#clientAttributeDiv" keyword="dataEntryForm_tab_clientAttributes_headerTitle">Client Information</a></li>
 				    		<li><a href="#previousTestDiv" keyword="dataEntryForm_tab_previousTests_headerTitle">Previous Tests</a></li>
-				    		<li><a href="#thisTestDiv" keyword="dataEntryForm_tab_thisTest_headerTitle">New Test</a></li>
-				    		
-				    		<li><a href="#contactLogDiv" keyword="dataEntryForm_tab_contactLog_headerTitle">Contact Log</a></li>
-				    		<li><a href="#artReferDiv" keyword="dataEntryForm_tab_ARTRefer_headerTitle">ART Refer.</a></li>
+				    		<li><a href="#thisTestDiv"><span keyword="dataEntryForm_tab_thisTest_headerTitle">New Test</span> <span style="color:red;display:none;padding-left: 10px;" class="tabIcon glyphicon glyphicon-lock"></span></a></li>
+				    		<li><a href="#contactLogDiv"><span keyword="dataEntryForm_tab_contactLog_headerTitle">Contact Log</span> <span style="color:red;padding-left: 10px;" class="tabIcon glyphicon glyphicon-user"></span></a></li>
+				    		<li><a href="#artReferDiv"><span keyword="dataEntryForm_tab_ARTRefer_headerTitle">ART Refer.</span> <span style="color:red;padding-left: 10px;" class="tabIcon glyphicon glyphicon-plus"></span></a></li>
 				  		</ul>
 				  		
 				  		
@@ -415,9 +419,9 @@
 												<span style="float:right;" keyword="contactLogForm_tab_btn_add">Add</span>
 											</th>
 											<th style="width:20px;background-color:#afc3d8;" class="actionCell">
-												<button id="addContactLogEventBtn" class="imgBtn" style="background-color:#afc3d8 !important"><span class="glyphicon glyphicon-plus"></span></button>
-											</th>	
-										</tr>
+												<button id="addContactLogEventBtn" class="imgBtn" ><span class="glyphicon glyphicon-plus"></span></button>
+											</th>
+										</tr>	
 									</thead>
 									
 									<tbody id="contactLogEventForm" style="display:none;">
@@ -427,12 +431,12 @@
 										<tr>
 											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_typeOfContact">Type of contact</td>
 											<td dataelementtag="wzM3bUiPowS"></td>
-											<td keyword="contactLogForm_tab_eventForm_header_outcome">Outcome</td>
-											<td colspan="2" dataelementtag="hjpNXAyZ0cm"></td>
+											<td><span keyword="contactLogForm_tab_eventForm_header_nextAction">Next action</span> <span class="required">*</span></td>
+											<td colspan="2" dataelementtag="mcgzEFh5IV8" style="min-width: 200px;"></td>
 										</tr>
 										<tr>
-											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_nextAction">Next action</td>
-											<td dataelementtag="mcgzEFh5IV8"></td>
+											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_outcome">Outcome</td>
+											<td dataelementtag="hjpNXAyZ0cm"></td>
 											<td keyword="contactLogForm_tab_eventForm_header_dueDate">Due date</td>
 											<td colspan="2" dataelementtag="HcBFZsCt8Sy"></td>
 										</tr>

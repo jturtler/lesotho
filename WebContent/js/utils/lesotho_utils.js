@@ -649,6 +649,23 @@ Util.convertDateStrToObject = function( dateStr )
 	return new Date( year, month, day );
 }
 
+/** 
+ * dateObj : Date Object
+ * Result : 2017-01-02
+ * **/
+Util.convertDateObjToStr = function( dateObj )
+{	
+	var year = dateObj.getFullYear();
+	var month = dateObj.getMonth();
+	month = ( month < 10 ) ? "0" + month : "" + month;
+	
+	var dayInMonth = dateObj.getDate();
+	dayInMonth = ( dayInMonth < 10 ) ? "0" + dayInMonth : dayInMonth;
+	
+	return year + "-" + month + "-" + dayInMonth;
+};
+
+
 Util.datePicker = function( dateTag )
 {
 	dateTag.attr( "readonly", true );

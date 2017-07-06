@@ -2,6 +2,7 @@ package psi.lesotho.service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -309,7 +310,7 @@ public class ClientController
         {
             String attributeId = attributeList.getJSONObject( i ).getString( "attribute" );
             String value = attributeList.getJSONObject( i ).getString( "value" );
-            condition += "var=" + attributeId + ":" + value + "&";
+            condition += "var=" + attributeId + ":" + URLEncoder.encode( value ) + "&";
             
             if ( searchVariableCopy.indexOf( attributeId ) >= 0 )
             {

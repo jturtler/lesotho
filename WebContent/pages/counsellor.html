@@ -282,10 +282,9 @@
 						<ul>
 				    		<li><a href="#clientAttributeDiv" keyword="dataEntryForm_tab_clientAttributes_headerTitle">Client Information</a></li>
 				    		<li><a href="#previousTestDiv" keyword="dataEntryForm_tab_previousTests_headerTitle">Previous Tests</a></li>
-				    		<li><a href="#thisTestDiv" keyword="dataEntryForm_tab_thisTest_headerTitle">New Test</a></li>
-				    		
-				    		<li><a href="#contactLogDiv" keyword="dataEntryForm_tab_contactLog_headerTitle">Contact Log</a></li>
-				    		<li><a href="#artReferDiv" keyword="dataEntryForm_tab_ARTRefer_headerTitle">ART Refer.</a></li>
+				    		<li><a href="#thisTestDiv"><span keyword="dataEntryForm_tab_thisTest_headerTitle">New Test</span> <span style="color:red;display:none;padding-left: 10px;" class="tabIcon glyphicon glyphicon-lock"></span></a></li>
+				    		<li><a href="#contactLogDiv"><span keyword="dataEntryForm_tab_contactLog_headerTitle">Contact Log</span> <span style="color:red;padding-left: 10px;" class="tabIcon glyphicon glyphicon-user"></span></a></li>
+				    		<li><a href="#artReferDiv"><span keyword="dataEntryForm_tab_ARTRefer_headerTitle">ART Refer.</span> <span style="color:red;padding-left: 10px;" class="tabIcon glyphicon glyphicon-plus"></span></a></li>
 				  		</ul>
 				  		
 				  		
@@ -372,6 +371,7 @@
 							
 							<div id="addContactLogEventDiv">
 								<table class="table previousTestTb panel panel-default" id="addContactLogEventForm">
+									
 									<thead>
 										<tr class="actionBar">
 											<th colspan="5">
@@ -379,9 +379,9 @@
 												<span style="float:right;" keyword="contactLogForm_tab_btn_add">Add</span>
 											</th>
 											<th style="width:20px;background-color:#afc3d8;" class="actionCell">
-												<button id="addContactLogEventBtn" class="imgBtn" style="background-color:#afc3d8 !important"><span class="glyphicon glyphicon-plus"></span></button>
-											</th>	
-										</tr>
+												<button id="addContactLogEventBtn" class="imgBtn" ><span class="glyphicon glyphicon-plus"></span></button>
+											</th>
+										</tr>	
 									</thead>
 									
 									<tbody id="contactLogEventForm" style="display:none;">
@@ -391,12 +391,12 @@
 										<tr>
 											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_typeOfContact">Type of contact</td>
 											<td dataelementtag="wzM3bUiPowS"></td>
-											<td keyword="contactLogForm_tab_eventForm_header_outcome">Outcome</td>
-											<td colspan="2" dataelementtag="hjpNXAyZ0cm"></td>
+											<td><span keyword="contactLogForm_tab_eventForm_header_nextAction">Next action</span> <span class="required">*</span></td>
+											<td colspan="2" dataelementtag="mcgzEFh5IV8" style="min-width: 200px;"></td>
 										</tr>
 										<tr>
-											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_nextAction">Next action</td>
-											<td dataelementtag="mcgzEFh5IV8"></td>
+											<td colspan="2" keyword="contactLogForm_tab_eventForm_header_outcome">Outcome</td>
+											<td dataelementtag="hjpNXAyZ0cm"></td>
 											<td keyword="contactLogForm_tab_eventForm_header_dueDate">Due date</td>
 											<td colspan="2" dataelementtag="HcBFZsCt8Sy"></td>
 										</tr>

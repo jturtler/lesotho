@@ -24,18 +24,18 @@ import org.json.JSONObject;
 
 public final class Util
 {
-//    public static String LOCATION_DHIS_SERVER = "https://clone.psi-mis.org";
-//  public static String LOCATION_DHIS_SERVER = "https://james.psi-mis.org";
-//  public static String LOCATION_DHIS_SERVER = "http://localhost:8080/dhis";
     
+//  public static String LOCATION_DHIS_SERVER = "http://localhost:8080/dhis";
 
     // https://data.psi-mis.org
-    public static String LOCATION_DHIS_SERVER = "https://clone.psi-mis.org";
+//    public static String LOCATION_DHIS_SERVER = "https://data.psi-mis.org";
+  public static String LOCATION_DHIS_SERVER = "https://clone.psi-mis.org";
     public static final String ID_TRACKED_ENTITY = "XV3kldsZq0H";
-
+    
 //    // https://sandbox.psi-mis.org
-//    public static final String ID_TRACKED_ENTITY = "MCPQUTHX1Ze";
 //    public static String LOCATION_DHIS_SERVER = "https://sandbox.psi-mis.org";
+//    public static final String ID_TRACKED_ENTITY = "MCPQUTHX1Ze";
+
 
     
     public static String REQUEST_PARAM_USERNAME = "usr";
@@ -104,6 +104,7 @@ public final class Util
     public static String PAMAM_PARTNER_CUIC = "partnerCUIC";
     public static String PAMAM_COUPLE_STAUTS = "coupleStatus";
     
+    
     // -------------------------------------------------------------------------
     // UIDs
     // -------------------------------------------------------------------------
@@ -112,11 +113,7 @@ public final class Util
     // Supper DHIS account
     public static String ACCESS_SERVER_USERNAME = "ls.webapp";
     public static String ACCESS_SERVER_PASSWORD = "Q57pAJ9V";
-    
-//    public static String ACCESS_SERVER_USERNAME = "lesotho_superuser";
-//    public static String ACCESS_SERVER_PASSWORD = "ABCD1234";
-    
-    
+     
     // Translation Ids
     // public static String KEY_TRANSLATION_KEYWORDS_PROJECT_ID = "98319"; // On Rodolfo account
     // public static String KEY_TRANSLATION_VERSION_PROJECT_ID = "95765"; // On Rodolfo account
