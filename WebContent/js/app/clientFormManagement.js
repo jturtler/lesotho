@@ -187,6 +187,7 @@ function ClientFormManagement( _mainPage, _metaData )
 
 	me.de_HIVTestChannel = "quOYwc0SOqD";
 	me.de_HIVTestChannel_OtherReason = "Tjw4iDAjyy6";
+	me.de_IndexLeadCUIC = "nSr0NMql5FW";
 	me.de_WhatMotivatedHIVTest = "vOrRzjpdQC6";
 	me.de_WhatMotivatedHIVTest_OtherReason = "GCl3ORKj1jC";
 	me.de_Layer = "fGSXGuPIEOy";
@@ -1184,14 +1185,23 @@ function ClientFormManagement( _mainPage, _metaData )
 		// HIVTestChannel
 		var testChannelTag = me.getDataElementField( me.de_HIVTestChannel );
 		otherReasonTag = me.getDataElementField( me.de_HIVTestChannel_OtherReason );
+		var deIndexLeadCUICTag = me.getDataElementField( me.de_IndexLeadCUIC );
 		if( testChannelTag.val() == "LS_CHA7" ) // [Other testing channel] Option
 		{
 			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
+			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), true );
+		}
+		else if( testChannelTag.val() == "LS_CHA4" ) // [Index] option
+		{
+			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), false );
+			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
 		}
 		else
 		{
 			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
+			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), true );
 			otherReasonTag.val("");
+			deIndexLeadCUICTag.val("");
 		}
 		
 		// whatMotivatedHIVTest
