@@ -20,7 +20,6 @@ Commons.checkSession = function( returnFunc )
 		,url: "../checkSession"
 		,dataType: "json"
         ,contentType: "application/json;charset=utf-8"
-        ,data: '{}'
 		,success: function( response ) 
 		{					
 			returnFunc( !Commons.checkForSessionExpired( response ) );
