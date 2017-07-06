@@ -2,9 +2,9 @@
 function Commons() {}
 
 Commons.VERSION = "v0.35";
-Commons.VERSION_DATE = "Jul 05 2017";
+Commons.VERSION_DATE = "Jul 06 2017";
 
-Commons.wsUrl = "lsTrain";
+Commons.wsUrl = "ls-train";
 
 Commons.dateFormat = "DD MMM YYYY";
 Commons.dateTimeFormat = "YYYY-MM-DD HH:mm";
