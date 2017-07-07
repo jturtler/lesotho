@@ -625,7 +625,7 @@ function CoordinatorListManagement( _mainPage )
 					var statusNextActionIcon = ""; 
 					if( actions.nextAction.statusColor != "" )
 					{
-						statusNextActionIcon = "<span class='glyphicon glyphicon-time' style='font-size: 22px;color:" + actions.nextAction.statusColor + "'></span>";
+						statusNextActionIcon = "<span class='glyphicon glyphicon-time' style='color:" + actions.nextAction.statusColor + "'></span>";
 					}
 						
 					// Populate data in table

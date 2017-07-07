@@ -2040,13 +2040,13 @@ function ClientFormManagement( _mainPage, _metaData )
 			}
 			
 		}
-		else if( sexTag.val() == "Male" && dataSaved ) // If Sex = Male, HIDE FSW
+		else if( sexTag.val() == "Male" ) // If Sex = Male, HIDE FSW
 		{
 			// Show option values [MSM] of attribute [Key Population]
 			keyPopulationTag.find("option[value='MSMSW']").show();
 			keyPopulationTag.find("option[value='MSMNONSW']").show();
 			
-			if( referralOfferedTag.val() == "true" )
+			if( referralOfferedTag.val() == "true" && dataSaved )
 			{
 				// Hide [Referral to VMMC]
 				me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), false );
