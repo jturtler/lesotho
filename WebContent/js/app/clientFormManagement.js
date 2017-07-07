@@ -442,18 +442,45 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.saveContactLogEventBtnTag.click(function(){
 			
 			var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
+			var jsonEvent = me.contactLogEventFormTag.attr( "event" );
+			var eventId;
 			
-			var jsonEvent = { 
-				"programStage": me.stage_ContactLog 
-				,"status": "COMPLETED"
-			};
+			if( jsonEvent != undefined )
+			{
+				jsonEvent = JSON.parse( jsonEvent );
+				eventId = jsonEvent.event;
+			}
+			else
+			{
+				jsonEvent = { 
+						"programStage": me.stage_ContactLog 
+						,"status": "COMPLETED"
+					};
+			}
+			
 			jsonEvent.dataValues = Util.getArrayJsonData( "dataElement", me.contactLogEventFormTag );
 			
-			me.execSaveEvent( me.contactLogEventFormTag, jsonEvent, jsonClient.trackedEntityInstance, undefined, function( jsonData ){
+			me.execSaveEvent( me.contactLogEventFormTag, jsonEvent, jsonClient.trackedEntityInstance, eventId, function( jsonData ){
+				// In case, users edit an event( not create a new one ), remove it from history
+				// We don't want to make double record for one event in history
+				if( eventId != undefined ) 
+				{
+					var headerTag = me.contactLogEventHistoryTbTag.find("tr[eventId='" + eventId + "']");
+					headerTag.closest("tbody").remove(); // Remove history of the edit event
+				}
+				else
+				{
+					var firstCommentTd = me.contactLogEventHistoryTbTag.find("tbody:first");
+					firstCommentTd.find("button").closest("th").remove(); // Remove Edit button column
+					firstCommentTd.find("th.outcome").attr("colspan", "2");
+				}
+				
 				me.contactLogEventFormTag.hide();
-				me.populateContactLogEventHistory( jsonData );
+				me.populateContactLogEventHistory( jsonData, true );
 				me.populateNextContactLogActionBar( jsonData );
 				Util.disableTag( me.addContactLogEventBtnTag, false );
+				me.contactLogEventFormTag.removeAttr( "event" );
+				
 			});
 			return false;
 		});
@@ -2379,6 +2406,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		// [Contat Log] tab
 
 		me.showIconInTab( me.TAB_NAME_CONTACT_LOG );
+
+		me.contactLogEventFormTag.removeAttr( "event" );
 		
 		// -- [Contact Log Attribute] form
 		me.contactLogFormTag.find("input[type='text'],select").val("");
@@ -2410,7 +2439,6 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		// Set init data values
 		me.showOpeningTag = false;
-		
 		
 		// ---------------------------------------------------------------------
 		// [Opening ART Refer] Tab
@@ -3836,18 +3864,21 @@ function ClientFormManagement( _mainPage, _metaData )
 	{
 		me.contactLogEventHistoryTbTag.html( "" );
 		
+		var idx = 0;
 		for( var i in eventList )
 		{
-			me.populateContactLogEventHistory( eventList[i] );
+			me.populateContactLogEventHistory( eventList[i], ( idx == eventList.length - 1 ) );
+			idx ++;
 		}
 		
+		// Populate for [Next action] of [Contact Log]
 		if( eventList.length > 0 )
 		{
 			me.populateNextContactLogActionBar( eventList[eventList.length - 1] );
 		}
 	};
 	 
-	me.populateContactLogEventHistory = function( eventJson )
+	me.populateContactLogEventHistory = function( eventJson, canEdit )
 	{
 		var eventDate = "";
 		if( eventJson.eventDate !== undefined ){
@@ -3894,16 +3925,25 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		var tbody = $("<tbody></tbody");
 		
+		// ---------------------------------------------------------------------
 		// Header
-		var headerTag = $("<tr class='actionBar'></tr>");
+		
+		var headerTag = $("<tr class='actionBar' event='" + JSON.stringify( eventJson ) + "' eventId='" + eventJson.event + "'></tr>");
 		headerTag.append("<th>Date: " + eventDate + "</th>");
 		headerTag.append("<th>Type: " + typeOfContact + "</th>");
-		headerTag.append("<th>Outcome: " + outcome + "</th>");
-		headerTag.append("<th class='actionCell' style='width:20px;'><button><span class='glyphicon glyphicon-pencil'></span></button></th>");
 		
-		// Add event for [Edit] button
-		me.setUp_Events_EditContactLogEvent( headerTag.find("button") );
+		// [Outcome] Cell
+		var outcomeColspan = ( canEdit ) ? "1" : "2";
+		headerTag.append("<th colspan='" + outcomeColspan + "' class='outcome'>Outcome: " + outcome + "</th>");
+		if( canEdit )
+		{
+			var editCellTag = $( "<th class='actionCell' style='width:20px;'><button><span class='glyphicon glyphicon-pencil'></span></button></th>" );
+			headerTag.append( editCellTag );
+			me.setUp_Events_EditContactLogEvent( editCellTag );
+		}
 		
+		
+		// ---------------------------------------------------------------------
 		// Add event information in history table
 		var rowTag = $("<tr></tr>");
 		rowTag.append("<td colspan='4'>" + comments + "</td>");
@@ -3966,9 +4006,29 @@ function ClientFormManagement( _mainPage, _metaData )
 		}
 	};
 	
-	me.setUp_Events_EditContactLogEvent = function( editBtnTag )
+	me.setUp_Events_EditContactLogEvent = function( editCellTag )
 	{
-		
+		editCellTag.click( function(){
+			var event = editCellTag.closest("tr").attr("event");
+			me.contactLogEventFormTag.attr( "event", event );
+			var eventJson = JSON.parse( event );
+			
+			var dataValues = eventJson.dataValues;
+			for( var i in dataValues )
+			{
+				var deId = dataValues[i].dataElement;
+				var value = dataValues[i].value;
+				
+				var inputTag = me.contactLogEventFormTag.find("[dataelement='" + deId + "']");
+				if( inputTag.attr("isDate") ==  "true" )
+				{
+					value = Util.formatDate_LocalDisplayDate( value );
+				}
+				inputTag.val( value );
+			}
+
+			me.contactLogEventFormTag.show();
+		});
 	};
 	
 	me.getDisplayNameByDataValue = function( deId, value )
