@@ -114,7 +114,7 @@ function Coordinator( storageObj, translationObj )
 		});
 		
 		me.settingsLinkTag.click(function(){
-			me.storageObj.addItem("page", me.mainPage.settingsManagement.PAGE_SETTINGS);
+			me.storageObj.addItem("page", me.settingsManagement.PAGE_SETTINGS);
 			Util.resetPageDisplay();
 			me.settingsManagement.settingsDivTag.show("fast");
 			$('.overlay').click();
@@ -124,7 +124,7 @@ function Coordinator( storageObj, translationObj )
 			$('.overlay').click();
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.mainPage.settingsManagement.PAGE_ABOUT);
+				me.storageObj.addItem("page", me.settingsManagement.PAGE_ABOUT);
 				Util.resetPageDisplay();
 				me.settingsManagement.aboutDivTag.show("fast");
 			});
@@ -140,7 +140,7 @@ function Coordinator( storageObj, translationObj )
 			$('.overlay').click();
 			
 			me.settingsManagement.checkOrgunitSetting( function(){
-				me.storageObj.addItem("page", me.mainPage.settingsManagement.PAGE_REPORT_PARAM);
+				me.storageObj.addItem("page", me.settingsManagement.PAGE_REPORT_PARAM);
 				Util.resetPageDisplay();
 				me.reportManagement.getReport();
 			});
