@@ -216,6 +216,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	// [ART Closure] form
 	me.attr_ARTClosure_ReferralFacilityName = "LCLiPzJWVAb";
 	me.attr_ARTClosure_OtherSpecialFacilityName = "Ra1Deyvyrbm";
+	me.attr_Date_Of_ART_Enrollment = "LnXn5fK0b5b";
 	
 	
 	// Data Element Logic fields
@@ -561,7 +562,6 @@ function ClientFormManagement( _mainPage, _metaData )
 					
 					me.artReferCloseFormTag.show();
 					
-					me.hideIconInTab( me.TAB_NAME_ART_REFER );
 					
 					Util.disableForm( me.artReferOpenFormTag, true );
 				});
@@ -572,7 +572,9 @@ function ClientFormManagement( _mainPage, _metaData )
 			return false;
 		});
 		
-
+		me.setUp_validationCheck( me.artReferOpenFormTag.find( 'input,select' ) );
+		
+		
 		// -----------------------------------------------------------------------------------------
 		// [ART Refer Close] button events
 		
@@ -611,14 +613,6 @@ function ClientFormManagement( _mainPage, _metaData )
 			var artClosureEvent = me.artReferCloseFormTag.attr("event");
 			if( artClosureEvent === undefined )
 			{
-				// Generate [Time Elapsed] attribute value for [ART Closure] form
-				var artOpeningEvent = JSON.parse( me.artReferOpenFormTag.attr("event") );
-				var openEventDate = Util.convertUTCDateToLocalDate( artOpeningEvent.eventDate );
-				var closureEventDate = new Date();
-				
-				var timeElapsed = Util.getTimeElapsed( openEventDate, closureEventDate );
-				me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( timeElapsed );
-
 				me.artReferCloseFormTag.attr("event", "");
 			}
 			
@@ -640,8 +634,31 @@ function ClientFormManagement( _mainPage, _metaData )
 			
 		});
 		
+		me.setUp_validationCheck( me.artReferCloseFormTag.find( 'input,select' ) );
 	};
 	
+	
+	me.calulate_ARTClosureTimeElapsed = function()
+	{
+		var artOpeningEvent = me.artReferOpenFormTag.attr("event");
+		
+		var dateOfARTEnrollmentVal = me.getAttributeField( me.attr_Date_Of_ART_Enrollment ).val();
+		if( artOpeningEvent != undefined && dateOfARTEnrollmentVal != "" )
+		{
+			dateOfARTEnrollmentVal = Util.formatDate_DbDate( dateOfARTEnrollmentVal );
+			dateOfARTEnrollmentVal = Util.convertDateStrToObject( dateOfARTEnrollmentVal );
+				
+			artOpeningEvent = JSON.parse( me.artReferOpenFormTag.attr("event") );
+			var openEventDate = Util.convertDateStrToObject( artOpeningEvent.eventDate.substring(0, 10) );
+			
+			var timeElapsed = Util.getDaysElapsed( openEventDate, dateOfARTEnrollmentVal );
+			me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( timeElapsed );
+		}
+		else
+		{
+			me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( "" );
+		}
+	}
 	
 	// Add Events for [Event Data Entry] form
 	
@@ -1436,37 +1453,48 @@ function ClientFormManagement( _mainPage, _metaData )
 	{
 		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
 		var droppedReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
+		var closureLinkageOutcomeVal = closureLinkageOutcomeTag.val();
 		
-		if( closureLinkageOutcomeTag.val() == "" )
+		if( closureLinkageOutcomeVal == "" )
 		{
 			me.artReferCloseFormTag.find("input,select").each(function(){
 				me.setHideLogicTag( $(this), true);
+				$(this).val("");
 			});
 		}
-		else if( closureLinkageOutcomeTag.val() == "SUCCESS" )
+		else if( closureLinkageOutcomeVal == "SUCCESS" )
 		{
 			me.artReferCloseFormTag.find("input,select").each(function(){
 				me.setHideLogicTag( $(this), false);
+				$(this).val("");
 			});
 			
 			me.setHideLogicTag( droppedReasonTag, true);
+			me.removeMandatoryForField( droppedReasonTag );
+			
+			// Set Date picker for [Date of ART enrollment]
+			var openingEventDate = JSON.parse( me.artReferOpenFormTag.attr("event") );
+			var dateARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );		
+			Util.datePicker_SetDateRange( dateARTEnrollmentTag, openingEventDate.eventDate, Util.convertDateObjToStr( new Date() ) );
+			
+			// Show/Hide [Other facility name]
+			var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
+			var specialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
+			me.setHideLogicTag( specialOtherFacilityNameTag, !( closeReferFacilityNameTag.val() == "Other" ) );
 		}
-		else if( closureLinkageOutcomeTag.val() == "DROPPED" )
+		else if( closureLinkageOutcomeVal == "DROPPED" )
 		{
 			me.artReferCloseFormTag.find("input,select").each(function(){
 				me.setHideLogicTag( $(this), true);
+				$(this).val("");
 			});
 			
 			me.setHideLogicTag( droppedReasonTag, false);
+			me.addMandatoryForField( droppedReasonTag );
 		}
 
 		me.setHideLogicTag( closureLinkageOutcomeTag, false);
-		
-
-		// Show/Hide [Other facility name]
-		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
-		var specialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
-		me.setHideLogicTag( specialOtherFacilityNameTag, !( closeReferFacilityNameTag.val() == "Other" ) );
+		closureLinkageOutcomeTag.val( closureLinkageOutcomeVal );
 	};
 	
 	me.getDataElementField = function( deId )
@@ -1617,7 +1645,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				{
 					var historyGroupTb = $( "<tbody historyGroupId='" + group.id + "' style='display:none;'></tbody>" );
 					var historyHeaderTag = $("<tr header='true'></tr>");					
-					historyHeaderTag.append("<th colspan='3'><img style='float:left' class='arrowDownImg showHide' src='../images/down.gif'> " + group.name + "<span style='float:right;'>Edit</span></th>" );
+					historyHeaderTag.append("<th colspan='3'><img style='float:left' class='arrowDownImg showHide' src='../images/down.gif'> " + groupName + "<span style='float:right;'>Edit</span></th>" );
 					historyHeaderTag.append("<th style='width:20px;'><span style='cursor:pointer;' class='editBtn glyphicon glyphicon-pencil'></th>");
 					historyGroupTb.append( historyHeaderTag );		
 
@@ -1814,10 +1842,12 @@ function ClientFormManagement( _mainPage, _metaData )
 			if( referralFacilityNameTag.val() == "Other" )
 			{
 				me.setHideLogicTag( specialOtherFacilityNameTag, false ); 
+				me.addMandatoryForField( specialOtherFacilityNameTag );
 			}
 			else
 			{
 				me.setHideLogicTag( specialOtherFacilityNameTag, true ); 
+				me.removeMandatoryForField( specialOtherFacilityNameTag );
 			}
 		});
 
@@ -1838,11 +1868,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		// Resolve [ART Closure] entry forms
 		me.mergeARTAttributeFormAndEntryForm( me.artReferCloseFormTag );
-		
-		// Set autocompleted for [Referral facility name] in [ART Closure] form
-		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
-		Util.setAutoCompleteTag( closeReferFacilityNameTag );
-		
+
 		//  Set mandatory for attributes in form
 		me.artReferCloseFormTag.find("input[attribute],select[attribute]").each(function(){
 			me.addMandatoryForField( $(this) );
@@ -1853,25 +1879,35 @@ function ClientFormManagement( _mainPage, _metaData )
 			Util.datePicker( $(this) );
 		});
 		
-		// Linkage Status event
-		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
-		closureLinkageOutcomeTag.change( function(){
-			me.setUp_ARTClosureForm();
-			
-		});
-
+		// Set autocompleted for [Referral facility name] in [ART Closure] form
+		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
+		Util.setAutoCompleteTag( closeReferFacilityNameTag );
+		
 		// Add event for [Referral facility name]
-		var closeReferralFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
 		var closeSpecialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
-		closeReferralFacilityNameTag.change(function(){
-			if( closeReferralFacilityNameTag.val() == "Other" )
+		closeReferFacilityNameTag.change(function(){
+			if( closeReferFacilityNameTag.val() == "Other" )
 			{
-				me.setHideLogicTag( closeSpecialOtherFacilityNameTag, false ); 
+				me.setHideLogicTag( closeSpecialOtherFacilityNameTag, false );
+				me.addMandatoryForField( closeSpecialOtherFacilityNameTag );
 			}
 			else
 			{
 				me.setHideLogicTag( closeSpecialOtherFacilityNameTag, true ); 
+				me.removeMandatoryForField( closeSpecialOtherFacilityNameTag );
 			}
+		});
+		
+		// Linkage Status event
+		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		closureLinkageOutcomeTag.change( function(){
+			me.setUp_ARTClosureForm();
+		});
+		
+		// Set up Event of [Date Of ART Enrollment] field
+		var dateOfARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );
+		dateOfARTEnrollmentTag.on('dp.change', function(e){ 
+			me.calulate_ARTClosureTimeElapsed();
 		});
 	};
 
@@ -2416,6 +2452,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.contactLogFormTag.find("tbody[historyGroupId]").hide();
 		me.contactLogFormTag.find("tbody[historyGroupId]").find("td.historyInfo").html("");
 		me.contactLogFormTag.find("tbody[groupId]").show();
+		me.contactLogFormTag.find("tbody[groupId]").find("tr.action").hide();
 		me.contactLogFormTag.find("tbody:last").show();
 		
 		// Hide [Next Contact Log] infor
@@ -2439,6 +2476,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		// Set init data values
 		me.showOpeningTag = false;
+		
 		
 		// ---------------------------------------------------------------------
 		// [Opening ART Refer] Tab
@@ -3715,17 +3753,12 @@ function ClientFormManagement( _mainPage, _metaData )
  			}
  			
  			// Generate [Time elapse] in header of [ART Ref.] form
- 	 		var daysElapsed = Util.getDaysTimeElapsed( openingEventDate, closureEventDate );
+ 	 		var daysElapsed = Util.getDaysTimeElapsed( openingEventDate, new Date() );
  	 		me.artEventInfoTbTag.find("span.timeClientReferredARTOn").html( daysElapsed );
- 	 		
- 	 		// Generate [Time elapse] attribute value for [ART Closure] form
- 	 		var timeElapsed = Util.getDaysElapsed( openingEventDate, closureEventDate );
- 			me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( timeElapsed );
  		}
  		else
  		{
  			me.artEventInfoTbTag.find("span.timeClientReferredARTOn").html( "" );
- 			me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( "" );
  		}
 	};
 	

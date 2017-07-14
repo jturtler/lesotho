@@ -15,6 +15,7 @@ function LoginForm( storageObj, translationObj )
 	me.loadingOuListImgTag = $("#loadingOuListImg");
 
 	me.appVersionInfoTag = $("#appVersionInfo");
+	me.siteInfoTag = $("#siteInfo");
 	me.errorMessageTag = $("#errorMessage");
 	me.loginBtnTag =  $("#loginBtn");
 	me.loginFormTag = $("#loginForm");
@@ -25,7 +26,7 @@ function LoginForm( storageObj, translationObj )
 		me.loadDistrict();
 		me.clear();
 		me.setupEvents();
-		me.setupVersion( me.appVersionInfoTag );
+		me.setupAppInfo();
 	};
 	
 	me.clearPageParamInStorage = function()
@@ -116,9 +117,10 @@ function LoginForm( storageObj, translationObj )
 	},
 
 
-	me.setupVersion = function( appVersionInfoTag )
+	me.setupAppInfo = function()
 	{
-		appVersionInfoTag.text( Commons.VERSION + ", " + Commons.VERSION_DATE );
+		me.appVersionInfoTag.text( Commons.VERSION + ", " + Commons.VERSION_DATE );
+		me.siteInfoTag.text( Util.SITE_INFO );
 	};	
 	
 	// -------------------------------------------------------------------------------

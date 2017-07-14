@@ -72,6 +72,8 @@ Util.setAutoCompleteTag = function( selectTag )
     var wrapper = $("<span>").addClass("ui-combobox").insertAfter(selectTag);
     
 	var input = $("<input>").appendTo(wrapper).val( text );
+	input.attr( "mandatory", selectTag.attr("mandatory") );
+	
 	input.addClass( "form-control" );
     input.autocomplete( {
         delay: 0,
@@ -392,6 +394,12 @@ Util.DAYS = ["Sunday", "Monday", "Tuesday", "Webnesday", "Thursday", "Friday", "
 Util.MONTH_INDEXES = {"Jan" : "01", "Feb" : "02", "Mar" : "03", "Apr" : "04", "May" : "05", "Jun" : "06", "Jul" : "07", "Aug" : "08", "Sep" : "09", "Oct" : "10", "Nov" : "11", "Dec" : "12"};
 
 
+
+/** 
+ * Get a past date object from a special date 
+ * Param  : dateStr ( '2017-01-02' )
+ * Result : Object Date( converted from server time to local time )
+ * **/
 Util.getLastXDateFromDateStr = function( dateStr, noDays )
 {
 	var date = Util.convertUTCDateToLocalDate( dateStr );
@@ -400,11 +408,24 @@ Util.getLastXDateFromDateStr = function( dateStr, noDays )
     return date;
 };
 
+
+/** 
+ * Get a past date object from a special date
+ * Params : dateStr ( '2017-01-02' )
+ * 		   The number of days in the past
+ * Result : 17 Jan 2017 ( converted from server time to local time )
+ * **/
 Util.formatDate_LastXDateFromDateStr = function( dateStr, noDays )
 {  
     return Util.formatDateObj_DisplayDate( Util.getLastXDateFromDateStr( dateStr, noDays ) );
 };
 
+
+/** 
+ * Get a past date object from current date
+ * Params : A number
+ * Result : Date object( converted from local time to UTM time )
+ * **/
 Util.getLastNDate = function( noDays )
 {
 	var date = new Date();
@@ -414,6 +435,11 @@ Util.getLastNDate = function( noDays )
 };
 
 
+/** 
+ * Get a string past date from current date ( UTM time (
+ * Params : A number
+ * Result : Date object( converted from local time to UTM time )
+ * **/
 Util.formatDate_LastNDate = function( noDays )
 {
 	var date = new Date();
@@ -440,15 +466,16 @@ Util.formatDate_DisplayDateInWeek = function( date )
 
 
 /** 
- * dateStr : 2017-01-02, convert date from UTC time to local time
- * Result : 02 Jan 2017
+ * Convert date from UTC time to local time
+ * dateStr : A UTC time date string ( 2017-01-02 )
+ * Result : 02 Jan 2017 ( local time )
  * **/
 Util.formatDate_DisplayDate = function( dateStr )
 {
 	var date = Util.convertUTCDateToLocalDate( dateStr );
 	
 	var year = date.getFullYear();
-	var month = date.getMonth();
+	var month = date.getMonth()
 	var dayInMonth = date.getDate();
 	dayInMonth = ( dayInMonth < 10 ) ? "0" + dayInMonth : dayInMonth;
 	
@@ -570,9 +597,17 @@ Util.convertUTCDateToLocalDate = function( serverdate ) {
 	var year = serverdate.substring( 0, 4 );
 	var month = eval( serverdate.substring( 5,7 ) ) - 1;
 	var day = eval( serverdate.substring( 8, 10 ) );
-	var hour = serverdate.substring( 11, 13);
-	var minute = serverdate.substring( 14, 16 );
-	var second = serverdate.substring( 17, 19 );
+	
+	var hour = "00";
+	var minute = "00";
+	var second = "00";
+	if( serverdate.length > 10 )
+	{
+		hour = serverdate.substring( 11, 13);
+		minute = serverdate.substring( 14, 16 );
+		second = serverdate.substring( 17, 19 );
+	}
+
 	var date = new Date( year, month, day, hour, minute, second );
 	
 	var newDate = new Date(date);
@@ -610,12 +645,8 @@ Util.getDaysElapsed = function( date1, date2 )
 	var diffInHours = Math.floor( diff/1000/60/60 ); // Convert milliseconds to hours
 	
 	var noDays = Math.floor( diffInHours/24 );
-	noDays = ( noDays < 10 ) ? "0" + noDays : noDays;
 	
-	var noHours = diffInHours - ( 24 * noDays ); 
-//	noHours = ( noHours < 10 ) ? "0" + noHours : noHours;
-	
-	return noDays + "d";
+	return noDays;
 };
 
 
@@ -656,7 +687,7 @@ Util.convertDateStrToObject = function( dateStr )
 Util.convertDateObjToStr = function( dateObj )
 {	
 	var year = dateObj.getFullYear();
-	var month = dateObj.getMonth();
+	var month = dateObj.getMonth() + 1;
 	month = ( month < 10 ) ? "0" + month : "" + month;
 	
 	var dayInMonth = dateObj.getDate();
@@ -669,6 +700,7 @@ Util.convertDateObjToStr = function( dateObj )
 Util.datePicker = function( dateTag )
 {
 	dateTag.attr( "readonly", true );
+	
 	dateTag.datetimepicker({
 		viewMode: 'years'
         ,format: Commons.dateFormat
@@ -682,13 +714,14 @@ Util.datePicker = function( dateTag )
 	 
 	dateTag.on('dp.change', function(e){ 
 		dateTag.change();
-	})
+	});
 	
 };
 
 Util.monthYearPicker = function( dateTag )
 {
 	dateTag.attr( "readonly", true );
+	
 	dateTag.datetimepicker({
 		viewMode: 'years'
         ,format: Commons.monthYearFormat
@@ -702,12 +735,13 @@ Util.monthYearPicker = function( dateTag )
 		 
 	dateTag.on('dp.change', function(e){ 
 		dateTag.change();
-	})
+	});
 };
 
 Util.dateFuturePicker = function( dateTag )
 {
 	dateTag.attr( "readonly", true );
+	
 	dateTag.datetimepicker({
 		viewMode: 'years'
         ,format: Commons.dateFormat
@@ -720,12 +754,13 @@ Util.dateFuturePicker = function( dateTag )
 	
 	dateTag.on('dp.change', function(e){ 
 		dateTag.change();
-	})
+	});
 };
 
 Util.dateFutureOnlyPicker = function( dateTag )
 {
 	dateTag.attr( "readonly", true );
+	
 	dateTag.datetimepicker({
 		viewMode: 'years'
         ,format: Commons.dateFormat
@@ -739,13 +774,39 @@ Util.dateFutureOnlyPicker = function( dateTag )
 	
 	dateTag.on('dp.change', function(e){ 
 		dateTag.change();
-	})
+	});
 		  
+};
+
+Util.datePickerStartEnd = function( dateTag, startDateStr, endDateStr )
+{
+	var startDate = Util.convertDateStrToObject( startDateStr );
+	var endDate = Util.convertDateStrToObject( endDateStr );
+	
+	dateTag.attr( "readonly", true );
+	
+	dateTag.datetimepicker({
+		viewMode: 'years'
+        ,format: Commons.dateFormat
+        ,widgetPositioning: { 
+            vertical: 'bottom'
+        }
+		,maxDate: startDate
+		,minDate: endDate
+		,ignoreReadonly: true
+        ,showClear: true
+     });
+	 
+	dateTag.on('dp.change', function(e){ 
+		dateTag.change();
+	});
+	
 };
 
 Util.dateTimePicker = function( dateTag )
 {	
 	dateTag.attr( "readonly", true );
+	
 	dateTag.datetimepicker({
 		viewMode: 'years'
         ,format: Commons.dateFormat
@@ -758,9 +819,18 @@ Util.dateTimePicker = function( dateTag )
 	
 	dateTag.on('dp.change', function(e){ 
 		dateTag.change();
-	})
+	});
 };
 
+
+Util.datePicker_SetDateRange = function( dateTag, startDateStr, endDateStr )
+{
+	var startDate = Util.convertDateStrToObject( startDateStr );
+	dateTag.data("DateTimePicker").minDate( startDate );
+	
+	var endDate = Util.convertDateStrToObject( endDateStr );
+	dateTag.data("DateTimePicker").maxDate( endDate );
+};
 
 //-------------------------------------------------------------------------------------
 // Utils Periods
