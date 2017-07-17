@@ -30,7 +30,7 @@ public class EventController
 
     // Load meta data
     private static String URL_QUERY_METADATA = Util.LOCATION_DHIS_SERVER
-        + "/api/programs/" + Util.ID_PROGRAM + ".json?fields=programStages[programStageDataElements[dataElement[id,optionSet[options[code,name]]]]],programTrackedEntityAttributes[trackedEntityAttribute[id,optionSet[options[code,name]]]";
+        + "/api/programs/" + Util.ID_PROGRAM + ".json?fields=programStages[programStageDataElements[dataElement[id,formName,optionSet[options[code,name]]]]],programTrackedEntityAttributes[trackedEntityAttribute[id,shortName,optionSet[options[code,name]]]";
     
     
     // -------------------------------------------------------------------------

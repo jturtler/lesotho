@@ -5,14 +5,16 @@ function EventReport()
 	
 	me.eventReportTag = $("#eventReport");
 	
-	me.attr_CUIC = "zRA08XEYiSF";
-	me.attr_lastName = "mUxDHgywnn2";
-	me.attr_lastName = "mUxDHgywnn2";
-	me.attr_firstName = "mW2l3T2zL0N";
-	me.attr_dateOfBirth = "wSp6Q7QDMsk";
+	me.attr_CUIC = "rw3W9pDCPb2";
+	me.attr_firstName = "R9Lw1uNtRuj";
+	me.attr_lastName = "TBt2a4Bq0Lx";
+	me.attr_dateOfBirth = "BvsJfkddTgZ";
 	me.attr_districtOfBirth = "u57uh7lHwF8";
-	me.attr_birthOrder = "vTPYC9BXPNn";
-	me.attr_dateRecentHIVTest = "PyfoYtwNGrI";
+	me.attr_ClientCUIC = "rw3W9pDCPb2";
+	me.attr_birthOrder ="vTPYC9BXPNn";
+	me.attr_dateMostRecentHIVTest = "PyfoYtwNGrI";
+	
+	me.de_indexLeadUIC = "nSr0NMql5FW";
 	
 
 	me.metaData = {};
@@ -20,9 +22,9 @@ function EventReport()
 	
 	me.init = function()
 	{
-		me.eventReportTag.find("[attribute]").html("");
-		me.eventReportTag.find("[dataelement]").html("");
-		me.eventReportTag.find("[eventDate]").html("");
+		me.eventReportTag.find("[attribute]").html("-");
+		me.eventReportTag.find("[dataelement]").html("-");
+		me.eventReportTag.find("[eventDate]").html("-");
 		me.eventId = Util.getURLParameterByName( location.href, "eventid" );
 		me.loadAndPopulateEventData();
 	};
@@ -47,9 +49,11 @@ function EventReport()
 				for( var i in psAttributes )
 				{
 					var attribute = psAttributes[i].trackedEntityAttribute;
+					
+					me.metaData[attribute.id] = {};
+					me.metaData[attribute.id].shortName = attribute.shortName;
 					if( attribute.optionSet !== undefined )
 					{
-						me.metaData[attribute.id] = {};
 						var options = attribute.optionSet.options;
 						for( var i in options )
 						{
@@ -65,9 +69,11 @@ function EventReport()
 				for( var i in psDEs )
 				{
 					var dataElement = psDEs[i].dataElement;
+					
+					me.metaData[dataElement.id] = {};
+					me.metaData[dataElement.id].shortName = dataElement.formName;
 					if( dataElement.optionSet !== undefined )
 					{
-						me.metaData[dataElement.id] = {};
 						var options = dataElement.optionSet.options;
 						for( var i in options )
 						{
@@ -77,10 +83,11 @@ function EventReport()
 					}
 				}
 				
+				
 				// Populate OrgUnit Information
 				var ouData = response.ouInfo;
 				me.eventReportTag.find("[attribute='districtName']").html( ouData.parent.name );
-				me.eventReportTag.find("[attribute='ouName']").html( ouData.name );
+				me.eventReportTag.find("[attribute='councilName']").html( ouData.name );
 				
 				// Populate Category Option Code
 				var catOptCode = response.catOptCode;
@@ -89,36 +96,77 @@ function EventReport()
 					me.eventReportTag.find("[attribute='catOptCode'][idx='" + i + "']").html( catOptCode.charAt(i) );
 				}
 				
-				// Populate event date
-				var eventDate = response.eventDetails.eventDate;
-				me.eventReportTag.find("[eventDate][idx='0']").html( eventDate.charAt(8) );
-				me.eventReportTag.find("[eventDate][idx='1']").html( eventDate.charAt(9) );
-				me.eventReportTag.find("[eventDate][idx='2']").html( eventDate.charAt(5) );
-				me.eventReportTag.find("[eventDate][idx='3']").html( eventDate.charAt(6) );
-				me.eventReportTag.find("[eventDate][idx='4']").html( eventDate.charAt(0) );
-				me.eventReportTag.find("[eventDate][idx='5']").html( eventDate.charAt(1) );
-				me.eventReportTag.find("[eventDate][idx='6']").html( eventDate.charAt(2) );
-				me.eventReportTag.find("[eventDate][idx='7']").html( eventDate.charAt(3) );
 				
-				
+
 				// Populate event data
 				var dataValues = response.eventDetails.dataValues;
+				
+				
+				// Populate [Index Lead UIC]
+				var indexLeadUIC = me.getIndexLeadUIC( dataValues );
+				for( var i=0; i<indexLeadUIC.length; i++ )
+				{
+					me.eventReportTag.find("[dataelement='" + me.de_indexLeadUIC + "'][idx='" + i + "']").html( indexLeadUIC.charAt(i) );
+				}
+				
+				// Populate event date
+				var exceptions = {
+			            "UYyCL2xz8Wz": { },
+			            "Ml9lBSv0iCC": { },
+			            "za8zgXEjUHp": { },
+			            "tUIkmIFMEDS": { },
+			            "ZKWK5UIO9wp": { },
+			            "sTmbmjnUhrA": { },
+			            "a9x8qqtTs0J": { },
+			            "hv1oAJf18cE": { },
+			            "DbfyDJ04SjL": { },
+			            "BqyBHC6eEFr": { },
+			            "quOYwc0SOqD": { },
+			            "fGSXGuPIEOy": { },
+			            "omugvBULuf0": { },
+			            "vOrRzjpdQC6": { },
+			            "GCl3ORKj1jC": { }
+			          };
+				
+				
+				var eventDate = Util.formatDate_DisplayDate( response.eventDetails.eventDate );
+				me.eventReportTag.find("[attribute='eventDate']").html( eventDate );
+				
+				
 				for( var i in dataValues )
 				{
 					var deId = dataValues[i].dataElement;
-					var value = dataValues[i].value;
-					if( me.metaData[deId] !== undefined )
-					{
-						value = me.metaData[deId][value];
-					}
-					if( value == "true"){
-						value = "Yes";
-					}
-					else if( value == "false"){
-						value = "No";
-					}
 					
-					me.eventReportTag.find( "[dataelement='" + deId+ "']").html( value );
+					if( deId != me.de_indexLeadUIC )
+					{
+						var value = dataValues[i].value;
+						
+						if( exceptions[deId] != undefined )
+						{
+							
+							if( me.metaData[deId][value] != undefined )
+							{
+								value = me.metaData[deId][value];
+							}
+							else
+							{
+								value = me.metaData[deId].shortName;
+							}
+						}
+						else if( me.metaData[deId][value] != undefined )
+						{
+							value = me.metaData[deId][value];
+						}
+						
+						if( value == "true"){
+							value = "Yes";
+						}
+						else if( value == "false"){
+							value = "No";
+						}
+						
+						me.eventReportTag.find( "[dataelement='" + deId+ "']").html( value );
+					}
 				}
 				
 				// Populate client data
@@ -141,54 +189,52 @@ function EventReport()
 			{
 				var attributes = response.client.attributes;
 				
-				var firstName = me.getClientFirstName( attributes );
-				var lastName = me.getClientLastName( attributes );
-				var dateOfBirth = me.getClientDateOfBirth( attributes );
+				// -------------------------------------------------------------
+				// STEP 2. Populate client data
 				
-				var districtOfBirth = me.getClientDistrictOfBirth( attributes );
+				// BirthOfDistrict
+				var districtOfBirth = me.getAttributeData( attributes, me.attr_districtOfBirth );
 				var districtOfBirthVal = me.metaData[me.attr_districtOfBirth][districtOfBirth];
 				districtOfBirth = ( districtOfBirthVal == undefined ) ? districtOfBirth : districtOfBirthVal;
+				me.eventReportTag.find("[attribute='" + me.attr_districtOfBirth + "']").html( districtOfBirth );
 				
-				var orderOfBirth = me.getClientBirthOrder( attributes );
+				
+				// BirthOrder
+				var orderOfBirth = me.getAttributeData( attributes, me.attr_birthOrder );
 				var orderOfBirthVal = me.metaData[me.attr_birthOrder][orderOfBirth] ;
 				orderOfBirth = ( orderOfBirthVal == undefined ) ? orderOfBirth : orderOfBirthVal;
-	
-				
-				// STEP 2. Populate client data
-				me.eventReportTag.find("[attribute='" + me.attr_districtOfBirth + "']").html( districtOfBirth );
 				me.eventReportTag.find("[attribute='" + me.attr_birthOrder + "']").html( orderOfBirth );
 
+				
 				// CUIC
-				var cuic = me.getClientUIC( attributes );
+				var cuic = me.getAttributeData( attributes, me.attr_CUIC );
 				for( var i=0; i<cuic.length; i++ )
 				{
 					me.eventReportTag.find("[attribute='" + me.attr_CUIC + "'][idx='" + i + "']").html( cuic.charAt(i) );
 				}
 				
-				// BirthOfDistrict
-				me.eventReportTag.find("[attribute='" + me.attr_districtOfBirth + "']").html( districtOfBirth );
-				
-				// BirthOrder
-				me.eventReportTag.find("[attribute='" + me.attr_birthOrder + "']").html( orderOfBirth );
 				
 				// dateOfBirth
-				me.eventReportTag.find("[attribute='" + me.attr_dateOfBirth + "'][idx='0']").html( dateOfBirth.charAt(8) );
-				me.eventReportTag.find("[attribute='" + me.attr_dateOfBirth + "'][idx='1']").html( dateOfBirth.charAt(9) );
-				me.eventReportTag.find("[attribute='" + me.attr_dateOfBirth + "'][idx='2']").html( dateOfBirth.charAt(5) );
-				me.eventReportTag.find("[attribute='" + me.attr_dateOfBirth + "'][idx='3']").html( dateOfBirth.charAt(6) );
-				me.eventReportTag.find("[attribute='" + me.attr_dateOfBirth + "'][idx='4']").html( dateOfBirth.charAt(2) );
-				me.eventReportTag.find("[attribute='" + me.attr_dateOfBirth + "'][idx='5']").html( dateOfBirth.charAt(3) );	
+				var dateOfBirth = Util.formatDate_LocalDisplayDate( me.getAttributeData( attributes, me.attr_dateOfBirth ) );
+				me.eventReportTag.find("[attribute='" + me.attr_dateOfBirth + "']").html( dateOfBirth );
 				
-				// dateRecentHIVTest
-				var dateRecentHIVTest = me.getClientDateRecentHIVTest( attributes );
-				me.eventReportTag.find("[attribute='" + me.attr_dateRecentHIVTest + "'][idx='0']").html( dateRecentHIVTest.charAt(5) );
-				me.eventReportTag.find("[attribute='" + me.attr_dateRecentHIVTest + "'][idx='1']").html( dateRecentHIVTest.charAt(6) );
-				me.eventReportTag.find("[attribute='" + me.attr_dateRecentHIVTest + "'][idx='2']").html( dateRecentHIVTest.charAt(0) );
-				me.eventReportTag.find("[attribute='" + me.attr_dateRecentHIVTest + "'][idx='3']").html( dateRecentHIVTest.charAt(1) );
-				me.eventReportTag.find("[attribute='" + me.attr_dateRecentHIVTest + "'][idx='4']").html( dateRecentHIVTest.charAt(2) );
-				me.eventReportTag.find("[attribute='" + me.attr_dateRecentHIVTest + "'][idx='5']").html( dateRecentHIVTest.charAt(3) );	
+				// dateMostRecentHIVTest
+				var dateMostRecentHIVTest = Util.formatDate_LocalDisplayDate( me.getAttributeData( attributes, me.attr_dateMostRecentHIVTest ) );
+				me.eventReportTag.find("[attribute='" + me.attr_dateMostRecentHIVTest + "']").html( dateMostRecentHIVTest );
 				
-				// Another attribute values
+				
+				// -------------------------------------------------------------
+				// Another attribute values 
+				
+				var exceptions = {
+		            "kdzfhXK71re": {},
+		            "Fty7JMtC7mX": {},
+		            "tzZCy78mWEG": {},
+		            "kpMMzIM3t5I": {},
+		            "gYiUqfKwktq": {},
+		            "fa7lRYdWJfl": {}
+				};
+				
 				for( var i in attributes )
 				{
 					var attrValue = attributes[i];
@@ -197,15 +243,27 @@ function EventReport()
 					
 					if( attrId != me.attr_CUIC 
 							&& attrId != me.attr_dateOfBirth
-							&& attrId != me.attr_dateRecentHIVTest
 							&& attrId != me.attr_districtOfBirth
-							&& attrId != me.attr_birthOrder ) 
+							&& attrId != me.attr_birthOrder 
+							&& attrId != me.attr_dateMostRecentHIVTest && me.metaData[attrId] != undefined ) 
 					{
-						if( me.metaData[attrId] !== undefined )
+						if( exceptions[attrId] != undefined )
+						{
+							if( me.metaData[attrId][value] != undefined )
+							{
+								value = me.metaData[attrId][value];
+							}
+							else
+							{
+								value = me.metaData[attrId].shortName;
+							}
+						}
+						else if( me.metaData[attrId][value] != undefined )
 						{
 							value = me.metaData[attrId][value];
 						}
-						else if( value == "true"){
+						
+						if( value == "true"){
 							value = "Yes";
 						}
 						else if( value == "false"){
@@ -214,6 +272,7 @@ function EventReport()
 						
 						me.eventReportTag.find("[attribute='" + attrValue.attribute + "']").html( value );
 					}
+					
 				}
 				
 			}
@@ -231,92 +290,27 @@ function EventReport()
 	// Get client attribute values
 	// ------------------------------------------------------------------------------------------
 	
+	me.getAttributeData = function( attributes, attrId )
+	{
+		for( var j in attributes )
+		{
+			var attrValue = attributes[j];
+			if( attrValue.attribute == attrId ) {
+				return attrValue.value;
+			}
+		}
+		
+		return "";
+	};
+	
 
-	me.getClientUIC = function( attributes )
+	me.getIndexLeadUIC = function( dataValues )
 	{
-		for( var j in attributes )
+		for( var j in dataValues )
 		{
-			var attrValue = attributes[j];
-			if( attrValue.attribute == me.attr_CUIC ) {
-				return attrValue.value;
-			}
-		}
-		
-		return "";
-	};
-	
-	me.getClientLastName = function( attributes )
-	{
-		for( var j in attributes )
-		{
-			var attrValue = attributes[j];
-			if( attrValue.attribute == me.attr_lastName ) {
-				return attrValue.value;
-			}
-		}
-		
-		return "";
-	};
-		
-	me.getClientFirstName = function( attributes )
-	{
-		for( var j in attributes )
-		{
-			var attrValue = attributes[j];
-			if( attrValue.attribute == me.attr_firstName ) {
-				return attrValue.value;
-			}
-		}
-		
-		return "";
-	};
-	
-	me.getClientDateOfBirth = function( attributes )
-	{
-		for( var j in attributes )
-		{
-			var attrValue = attributes[j];
-			if( attrValue.attribute == me.attr_dateOfBirth ) {
-				return attrValue.value;
-			}
-		}
-		
-		return "";
-	};
-	
-	me.getClientDistrictOfBirth = function( attributes )
-	{
-		for( var j in attributes )
-		{
-			var attrValue = attributes[j];
-			if( attrValue.attribute == me.attr_districtOfBirth ) {
-				return attrValue.value;
-			}
-		}
-		
-		return "";
-	};
-	
-	me.getClientBirthOrder = function( attributes )
-	{
-		for( var j in attributes )
-		{
-			var attrValue = attributes[j];
-			if( attrValue.attribute == me.attr_birthOrder ) {
-				return attrValue.value;
-			}
-		}
-		
-		return "";
-	};
-
-	me.getClientDateRecentHIVTest = function( attributes )
-	{
-		for( var j in attributes )
-		{
-			var attrValue = attributes[j];
-			if( attrValue.attribute == me.attr_dateRecentHIVTest ) {
-				return attrValue.value;
+			var dataValue = dataValues[j];
+			if( dataValue.dataElement == me.de_indexLeadUIC ) {
+				return dataValue.value;
 			}
 		}
 		

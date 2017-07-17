@@ -126,13 +126,10 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	// [Contact Log] Ids
 	me.attr_ConsentToContact = "ZQiKIaeOKv4"; // Set this one mandatory for Contact Log
-	me.attr_ContactDetails_phoneNumber = "C1twCsH0rjI"; 
+	me.attr_ContactDetails_phoneNumber = "Rl2hRelrfur"; 
 	me.attr_ContactDetails_District = "qynN2cqRe71"; 
 	me.attr_ContactDetails_Council = "NLNTtpbT3c5";
 	me.attr_NextOfKin_ConsenToContact = "VRUFmF5tE7b";
-	
-	
-	me.attr_ContactPhoneNumber = "C1twCsH0rjI";
 	me.attr_RestrictionsContacting  = "z78Y1qdewNQ";
 	me.attr_Address1 = "gY1FrhX5UTn";
 	me.attr_Address2 = "gn35714pj4p";
@@ -562,8 +559,9 @@ function ClientFormManagement( _mainPage, _metaData )
 					
 					me.artReferCloseFormTag.show();
 					
-					
 					Util.disableForm( me.artReferOpenFormTag, true );
+					
+					me.hideIconInTab( me.TAB_NAME_ART_REFER );
 				});
 				
 			});
@@ -610,25 +608,28 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		me.saveARTCloseEventBtnTag.click( function(){	
 
-			var artClosureEvent = me.artReferCloseFormTag.attr("event");
-			if( artClosureEvent === undefined )
+			if( me.validationObj.checkFormEntryTagsData( me.artReferCloseFormTag ) )
 			{
-				me.artReferCloseFormTag.attr("event", "");
+				var artClosureEvent = me.artReferCloseFormTag.attr("event");
+				if( artClosureEvent === undefined )
+				{
+					me.artReferCloseFormTag.attr("event", "");
+				}
+				
+				me.setARTLinkageStatusAttrValue();
+				if( artClosureEvent === undefined )
+				{
+					me.artReferCloseFormTag.removeAttr("event");
+				}
+				
+				var jsonClient = me.getClientJsonData( me.artAttributeFormTag );
+				var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
+				
+				me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
+					Util.disableForm( me.thisTestDivTag, true );				
+					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
+				} );
 			}
-			
-			me.setARTLinkageStatusAttrValue();
-			if( artClosureEvent === undefined )
-			{
-				me.artReferCloseFormTag.removeAttr("event");
-			}
-			
-			var jsonClient = me.getClientJsonData( me.artAttributeFormTag );
-			var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
-			
-			me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
-				Util.disableForm( me.thisTestDivTag, true );				
-				me.showTabInClientForm( me.TAB_NAME_ART_REFER );
-			} );
 			
 			return false;
 			
@@ -642,7 +643,8 @@ function ClientFormManagement( _mainPage, _metaData )
 	{
 		var artOpeningEvent = me.artReferOpenFormTag.attr("event");
 		
-		var dateOfARTEnrollmentVal = me.getAttributeField( me.attr_Date_Of_ART_Enrollment ).val();
+		var dateOfARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );
+		var dateOfARTEnrollmentVal = dateOfARTEnrollmentTag.val();
 		if( artOpeningEvent != undefined && dateOfARTEnrollmentVal != "" )
 		{
 			dateOfARTEnrollmentVal = Util.formatDate_DbDate( dateOfARTEnrollmentVal );
@@ -656,7 +658,9 @@ function ClientFormManagement( _mainPage, _metaData )
 		}
 		else
 		{
-			me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( "" );
+			var closureTimeElapsedTag = me.getAttributeField( me.attr_ARTClosure_TimeElapsed );
+			closureTimeElapsedTag.val( "" );
+			dateOfARTEnrollmentTag.change();
 		}
 	}
 	
@@ -811,29 +815,13 @@ function ClientFormManagement( _mainPage, _metaData )
 			
 			event.dataValues = Util.getArrayJsonData( "dataElement", me.thisTestDivTag );
 			
+//			// Save Event
+//			me.execSaveEvent( me.thisTestDivTag, event, client.trackedEntityInstance, event.event );
+			
 			// Save Event
 			me.execSaveEvent( me.thisTestDivTag, event, client.trackedEntityInstance, event.event, function( eventJson ){
-				
-				var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
-				var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
-				var partnerEventId = me.getDataElementField( me.de_PartnerEventId ).val();
-				if( partnerCUICOptTag.val() == "2" && partnerCUICTag.val() != "" && partnerEventId != undefined )
-				{
-					me.savePartnerCUIC();
-				}
-				
-				me.addEventFormTag.attr("event", JSON.stringify( eventJson ));
-				me.disableClientDetailsAndCUICAttrGroup( true );
-				
-				// Show the icon [red] icon on [New Test] if any
-				me.showIconInTab( me.TAB_NAME_THIS_TEST );
-				
-				if( me.checkIfARTEvent( eventJson ) )
-				{
-					me.addClientFormTabTag.attr("artHIVTestingEvent", JSON.stringify( eventJson ));
-					me.showOpeningTag = false;
-				}
-				me.checkAndShowARTReferTab( eventJson );
+
+				me.updatePartnerInfo( eventJson );
 			} );
 		});
 				
@@ -1476,6 +1464,7 @@ function ClientFormManagement( _mainPage, _metaData )
 			var openingEventDate = JSON.parse( me.artReferOpenFormTag.attr("event") );
 			var dateARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );		
 			Util.datePicker_SetDateRange( dateARTEnrollmentTag, openingEventDate.eventDate, Util.convertDateObjToStr( new Date() ) );
+			dateARTEnrollmentTag.change();
 			
 			// Show/Hide [Other facility name]
 			var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
@@ -3214,7 +3203,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	            ,beforeSend: function()
 	            {
 	            	var tranlatedText = "";
-	            	if( jsonData.status == "complete" )
+	            	if( jsonData.status == "COMPLETED" )
             		{
 	            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_completingEvent" );
             		}
@@ -3237,7 +3226,7 @@ function ClientFormManagement( _mainPage, _metaData )
 
 					// STEP 4. Unblock form
 					var translateMsg = "";
-					if( jsonData.status == "complete" )
+					if( response.status == "COMPLETED" )
             		{
 						translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventCompleted" );
             		}
@@ -3245,7 +3234,8 @@ function ClientFormManagement( _mainPage, _metaData )
 					{
 						translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );		
 					}
-										
+					
+					
 					if( exeFunc !== undefined ) exeFunc( response );
 					
 					MsgManager.msgAreaShow( translateMsg, "SUCCESS" );
@@ -3310,6 +3300,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		me.execSaveEvent( me.thisTestDivTag, event, trackedEntityInstanceId, eventId, function( jsonEvent ){
 
+			me.updatePartnerInfo( jsonEvent );
+			
 			// Add completed event in [Previous Test] tab
 			
 			var tbody = me.createAndPopulateDataInEntryForm( jsonEvent, me.stage_HIVTesting );
@@ -3357,6 +3349,31 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	};
 	
+	me.updatePartnerInfo = function( jsonEvent )
+	{
+		// Update the partner information
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		var partnerEventId = me.getDataElementField( me.de_PartnerEventId ).val();
+		if( partnerCUICOptTag.val() == "2" && partnerCUICTag.val() != "" && partnerEventId != undefined )
+		{
+			me.savePartnerCUIC();
+		}
+		
+		me.addEventFormTag.attr("event", JSON.stringify( jsonEvent ));
+		me.disableClientDetailsAndCUICAttrGroup( true );
+		
+		// Show the icon [red] icon on [New Test] if any
+		me.showIconInTab( me.TAB_NAME_THIS_TEST );
+		
+		if( me.checkIfARTEvent( jsonEvent ) )
+		{
+			me.addClientFormTabTag.attr("artHIVTestingEvent", JSON.stringify( jsonEvent ));
+			me.showOpeningTag = false;
+		}
+		me.checkAndShowARTReferTab( jsonEvent );
+	};
+	
 	
 	// -------------------------------------------------------------------------------------------------
 	// Show/Hide modules
@@ -3399,9 +3416,6 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.resetClientForm();
 		me.resetDataEntryForm();
 		
-		// Init attribute fields
-		me.setUp_ClientRegistrationFormDataLogic();
-		
 		
 		// Change the Header title && 'Save' buton display name
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_addClient" );
@@ -3422,6 +3436,9 @@ function ClientFormManagement( _mainPage, _metaData )
 				field.val( value );
 			}
 		});
+
+		// Init attribute fields
+		me.setUp_ClientRegistrationFormDataLogic();
 		
 		// Generate Client CUIC if any
 		me.generateClientCUIC();
@@ -3820,7 +3837,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		{
 			me.artReferCloseFormTag.show();
 //			Util.disableForm( me.artReferOpenFormTag, true );
-			me.hideIconInTab( me.TAB_NAME_ART_REFER );
+//			me.hideIconInTab( me.TAB_NAME_ART_REFER );
 		}
 		else
 		{
@@ -3859,7 +3876,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		if( groupId == "TTTT4Ll5TdV" ) // Attribute Group [LS LOG 2 - Contact Details]
 		{
-			var contactPhoneNumber = me.getAttributeField( me.attr_ContactPhoneNumber ).val();
+			var contactPhoneNumber = me.getAttributeField( me.attr_ContactDetails_phoneNumber ).val();
 		
 			var restrictionsContacting  = me.getAttributeField( me.attr_RestrictionsContacting ).val();
 			restrictionsContacting = ( restrictionsContacting != "" ) ? " - Restrictions: " +  restrictionsContacting : "";
