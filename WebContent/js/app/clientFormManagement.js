@@ -3726,6 +3726,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		{
 			me.artReferOpenFormTag.attr("event", JSON.stringify( artOpeningEvent ) );
 			me.populateDataValuesInEntryForm( me.artReferOpenFormTag, artOpeningEvent );
+			me.hideIconInTab( me.TAB_NAME_ART_REFER );
+		}
+		else
+		{
+			me.showIconInTab( me.TAB_NAME_ART_REFER );
 		}
 		
 		// Set value for autocomple input tag
