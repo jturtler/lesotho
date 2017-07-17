@@ -361,7 +361,7 @@
 				      	<div id="thisTestDiv">
 				  			<form class="form-horizontal"">
 				  				<table class='table table-hover table-striped previousTestTb panel panel-default' id="addEventForm">
-				  				
+				  						
 	  								<!--  Action bar -->
 	  								<tbody>
 	  									<tr class="actionBar">
@@ -372,10 +372,8 @@
 												<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
 												<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
 											</th>
-											<th style="width:100px;" class="actionCell">
-												<button id="saveEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
-												<span style="color:#d6d2d2;"> | </span>
-												<button id="completedEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-saved"></span></button>
+											<th style="width:20px;" class="actionCell">
+												<button id="showEventSaveOptionDiaglogBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
 											</th>						
 										</tr>
 									</tbody>
@@ -532,6 +530,39 @@
 					</div>
 						
 		  		</div>	
+				
+				<!-- Dialog to ask users if they want to complete event OR just want to save and edit later -->
+				
+				<div id="saveEventDialogForm" style="display:none;justify-content: center;">
+					<table class="actionTable">
+						<col width="32%">
+						<col width="1%">
+						<col width="32%">
+						<col width="1%">
+						<col width="32%">
+						<col width="1%">
+						<tr>
+							<td id="saveEventBtn">
+								<span keyword="contactLogForm_msg_askToSaveEvent">Save (open for edit)</span><br>
+								<div class="btn saveEventBtn" style="color:green;"><span class="glyphicon glyphicon-ok"></span></div>
+							</td>
+							
+							<td style="background-color:white;border: 0px;">&nbsp;</td>
+							
+							<td id="completedEventBtn">
+								<span keyword="contactLogForm_msg_askToCompletedEvent">Save and lock</span><br>
+								<div class="btn saveEventBtn" style="color:gray;"><span class="glyphicon glyphicon-lock"></span></div>
+							</td>
+							
+							<td style="background-color:white;border: 0px;">&nbsp;</td>
+							
+							<td id="cancelEventBtn">
+								<span keyword="contactLogForm_msg_cancelSavingEvent" ></span><br>
+								<div class="btn saveEventBtn" style="color:red;"><span class="glyphicon glyphicon-remove"></span></div>
+							</td>
+						</tr>
+					</table>
+				</div>
 				
 				<!-- END Search and Create Client  -->
 				

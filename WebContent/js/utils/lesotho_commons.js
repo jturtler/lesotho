@@ -1,10 +1,11 @@
 
 function Commons() {}
 
-Commons.VERSION = "v0.35";
-Commons.VERSION_DATE = "Jul 06 2017";
+Commons.VERSION = "v0.37";
+Commons.VERSION_DATE = "Jul 17 2017";
+Util.SITE_INFO = "This is developement site";
 
-Commons.wsUrl = "ls-train";
+Commons.wsUrl = "lesotho";
 
 Commons.dateFormat = "DD MMM YYYY";
 Commons.dateTimeFormat = "YYYY-MM-DD HH:mm";
@@ -26,7 +27,7 @@ Commons.checkSession = function( returnFunc )
 		}
 		,error: function(response)
 		{
-			returnFunc( false );					
+			returnFunc( false );
 		}
 	});
 };

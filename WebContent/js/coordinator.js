@@ -287,7 +287,7 @@ function Coordinator( storageObj, translationObj )
 				
 				me.runSearchClients( function(){
 	
-					if( subPage ==  me.settingsManagement.PAGE_SEARCH_EDIT_CLIENT )
+					if( subPage == me.settingsManagement.PAGE_SEARCH_EDIT_CLIENT )
 					{
 						var clientId = me.storageObj.getItem( "clientId" );
 						var eventId = me.storageObj.getItem( "eventId" );

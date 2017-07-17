@@ -126,13 +126,10 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	// [Contact Log] Ids
 	me.attr_ConsentToContact = "ZQiKIaeOKv4"; // Set this one mandatory for Contact Log
-	me.attr_ContactDetails_phoneNumber = "C1twCsH0rjI"; 
+	me.attr_ContactDetails_phoneNumber = "Rl2hRelrfur"; 
 	me.attr_ContactDetails_District = "qynN2cqRe71"; 
 	me.attr_ContactDetails_Council = "NLNTtpbT3c5";
 	me.attr_NextOfKin_ConsenToContact = "VRUFmF5tE7b";
-	
-	
-	me.attr_ContactPhoneNumber = "C1twCsH0rjI";
 	me.attr_RestrictionsContacting  = "z78Y1qdewNQ";
 	me.attr_Address1 = "gY1FrhX5UTn";
 	me.attr_Address2 = "gn35714pj4p";
@@ -216,6 +213,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	// [ART Closure] form
 	me.attr_ARTClosure_ReferralFacilityName = "LCLiPzJWVAb";
 	me.attr_ARTClosure_OtherSpecialFacilityName = "Ra1Deyvyrbm";
+	me.attr_Date_Of_ART_Enrollment = "LnXn5fK0b5b";
 	
 	
 	// Data Element Logic fields
@@ -442,18 +440,45 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.saveContactLogEventBtnTag.click(function(){
 			
 			var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
+			var jsonEvent = me.contactLogEventFormTag.attr( "event" );
+			var eventId;
 			
-			var jsonEvent = { 
-				"programStage": me.stage_ContactLog 
-				,"status": "COMPLETED"
-			};
+			if( jsonEvent != undefined )
+			{
+				jsonEvent = JSON.parse( jsonEvent );
+				eventId = jsonEvent.event;
+			}
+			else
+			{
+				jsonEvent = { 
+						"programStage": me.stage_ContactLog 
+						,"status": "COMPLETED"
+					};
+			}
+			
 			jsonEvent.dataValues = Util.getArrayJsonData( "dataElement", me.contactLogEventFormTag );
 			
-			me.execSaveEvent( me.contactLogEventFormTag, jsonEvent, jsonClient.trackedEntityInstance, undefined, function( jsonData ){
+			me.execSaveEvent( me.contactLogEventFormTag, jsonEvent, jsonClient.trackedEntityInstance, eventId, function( jsonData ){
+				// In case, users edit an event( not create a new one ), remove it from history
+				// We don't want to make double record for one event in history
+				if( eventId != undefined ) 
+				{
+					var headerTag = me.contactLogEventHistoryTbTag.find("tr[eventId='" + eventId + "']");
+					headerTag.closest("tbody").remove(); // Remove history of the edit event
+				}
+				else
+				{
+					var firstCommentTd = me.contactLogEventHistoryTbTag.find("tbody:first");
+					firstCommentTd.find("button").closest("th").remove(); // Remove Edit button column
+					firstCommentTd.find("th.outcome").attr("colspan", "2");
+				}
+				
 				me.contactLogEventFormTag.hide();
-				me.populateContactLogEventHistory( jsonData );
+				me.populateContactLogEventHistory( jsonData, true );
 				me.populateNextContactLogActionBar( jsonData );
 				Util.disableTag( me.addContactLogEventBtnTag, false );
+				me.contactLogEventFormTag.removeAttr( "event" );
+				
 			});
 			return false;
 		});
@@ -534,9 +559,9 @@ function ClientFormManagement( _mainPage, _metaData )
 					
 					me.artReferCloseFormTag.show();
 					
-					me.hideIconInTab( me.TAB_NAME_ART_REFER );
-					
 					Util.disableForm( me.artReferOpenFormTag, true );
+					
+					me.hideIconInTab( me.TAB_NAME_ART_REFER );
 				});
 				
 			});
@@ -545,7 +570,9 @@ function ClientFormManagement( _mainPage, _metaData )
 			return false;
 		});
 		
-
+		me.setUp_validationCheck( me.artReferOpenFormTag.find( 'input,select' ) );
+		
+		
 		// -----------------------------------------------------------------------------------------
 		// [ART Refer Close] button events
 		
@@ -581,40 +608,61 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		me.saveARTCloseEventBtnTag.click( function(){	
 
-			var artClosureEvent = me.artReferCloseFormTag.attr("event");
-			if( artClosureEvent === undefined )
+			if( me.validationObj.checkFormEntryTagsData( me.artReferCloseFormTag ) )
 			{
-				// Generate [Time Elapsed] attribute value for [ART Closure] form
-				var artOpeningEvent = JSON.parse( me.artReferOpenFormTag.attr("event") );
-				var openEventDate = Util.convertUTCDateToLocalDate( artOpeningEvent.eventDate );
-				var closureEventDate = new Date();
+				var artClosureEvent = me.artReferCloseFormTag.attr("event");
+				if( artClosureEvent === undefined )
+				{
+					me.artReferCloseFormTag.attr("event", "");
+				}
 				
-				var timeElapsed = Util.getTimeElapsed( openEventDate, closureEventDate );
-				me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( timeElapsed );
-
-				me.artReferCloseFormTag.attr("event", "");
+				me.setARTLinkageStatusAttrValue();
+				if( artClosureEvent === undefined )
+				{
+					me.artReferCloseFormTag.removeAttr("event");
+				}
+				
+				var jsonClient = me.getClientJsonData( me.artAttributeFormTag );
+				var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
+				
+				me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
+					Util.disableForm( me.thisTestDivTag, true );				
+					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
+				} );
 			}
-			
-			me.setARTLinkageStatusAttrValue();
-			if( artClosureEvent === undefined )
-			{
-				me.artReferCloseFormTag.removeAttr("event");
-			}
-			
-			var jsonClient = me.getClientJsonData( me.artAttributeFormTag );
-			var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
-			
-			me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
-				Util.disableForm( me.thisTestDivTag, true );				
-				me.showTabInClientForm( me.TAB_NAME_ART_REFER );
-			} );
 			
 			return false;
 			
 		});
 		
+		me.setUp_validationCheck( me.artReferCloseFormTag.find( 'input,select' ) );
 	};
 	
+	
+	me.calulate_ARTClosureTimeElapsed = function()
+	{
+		var artOpeningEvent = me.artReferOpenFormTag.attr("event");
+		
+		var dateOfARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );
+		var dateOfARTEnrollmentVal = dateOfARTEnrollmentTag.val();
+		if( artOpeningEvent != undefined && dateOfARTEnrollmentVal != "" )
+		{
+			dateOfARTEnrollmentVal = Util.formatDate_DbDate( dateOfARTEnrollmentVal );
+			dateOfARTEnrollmentVal = Util.convertDateStrToObject( dateOfARTEnrollmentVal );
+				
+			artOpeningEvent = JSON.parse( me.artReferOpenFormTag.attr("event") );
+			var openEventDate = Util.convertDateStrToObject( artOpeningEvent.eventDate.substring(0, 10) );
+			
+			var timeElapsed = Util.getDaysElapsed( openEventDate, dateOfARTEnrollmentVal );
+			me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( timeElapsed );
+		}
+		else
+		{
+			var closureTimeElapsedTag = me.getAttributeField( me.attr_ARTClosure_TimeElapsed );
+			closureTimeElapsedTag.val( "" );
+			dateOfARTEnrollmentTag.change();
+		}
+	}
 	
 	// Add Events for [Event Data Entry] form
 	
@@ -767,29 +815,13 @@ function ClientFormManagement( _mainPage, _metaData )
 			
 			event.dataValues = Util.getArrayJsonData( "dataElement", me.thisTestDivTag );
 			
+//			// Save Event
+//			me.execSaveEvent( me.thisTestDivTag, event, client.trackedEntityInstance, event.event );
+			
 			// Save Event
 			me.execSaveEvent( me.thisTestDivTag, event, client.trackedEntityInstance, event.event, function( eventJson ){
-				
-				var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
-				var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
-				var partnerEventId = me.getDataElementField( me.de_PartnerEventId ).val();
-				if( partnerCUICOptTag.val() == "2" && partnerCUICTag.val() != "" && partnerEventId != undefined )
-				{
-					me.savePartnerCUIC();
-				}
-				
-				me.addEventFormTag.attr("event", JSON.stringify( eventJson ));
-				me.disableClientDetailsAndCUICAttrGroup( true );
-				
-				// Show the icon [red] icon on [New Test] if any
-				me.showIconInTab( me.TAB_NAME_THIS_TEST );
-				
-				if( me.checkIfARTEvent( eventJson ) )
-				{
-					me.addClientFormTabTag.attr("artHIVTestingEvent", JSON.stringify( eventJson ));
-					me.showOpeningTag = false;
-				}
-				me.checkAndShowARTReferTab( eventJson );
+
+				me.updatePartnerInfo( eventJson );
 			} );
 		});
 				
@@ -1409,37 +1441,49 @@ function ClientFormManagement( _mainPage, _metaData )
 	{
 		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
 		var droppedReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
+		var closureLinkageOutcomeVal = closureLinkageOutcomeTag.val();
 		
-		if( closureLinkageOutcomeTag.val() == "" )
+		if( closureLinkageOutcomeVal == "" )
 		{
 			me.artReferCloseFormTag.find("input,select").each(function(){
 				me.setHideLogicTag( $(this), true);
+				$(this).val("");
 			});
 		}
-		else if( closureLinkageOutcomeTag.val() == "SUCCESS" )
+		else if( closureLinkageOutcomeVal == "SUCCESS" )
 		{
 			me.artReferCloseFormTag.find("input,select").each(function(){
 				me.setHideLogicTag( $(this), false);
+				$(this).val("");
 			});
 			
 			me.setHideLogicTag( droppedReasonTag, true);
+			me.removeMandatoryForField( droppedReasonTag );
+			
+			// Set Date picker for [Date of ART enrollment]
+			var openingEventDate = JSON.parse( me.artReferOpenFormTag.attr("event") );
+			var dateARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );		
+			Util.datePicker_SetDateRange( dateARTEnrollmentTag, openingEventDate.eventDate, Util.convertDateObjToStr( new Date() ) );
+			dateARTEnrollmentTag.change();
+			
+			// Show/Hide [Other facility name]
+			var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
+			var specialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
+			me.setHideLogicTag( specialOtherFacilityNameTag, !( closeReferFacilityNameTag.val() == "Other" ) );
 		}
-		else if( closureLinkageOutcomeTag.val() == "DROPPED" )
+		else if( closureLinkageOutcomeVal == "DROPPED" )
 		{
 			me.artReferCloseFormTag.find("input,select").each(function(){
 				me.setHideLogicTag( $(this), true);
+				$(this).val("");
 			});
 			
 			me.setHideLogicTag( droppedReasonTag, false);
+			me.addMandatoryForField( droppedReasonTag );
 		}
 
 		me.setHideLogicTag( closureLinkageOutcomeTag, false);
-		
-
-		// Show/Hide [Other facility name]
-		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
-		var specialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
-		me.setHideLogicTag( specialOtherFacilityNameTag, !( closeReferFacilityNameTag.val() == "Other" ) );
+		closureLinkageOutcomeTag.val( closureLinkageOutcomeVal );
 	};
 	
 	me.getDataElementField = function( deId )
@@ -1590,7 +1634,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				{
 					var historyGroupTb = $( "<tbody historyGroupId='" + group.id + "' style='display:none;'></tbody>" );
 					var historyHeaderTag = $("<tr header='true'></tr>");					
-					historyHeaderTag.append("<th colspan='3'><img style='float:left' class='arrowDownImg showHide' src='../images/down.gif'> " + group.name + "<span style='float:right;'>Edit</span></th>" );
+					historyHeaderTag.append("<th colspan='3'><img style='float:left' class='arrowDownImg showHide' src='../images/down.gif'> " + groupName + "<span style='float:right;'>Edit</span></th>" );
 					historyHeaderTag.append("<th style='width:20px;'><span style='cursor:pointer;' class='editBtn glyphicon glyphicon-pencil'></th>");
 					historyGroupTb.append( historyHeaderTag );		
 
@@ -1787,10 +1831,12 @@ function ClientFormManagement( _mainPage, _metaData )
 			if( referralFacilityNameTag.val() == "Other" )
 			{
 				me.setHideLogicTag( specialOtherFacilityNameTag, false ); 
+				me.addMandatoryForField( specialOtherFacilityNameTag );
 			}
 			else
 			{
 				me.setHideLogicTag( specialOtherFacilityNameTag, true ); 
+				me.removeMandatoryForField( specialOtherFacilityNameTag );
 			}
 		});
 
@@ -1811,11 +1857,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		// Resolve [ART Closure] entry forms
 		me.mergeARTAttributeFormAndEntryForm( me.artReferCloseFormTag );
-		
-		// Set autocompleted for [Referral facility name] in [ART Closure] form
-		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
-		Util.setAutoCompleteTag( closeReferFacilityNameTag );
-		
+
 		//  Set mandatory for attributes in form
 		me.artReferCloseFormTag.find("input[attribute],select[attribute]").each(function(){
 			me.addMandatoryForField( $(this) );
@@ -1826,25 +1868,35 @@ function ClientFormManagement( _mainPage, _metaData )
 			Util.datePicker( $(this) );
 		});
 		
-		// Linkage Status event
-		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
-		closureLinkageOutcomeTag.change( function(){
-			me.setUp_ARTClosureForm();
-			
-		});
-
+		// Set autocompleted for [Referral facility name] in [ART Closure] form
+		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
+		Util.setAutoCompleteTag( closeReferFacilityNameTag );
+		
 		// Add event for [Referral facility name]
-		var closeReferralFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
 		var closeSpecialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
-		closeReferralFacilityNameTag.change(function(){
-			if( closeReferralFacilityNameTag.val() == "Other" )
+		closeReferFacilityNameTag.change(function(){
+			if( closeReferFacilityNameTag.val() == "Other" )
 			{
-				me.setHideLogicTag( closeSpecialOtherFacilityNameTag, false ); 
+				me.setHideLogicTag( closeSpecialOtherFacilityNameTag, false );
+				me.addMandatoryForField( closeSpecialOtherFacilityNameTag );
 			}
 			else
 			{
 				me.setHideLogicTag( closeSpecialOtherFacilityNameTag, true ); 
+				me.removeMandatoryForField( closeSpecialOtherFacilityNameTag );
 			}
+		});
+		
+		// Linkage Status event
+		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		closureLinkageOutcomeTag.change( function(){
+			me.setUp_ARTClosureForm();
+		});
+		
+		// Set up Event of [Date Of ART Enrollment] field
+		var dateOfARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );
+		dateOfARTEnrollmentTag.on('dp.change', function(e){ 
+			me.calulate_ARTClosureTimeElapsed();
 		});
 	};
 
@@ -2013,13 +2065,13 @@ function ClientFormManagement( _mainPage, _metaData )
 			}
 			
 		}
-		else if( sexTag.val() == "Male" && dataSaved ) // If Sex = Male, HIDE FSW
+		else if( sexTag.val() == "Male" ) // If Sex = Male, HIDE FSW
 		{
 			// Show option values [MSM] of attribute [Key Population]
 			keyPopulationTag.find("option[value='MSMSW']").show();
 			keyPopulationTag.find("option[value='MSMNONSW']").show();
 			
-			if( referralOfferedTag.val() == "true" )
+			if( referralOfferedTag.val() == "true" && dataSaved )
 			{
 				// Hide [Referral to VMMC]
 				me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), false );
@@ -2379,6 +2431,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		// [Contat Log] tab
 
 		me.showIconInTab( me.TAB_NAME_CONTACT_LOG );
+
+		me.contactLogEventFormTag.removeAttr( "event" );
 		
 		// -- [Contact Log Attribute] form
 		me.contactLogFormTag.find("input[type='text'],select").val("");
@@ -2387,6 +2441,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.contactLogFormTag.find("tbody[historyGroupId]").hide();
 		me.contactLogFormTag.find("tbody[historyGroupId]").find("td.historyInfo").html("");
 		me.contactLogFormTag.find("tbody[groupId]").show();
+		me.contactLogFormTag.find("tbody[groupId]").find("tr.action").hide();
 		me.contactLogFormTag.find("tbody:last").show();
 		
 		// Hide [Next Contact Log] infor
@@ -3148,7 +3203,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	            ,beforeSend: function()
 	            {
 	            	var tranlatedText = "";
-	            	if( jsonData.status == "complete" )
+	            	if( jsonData.status == "COMPLETED" )
             		{
 	            		tranlatedText = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_completingEvent" );
             		}
@@ -3171,7 +3226,7 @@ function ClientFormManagement( _mainPage, _metaData )
 
 					// STEP 4. Unblock form
 					var translateMsg = "";
-					if( jsonData.status == "complete" )
+					if( response.status == "COMPLETED" )
             		{
 						translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventCompleted" );
             		}
@@ -3179,7 +3234,8 @@ function ClientFormManagement( _mainPage, _metaData )
 					{
 						translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );		
 					}
-										
+					
+					
 					if( exeFunc !== undefined ) exeFunc( response );
 					
 					MsgManager.msgAreaShow( translateMsg, "SUCCESS" );
@@ -3244,6 +3300,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		me.execSaveEvent( me.thisTestDivTag, event, trackedEntityInstanceId, eventId, function( jsonEvent ){
 
+			me.updatePartnerInfo( jsonEvent );
+			
 			// Add completed event in [Previous Test] tab
 			
 			var tbody = me.createAndPopulateDataInEntryForm( jsonEvent, me.stage_HIVTesting );
@@ -3291,6 +3349,31 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	};
 	
+	me.updatePartnerInfo = function( jsonEvent )
+	{
+		// Update the partner information
+		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
+		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+		var partnerEventId = me.getDataElementField( me.de_PartnerEventId ).val();
+		if( partnerCUICOptTag.val() == "2" && partnerCUICTag.val() != "" && partnerEventId != undefined )
+		{
+			me.savePartnerCUIC();
+		}
+		
+		me.addEventFormTag.attr("event", JSON.stringify( jsonEvent ));
+		me.disableClientDetailsAndCUICAttrGroup( true );
+		
+		// Show the icon [red] icon on [New Test] if any
+		me.showIconInTab( me.TAB_NAME_THIS_TEST );
+		
+		if( me.checkIfARTEvent( jsonEvent ) )
+		{
+			me.addClientFormTabTag.attr("artHIVTestingEvent", JSON.stringify( jsonEvent ));
+			me.showOpeningTag = false;
+		}
+		me.checkAndShowARTReferTab( jsonEvent );
+	};
+	
 	
 	// -------------------------------------------------------------------------------------------------
 	// Show/Hide modules
@@ -3333,9 +3416,6 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.resetClientForm();
 		me.resetDataEntryForm();
 		
-		// Init attribute fields
-		me.setUp_ClientRegistrationFormDataLogic();
-		
 		
 		// Change the Header title && 'Save' buton display name
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_headerTitle_addClient" );
@@ -3356,6 +3436,9 @@ function ClientFormManagement( _mainPage, _metaData )
 				field.val( value );
 			}
 		});
+
+		// Init attribute fields
+		me.setUp_ClientRegistrationFormDataLogic();
 		
 		// Generate Client CUIC if any
 		me.generateClientCUIC();
@@ -3643,6 +3726,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		{
 			me.artReferOpenFormTag.attr("event", JSON.stringify( artOpeningEvent ) );
 			me.populateDataValuesInEntryForm( me.artReferOpenFormTag, artOpeningEvent );
+			me.hideIconInTab( me.TAB_NAME_ART_REFER );
+		}
+		else
+		{
+			me.showIconInTab( me.TAB_NAME_ART_REFER );
 		}
 		
 		// Set value for autocomple input tag
@@ -3687,17 +3775,12 @@ function ClientFormManagement( _mainPage, _metaData )
  			}
  			
  			// Generate [Time elapse] in header of [ART Ref.] form
- 	 		var daysElapsed = Util.getDaysTimeElapsed( openingEventDate, closureEventDate );
+ 	 		var daysElapsed = Util.getDaysTimeElapsed( openingEventDate, new Date() );
  	 		me.artEventInfoTbTag.find("span.timeClientReferredARTOn").html( daysElapsed );
- 	 		
- 	 		// Generate [Time elapse] attribute value for [ART Closure] form
- 	 		var timeElapsed = Util.getDaysElapsed( openingEventDate, closureEventDate );
- 			me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( timeElapsed );
  		}
  		else
  		{
  			me.artEventInfoTbTag.find("span.timeClientReferredARTOn").html( "" );
- 			me.getAttributeField( me.attr_ARTClosure_TimeElapsed ).val( "" );
  		}
 	};
 	
@@ -3759,7 +3842,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		{
 			me.artReferCloseFormTag.show();
 //			Util.disableForm( me.artReferOpenFormTag, true );
-			me.hideIconInTab( me.TAB_NAME_ART_REFER );
+//			me.hideIconInTab( me.TAB_NAME_ART_REFER );
 		}
 		else
 		{
@@ -3798,7 +3881,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		if( groupId == "TTTT4Ll5TdV" ) // Attribute Group [LS LOG 2 - Contact Details]
 		{
-			var contactPhoneNumber = me.getAttributeField( me.attr_ContactPhoneNumber ).val();
+			var contactPhoneNumber = me.getAttributeField( me.attr_ContactDetails_phoneNumber ).val();
 		
 			var restrictionsContacting  = me.getAttributeField( me.attr_RestrictionsContacting ).val();
 			restrictionsContacting = ( restrictionsContacting != "" ) ? " - Restrictions: " +  restrictionsContacting : "";
@@ -3836,18 +3919,21 @@ function ClientFormManagement( _mainPage, _metaData )
 	{
 		me.contactLogEventHistoryTbTag.html( "" );
 		
+		var idx = 0;
 		for( var i in eventList )
 		{
-			me.populateContactLogEventHistory( eventList[i] );
+			me.populateContactLogEventHistory( eventList[i], ( idx == eventList.length - 1 ) );
+			idx ++;
 		}
 		
+		// Populate for [Next action] of [Contact Log]
 		if( eventList.length > 0 )
 		{
 			me.populateNextContactLogActionBar( eventList[eventList.length - 1] );
 		}
 	};
 	 
-	me.populateContactLogEventHistory = function( eventJson )
+	me.populateContactLogEventHistory = function( eventJson, canEdit )
 	{
 		var eventDate = "";
 		if( eventJson.eventDate !== undefined ){
@@ -3894,16 +3980,25 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		var tbody = $("<tbody></tbody");
 		
+		// ---------------------------------------------------------------------
 		// Header
-		var headerTag = $("<tr class='actionBar'></tr>");
+		
+		var headerTag = $("<tr class='actionBar' event='" + JSON.stringify( eventJson ) + "' eventId='" + eventJson.event + "'></tr>");
 		headerTag.append("<th>Date: " + eventDate + "</th>");
 		headerTag.append("<th>Type: " + typeOfContact + "</th>");
-		headerTag.append("<th>Outcome: " + outcome + "</th>");
-		headerTag.append("<th class='actionCell' style='width:20px;'><button><span class='glyphicon glyphicon-pencil'></span></button></th>");
 		
-		// Add event for [Edit] button
-		me.setUp_Events_EditContactLogEvent( headerTag.find("button") );
+		// [Outcome] Cell
+		var outcomeColspan = ( canEdit ) ? "1" : "2";
+		headerTag.append("<th colspan='" + outcomeColspan + "' class='outcome'>Outcome: " + outcome + "</th>");
+		if( canEdit )
+		{
+			var editCellTag = $( "<th class='actionCell' style='width:20px;'><button><span class='glyphicon glyphicon-pencil'></span></button></th>" );
+			headerTag.append( editCellTag );
+			me.setUp_Events_EditContactLogEvent( editCellTag );
+		}
 		
+		
+		// ---------------------------------------------------------------------
 		// Add event information in history table
 		var rowTag = $("<tr></tr>");
 		rowTag.append("<td colspan='4'>" + comments + "</td>");
@@ -3966,9 +4061,29 @@ function ClientFormManagement( _mainPage, _metaData )
 		}
 	};
 	
-	me.setUp_Events_EditContactLogEvent = function( editBtnTag )
+	me.setUp_Events_EditContactLogEvent = function( editCellTag )
 	{
-		
+		editCellTag.click( function(){
+			var event = editCellTag.closest("tr").attr("event");
+			me.contactLogEventFormTag.attr( "event", event );
+			var eventJson = JSON.parse( event );
+			
+			var dataValues = eventJson.dataValues;
+			for( var i in dataValues )
+			{
+				var deId = dataValues[i].dataElement;
+				var value = dataValues[i].value;
+				
+				var inputTag = me.contactLogEventFormTag.find("[dataelement='" + deId + "']");
+				if( inputTag.attr("isDate") ==  "true" )
+				{
+					value = Util.formatDate_LocalDisplayDate( value );
+				}
+				inputTag.val( value );
+			}
+
+			me.contactLogEventFormTag.show();
+		});
 	};
 	
 	me.getDisplayNameByDataValue = function( deId, value )
