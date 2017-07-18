@@ -558,9 +558,7 @@ function ClientFormManagement( _mainPage, _metaData )
 					me.populateTimeElapsed( response, artClosureEvent );
 					
 					me.artReferCloseFormTag.show();
-					
-					Util.disableForm( me.artReferOpenFormTag, true );
-					
+				
 					me.hideIconInTab( me.TAB_NAME_ART_REFER );
 				});
 				
@@ -628,6 +626,7 @@ function ClientFormManagement( _mainPage, _metaData )
 				me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
 					Util.disableForm( me.thisTestDivTag, true );				
 					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
+					Util.disableForm( me.artReferOpenFormTag, true );
 				} );
 			}
 			
@@ -1474,8 +1473,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		else if( closureLinkageOutcomeVal == "DROPPED" )
 		{
 			me.artReferCloseFormTag.find("input,select").each(function(){
-				me.setHideLogicTag( $(this), true);
-				$(this).val("");
+				if( $(this).attr("dataelement") != me.de_LinkageStatusDropReason )
+				{
+					me.setHideLogicTag( $(this), true);
+					$(this).val("");
+				}
 			});
 			
 			me.setHideLogicTag( droppedReasonTag, false);
@@ -3702,7 +3704,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		
 		// ---------------------------------------------------------------------
-		// [ART Refer] Tab
+		// [ART Refer] header
 		
 		// [Client referred to ART]
 		if( artHIVTestingEvent != undefined )
@@ -3751,6 +3753,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		{
 			me.artReferCloseFormTag.attr("event", JSON.stringify( artClosureEvent ) );
 			me.populateDataValuesInEntryForm( me.artReferCloseFormTag, artClosureEvent );
+			
+			Util.disableForm( me.artReferOpenFormTag, true );
 		}
 
 		// Set value for autocomple input tag
