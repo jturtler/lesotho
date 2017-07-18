@@ -1474,8 +1474,11 @@ function ClientFormManagement( _mainPage, _metaData )
 		else if( closureLinkageOutcomeVal == "DROPPED" )
 		{
 			me.artReferCloseFormTag.find("input,select").each(function(){
-				me.setHideLogicTag( $(this), true);
-				$(this).val("");
+				if( $(this).attr("dataelement") != me.de_LinkageStatusDropReason )
+				{
+					me.setHideLogicTag( $(this), true);
+					$(this).val("");
+				}
 			});
 			
 			me.setHideLogicTag( droppedReasonTag, false);
@@ -3702,7 +3705,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		
 		// ---------------------------------------------------------------------
-		// [ART Refer] Tab
+		// [ART Refer] header
 		
 		// [Client referred to ART]
 		if( artHIVTestingEvent != undefined )
