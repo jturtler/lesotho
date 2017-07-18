@@ -748,6 +748,18 @@ function ClientFormManagement( _mainPage, _metaData )
 			if( result )
 			{
 				Util.resetForm( me.addEventFormTag );
+				me.getDataElementField( me.de_PartnerEventId ).val("");
+				me.getDataElementField( me.de_FinalResult_HIVStatus ).val("");
+				me.getDataElementField( me.de_CoupleStatus ).val("");
+				me.getDataElementField( me.de_EQCPPTPassed ).val("");
+				
+				var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
+				partnerCUICTag.val("");
+				partnerCUICTag.removeAttr("title" );
+				partnerCUICTag.removeAttr("lastHIVTest" );
+				partnerCUICTag.closest( "td" ).find( "span.partnerDetails" ).hide();
+				partnerCUICTag.closest( "td" ).find("span.partnerInfo").html("");
+				partnerCUICTag.closest( "td" ).find("span.partnerInfo").hide();
 				
 				if( me.addEventFormTag.attr("event") != undefined )
 				{
@@ -2411,6 +2423,9 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		me.addEventFormTag.removeAttr( "event" );
 		me.addEventFormTag.removeAttr( "partnerData" );
+
+		// ---------------------------------------------------------------------
+		// [New Test] Tab
 		
 		var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
 		partnerCUICTag.removeAttr("title" );
