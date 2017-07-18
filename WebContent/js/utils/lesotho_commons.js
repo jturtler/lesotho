@@ -1,11 +1,11 @@
 
 function Commons() {}
 
-Commons.VERSION = "v0.37";
-Commons.VERSION_DATE = "Jul 17 2017";
-Util.SITE_INFO = "This is developement site";
+Commons.VERSION = "v0.39";
+Commons.VERSION_DATE = "Jul 18 2017";
+Util.SITE_INFO = "This is training site";
 
-Commons.wsUrl = "lesotho";
+Commons.wsUrl = "ls-train";
 
 Commons.dateFormat = "DD MMM YYYY";
 Commons.dateTimeFormat = "YYYY-MM-DD HH:mm";
