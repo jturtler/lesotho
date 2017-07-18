@@ -559,8 +559,6 @@ function ClientFormManagement( _mainPage, _metaData )
 					
 					me.artReferCloseFormTag.show();
 					
-					Util.disableForm( me.artReferOpenFormTag, true );
-					
 					me.hideIconInTab( me.TAB_NAME_ART_REFER );
 				});
 				
@@ -628,6 +626,8 @@ function ClientFormManagement( _mainPage, _metaData )
 				me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
 					Util.disableForm( me.thisTestDivTag, true );				
 					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
+					
+					Util.disableForm( me.artReferOpenFormTag, true );
 				} );
 			}
 			
@@ -3751,6 +3751,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		{
 			me.artReferCloseFormTag.attr("event", JSON.stringify( artClosureEvent ) );
 			me.populateDataValuesInEntryForm( me.artReferCloseFormTag, artClosureEvent );
+			
+			Util.disableForm( me.artReferOpenFormTag, true );
 		}
 
 		// Set value for autocomple input tag
