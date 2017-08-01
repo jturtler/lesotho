@@ -1,10 +1,11 @@
 
 
-function ClientFormManagement( _mainPage, _metaData )
+function ClientFormManagement( _mainPage, _metaData, _appPage )
 {
 	var me = this;
 	me.mainPage = _mainPage;
 	me.metaData = _metaData;
+	me.appPage = _appPage;
 	me.storageObj = me.mainPage.storageObj;
 	me.translationObj = me.mainPage.translationObj;
 	me.validationObj = me.mainPage.validationObj;
@@ -592,7 +593,12 @@ function ClientFormManagement( _mainPage, _metaData )
 					var jsonEvent = JSON.parse( me.artReferCloseFormTag.attr("event") );
 					me.populateDataValuesInEntryForm( me.artReferCloseFormTag, jsonEvent );	
 				}
-
+				
+				// Populate data for auto completed field
+				var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
+				var facilityName = closeReferFacilityNameTag.find("option:selected").text();
+				closeReferFacilityNameTag.closest("td").find( "input" ).val( facilityName );
+				
 				// Check validation
 				me.validationObj.checkFormEntryTagsData( me.artReferCloseFormTag );
 				
@@ -825,9 +831,6 @@ function ClientFormManagement( _mainPage, _metaData )
 			}
 			
 			event.dataValues = Util.getArrayJsonData( "dataElement", me.thisTestDivTag );
-			
-//			// Save Event
-//			me.execSaveEvent( me.thisTestDivTag, event, client.trackedEntityInstance, event.event );
 			
 			// Save Event
 			me.execSaveEvent( me.thisTestDivTag, event, client.trackedEntityInstance, event.event, function( eventJson ){
@@ -1556,6 +1559,12 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.createAttributeClientForm( me.artAttributeFormTag, "LSHTC_ART_", false );
 		me.createAttributeClientForm( me.artReferCloseFormTag, "LSHTC_ARTClosure_G1", false );
 		
+		
+		// set validation for firstName and lastName
+		me.getAttributeField( me.attr_FirstName ).attr( "notAllowSpecialChars", true );
+		me.getAttributeField( me.attr_LastName ).attr( "notAllowSpecialChars", true );
+		
+		
 		// Set Mandatory for [Consent to contact] field
 		me.addMandatoryForField( me.getAttributeField( me.attr_ConsentToContact ) );
 		me.addMandatoryForField( me.getAttributeField( me.attr_ContactDetails_phoneNumber ) );
@@ -1860,7 +1869,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		});
 		
 		// Set mandatory for attributes in form
-		me.artReferOpenFormTag.find("input[attribute],select[attribute]").each(function(){
+		me.artReferOpenFormTag.find("input[attribute],select[attribute],textarea[attribute]").each(function(){
 			me.addMandatoryForField( $(this) );
 		});
 		
@@ -1873,7 +1882,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.mergeARTAttributeFormAndEntryForm( me.artReferCloseFormTag );
 
 		//  Set mandatory for attributes in form
-		me.artReferCloseFormTag.find("input[attribute],select[attribute]").each(function(){
+		me.artReferCloseFormTag.find("input[attribute],select[attribute],textarea[attribute]").each(function(){
 			me.addMandatoryForField( $(this) );
 		});
 		
@@ -2144,7 +2153,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	me.getAttributeField = function( attrId )
 	{
-		return me.addClientFormTabTag.find( "input[attribute='" + attrId + "'],select[attribute='" + attrId + "']" );
+		return me.addClientFormTabTag.find( "input[attribute='" + attrId + "'],select[attribute='" + attrId + "'],textarea[attribute='" + attrId + "']" );
 	}
 	
 	
@@ -2402,9 +2411,6 @@ function ClientFormManagement( _mainPage, _metaData )
 		// Reset values in the form
 		
 		Util.resetForm( me.thisTestDivTag );
-		Util.resetForm( me.contactLogEventFormTag );
-		Util.resetForm( me.artReferOpenFormTag );
-		Util.resetForm( me.artReferCloseFormTag );
 		
 	};
 	
@@ -2453,6 +2459,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		// -- [Contact Log Attribute] form
 		me.contactLogFormTag.find("input[type='text'],select").val("");
+		me.contactLogFormTag.find("textarea").val("");
 		me.contactLogFormTag.find("input[type='checkbox']").prop("checked", false);
 		me.contactLogFormTag.find( "span.errorMsg" ).remove();
 		me.contactLogFormTag.find("tbody[historyGroupId]").hide();
@@ -2589,7 +2596,7 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	me.getRemoveOldAttrValueFromJson = function( jsonData, formTag )
 	{
-		formTag.find("input,select").each(function(){
+		formTag.find("input,select,textarea").each(function(){
 			var attrId = $(this).attr("attribute");
 			Util.RemoveFromArray( jsonData, "attribute", attrId );
 		});
@@ -3241,6 +3248,12 @@ function ClientFormManagement( _mainPage, _metaData )
 					
 					me.disableClientDetailsAndCUICAttrGroup( true );
 
+					
+					if( me.checkIfARTEvent( jsonData ) )
+					{
+						me.addClientFormTabTag.attr("artHIVTestingEvent", JSON.stringify( jsonData ));
+					}
+					
 					// STEP 4. Unblock form
 					var translateMsg = "";
 					if( response.status == "COMPLETED" )
@@ -3251,7 +3264,6 @@ function ClientFormManagement( _mainPage, _metaData )
 					{
 						translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );		
 					}
-					
 					
 					if( exeFunc !== undefined ) exeFunc( response );
 					
@@ -3388,7 +3400,12 @@ function ClientFormManagement( _mainPage, _metaData )
 			me.addClientFormTabTag.attr("artHIVTestingEvent", JSON.stringify( jsonEvent ));
 			me.showOpeningTag = false;
 		}
-		me.checkAndShowARTReferTab( jsonEvent );
+
+		var artHIVTestingEvent = me.addClientFormTabTag.attr("artHIVTestingEvent" );
+		if( artHIVTestingEvent != undefined )
+		{
+			me.checkAndShowARTReferTab( JSON.parse( artHIVTestingEvent ) );
+		}
 	};
 	
 	
@@ -3432,6 +3449,9 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.saveClientRegBtnTag.attr("status", "add" );
 		me.resetClientForm();
 		me.resetDataEntryForm();
+		Util.resetForm( me.contactLogEventFormTag );
+		Util.resetForm( me.artReferOpenFormTag );
+		Util.resetForm( me.artReferCloseFormTag );
 		
 		
 		// Change the Header title && 'Save' buton display name
@@ -3439,10 +3459,10 @@ function ClientFormManagement( _mainPage, _metaData )
 		me.addClientFormDivTag.find(".headerList").html(tranlatedText);
 		
 		// Populate values from Search form to Add client form
-		me.mainPage.searchClientManagement.seachAddClientFormTag.find("input[attribute],select[attribute]").each(function(){
+		me.mainPage.searchClientManagement.seachAddClientFormTag.find("input[attribute],select[attribute],textarea[attribute]").each(function(){
 			var attrId = $(this).attr("attribute");
 			var value = $(this).val();
-			var field = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "']");
+			var field = me.addClientFormTag.find("input[attribute='" + attrId + "'],select[attribute='" + attrId + "'],textarea[attribute='" + attrId + "']");
 			
 			if( field.attr("type") == "radio" || field.attr("type") == "checkbox" )
 			{
@@ -3456,6 +3476,13 @@ function ClientFormManagement( _mainPage, _metaData )
 
 		// Init attribute fields
 		me.setUp_ClientRegistrationFormDataLogic();
+		
+		// Remove [Drop case] in [ART Closure] form if the loggin user is counsellor
+		Util.disableForm( me.artReferCloseFormTag, false );
+		if( me.appPage == Commons.APPPAGE_COUNSELLOR )
+		{
+			me.getDataElementField( me.de_ARTClosureLinkageOutcome ).find("option[value='DROPPED']").hide();
+		}
 		
 		// Generate Client CUIC if any
 		me.generateClientCUIC();
@@ -3488,6 +3515,10 @@ function ClientFormManagement( _mainPage, _metaData )
 		// STEP 2. Reset te TAB
 		me.resetClientForm();
 		me.resetDataEntryForm();
+		Util.resetForm( me.contactLogEventFormTag );
+		Util.resetForm( me.artReferOpenFormTag );
+		Util.resetForm( me.artReferCloseFormTag );
+		
 		me.mainPage.searchClientManagement.searchResultTbTag.hide();
 		me.mainPage.searchClientManagement.searchResultTag.hide();
 		me.mainPage.searchClientManagement.searchClientFormTag.hide();
@@ -3562,8 +3593,9 @@ function ClientFormManagement( _mainPage, _metaData )
 		// STEP 4. Populate Client Registration data		
 		me.addClientFormTabTag.attr( "client", JSON.stringify( data.client ) );
 		me.populateClientAttrValues( me.addClientFormTabTag, data.client );
+
 		me.filterCouncilsByDistrict();
-		
+
 		// STEP 5. Init logic for attribute fields based on attribute values
 		me.setUp_ClientRegistrationFormDataLogic();
 
@@ -3575,7 +3607,7 @@ function ClientFormManagement( _mainPage, _metaData )
 		{
 			me.disableClientDetailsAndCUICAttrGroup( true );
 		}
-		
+
 		// ---------------------------------------------------------------------------------------
 		// Set up HIV Testing event data
 		
@@ -3584,7 +3616,7 @@ function ClientFormManagement( _mainPage, _metaData )
 
 		// STEP 9. Set up data in "This Test" tab
 		me.setUp_DataInThisTestTab( activeHIVTestingEvent, data.partner );
-		
+
 		
 		// ---------------------------------------------------------------------------------------
 		// STEP 10. Set up data in "Contact Log" tab and "ART Refer" tab
@@ -3592,7 +3624,6 @@ function ClientFormManagement( _mainPage, _metaData )
 		// Set up data in "Contact Log" tab and "ART Refer" tab
 		me.populateDataValueForContactLogAndARTRefTab( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent );
 		me.checkAndShowARTReferTab( artHIVTestingEvent );
-		
 		
 		// ---------------------------------------------------------------------------------------
 		// STEP 11. Show [This Test] / [Previous Test] tab if there is a "seleted event id"
@@ -3616,7 +3647,8 @@ function ClientFormManagement( _mainPage, _metaData )
 		// ---------------------------------------------------------------------------------------
 		// STEP 12. Show form
 		// ---------------------------------------------------------------------------------------
-				
+
+		console.log( '-- 10 : ' + me.getAttributeField( "t6JNCifEt8r" ).val() );		
 		me.addClientFormDivTag.show("fast");
 		
 	};
@@ -3630,14 +3662,14 @@ function ClientFormManagement( _mainPage, _metaData )
 	
 	me.populateClientAttrValues = function( formTag, client )
 	{
-		formTag.find("input[attribute],select[attribute]").each(function(){
+		formTag.find("input[attribute],select[attribute],textarea[attribute]").each(function(){
 			var attrId = $(this).attr("attribute");
 			var value = me.getAttributeValue( client, attrId );
 			me.setValueForInputTag( $(this), value );
 		});
 		
 		// [Closure ART Refer] - Show/Hide [Other facility name]
-		var closeReferralFacilityNameTag = me.getDataElementField( me.attr_ARTClosure_ReferralFacilityName );
+		var closeReferralFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
 		var closeSpecialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
 		me.setHideLogicTag( closeSpecialOtherFacilityNameTag, !( closeReferralFacilityNameTag.val() == "Other" ) );
 	};
@@ -3762,23 +3794,84 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		// ---------------------------------------------------------------------
 		// [Closure ART Refer]
- 		
+
 		// Populate data
 		if( artClosureEvent !== undefined )
 		{
 			me.artReferCloseFormTag.attr("event", JSON.stringify( artClosureEvent ) );
 			me.populateDataValuesInEntryForm( me.artReferCloseFormTag, artClosureEvent );
-			
+			me.setUp_ARTClosureFormByCaseOption();
 			Util.disableForm( me.artReferOpenFormTag, true );
 		}
+		
 
+		// Remove [Drop case] in [ART Closure] form if the loggin user is counsellor
+		var linkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		if( me.appPage == Commons.APPPAGE_COUNSELLOR )
+		{
+			if( linkageOutcomeTag.val() != "DROPPED" )
+			{
+				linkageOutcomeTag.find("option[value='DROPPED']").hide();
+				Util.disableForm( me.artReferCloseFormTag, false );
+			}
+			else
+			{
+				linkageOutcomeTag.find("option[value='DROPPED']").show();
+				Util.disableForm( me.artReferCloseFormTag, true );
+			}
+		}
+		else
+		{
+			Util.disableForm( me.artReferCloseFormTag, false );
+		}
+		
+	};
+	
+	me.setUp_ARTClosureFormByCaseOption = function()
+	{
 		// Set value for autocomple input tag
 		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
 		closeReferFacilityNameTag.closest( "td" ).find("input").val( closeReferFacilityNameTag.find("option:selected").text() );
 		
+
 		// Set up [ART Closure] form
-		me.setUp_ARTClosureForm();
+		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		var droppedReasonTag = me.getDataElementField( me.de_LinkageStatusDropReason );
+		var closureLinkageOutcomeVal = closureLinkageOutcomeTag.val();
 		
+		if( closureLinkageOutcomeVal == "SUCCESS" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				me.setHideLogicTag( $(this), false);
+			});
+		
+			me.setHideLogicTag( droppedReasonTag, true);
+			me.removeMandatoryForField( droppedReasonTag );
+			
+			// Set Date picker for [Date of ART enrollment]
+			var openingEventDate = JSON.parse( me.artReferOpenFormTag.attr("event") );
+			var dateARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );		
+			Util.datePicker_SetDateRange( dateARTEnrollmentTag, openingEventDate.eventDate, Util.convertDateObjToStr( new Date() ) );
+			dateARTEnrollmentTag.change();
+			
+			// Show/Hide [Other facility name]
+			var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
+			var specialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
+			me.setHideLogicTag( specialOtherFacilityNameTag, !( closeReferFacilityNameTag.val() == "Other" ) );
+		}
+		else if( closureLinkageOutcomeVal == "DROPPED" )
+		{
+			me.artReferCloseFormTag.find("input,select").each(function(){
+				if( $(this).attr("dataelement") != me.de_LinkageStatusDropReason )
+				{
+					me.setHideLogicTag( $(this), true);
+				}
+			});
+			me.setHideLogicTag( droppedReasonTag, false);
+			me.addMandatoryForField( droppedReasonTag );
+		}
+
+		me.setHideLogicTag( closureLinkageOutcomeTag, false);
 	};
 	
 	me.populateTimeElapsed = function( artOpeningEvent, artClosureEvent )
@@ -3860,12 +3953,9 @@ function ClientFormManagement( _mainPage, _metaData )
 		if( me.artReferOpenFormTag.attr("event") != undefined )
 		{
 			me.artReferCloseFormTag.show();
-//			Util.disableForm( me.artReferOpenFormTag, true );
-//			me.hideIconInTab( me.TAB_NAME_ART_REFER );
 		}
 		else
 		{
-//			Util.disableForm( me.artReferOpenFormTag, false );
 			me.showIconInTab( me.TAB_NAME_ART_REFER );
 			me.artReferCloseFormTag.hide();
 		}
@@ -4541,13 +4631,24 @@ function ClientFormManagement( _mainPage, _metaData )
 		
 		var dateOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DoB + "']").val();
 		var districtOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DistrictOB + "']").val();
-		var firstName = me.addClientFormTabTag.find("[attribute='" + me.attr_FirstName + "']").val();
-		var lastName = me.addClientFormTabTag.find("[attribute='" + me.attr_LastName + "']").val();
+		var firstName = me.addClientFormTabTag.find("[attribute='" + me.attr_FirstName + "']").val().toUpperCase();
+		var lastName = me.addClientFormTabTag.find("[attribute='" + me.attr_LastName + "']").val().toUpperCase();
 		var birthOrder = me.addClientFormTabTag.find("[attribute='" + me.attr_BirthOrder + "']").val();
+		
+		// Remove white space and ' from firstName and lastName
+		
+		firstName = firstName.split(" ").join("");
+		firstName = firstName.split("'").join("");
+		var firstCharsFirstName = ( firstName.length >= 2 ) ? firstName.substring(0, 2) : firstName;
+		
+		lastName = lastName.split(" ").join("");
+		lastName = lastName.split("'").join("");
+		var firstCharsLastName = ( lastName.length >= 2 ) ? lastName.substring(0, 2) : lastName;
+		
 		
 		if( dateOfBirth != "" && districtOfBirth != "" &&  firstName != "" && lastName != "" && birthOrder != "" )
 		{
-			clientCUIC = dateOfBirth.substring(9, 12) + Util.MONTH_INDEXES[dateOfBirth.substring(3, 6)] + districtOfBirth.substring(0, 2).toUpperCase() + firstName.substring(0, 2).toUpperCase() + lastName.substring(0, 2).toUpperCase() + birthOrder;
+			clientCUIC = dateOfBirth.substring(9, 12) + Util.MONTH_INDEXES[dateOfBirth.substring(3, 6)] + districtOfBirth.substring(0, 2).toUpperCase() + firstCharsFirstName + firstCharsLastName + birthOrder;
 		}
 		
 		me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']").val( clientCUIC );

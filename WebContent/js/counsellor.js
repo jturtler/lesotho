@@ -58,15 +58,46 @@ function Counsellor( storageObj, translationObj )
 		me.setUp_Events();
 		
 		me.settingsManagement = new SettingsManagement( me, function( metaData ){
-			me.clientFormManagement = new ClientFormManagement( me, metaData );
+			me.clientFormManagement = new ClientFormManagement( me, metaData, Commons.APPPAGE_COUNSELLOR );
 			me.searchClientManagement = new SearchClientManagement( me, metaData, Commons.APPPAGE_COUNSELLOR );
 			me.listManagement = new CounsellorListMaganement( me );
 			me.reportManagement = new CounsellorReportManagement( me );
 			me.checkAndLoadDataAfterInit();
 			
 		} );
+		
+		
+		// Monitor the session expired, run every 5 seconds
+		setInterval(function() {
+			
+			Commons.checkSessionTimeOut( function( sessionExpired ){
+				if( sessionExpired )
+				{
+					var sessionExpiredText = me.translationObj.getTranslatedValueByKey( "session_msg_checkedSessionExpired" );
+					var loginAgainText = me.translationObj.getTranslatedValueByKey( "session_msg_loginAgain" );
+					me.settingsManagement.showExpireSessionMessage();	
+					alert( sessionExpiredText + ". " + loginAgainText );
+				}
+			});			
+		}, 5000);
+		
+		
+		// Check Internet connectivity if it is loss. 
+		// Run every 10 seconds
+		setInterval(function() {
+			
+			Commons.ping( function( online ){
+				if( !online )
+				{
+					var internetConnectivityLoss = me.translationObj.getTranslatedValueByKey( "session_msg_internetConnectivityLoss" );
+					alert( internetConnectivityLoss );
+				}
+			});			
+		}, 10000);
+		
+		
 	}
-
+	
 	// Set current page
 	me.setCurrentPage = function( pageName )
 	{

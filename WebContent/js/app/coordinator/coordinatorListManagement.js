@@ -13,6 +13,7 @@ function CoordinatorListManagement( _mainPage )
 	me.filterHealthFacilities = me.settingsManagement.filterHealthFacilities;
 	me.closureARTStatus = me.settingsManagement.closureARTStatus;
 	me.contactLogTypeName = me.settingsManagement.contactLogTypeName;
+	me.nextActionName = me.settingsManagement.nextActionName;
 	
 	// Today F/U
 	me.todayFUListTag = $("#todayFUList");
@@ -532,6 +533,10 @@ function CoordinatorListManagement( _mainPage )
 					// [Contact log] event data
 					// ---------------------------------------------------------
 					
+					if( cuic == "130104T1T102" )
+					{
+						var fsad = 0;
+					}
 					var contactLogEvent = clientData[6];
 					var contactLogEventDate = "";
 					var contactLogEventContactType = "";
@@ -541,6 +546,7 @@ function CoordinatorListManagement( _mainPage )
 					if( contactLogEvent != "" )
 					{
 						contactLogEvent = JSON.parse( "[" + contactLogEvent + "]" );
+						contactLogEvent = Util.sortDescByKey( contactLogEvent, "eventDate" );
 						var latestEventId = contactLogEvent[0].eventId;
 						contactLogEventDate = contactLogEvent[0].eventDate;
 						for( var j in contactLogEvent )
@@ -560,7 +566,7 @@ function CoordinatorListManagement( _mainPage )
 								else if( event.deId == me.de_contactLog_nextActionName )
 								{
 									contactLogNextAction = event.datavalue;
-									var searched = Util.findItemFromList( me.contactLogTypeName, "code", contactLogNextAction );
+									var searched = Util.findItemFromList( me.nextActionName, "code", contactLogNextAction );
 									if( searched )
 									{
 										contactLogNextAction = searched.name;
