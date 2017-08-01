@@ -40,7 +40,9 @@ public class CheckSession
         }
         else
         {
+            long remainingTimeInMilliseconds = session.getMaxInactiveInterval(); // miliseconds
             responseData.put( "msg", "ok" );
+            responseData.put( "sessionTimeOut", remainingTimeInMilliseconds );
         }
         
         PrintWriter out = response.getWriter();

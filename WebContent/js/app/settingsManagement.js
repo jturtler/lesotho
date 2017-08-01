@@ -42,12 +42,14 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.de_ClosureART_Status = "nOK8JcDWT9X";
 	
 	me.de_ContactLog_TypeOfContact = "wzM3bUiPowS";
+	me.de_ContactLog_nextAction = "mcgzEFh5IV8";
 	
 	me.metaData;
 	me.filterDistricts;
 	me.filterCouncils;
 	me.closureARTStatus;
 	me.contactLogTypeName;
+	me.nextActionName;
 		
 	me.userInfoLoaded = false;
 	me.metadataLoaded = false;
@@ -293,6 +295,10 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 						else if( psDEs[j].dataElement.id === me.de_ContactLog_TypeOfContact )
 						{
 							me.contactLogTypeName = psDEs[j].dataElement.optionSet.options;
+						}
+						else if( psDEs[j].dataElement.id === me.de_ContactLog_nextAction )
+						{
+							me.nextActionName = psDEs[j].dataElement.optionSet.options;
 						}
 					}
 				}

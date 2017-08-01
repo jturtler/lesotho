@@ -187,13 +187,17 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 		me.seachAddClientFormTag.find("input,select").removeAttr("mandatory");
 		me.validationObj.setUp_isNumberOnly_OlderBrowserSupport( me.seachAddClientFormTag );
 		
+		// set validation for firstName and lastName
+		me.getAttributeField( me.attr_FirstName ).attr( "notAllowSpecialChars", true );
+		me.getAttributeField( me.attr_LastName ).attr( "notAllowSpecialChars", true );
+		
+		
 		var dobTag = me.seachAddClientFormTag.find( "input[attribute='" + me.attr_DoB + "']" );
 		dobTag.attr( "readonly", true );
 	
 
 		// Remove the 'mandatory' SPAN from the Search table
 		me.seachAddClientFormTag.find("span.required").remove();
-		
 		
 	};	
 
@@ -213,7 +217,7 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 						"attributes": clientData
 					};
 					
-					if( requestData.attributes.length > 0 )
+					if( requestData.attributes.length > 0 && me.validationObj.checkFormEntryTagsData( me.searchClientFormTag ) )
 					{
 						me.searchResultTbTag.find("tbody").html("");
 						me.backToSearchClientResultBtnTag.show();
