@@ -209,6 +209,10 @@ Util.getArrayJsonData = function( key, formTag, isGetEmptyValue )
 		var item = $(this);
 		var attrId = item.attr(key);
 		var value = item.val();
+		if( attrId == "gn35714pj4p" )
+		{
+			var fadsfasd = 0;
+		}
 		if( item.attr("type") == "checkbox" )
 		{
 			if( item.prop("checked") )
@@ -240,6 +244,7 @@ Util.getArrayJsonData = function( key, formTag, isGetEmptyValue )
 			var data = {};
 			data[key] = attrId;
 			data["value"] = value;
+			//data["value"] = encodeURI(value);
 			
 			jsonData.push(data);
 		}		
@@ -297,6 +302,14 @@ Util.sortByKey = function( array, key ) {
 		return ( ( x < y ) ? -1 : ( ( x > y ) ? 1 : 0 ) );
 	});
 };
+
+Util.sortDescByKey = function( array, key ) {
+	return array.sort( function( a, b ) {
+		var x = a[key]; var y = b[key];
+		return ( ( x < y ) ? 1 : ( ( x > y ) ? -1 : 0 ) );
+	});
+};
+
 
 //-------------------------------------------------------------------
 // Utils - Strings

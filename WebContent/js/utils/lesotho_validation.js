@@ -52,6 +52,7 @@ function Validation( translationObj )
 			me.performValidationCheck( tag, 'letter', divTag );
 			me.performValidationCheck( tag, 'phonenumber', divTag );
 			me.performValidationCheck( tag, 'valueNotAllow', divTag );
+			me.performValidationCheck( tag, 'notAllowSpecialChars', divTag );
 		}
 
 		var valid = ( tag.attr( 'valid' ) == 'true' );
@@ -86,6 +87,7 @@ function Validation( translationObj )
 			else if ( type == 'letter' ) valid = me.checkValueLetter( tag, divTag );
 			else if ( type == 'phonenumber' ) valid = me.checkPhoneNumberValue( tag, divTag );
 			else if ( type == 'valueNotAllow' ) valid = me.checkNotAllowValue( tag, divTag );
+			else if ( type == 'notAllowSpecialChars' ) valid = me.checkNotAllowSpecialChars( tag, divTag );
 			
 			
 			if ( !valid ) tag.attr( 'valid', false );
@@ -278,6 +280,20 @@ function Validation( translationObj )
 		}
 		
 		return valid;
+	};
+	
+	me.checkNotAllowSpecialChars = function( inputTag, divTag )
+	{
+		var valid = true;
+		
+		var value = inputTag.val();
+		var validValueReq = /^[(A-Za-z)( |')]+$/;
+	    
+	    if ( value && !value.match(validValueReq) ) {
+	    	divTag.append( me.getErrorSpanTag( 'common_validation_notAllowSpecialChars' ) );
+			valid = false;
+	    }
+	    return valid;
 	};
 
 	me.phoneNumberValidation = function( phoneVal )
