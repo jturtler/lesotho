@@ -310,6 +310,8 @@ public class ClientController
         {
             String attributeId = attributeList.getJSONObject( i ).getString( "attribute" );
             String value = attributeList.getJSONObject( i ).getString( "value" );
+            value = value.replaceAll("'", "''");
+            
             condition += "var=" + attributeId + ":" + URLEncoder.encode( value ) + "&";
             
             if ( searchVariableCopy.indexOf( attributeId ) >= 0 )

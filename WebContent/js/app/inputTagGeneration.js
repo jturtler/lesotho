@@ -43,7 +43,7 @@ function InputTagGeneration( attribute )
 //		}
 		else if( attribute.valueType === "LONG_TEXT" )
 		{
-			inputTag = "<textarea class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
+			inputTag = "<textarea class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' maxlength='255'>";
 		}
 		
 		return inputTag;
