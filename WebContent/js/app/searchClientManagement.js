@@ -98,9 +98,6 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 		me.searchClientBtnTag.click(function(e){
 			e.preventDefault();
 			
-			var tranlatedMsg = me.translationObj.getTranslatedValueByKey( "searchClient_msg_checkingData" );
-			MsgManager.appBlock( tranlatedMsg );
-			
 			var clientData = Util.getArrayJsonData( "attribute", me.searchClientFormTag );
 			var requestData = { "attributes": clientData };
 			

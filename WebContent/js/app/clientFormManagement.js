@@ -3167,7 +3167,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		} else {
 			 exeFunc( "", "" );
 		}
-		 
+		
 	};
 	
 	me.execSaveEvent = function( formTag, jsonData, clientId, eventId, exeFunc )
@@ -3802,6 +3802,10 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			me.populateDataValuesInEntryForm( me.artReferCloseFormTag, artClosureEvent );
 			me.setUp_ARTClosureFormByCaseOption();
 			Util.disableForm( me.artReferOpenFormTag, true );
+		}
+		else
+		{
+			Util.disableForm( me.artReferOpenFormTag, false );
 		}
 		
 
