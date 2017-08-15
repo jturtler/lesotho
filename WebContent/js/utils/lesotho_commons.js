@@ -1,8 +1,8 @@
 
 function Commons() {}
 
-Commons.VERSION = "v0.42";
-Commons.VERSION_DATE = "Aug 10 2017";
+Commons.VERSION = "v0.43";
+Commons.VERSION_DATE = "Aug 16 2017";
 Util.SITE_INFO = "This is developement site";
 
 Commons.wsUrl = "lesotho";
@@ -15,7 +15,7 @@ Commons.APPPAGE_COORDINATOR = "coordinator";
 Commons.APPPAGE_COUNSELLOR = "counsellor";
 
 Commons.sessionTimeOut = 60 * 60 * 1000;; // Get from [web.xml] configuration file
-Commons.intervalCheckSession = 5000; // 5 miliseconds;
+Commons.intervalCheckSession = 5000; // 5 seconds;
 
 Commons.checkSession = function( returnFunc )
 {		
@@ -55,7 +55,7 @@ Commons.checkSessionTimeOut = function( returnFunc )
 {
 	Commons.sessionTimeOut = Commons.sessionTimeOut - Commons.intervalCheckSession;
 	var expired = ( Commons.sessionTimeOut <=0 );
-	returnFunc( expired );
+	returnFunc( expired, Commons.sessionTimeOut );
 };
 
 
