@@ -1,10 +1,12 @@
 package psi.lesotho.service;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -271,10 +273,15 @@ public final class Util
         {
             // Send post request
             con.setDoOutput( true );
-            DataOutputStream wr = new DataOutputStream( con.getOutputStream() );
+            /* DataOutputStream wr = new DataOutputStream( con.getOutputStream() );
             wr.writeBytes( jsonData.toString() );
             wr.flush();
-            wr.close();
+            wr.close(); */
+            
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream(), "UTF-8"));
+            bw.write(jsonData.toString());
+            bw.flush();
+            bw.close();
         }
 
         if ( params != null && !params.isEmpty() )
@@ -339,7 +346,6 @@ public final class Util
         URL obj = new URL( url );
         // Since HttpsURLConnection extends HttpURLConnection, we can use this
         // for both HTTP & HTTPS?
-        // HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
         HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
         // add Request header
@@ -349,9 +355,8 @@ public final class Util
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11" );
         con.setRequestProperty( "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" );
         con.setRequestProperty( "Accept-Language", "en-US,en;q=0.5" );
-
         con.setRequestProperty( "Content-Type", "application/json; charset=utf-8" );
-
+        
         String userpass = username + ":" + password;
         String basicAuth = "Basic " + new String( new Base64().encode( userpass.getBytes() ) );
         con.setRequestProperty( "Authorization", basicAuth );
@@ -361,10 +366,15 @@ public final class Util
         {
             // Send post request
             con.setDoOutput( true );
-            DataOutputStream wr = new DataOutputStream( con.getOutputStream() );
-            wr.writeBytes( jsonData.toString() );
-            wr.flush();
-            wr.close();
+//            DataOutputStream wr = new DataOutputStream( con.getOutputStream() );
+//            wr.writeBytes( jsonData.toString() );
+//            wr.flush();
+//            wr.close();
+            
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream(), "UTF-8"));
+            bw.write(jsonData.toString());
+            bw.flush();
+            bw.close();
         }
 
         if ( params != null && !params.isEmpty() )
@@ -395,7 +405,7 @@ public final class Util
 
         // 5. Other response info
         if ( con.getResponseCode() == HttpURLConnection.HTTP_OK ) 
-        { 
+        {
             BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
 
             String inputLine;
@@ -411,7 +421,7 @@ public final class Util
              String json = Util.readStream(con.getErrorStream());
              responseMsg.append( json );
         }
-        
+
         responseInfo.data = new JSONObject( responseMsg.toString() );
 
         return responseInfo;
@@ -426,7 +436,7 @@ public final class Util
             }
             in.close();
         }
-        System.out.println("JSON: " + builder.toString());
+        
         return builder.toString();
     }
     

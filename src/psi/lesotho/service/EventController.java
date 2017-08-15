@@ -130,7 +130,7 @@ public class EventController
                     String clientId = request.getParameter( Util.PAMAM_CLIENT_ID );
                     String eventId = request.getParameter( Util.PAMAM_EVENT_ID );
                     JSONObject receivedData = Util.getJsonFromInputStream( request.getInputStream() );
-
+                    System.out.println(receivedData ); 
                     // Create Event
                     if ( eventId == null )
                     {

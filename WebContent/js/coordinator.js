@@ -70,7 +70,7 @@ function Coordinator( storageObj, translationObj )
 					alert( sessionExpiredText + ".\n" + loginAgainText );
 				}
 			});			
-		}, 5000);
+		}, Commons.intervalCheckSession);
 		
 		
 		// Check Internet connectivity if it is loss. 
