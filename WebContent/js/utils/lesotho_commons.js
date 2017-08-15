@@ -2,10 +2,10 @@
 function Commons() {}
 
 Commons.VERSION = "v0.43";
-Commons.VERSION_DATE = "Aug 16 2017";
-Util.SITE_INFO = "This is developement site";
+Commons.VERSION_DATE = "Aug 15 2017";
+Util.SITE_INFO = "This is training site";
 
-Commons.wsUrl = "lesotho";
+Commons.wsUrl = "ls-train";
 
 Commons.dateFormat = "DD MMM YYYY";
 Commons.dateTimeFormat = "YYYY-MM-DD HH:mm";
@@ -14,8 +14,9 @@ Commons.monthYearFormat = "MMM YYYY";
 Commons.APPPAGE_COORDINATOR = "coordinator";
 Commons.APPPAGE_COUNSELLOR = "counsellor";
 
+
 Commons.sessionTimeOut = 60 * 60 * 1000;; // Get from [web.xml] configuration file
-Commons.intervalCheckSession = 5000; // 5 seconds;
+Commons.intervalCheckSession = 5000; // 5 miliseconds;
 
 Commons.checkSession = function( returnFunc )
 {		
@@ -58,20 +59,6 @@ Commons.checkSessionTimeOut = function( returnFunc )
 	returnFunc( expired, Commons.sessionTimeOut );
 };
 
-
-/* Commons.ping = function( returnFunc )
-{
-	$.ajax({
-	    url: "https://www.google.com"
-	    ,success: function() {
-	    	returnFunc(true);//Online
-	    }
-	    ,error: function(jqXHR, exception) {
-	    	returnFunc(false);//Offline
-	    }
-	});
-	
-}; */
 
 Commons.ping = function( returnFunc )
 {
