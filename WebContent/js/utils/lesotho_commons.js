@@ -1,8 +1,8 @@
 
 function Commons() {}
 
-Commons.VERSION = "v0.42";
-Commons.VERSION_DATE = "Aug 10 2017";
+Commons.VERSION = "v0.43";
+Commons.VERSION_DATE = "Aug 15 2017";
 Util.SITE_INFO = "This is training site";
 
 Commons.wsUrl = "ls-train";
@@ -56,23 +56,9 @@ Commons.checkSessionTimeOut = function( returnFunc )
 {
 	Commons.sessionTimeOut = Commons.sessionTimeOut - Commons.intervalCheckSession;
 	var expired = ( Commons.sessionTimeOut <=0 );
-	returnFunc( expired );
+	returnFunc( expired, Commons.sessionTimeOut );
 };
 
-
-/* Commons.ping = function( returnFunc )
-{
-	$.ajax({
-	    url: "https://www.google.com"
-	    ,success: function() {
-	    	returnFunc(true);//Online
-	    }
-	    ,error: function(jqXHR, exception) {
-	    	returnFunc(false);//Offline
-	    }
-	});
-	
-}; */
 
 Commons.ping = function( returnFunc )
 {

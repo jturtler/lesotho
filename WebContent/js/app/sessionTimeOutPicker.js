@@ -7,6 +7,9 @@ function SessionTimeOutPicker()
 	
 	me.init = function()
 	{
+		var data = me.getTimeRemaining();
+		me.sessionTimeOutTag.html( data.hours + ":" + data.minutes );
+		
 		// Monitor the session expired, run every 5 seconds
 		setInterval(function() {
 			
