@@ -95,6 +95,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	me.stage_ContactLog = "gmBozy0KAMC";
 	me.stage_ARTReferralOpenning = "OSpZnLBMVhr";
 	me.stage_ARTReferralClosure = "usEIFQODMxf";
+	me.sectionIndexing = "psI6gRxcdNs";
 
 	me.section_TestingMaterial_Id = "SM7CTqPBbCX";
 
@@ -183,13 +184,17 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	me.de_BMI = "r0Lh3dEecPF";
 	
 
-	me.de_HIVTestChannel = "quOYwc0SOqD";
-	me.de_HIVTestChannel_OtherReason = "Tjw4iDAjyy6";
 	me.de_IndexLeadCUIC = "nSr0NMql5FW";
 	me.de_WhatMotivatedHIVTest = "vOrRzjpdQC6";
 	me.de_WhatMotivatedHIVTest_OtherReason = "GCl3ORKj1jC";
 	me.de_Layer = "fGSXGuPIEOy";
 	me.de_Layer_OtherReason = "omugvBULuf0";
+
+	
+	me.de_IndexedContact = "s4UKKsAEEie";
+	me.de_HIVTestChannel = "quOYwc0SOqD";
+	me.de_HIVTestChannel_OtherReason = "Tjw4iDAjyy6";
+	me.de_BecomeIndexLead = "bqYQjEXXJfW";
 	
 	
 	me.de_Referral_Offered = "r8AftzZCjWP";
@@ -730,6 +735,12 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			me.setUp_ReferralOfferedLogic();
 		});
 		
+		// [Index Contact]
+		me.getDataElementField( me.de_IndexedContact ).change( function(){
+			me.setUp_IndexedContactLogic();
+		});
+		
+		
 		// TB Screening Conducted
 		me.getDataElementField( me.de_TBScreeningConducted ).change( function(){
 			me.setUp_DataElementTBScreeningConductedLogic();
@@ -866,6 +877,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.setUp_validationCheck( me.thisTestDivTag.find( 'input,select' ) );
 		
 		me.activeEventHeaderTag = $("#activeEventHeader");
+		me.notAllowToCreateEventHeaderTag = $("#notAllowToCreateEventHeader");
 		
 	};
 	
@@ -905,6 +917,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.setUp_DataElementPartnerKnowHIVStatusLogic();
 		me.setUp_DataElementFinalHIVStatusLogic();
 		me.setUp_ReferralOfferedLogic();
+		me.setUp_IndexedContactLogic();
 		me.setUp_DataElementTBScreeningConductedLogic();
 		me.setUp_OtherReasonTagLogic();
 		me.setUp_DataElementBMI();
@@ -1150,6 +1163,21 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		}
 	};
 	
+	me.setUp_IndexedContactLogic = function()
+	{	
+		var indexedContactTag = me.getDataElementField( me.de_IndexedContact );
+		var sectionTag = me.addEventFormTag.find("[sectionid='" + me.sectionIndexing + "']");
+		var inputTags = sectionTag.find( "input,select,textarea");
+		if( indexedContactTag.val() == "true" )
+		{
+			sectionTag.show();
+		}
+		else
+		{
+			sectionTag.hide();
+		}
+			
+	};
 
 	me.setUp_ReferralOfferedLogic = function()
 	{
@@ -1160,6 +1188,9 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			jsonClient = JSON.parse( jsonClient );
 			gender = me.getAttributeValue( jsonClient, me.attr_Sex );
 		}
+		
+		
+		var becomeIndexLeadTag = me.getDataElementField( me.de_BecomeIndexLead );
 		
 		var referralOfferedTag = me.getDataElementField( me.de_Referral_Offered );
 		var testResultsGivenTag = me.getDataElementField( me.de_TestResultsGiven );
@@ -1179,6 +1210,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.setHideLogicTag( referralGivenFPTag.closest("tr"), true );
 		me.setHideLogicTag( referralGivenVMMCTag.closest("tr"), true );
 		me.setHideLogicTag( referralGivenARTTag.closest("tr"), true );
+		me.setHideLogicTag( becomeIndexLeadTag.closest("tr"), true );
 		me.setHideLogicTag( referralGivenPRePNegativeTag.closest("tr"), true );
 		me.setHideLogicTag( referralGivenDNAPCRTag.closest("tr"), true );
 		
@@ -1194,6 +1226,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			if( resultFinalHIVStatusTag.val() == "Positive" && testResultsGivenTag.val() == "true" )
 			{
 				me.setHideLogicTag( referralGivenARTTag.closest("tr"), false );
+				me.setHideLogicTag( becomeIndexLeadTag.closest("tr"), false );
 			}
 			else if( resultFinalHIVStatusTag.val() == "Negative" )
 			{
@@ -1212,6 +1245,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			referralGivenFPTag.prop("checked", false);
 			referralGivenVMMCTag.prop("checked", false);
 			referralGivenARTTag.prop("checked", false);
+			becomeIndexLeadTag.val( true );
 			referralGivenDNAPCRTag.prop("checked", false);
 		}
 	};
@@ -1234,27 +1268,27 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 
 	me.setUp_OtherReasonTagLogic = function()
 	{
-		// HIVTestChannel
-		var testChannelTag = me.getDataElementField( me.de_HIVTestChannel );
-		otherReasonTag = me.getDataElementField( me.de_HIVTestChannel_OtherReason );
-		var deIndexLeadCUICTag = me.getDataElementField( me.de_IndexLeadCUIC );
-		if( testChannelTag.val() == "LS_CHA7" ) // [Other testing channel] Option
-		{
-			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
-			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), true );
-		}
-		else if( testChannelTag.val() == "LS_CHA4" ) // [Index] option
-		{
-			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), false );
-			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
-		}
-		else
-		{
-			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
-			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), true );
-			otherReasonTag.val("");
-			deIndexLeadCUICTag.val("");
-		}
+//		// HIVTestChannel
+//		var testChannelTag = me.getDataElementField( me.de_HIVTestChannel );
+//		otherReasonTag = me.getDataElementField( me.de_HIVTestChannel_OtherReason );
+//		var deIndexLeadCUICTag = me.getDataElementField( me.de_IndexLeadCUIC );
+//		if( testChannelTag.val() == "LS_CHA7" ) // [Other testing channel] Option
+//		{
+//			me.setHideLogicTag( otherReasonTag.closest("tr"), false );
+//			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), true );
+//		}
+//		else if( testChannelTag.val() == "LS_CHA4" ) // [Index] option
+//		{
+//			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), false );
+//			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
+//		}
+//		else
+//		{
+//			me.setHideLogicTag( otherReasonTag.closest("tr"), true );
+//			me.setHideLogicTag( deIndexLeadCUICTag.closest("tr"), true );
+//			otherReasonTag.val("");
+//			deIndexLeadCUICTag.val("");
+//		}
 		
 		// whatMotivatedHIVTest
 		var whatMotivatedHIVTestTag = me.getDataElementField( me.de_WhatMotivatedHIVTest );
@@ -1741,6 +1775,9 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		
 		var translatedByText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_thisTest_msg_createdBy" );	
 		me.addEventFormTag.closest("form").prepend( "<div id='activeEventHeader' class='testMsg'>" + translatedByText + " '<span>" + me.userFullNameTag.html() + "</span>'</div>" );
+		
+		translatedByText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_thisTest_msg_alreadyTodayTest" );	
+		me.addEventFormTag.closest("form").prepend( "<div id='notAllowToCreateEventHeader' class='testMsg' style='display:none;'>" + translatedByText + "</div>" );
 		
 		
 		// ---------------------------------------------------------------------
@@ -3264,6 +3301,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 					{
 						translateMsg = me.translationObj.getTranslatedValueByKey( "clientEntryForm_msg_eventSaved" );		
 					}
+
+					Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, false );
 					
 					if( exeFunc !== undefined ) exeFunc( response );
 					
@@ -3296,10 +3335,10 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 					}
 					
 					MsgManager.appUnblock();
+
+					Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, false );
 					
 				}
-			}).always( function( data ) {
-				Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, false );
 			});
 		
 	};
@@ -3354,25 +3393,40 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			
 			// Set [event] attribute for [This test] Tab
 			me.addEventFormTag.attr( "event", JSON.stringify( jsonEvent ) );
-			me.addClientFormTabTag.attr( "artHIVTestingEvent", JSON.stringify( jsonEvent ) );
-
-			
-			// Set up Event creating logic
-			var artOpeningEvent = me.artReferOpenFormTag.attr("event");
-			if( artOpeningEvent !== undefined )
+			if( me.checkIfARTEvent( jsonEvent ))
 			{
-				artOpeningEvent = JSON.parse( artOpeningEvent );
+				me.addClientFormTabTag.attr( "artHIVTestingEvent", JSON.stringify( jsonEvent ) );
 			}
 			
-			var artClosureEvent = me.artReferCloseFormTag.attr("event");
-			if( artClosureEvent !== undefined )
+			// Set up [artHIVTestingEvent]
+			var artHIVTestingEvent = me.addClientFormTabTag.attr( "artHIVTestingEvent" );
+			if( artHIVTestingEvent != undefined )
 			{
-				artClosureEvent = JSON.parse( artClosureEvent );
+				artHIVTestingEvent = JSON.parse( artHIVTestingEvent );
 			}
 			
-			me.populateDataValueForContactLogAndARTRefTab( jsonEvent, [] );
+			// Set up [artHIVTestingEvent]
+			var artHIVTestingEvent = me.addClientFormTabTag.attr( "artHIVTestingEvent" );
+			if( artHIVTestingEvent != undefined )
+			{
+				artHIVTestingEvent = JSON.parse( artHIVTestingEvent );
+			}
+			
+			me.checkAndShowARTReferTab( artHIVTestingEvent );
 			
 			me.saveClientAfter( JSON.parse( me.addClientFormTabTag.attr("client") ), exeFunc, undefined, false );
+
+			// Not allow to create a new event if there is one event today
+			if( me.isTodayEvent( jsonEvent ) )
+			{
+				Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, true );
+				me.notAllowToCreateEventHeaderTag.show();
+			}
+			else
+			{
+				Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, false );
+				me.notAllowToCreateEventHeaderTag.hide();
+			}
 			
 		} );
 	
@@ -3528,6 +3582,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		// STEP 3. Get events
 		
 		var events = data.events.events;
+		var todayEvent = false;
 		var activeHIVTestingEvent;
 		var artHIVTestingEvent;
 		var completedHIVTestingEvents = [];
@@ -3562,6 +3617,13 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				{
 					artHIVTestingEvent = event;
 				}
+				
+				// Check event is today event
+				if( me.isTodayEvent( event ) && !todayEvent )
+				{
+					todayEvent = true;
+				}
+				
 			}
 			// Get [Contact Log] event
 			else if( event.programStage == me.stage_ContactLog )
@@ -3607,6 +3669,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		{
 			me.disableClientDetailsAndCUICAttrGroup( true );
 		}
+		
 
 		// ---------------------------------------------------------------------------------------
 		// Set up HIV Testing event data
@@ -3616,17 +3679,30 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 
 		// STEP 9. Set up data in "This Test" tab
 		me.setUp_DataInThisTestTab( activeHIVTestingEvent, data.partner );
+		
+		// STEP 10. Not allow to create a new event if there is one event today
+		if( me.addEventFormTag.attr( "event") == undefined && todayEvent )
+		{
+			Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, true );
+			me.notAllowToCreateEventHeaderTag.show();
+		}
+		else
+		{
+			Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, false );
+			me.notAllowToCreateEventHeaderTag.hide();
+		}
 
 		
 		// ---------------------------------------------------------------------------------------
-		// STEP 10. Set up data in "Contact Log" tab and "ART Refer" tab
+		// STEP 11. Set up data in "Contact Log" tab and "ART Refer" tab
 		
 		// Set up data in "Contact Log" tab and "ART Refer" tab
 		me.populateDataValueForContactLogAndARTRefTab( artHIVTestingEvent, contactLogEvents, artOpeningEvent, artClosureEvent );
 		me.checkAndShowARTReferTab( artHIVTestingEvent );
 		
+		
 		// ---------------------------------------------------------------------------------------
-		// STEP 11. Show [This Test] / [Previous Test] tab if there is a "seleted event id"
+		// STEP 12. Show [This Test] / [Previous Test] tab if there is a "seleted event id"
 		
 		if( selectedEventId !== undefined )
 		{
@@ -3645,19 +3721,36 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		}
 		
 		// ---------------------------------------------------------------------------------------
-		// STEP 12. Show form
+		// STEP 13. Show form
 		// ---------------------------------------------------------------------------------------
-
-		console.log( '-- 10 : ' + me.getAttributeField( "t6JNCifEt8r" ).val() );		
+		
 		me.addClientFormDivTag.show("fast");
 		
 	};
+	
+
+	me.isTodayEvent = function( event )
+	{
+		var todayStr = Util.convertDateObjToStr( new Date() );
+		if( event.eventDate != undefined )
+		{
+			if( todayStr == event.eventDate.substring(0, 10 ) )
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	};
+	
 	
 	me.checkIfARTEvent = function( event )
 	{
 		var artValue = me.getEventDataValue( event, me.de_ReferralGiven_ART );
 		var hivTestingValue = me.getEventDataValue( event, me.de_FinalResult_HIVStatus );
-		return( artValue == "true" && hivTestingValue == "Positive" );
+		var becomeIndexLeadVal = me.getEventDataValue( event, me.de_BecomeIndexLead );
+		
+		return( ( artValue == "true" || becomeIndexLeadVal == "true" ) && hivTestingValue == "Positive" );
 	};
 	
 	me.populateClientAttrValues = function( formTag, client )
@@ -3929,10 +4022,11 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			//	 move to contact log tab to force user to complete data points 
 			// 	 and move to ART referral tab )
 			var artValue = me.getEventDataValue( eventData, me.de_ReferralGiven_ART );
+			var becomeIndexLeadVal = me.getEventDataValue( eventData, me.de_BecomeIndexLead );
 			var finalHIVTestValue = me.getEventDataValue( eventData, me.de_FinalResult_HIVStatus );
 			var testResultGivenValue = me.getEventDataValue( eventData, me.de_TestResultsGiven );
 
-			if( finalHIVTestValue == "Positive" && artValue == "true" && testResultGivenValue == "true" )
+			if( finalHIVTestValue == "Positive" && ( artValue == "true" || becomeIndexLeadVal == "true" ) && testResultGivenValue == "true" )
 			{
 				var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
 				

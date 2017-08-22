@@ -1,11 +1,11 @@
 
 function Commons() {}
 
-Commons.VERSION = "v0.43";
-Commons.VERSION_DATE = "Aug 15 2017";
-Util.SITE_INFO = "This is training site";
+Commons.VERSION = "v0.44";
+Commons.VERSION_DATE = "Aug 22 2017";
+Util.SITE_INFO = "This is developing site";
 
-Commons.wsUrl = "ls-train";
+Commons.wsUrl = "lesotho";
 
 Commons.dateFormat = "DD MMM YYYY";
 Commons.dateTimeFormat = "YYYY-MM-DD HH:mm";
@@ -16,7 +16,7 @@ Commons.APPPAGE_COUNSELLOR = "counsellor";
 
 
 Commons.sessionTimeOut = 60 * 60 * 1000;; // Get from [web.xml] configuration file
-Commons.intervalCheckSession = 5000; // 5 miliseconds;
+Commons.intervalCheckSession = 5000; // 5 seconds;
 
 Commons.checkSession = function( returnFunc )
 {		
@@ -27,13 +27,13 @@ Commons.checkSession = function( returnFunc )
         ,contentType: "application/json;charset=utf-8"
 		,success: function( response ) 
 		{	
-			var valid = Commons.checkForSessionExpired( response );
-			if( valid )
+			var expired = Commons.checkForSessionExpired( response );
+			if( !expired )
 			{
-				Commons.sessionTimeOut = eval( response.sessionTimeOut ) * 60 * 1000; // convert minutes to miliseconds
+				Commons.sessionTimeOut = eval( response.sessionTimeOut ) * 1000; // convert seconds to miliseconds
 			}
 			
-			returnFunc( !valid );
+			returnFunc( !expired );
 		}
 		,error: function(response)
 		{

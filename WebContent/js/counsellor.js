@@ -68,9 +68,9 @@ function Counsellor( storageObj, translationObj )
 		
 		
 		// Init sesstion clock
-		new SessionTimeOutPicker();
+		new SessionTimeOutPicker( me );
 		
-		// Monitor the session expired, run every 5 seconds
+		/* // Monitor the session expired, run every 5 seconds
 		setInterval(function() {
 			
 			Commons.checkSessionTimeOut( function( sessionExpired, sessionTimeOut ){
@@ -92,7 +92,7 @@ function Counsellor( storageObj, translationObj )
 					
 				}
 			});			
-		}, Commons.intervalCheckSession);
+		}, Commons.intervalCheckSession); */
 		
 		
 		// Check Internet connectivity if it is loss. 
