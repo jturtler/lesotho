@@ -3,28 +3,30 @@ function SessionTimeOutPicker( mainPage )
 {
 	var me = this;
 	me.mainPage = mainPage;
-	me.translationObj = mainPage.translationObj;
 
 	me.sessionTimeOutTag = $("#sessionTimeOut");
 	me.dialogFormTag = $("#extendSessionTimeout");
 	
 	me.init = function()
 	{
+		if( mainPage != undefined )
+		{
+			me.translationObj = mainPage.translationObj;
+		}
+		
 		me.FormPopupSetup();
 		
-		Commons.checkSession( function( expiredSession ){
+		me.updateSessionTimeout();
+		
+		// Monitor the session expired, run every 5 seconds
+		setInterval(function() {
+			
 			me.updateSessionTimeout();
 			
-			// Monitor the session expired, run every 5 seconds
-			setInterval(function() {
-				
-				me.updateSessionTimeout();
-				
-			}, 60000); // Update every 1 minute
-			
-			me.checkAndExtendSessionTimeOut();
-		});
+		}, Commons.intervalCheckSession ); // Update every 1 minute
 		
+
+		me.checkAndExtendSessionTimeOut();
 	};
 	
 	
@@ -117,6 +119,8 @@ function SessionTimeOutPicker( mainPage )
 	{
 		me.dialogFormTag.dialog( "open" );
 	}
+	
+	
 	
 	// -------------------------------------------------------------------------
 	// RUN init method

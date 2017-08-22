@@ -70,31 +70,6 @@ function Counsellor( storageObj, translationObj )
 		// Init sesstion clock
 		new SessionTimeOutPicker( me );
 		
-		/* // Monitor the session expired, run every 5 seconds
-		setInterval(function() {
-			
-			Commons.checkSessionTimeOut( function( sessionExpired, sessionTimeOut ){
-				if( sessionExpired )
-				{
-					var sessionExpiredText = me.translationObj.getTranslatedValueByKey( "session_msg_checkedSessionExpired" );
-					var loginAgainText = me.translationObj.getTranslatedValueByKey( "session_msg_loginAgain" );
-					me.settingsManagement.showExpireSessionMessage();	
-					alert( sessionExpiredText + ". " + loginAgainText );
-				}
-				else
-				{
-					var fiveMinutes = 5 * 60 * 1000;
-					if( sessionTimeOut == fiveMinutes ) // 5 minute left
-					{
-						var sessionExpiredText = me.translationObj.getTranslatedValueByKey( "session_msg_sessionExpiredafter5Minutes" );
-						alert(sessionExpiredText);
-					}
-					
-				}
-			});			
-		}, Commons.intervalCheckSession); */
-		
-		
 		// Check Internet connectivity if it is loss. 
 		// Run every 10 seconds
 		setInterval(function() {

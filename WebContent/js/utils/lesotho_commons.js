@@ -16,7 +16,7 @@ Commons.APPPAGE_COUNSELLOR = "counsellor";
 
 
 Commons.sessionTimeOut = 60 * 60 * 1000;; // Get from [web.xml] configuration file
-Commons.intervalCheckSession = 5000; // 5 seconds;
+Commons.intervalCheckSession = 60000; // 1 minute
 
 Commons.checkSession = function( returnFunc )
 {		
@@ -31,6 +31,9 @@ Commons.checkSession = function( returnFunc )
 			if( !expired )
 			{
 				Commons.sessionTimeOut = eval( response.sessionTimeOut ) * 1000; // convert seconds to miliseconds
+				
+				var sessionTimeOutPicker = new SessionTimeOutPicker();
+				sessionTimeOutPicker.updateSessionTimeout();
 			}
 			
 			returnFunc( !expired );
