@@ -1777,7 +1777,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.addEventFormTag.closest("form").prepend( "<div id='activeEventHeader' class='testMsg'>" + translatedByText + " '<span>" + me.userFullNameTag.html() + "</span>'</div>" );
 		
 		translatedByText = me.translationObj.getTranslatedValueByKey( "dataEntryForm_tab_thisTest_msg_alreadyTodayTest" );	
-		me.addEventFormTag.closest("form").prepend( "<div id='notAllowToCreateEventHeader' class='testMsg' style='display:none;'>" + translatedByText + "</div>" );
+		me.addEventFormTag.closest("form").prepend( "<div id='notAllowToCreateEventHeader' class='testMsg' style='display:none;color:red'>" + translatedByText + "</div>" );
 		
 		
 		// ---------------------------------------------------------------------
@@ -3417,7 +3417,13 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			me.saveClientAfter( JSON.parse( me.addClientFormTabTag.attr("client") ), exeFunc, undefined, false );
 
 			// Not allow to create a new event if there is one event today
-			if( me.isTodayEvent( jsonEvent ) )
+			
+			
+			var jsonClient = JSON.parse( me.addClientFormTabTag.attr( "client" ) );
+			var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
+			var surName = me.getAttributeValue( jsonClient, me.attr_LastName ).toUpperCase();
+			
+			if( me.isTodayEvent( jsonEvent ) && !(( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )))
 			{
 				Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, true );
 				me.notAllowToCreateEventHeaderTag.show();
@@ -3680,8 +3686,12 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		// STEP 9. Set up data in "This Test" tab
 		me.setUp_DataInThisTestTab( activeHIVTestingEvent, data.partner );
 		
-		// STEP 10. Not allow to create a new event if there is one event today
-		if( me.addEventFormTag.attr( "event") == undefined && todayEvent )
+		// STEP 10. Except EQC client, Don't not allow to create a new event if there is one event today.
+		var jsonClient = JSON.parse( me.addClientFormTabTag.attr( "client" ) );
+		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
+		var surName = me.getAttributeValue( jsonClient, me.attr_LastName ).toUpperCase();
+		
+		if( me.addEventFormTag.attr( "event") == undefined && todayEvent && !(( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )) )
 		{
 			Util.disableTag( me.showEventSaveOptionDiaglogBtnTag, true );
 			me.notAllowToCreateEventHeaderTag.show();

@@ -18,15 +18,15 @@ function SessionTimeOutPicker( mainPage )
 		
 		me.updateSessionTimeout();
 		
-		// Monitor the session expired, run every 5 seconds
-		setInterval(function() {
-			
-			me.updateSessionTimeout();
-			
-		}, Commons.intervalCheckSession ); // Update every 1 minute
+//		// Monitor the session expired, run every 5 seconds
+//		setInterval(function() {
+//			
+//			me.updateSessionTimeout();
+//			
+//		}, Commons.intervalCheckSession ); // Update every 1 minute
 		
 
-		me.checkAndExtendSessionTimeOut();
+//		me.checkAndExtendSessionTimeOut();
 	};
 	
 	
@@ -61,8 +61,9 @@ function SessionTimeOutPicker( mainPage )
 	{
 		// Monitor the session expired, run every 5 seconds
 		setInterval(function() {
-			
 			Commons.checkSessionTimeOut( function( sessionExpired, sessionTimeOut ){
+
+				console.log('=== sessionTimeOut : ' + sessionTimeOut);
 				if( sessionExpired )
 				{
 					var sessionExpiredText = me.translationObj.getTranslatedValueByKey( "session_msg_checkedSessionExpired" );
@@ -77,10 +78,14 @@ function SessionTimeOutPicker( mainPage )
 					{
 						me.openForm();
 					}
+					else
+					{
+						me.updateSessionTimeout();
+					}
 					
 				}
 			});			
-		}, Commons.intervalCheckSession);
+		}, Commons.intervalCheckSession );
 		
 	};
 	

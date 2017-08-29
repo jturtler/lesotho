@@ -2,7 +2,7 @@
 function Commons() {}
 
 Commons.VERSION = "v0.44";
-Commons.VERSION_DATE = "Aug 22 2017";
+Commons.VERSION_DATE = "Aug 29 2017";
 Util.SITE_INFO = "This is developing site";
 
 Commons.wsUrl = "lesotho";
@@ -57,6 +57,10 @@ Commons.checkForSessionExpired = function( response )
 
 Commons.checkSessionTimeOut = function( returnFunc )
 {
+
+	console.log('--- sessionTimeOut : ' + Commons.sessionTimeOut);
+	console.log('intervalCheckSession : ' + Commons.intervalCheckSession);
+	
 	Commons.sessionTimeOut = Commons.sessionTimeOut - Commons.intervalCheckSession;
 	var expired = ( Commons.sessionTimeOut <=0 );
 	returnFunc( expired, Commons.sessionTimeOut );

@@ -68,7 +68,8 @@ function Counsellor( storageObj, translationObj )
 		
 		
 		// Init sesstion clock
-		new SessionTimeOutPicker( me );
+		var sessionTimeOutPicker = new SessionTimeOutPicker( me );
+		sessionTimeOutPicker.checkAndExtendSessionTimeOut();
 		
 		// Check Internet connectivity if it is loss. 
 		// Run every 10 seconds
