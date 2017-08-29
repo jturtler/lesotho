@@ -58,19 +58,9 @@ function Coordinator( storageObj, translationObj )
 		} );
 
 		
-		// Monitor the session expired, run every 10 seconds
-		setInterval(function() {
-			
-			Commons.checkSessionTimeOut( function( sessionExpired ){
-				if( sessionExpired )
-				{
-					var sessionExpiredText = me.translationObj.getTranslatedValueByKey( "session_msg_checkedSessionExpired" );
-					var loginAgainText = me.translationObj.getTranslatedValueByKey( "session_msg_loginAgain" );
-					me.settingsManagement.showExpireSessionMessage();	
-					alert( sessionExpiredText + ".\n" + loginAgainText );
-				}
-			});			
-		}, 5000);
+
+		var sessionTimeOutPicker = new SessionTimeOutPicker( me );
+		sessionTimeOutPicker.checkAndExtendSessionTimeOut();
 		
 		
 		// Check Internet connectivity if it is loss. 
