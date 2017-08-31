@@ -101,8 +101,8 @@ function SessionTimeOutPicker( mainPage )
 		me.dialogFormTag.dialog({
 		  autoOpen: false
 		  ,dialogClass: "noTitleStuff"
-		  ,width: me.width
-		  ,height: me.height				  
+		  ,width: 350
+		  ,height: 150				  
 		  ,modal: true				
 		  ,buttons: {
 			"OK": function() {
