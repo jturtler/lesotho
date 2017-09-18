@@ -50,6 +50,9 @@ function CoordinatorListManagement( _mainPage )
 	
 	me.backToCaseListBtnTag = $("[name='backToCaseListBtn']");
 	
+	
+	me.userFullNameTag = $("[name='userFullName']");
+	
 	// -------------------------------------------------------------------------
 	// IDs
 	// -------------------------------------------------------------------------
@@ -445,42 +448,46 @@ function CoordinatorListManagement( _mainPage )
 				if( openingARTEvent != "" )
 				{	
 					var hasCurrentUserEvent = false;
+
+					// ---------------------------------------------------------
+					// Client Info
+					// ---------------------------------------------------------
+					
+					var clientId = clientData[0];
+					var cuic = clientData[1];
 					
 					// ---------------------------------------------------------
 					// [HIV Testing]
 					// ---------------------------------------------------------
 					
 					// Event date
-					var eventDate = clientData[0];
+					var eventDate = clientData[2];
 					eventDateStr = Util.formatDate_DisplayDate( eventDate );
 					var eventKey = eventDate.substring(11, 19).split(":").join("");
 					
+					
 					// Event Id && Day Since Diagnosis
-					var HIVTestingEvent = JSON.parse( clientData[1] );
-					var eventId = HIVTestingEvent.eventId;
-					var daySinceDiagnosis = parseInt( HIVTestingEvent.daySinceDiagnosis );
-					
-					
-					// ---------------------------------------------------------
-					// Client Info
-					// ---------------------------------------------------------
-					
-					var clientId = clientData[2];
-					var cuic = clientData[3];
+					var eventId = clientData[3];
+					var daySinceDiagnosis = parseInt( clientData[4] );
 					
 					
 					// ---------------------------------------------------------
 					// Council code and name
 					// ---------------------------------------------------------
-					
-					var councilData = clientData[4];
+
+					var councilCode = clientData[5];
 					var councilName = "";
-					var councilCode = "";
-					if( councilData!= "" )
+					if( councilCode != "" )
 					{
-						councilData = JSON.parse( councilData );
-						councilName = councilData.name;
-						councilCode = councilData.code;
+						var searched = Util.findItemFromList( me.filterCouncils, "code", councilCode );
+						if( searched != undefined )
+						{
+							councilName = searched.name;
+						}
+						else
+						{
+							councilName = councilCode;
+						}
 					}
 					else
 					{
@@ -490,15 +497,28 @@ function CoordinatorListManagement( _mainPage )
 					// ---------------------------------------------------------
 					// [ART Opening] event data
 					// ---------------------------------------------------------
-					
-					var openingARTEvent = JSON.parse( "[" + openingARTEvent + "]" );
-					var facilityName = "";
-					var facilityCode = "";
-					var latestEventId = openingARTEvent[0].eventId;
-					openingARTEventDate = openingARTEvent[0].eventDate;
+
+					var latestEventId = clientData[6];
+					var openingARTEventDate = clientData[7];
+					var facilityCode = clientData[8];
+					var facilityName = clientData[9];
 					var openingARTEventName = me.settingsManagement.ARTReferralOpeningStage_Name;
 					
-					for( var j in openingARTEvent )
+					if( facilityName == "" )
+					{
+						var searched = Util.findItemFromList( me.filterHealthFacilities, "code", facilityCode );
+						if( searched != undefined )
+						{
+							facilityName = searched.name;
+						}
+						else
+						{
+							facilityName = facilityCode;
+						}
+					}
+					
+					
+					/* for( var j in openingARTEvent )
 					{
 						var event = openingARTEvent[j];
 						if( event.eventId == latestEventId )
@@ -518,7 +538,7 @@ function CoordinatorListManagement( _mainPage )
 						{
 							hasCurrentUserEvent = true;
 						}
-					}
+					} 
 					
 					if( facilityName == "" )
 					{
@@ -527,81 +547,37 @@ function CoordinatorListManagement( _mainPage )
 						{
 							facilityName = searched.name;
 						}
-					}
+					} */
 					
 					// ---------------------------------------------------------
 					// [Contact log] event data
 					// ---------------------------------------------------------
 					
-					if( cuic == "130104T1T102" )
+					var contactLogEventDate = clientData[10];
+					var contactLogEventContactType = clientData[11];
+					var contactLogDueDate = clientData[12];
+					var contactLogNextAction = clientData[13];
+
+					// Check if current user has any event
+					var hasCurrentUserEvent = false;
+					var countContactLogEvents = eval( clientData[14] );
+					var openingEventUsername = clientData[15];
+					if( countContactLogEvents > 0 || openingEventUsername == currentUsername )
 					{
-						var fsad = 0;
+						hasCurrentUserEvent = true;
 					}
-					var contactLogEvent = clientData[6];
-					var contactLogEventDate = "";
-					var contactLogEventContactType = "";
-					var contactLogDueDate = "";
-					var contactLogNextAction = "";
-					
-					if( contactLogEvent != "" )
-					{
-						contactLogEvent = JSON.parse( "[" + contactLogEvent + "]" );
-						contactLogEvent = Util.sortDescByKey( contactLogEvent, "eventDate" );
-						var latestEventId = contactLogEvent[0].eventId;
-						contactLogEventDate = contactLogEvent[0].eventDate;
-						for( var j in contactLogEvent )
-						{
-							var event = contactLogEvent[j];
-							if( event.eventId == latestEventId )
-							{
-								if( event.deId == me.de_contactLog_lastActionName )
-								{
-									contactLogEventContactType = event.datavalue;
-									var searched = Util.findItemFromList( me.contactLogTypeName, "code", contactLogEventContactType );
-									if( searched )
-									{
-										contactLogEventContactType = searched.name;
-									}
-								}
-								else if( event.deId == me.de_contactLog_nextActionName )
-								{
-									contactLogNextAction = event.datavalue;
-									var searched = Util.findItemFromList( me.nextActionName, "code", contactLogNextAction );
-									if( searched )
-									{
-										contactLogNextAction = searched.name;
-									}
-								}
-								else if( event.deId == me.de_contactLog_dueDate )
-								{
-									contactLogDueDate = event.datavalue;
-								}	
-							}
-							
-							// Check if current user has any event
-							if( event.username == currentUsername && !hasCurrentUserEvent )
-							{
-								hasCurrentUserEvent = true;
-							}
-						}
-						
-					}
-					
 					
 					// ---------------------------------------------------------
 					// [ART Closure] event
 					// ---------------------------------------------------------
-					
-					var closureARTEvent = clientData[7];
+
 					var isClosureEvent = false;
-					var closureARTEventDate = "";
-					var closureEventLinkageOutcome = "";
-					if( closureARTEvent != "" )
+					var closureARTEventDate = clientData[16];
+					var closureARTEventUsername = clientData[17];
+					var closureEventLinkageOutcome = clientData[18];
+					if( closureEventLinkageOutcome != "" )
 					{
 						isClosureEvent = true;
-						closureARTEvent = JSON.parse( closureARTEvent );
-						closureARTEventDate = closureARTEvent.eventDate;
-						closureEventLinkageOutcome = closureARTEvent.datavalue;
 						var searched = Util.findItemFromList( me.closureARTStatus, "code", closureEventLinkageOutcome);
 						if( searched )
 						{
@@ -609,7 +585,7 @@ function CoordinatorListManagement( _mainPage )
 						}
 						
 						// Check if current user has any event
-						if( closureARTEvent.username == currentUsername && !hasCurrentUserEvent )
+						if( closureARTEventUsername == currentUsername )
 						{
 							hasCurrentUserEvent = true;
 						}
