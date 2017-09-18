@@ -477,12 +477,16 @@ function CoordinatorListManagement( _mainPage )
 
 					var councilCode = clientData[5];
 					var councilName = "";
-					if( councilCode!= "" )
+					if( councilCode != "" )
 					{
 						var searched = Util.findItemFromList( me.filterCouncils, "code", councilCode );
 						if( searched != undefined )
 						{
-							facilityName = searched.name;
+							councilName = searched.name;
+						}
+						else
+						{
+							councilName = councilCode;
 						}
 					}
 					else
@@ -497,15 +501,19 @@ function CoordinatorListManagement( _mainPage )
 					var latestEventId = clientData[6];
 					var openingARTEventDate = clientData[7];
 					var facilityCode = clientData[8];
-					var facilityName = "";
+					var facilityName = clientData[9];
 					var openingARTEventName = me.settingsManagement.ARTReferralOpeningStage_Name;
 					
-					if( facilityName != "" )
+					if( facilityName == "" )
 					{
 						var searched = Util.findItemFromList( me.filterHealthFacilities, "code", facilityCode );
 						if( searched != undefined )
 						{
 							facilityName = searched.name;
+						}
+						else
+						{
+							facilityName = facilityCode;
 						}
 					}
 					
@@ -530,7 +538,7 @@ function CoordinatorListManagement( _mainPage )
 						{
 							hasCurrentUserEvent = true;
 						}
-					} */
+					} 
 					
 					if( facilityName == "" )
 					{
@@ -539,21 +547,21 @@ function CoordinatorListManagement( _mainPage )
 						{
 							facilityName = searched.name;
 						}
-					}
+					} */
 					
 					// ---------------------------------------------------------
 					// [Contact log] event data
 					// ---------------------------------------------------------
 					
-					var contactLogEventDate = clientData[9];
-					var contactLogEventContactType = clientData[10];
-					var contactLogDueDate = clientData[11];
-					var contactLogNextAction = clientData[12];
+					var contactLogEventDate = clientData[10];
+					var contactLogEventContactType = clientData[11];
+					var contactLogDueDate = clientData[12];
+					var contactLogNextAction = clientData[13];
 
 					// Check if current user has any event
 					var hasCurrentUserEvent = false;
-					var countContactLogEvents = eval( clientData[13] );
-					var openingEventUsername = clientData[14];
+					var countContactLogEvents = eval( clientData[14] );
+					var openingEventUsername = clientData[15];
 					if( countContactLogEvents > 0 || openingEventUsername == currentUsername )
 					{
 						hasCurrentUserEvent = true;
@@ -564,9 +572,9 @@ function CoordinatorListManagement( _mainPage )
 					// ---------------------------------------------------------
 
 					var isClosureEvent = false;
-					var closureARTEventDate = clientData[15];
-					var closureARTEventUsername = clientData[16];
-					var closureEventLinkageOutcome = clientData[17];
+					var closureARTEventDate = clientData[16];
+					var closureARTEventUsername = clientData[17];
+					var closureEventLinkageOutcome = clientData[18];
 					if( closureEventLinkageOutcome != "" )
 					{
 						isClosureEvent = true;
