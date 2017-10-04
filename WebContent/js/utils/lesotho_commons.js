@@ -1,8 +1,8 @@
 
 function Commons() {}
 
-Commons.VERSION = "v0.45";
-Commons.VERSION_DATE = "Sep 18 2017";
+Commons.VERSION = "v0.46";
+Commons.VERSION_DATE = "Oct 05 2017";
 Util.SITE_INFO = "This is training site";
 
 Commons.wsUrl = "ls-train";
