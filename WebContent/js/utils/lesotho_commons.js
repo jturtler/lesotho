@@ -3,9 +3,10 @@ function Commons() {}
 
 Commons.VERSION = "v0.46";
 Commons.VERSION_DATE = "Oct 05 2017";
-Util.SITE_INFO = "";
+Util.SITE_INFO = "This is training site";
 
-Commons.wsUrl = "ls";
+Commons.wsUrl = "ls-train";
+
 Commons.dateFormat = "DD MMM YYYY";
 Commons.dateTimeFormat = "YYYY-MM-DD HH:mm";
 Commons.monthYearFormat = "MMM YYYY";
@@ -56,10 +57,15 @@ Commons.checkForSessionExpired = function( response )
 
 Commons.checkSessionTimeOut = function( returnFunc )
 {
+
+	console.log('--- sessionTimeOut : ' + Commons.sessionTimeOut);
+	console.log('intervalCheckSession : ' + Commons.intervalCheckSession);
+	
 	Commons.sessionTimeOut = Commons.sessionTimeOut - Commons.intervalCheckSession;
 	var expired = ( Commons.sessionTimeOut <=0 );
 	returnFunc( expired, Commons.sessionTimeOut );
 };
+
 
 Commons.ping = function( returnFunc )
 {

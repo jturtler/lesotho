@@ -277,6 +277,8 @@ function CoordinatorListManagement( _mainPage )
 	
 	me.listTodayCases = function( exeFunc )
 	{
+		me.loadingDivTag.show();
+		
 		me.mainPage.setCurrentPage( me.settingsManagement.PAGE_TODAY_FU_LIST );
 		me.storageObj.addItem( "page", me.mainPage.settingsManagement.PAGE_TODAY_FU_LIST );
 		me.storageObj.removeItem( "subPage" );		
@@ -294,7 +296,8 @@ function CoordinatorListManagement( _mainPage )
 			
 			if( exeFunc !== undefined ) exeFunc();
 			
-			// Show table			
+			// Show table
+			me.loadingDivTag.hide();
 			MsgManager.appUnblock();
 		} );
 	}
@@ -309,7 +312,7 @@ function CoordinatorListManagement( _mainPage )
 		Util.resetPageDisplay();
 		MsgManager.appBlock( tranlatedText + " ..." );
 		
-		me.loadingDivTag.hide();
+		me.loadingDivTag.show();
 		me.reloadAllCases( function(){
 			me.allFUTblTag.show();
 			me.allFUListTag.show("fast");
@@ -317,6 +320,7 @@ function CoordinatorListManagement( _mainPage )
 			if( exeFunc !== undefined ) exeFunc();
 			
 			// Show table	
+			me.loadingDivTag.hide();
 			MsgManager.appUnblock();
 			
 			me.allFUNumberTag.html( me.allFUTblTag.find("tbody").find("tr:visible").length );

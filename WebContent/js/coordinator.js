@@ -261,8 +261,8 @@ function Coordinator( storageObj, translationObj )
 		}
 		else
 		{
-			me.listManagement.listTodayCases(function(){
-				me.loadSearchSubPage( me.todayCaseTblTag, subPage );
+			me.listManagement.listAllCase(function(){
+				me.loadSearchSubPage( me.listManagement.allFUTblTag, subPage );
 			});
 		}
 		
@@ -332,7 +332,7 @@ function Coordinator( storageObj, translationObj )
 		var page = me.storageObj.getItem( "page" );
 		if( page == "" )
 		{
-			me.listManagement.listTodayCases();
+			me.listManagement.listAllCase();
 		}
 		else
 		{
