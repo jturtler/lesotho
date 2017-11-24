@@ -5,7 +5,7 @@ Commons.VERSION = "v0.47";
 Commons.VERSION_DATE = "Oct 09 2017";
 Util.SITE_INFO = "This is training site";
 
-Commons.wsUrl = "ls-train";
+Commons.wsUrl = "ls-dev";
 
 Commons.dateFormat = "DD MMM YYYY";
 Commons.dateTimeFormat = "YYYY-MM-DD HH:mm";

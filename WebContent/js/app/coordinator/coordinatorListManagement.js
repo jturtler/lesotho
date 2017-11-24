@@ -943,6 +943,19 @@ function CoordinatorListManagement( _mainPage )
 	{
 		var districts = Util.getCheckedInputTexts( me.districtFilterTbTag );
 		var councils = Util.getCheckedInputTexts( me.councilFilterTbTag );
+		
+		var placeOfResidenceChecked = me.placeOfResidenceChkTag.prop("checked");
+		var facilityReferredToChecked = me.facilityReferredToChkTag.prop("checked");
+		if( placeOfResidenceChecked )
+		{
+			councils = Util.getCheckedInputTexts( me.councilFilterTbTag );
+		}
+		else
+		{
+			councils = Util.getCheckedInputTexts( me.healthFacilityFilterTbTag );
+		}
+		
+		
 		var noneFilter = "[" + me.translationObj.getTranslatedValueByKey( "allFU_filterBy_ouNone" ) + "]";
 		
 		me.districtFilterInfoTag.html( noneFilter );
