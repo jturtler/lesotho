@@ -954,7 +954,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				else if( attrId === me.de_Testing_ResultSDBioline )
 				{
 					var result = me.resultTestResultSDBiolineTag.val();
-					if( me.resultTestResultSDBiolineTag.val() == "Indeterminate out of stock" )
+					if( me.resultTestResultSDBiolineTag.val() == "Indeterminate out of stock"
+						|| me.resultTestResultSDBiolineTag.val() == "Positive" )
 					{
 						result = "Indeterminate";
 					}
@@ -1511,13 +1512,24 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			// Set Date picker for [Date of ART enrollment]
 			var openingEventDate = JSON.parse( me.artReferOpenFormTag.attr("event") );
 			var dateARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );		
-			Util.datePicker_SetDateRange( dateARTEnrollmentTag, openingEventDate.eventDate, Util.convertDateObjToStr( new Date() ) );
+//			Util.datePicker_SetDateRange( dateARTEnrollmentTag, openingEventDate.eventDate, Util.convertDateObjToStr( new Date() ) );
+			var minDate = new Date();
+			minDate.setFullYear( minDate.getFullYear() - 100 );
+			minDate = Util.convertDateObjToStr( minDate );
+			var maxDate = Util.convertDateStrToObject( openingEventDate.eventDate );
+			maxDate.setDate( maxDate.getDate() - 1 );
+			maxDate = Util.convertDateObjToStr( maxDate );
+			Util.datePicker_SetDateRange( dateARTEnrollmentTag, minDate, maxDate );
+			
 			dateARTEnrollmentTag.change();
 			
 			// Show/Hide [Other facility name]
 			var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
 			var specialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
 			me.setHideLogicTag( specialOtherFacilityNameTag, !( closeReferFacilityNameTag.val() == "Other" ) );
+			
+			var artClosure_TimeElapsedTag = me.getAttributeField( me.attr_ARTClosure_TimeElapsed );
+			Util.disableTag( artClosure_TimeElapsedTag, true );
 		}
 		else if( closureLinkageOutcomeVal == "DROPPED" )
 		{
@@ -4555,7 +4567,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			if( me.resultTestResultSDBiolineTag.val() != "" )
 			{
 				var result = me.resultTestResultSDBiolineTag.val();
-				if( me.resultTestResultSDBiolineTag.val() == "Indeterminate out of stock" )
+				if( me.resultTestResultSDBiolineTag.val() == "Indeterminate out of stock"
+					|| me.resultTestResultSDBiolineTag.val() == "Positive" )
 				{
 					result = "Indeterminate";
 				}
