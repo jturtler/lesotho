@@ -414,6 +414,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				if( me.showOpeningTag )
 				{
 					me.setARTLinkageStatusAttrValue();
+					me.showDateClientReferredARTOn();
 					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
 				}
 			} );
@@ -635,7 +636,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				var clientData = me.addClientFormTabTag.attr( "client", JSON.stringify( jsonClient ) );
 				
 				me.saveClientAndEvent( me.artReferCloseFormTag, me.stage_ARTReferralClosure, function( response ){
-					Util.disableForm( me.thisTestDivTag, true );				
+					Util.disableForm( me.thisTestDivTag, true );
+					me.showDateClientReferredARTOn();
 					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
 					Util.disableForm( me.artReferOpenFormTag, true );
 				} );
@@ -647,6 +649,17 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		
 		me.setUp_validationCheck( me.artReferCloseFormTag.find( 'input,select' ) );
 	};
+	
+	me.showDateClientReferredARTOn = function()
+	{
+		var artHIVTestingEvent = me.addClientFormTabTag.attr("artHIVTestingEvent");
+		if( artHIVTestingEvent != undefined )
+		{
+			artHIVTestingEvent = JSON.parse( artHIVTestingEvent );
+			var eventDateStr = Util.formatDate_DisplayDate( artHIVTestingEvent.eventDate );
+			me.artEventInfoTbTag.find("span.dateClientReferredARTOn").html( eventDateStr );
+		}
+	}
 	
 	
 	me.calulate_ARTClosureTimeElapsed = function()
@@ -1512,14 +1525,13 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			// Set Date picker for [Date of ART enrollment]
 			var openingEventDate = JSON.parse( me.artReferOpenFormTag.attr("event") );
 			var dateARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );		
-//			Util.datePicker_SetDateRange( dateARTEnrollmentTag, openingEventDate.eventDate, Util.convertDateObjToStr( new Date() ) );
 			var minDate = new Date();
 			minDate.setFullYear( minDate.getFullYear() - 100 );
 			minDate = Util.convertDateObjToStr( minDate );
-			var maxDate = Util.convertDateStrToObject( openingEventDate.eventDate );
-			maxDate.setDate( maxDate.getDate() - 1 );
-			maxDate = Util.convertDateObjToStr( maxDate );
-			Util.datePicker_SetDateRange( dateARTEnrollmentTag, minDate, maxDate );
+//			var maxDate = Util.convertDateStrToObject( openingEventDate.eventDate );
+//			maxDate.setDate( maxDate.getDate() - 1 );
+//			maxDate = Util.convertDateObjToStr( maxDate );
+			Util.datePicker_SetDateRange( dateARTEnrollmentTag, minDate, Util.convertDateObjToStr( new Date() ) );
 			
 			dateARTEnrollmentTag.change();
 			
@@ -2409,6 +2421,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		// ---------------------------------------------------------------------
 		// [New Test] Tab
 		
+		me.notAllowToCreateEventHeaderTag.hide();
+		me.activeEventHeaderTag.hide();
 		me.hideIconInTab( me.TAB_NAME_THIS_TEST );
 		me.setUp_DataEntryFormInputTagEvent();
 		
@@ -2418,7 +2432,6 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			me.setHideLogicTag( $(this), false );
 		});
 		
-		me.activeEventHeaderTag.hide();
 		
 		// Enable the form for entering data
 		me.disableDataEtryForm( false );
@@ -2543,6 +2556,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		// ---------------------------------------------------------------------
 		// [Opening ART Refer] Tab
 
+		me.showDateClientReferredARTOn();
 		me.showIconInTab( me.TAB_NAME_ART_REFER );
 		
 		var noneStatusStr = me.translationObj.getTranslatedValueByKey( "artRefer_tab_msg_statusNone" );
@@ -3894,6 +3908,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		}
 		else
 		{
+			me.showDateClientReferredARTOn();
 			me.showIconInTab( me.TAB_NAME_ART_REFER );
 		}
 		
@@ -3970,7 +3985,14 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			// Set Date picker for [Date of ART enrollment]
 			var openingEventDate = JSON.parse( me.artReferOpenFormTag.attr("event") );
 			var dateARTEnrollmentTag = me.getAttributeField( me.attr_Date_Of_ART_Enrollment );		
-			Util.datePicker_SetDateRange( dateARTEnrollmentTag, openingEventDate.eventDate, Util.convertDateObjToStr( new Date() ) );
+			
+			var minDate = new Date();
+			minDate.setFullYear( minDate.getFullYear() - 100 );
+			minDate = Util.convertDateObjToStr( minDate );
+//			var maxDate = Util.convertDateStrToObject( openingEventDate.eventDate );
+//			maxDate.setDate( maxDate.getDate() - 1 );
+//			maxDate = Util.convertDateObjToStr( maxDate );
+			Util.datePicker_SetDateRange( dateARTEnrollmentTag, minDate, Util.convertDateObjToStr( new Date() ) );
 			dateARTEnrollmentTag.change();
 			
 			// Show/Hide [Other facility name]
@@ -4050,9 +4072,10 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 
 			if( finalHIVTestValue == "Positive" && ( artValue == "true" || becomeIndexLeadVal == "true" ) && testResultGivenValue == "true" )
 			{
-				var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
+//				me.showDateClientReferredARTOn();
 				
 				// STEP 2. For [Coordinator] 
+				var consentToContactTag = me.getAttributeField( me.attr_ConsentToContact );
 				if( consentToContactTag.val() != "" )
 				{
 					me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
@@ -4076,6 +4099,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		}
 		else
 		{
+			me.showDateClientReferredARTOn();
 			me.showIconInTab( me.TAB_NAME_ART_REFER );
 			me.artReferCloseFormTag.hide();
 		}
