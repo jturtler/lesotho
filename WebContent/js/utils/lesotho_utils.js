@@ -731,6 +731,28 @@ Util.datePicker = function( dateTag )
 	
 };
 
+
+// Date FOR pass and future
+Util.freeDatePicker = function( dateTag )
+{
+	dateTag.attr( "readonly", true );
+	
+	dateTag.datetimepicker({
+		viewMode: 'years'
+        ,format: Commons.dateFormat
+        ,widgetPositioning: { 
+            vertical: 'bottom'
+        }
+		,ignoreReadonly: true
+        ,showClear: true
+     });
+	 
+	dateTag.on('dp.change', function(e){ 
+		dateTag.change();
+	});
+	
+};
+
 Util.monthYearPicker = function( dateTag )
 {
 	dateTag.attr( "readonly", true );
