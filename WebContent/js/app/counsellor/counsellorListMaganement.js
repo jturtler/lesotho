@@ -222,7 +222,7 @@ function CounsellorListMaganement( _mainPage  )
 				var clientId = event[0];
 				var eventId = event[1];
 				var eventDate = event[2];
-				var deResult1 = event[3];
+				var hivTestResult = event[3];
 				var cuic = event[4];
 				var ouName = event[6];
 				
@@ -231,31 +231,40 @@ function CounsellorListMaganement( _mainPage  )
 				// Set status icon
 				// -------------------------------------------------------------
 
-				var testResultTag = $( "<td>" + deResult1 + "</td>" );
+				var testResultTag = $( "<td>" + hivTestResult + "</td>" );
 				
 				var eventStatus = event[7];
 				var hasContactData = ( event[8] == 5 );
-				var hasOpenARTEvent = ( event[9] != "" );
+				var hasOpenARTEvent = ( event[9] != null &&  event[9] != "" );
 				var artValue = ( event[10] == "true" );
+				var hasOpenPrepReferEvent = ( event[11] != null && event[11] != "" );
 				
 				
 				//For both Negative and Positive, in red if the test has not been completed, in green if it has been completed
 				var statusColor = ( eventStatus == "COMPLETED" ) ? "green" : "red"; 
 				testResultTag.append("<span class='glyphicon glyphicon-lock' style='color:" + statusColor + ";padding-left:5px;'></span>");
 			
-				if( deResult1 == "Positive" )
-				{	
-					//For Positives only, in red if the mandatory fields in Contact Log - LS LOG 1 and LS LOG 2 have not been completed, if it has been: green
+				if(  hivTestResult == "Positive" || hivTestResult == "Negative" )
+				{
+					//For Positives only (???), in red if the mandatory fields in Contact Log - LS LOG 1 and LS LOG 2 have not been completed, if it has been: green
 					resultColor = ( hasContactData ) ? "green" : "red"; 
 					testResultTag.append("<span class='glyphicon glyphicon-user' style='color:" + resultColor + ";padding-left:5px;'></span>");
 					
-										
-					//For Positives only, in red if the Referral Opening event does not exist, green if it does
-					// resultColor = ( artValue && hasOpenARTEvent ) ? "green" : "red"; 
-					resultColor = ( hasOpenARTEvent ) ? "green" : "red"; 
-					testResultTag.append("<span class='glyphicon glyphicon-plus' style='color:" + resultColor + ";padding-left:5px;'></span>");
+					if( hivTestResult == "Positive" )
+					{						
+						//For Positives only, in red if the ART Referral Opening event does not exist, green if it does
+						// resultColor = ( artValue && hasOpenARTEvent ) ? "green" : "red"; 
+						resultColor = ( hasOpenARTEvent ) ? "green" : "red"; 
+						testResultTag.append("<span class='glyphicon glyphicon-plus' style='color:" + resultColor + ";padding-left:5px;'></span>");
+					}
+					else if( hivTestResult == "Negative" )
+					{		
+						// For Negative only, in red if the PrEP Referral Opening event does not exist, green if it does
+						// resultColor = ( artValue && hasOpenARTEvent ) ? "green" : "red"; 
+						resultColor = ( hasOpenPrepReferEvent ) ? "green" : "red"; 
+						testResultTag.append("<span class='glyphicon glyphicon-minus' style='color:" + resultColor + ";padding-left:5px;'></span>");
+					}
 				}
-				
 				
 				// -------------------------------------------------------------
 				// Event date
@@ -303,7 +312,7 @@ function CounsellorListMaganement( _mainPage  )
 				var clientId = event[0];
 				var eventId = event[1];
 				var eventDate = event[2];
-				var deResult1 = event[3];
+				var hivTestResult = event[3];
 				var cuic = event[4];
 				var noTest = event[5];
 				var ouName = event[6];
@@ -323,7 +332,7 @@ function CounsellorListMaganement( _mainPage  )
 				rowTag.append( "<td>" + cuic + "</td>" );
 				rowTag.append( "<td>" + ouName + "</td>" );
 				rowTag.append( "<td>" + noTest + "</td>" );
-				rowTag.append( "<td>" + deResult1 + "</td>" );
+				rowTag.append( "<td>" + hivTestResult + "</td>" );
 				
 				me.addEventForRowInList(rowTag);
 				
