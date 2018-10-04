@@ -1,7 +1,7 @@
 
 function Commons() {}
 
-Commons.VERSION = "v0.52";
+Commons.VERSION = "v0.51";
 Commons.VERSION_DATE = "Sep 22 2018";
 Util.SITE_INFO = "This is developing site";
 

@@ -776,7 +776,7 @@ tr.actionBar th
 
 .divRow
 {
-   /* display:table-row; */
+   display:table-row;
    width:auto;
 }
 
