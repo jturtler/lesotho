@@ -149,6 +149,14 @@ public final class Util
     public static final String ID_ATTR_DISTRICTOB = "u57uh7lHwF8";
     public static final String ID_ATTR_CLIENT_CUIC = "rw3W9pDCPb2";
     public static final String ID_ATTR_BIRTHORDER ="vTPYC9BXPNn";
+
+    public static final String ID_ATTR_HAS_CONTACT_LOG_INFOR ="i1NpXcIwfes";
+    public static final String ID_ATTR_HIV_TEST_FINAL_RESULT ="PoTcUsGrIbS";
+    public static final String ID_ATTR_HIV_TEST_FINAL_RESULT_EVENTDATE ="AcpKX4a2iAx";
+    public static final String ID_ATTR_HIV_TEST_FINAL_RESULT_CATOPT ="hkf4GS79Sul";
+    public static final String ID_ATTR_HIV_TESTING_EVENT_NUMBER ="Y1pdU5TSGrB";
+    
+    
     
     // DE Ids
     public static final String ID_DE_PARTNER_CUIC = "UYyCL2xz8Wz";
