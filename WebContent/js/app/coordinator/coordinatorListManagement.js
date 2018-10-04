@@ -342,7 +342,7 @@ function CoordinatorListManagement( _mainPage )
 			            ,contentType: "application/json;charset=utf-8"
 						,success: function( response ) 
 						{
-							exeFunc( response.listGrid.rows );
+							exeFunc( response.rows );
 						}
 						,error: function(response)
 						{

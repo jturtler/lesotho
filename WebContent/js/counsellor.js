@@ -20,7 +20,6 @@ function Counsellor( storageObj, translationObj )
 	me.clientFormManagement;
 	me.reportManagement;
 	me.searchClientManagement;
-	me.programSection;
 	
 	me.dateFormat = "dd M yy";
 	me.dateTimeFormat = "YYYY-MM-DD HH:mm";
@@ -63,7 +62,6 @@ function Counsellor( storageObj, translationObj )
 			me.searchClientManagement = new SearchClientManagement( me, metaData, Commons.APPPAGE_COUNSELLOR );
 			me.listManagement = new CounsellorListMaganement( me );
 			me.reportManagement = new CounsellorReportManagement( me );
-			me.programSection = new ProgramSection( me, metaData, me.translationObj );
 			me.checkAndLoadDataAfterInit();
 			
 		} );

@@ -269,7 +269,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		
 		// STEP 2. Structure attGroups with attributes in memory
 
-		var attrGroups = me.metaData.attGroups.programSections;
+		var attrGroups = me.metaData.attGroups.trackedEntityAttributeGroups;
 		var prgAttributes = me.metaData.programAttributes.programTrackedEntityAttributes;
 		me.attributeGroupList = me.generateAttributeGroupList( attrGroups, prgAttributes );
 		
@@ -1907,14 +1907,11 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		
 		// Set autocompleted for [Referral facility name]
 		var referralFacilityNameTag = me.getDataElementField( me.de_ARTOpen_ReferralFacilityName );
-		if( referralFacilityNameTag.length > 0 )
-		{
-			Util.setAutoCompleteTag( referralFacilityNameTag );
-		}
+		Util.setAutoCompleteTag( referralFacilityNameTag );
 		
 		// Add event for [Referral facility name]
 		var specialOtherFacilityNameTag = me.getDataElementField( me.de_ARTOpen_OtherSpecialFacilityName );
-		referralFacilityNameTag.change( function(){
+		referralFacilityNameTag.change(function(){
 			if( referralFacilityNameTag.val() == "Other" )
 			{
 				me.setHideLogicTag( specialOtherFacilityNameTag, false ); 
@@ -1957,10 +1954,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		
 		// Set autocompleted for [Referral facility name] in [ART Closure] form
 		var closeReferFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_ReferralFacilityName );
-		if( closeReferFacilityNameTag.length > 0 )
-		{
-			Util.setAutoCompleteTag( closeReferFacilityNameTag );
-		}
+		Util.setAutoCompleteTag( closeReferFacilityNameTag );
 		
 		// Add event for [Referral facility name]
 		var closeSpecialOtherFacilityNameTag = me.getAttributeField( me.attr_ARTClosure_OtherSpecialFacilityName );
@@ -2324,7 +2318,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			attributeGroupList[i].code = attrGroups[i].code;
 			attributeGroupList[i].list = [];
 			
-			var attrGroupList = attrGroups[i].programTrackedEntityAttribute;
+			var attrGroupList = attrGroups[i].trackedEntityAttributes;
 			for( var j in attrGroupList )
 			{
 				for( var k in prgAttributes )
@@ -2354,9 +2348,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	
 	me.generateDataEntryFormTable = function( table, stageId )
 	{
-		var stageData = Util.findItemFromList( me.sectionList, "id", stageId )
-		var sections = stageData.programStageSections;
-		var psDataElements = stageData.programStageDataElements;
+		var sections = Util.findItemFromList( me.sectionList, "id", stageId ).programStageSections;
 		
 		for( var i = sections.length - 1; i>=0; i-- )
 		{
@@ -2375,14 +2367,11 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			
 			// STEP 3. Populate dataElements in section
 			
-			var deList = sections[i].dataElements;
+			var deList = sections[i].programStageDataElements;
 			for( var l in deList)
 			{
-				var deId = deList[l].id;
-				var de = me.findDataElementInProgramStageDEList( deId, psDataElements );
-//				var de = Util.findItemFromList( psDataElements, "id", deId );
-				de.mandatory = eval( de.compulsory );
-				de = de.dataElement;
+				var de = deList[l].dataElement;
+				de.mandatory = eval( deList[l].compulsory );
 				
 				rowTag = $("<tr></tr>");
 				
@@ -2425,21 +2414,6 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			
 		}// END Sections
 		
-	};
-	
-	me.findDataElementInProgramStageDEList = function( searchedDeId, psDataElementList )
-	{
-		var searched;
-		for( var i = 0; i<psDataElementList.length; i++ )
-		{
-			var de = psDataElementList[i].dataElement;
-			if( de.id === searchedDeId )
-			{
-				searched = psDataElementList[i];
-			}
-		}
-		
-		return searched;
 	};
 	
 	me.resetDataEntryForm = function()
@@ -3252,7 +3226,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		    }, function(error) {
 		        clearTimeout(location_timeout);
 		        exeFunc( "", "" );
-		    },{timeout:5000});
+		    });
 		} else {
 			 exeFunc( "", "" );
 		}
@@ -4514,7 +4488,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		if( partnerData != undefined )
 		{
 			var partnerCUICTag = me.getDataElementField( me.de_partnerCUIC );
-			var rows = partnerData.listGrid.rows;
+			var rows = partnerData.rows;
 			if( rows.length == 1 )
 			{
 				var partnerCUICVal = rows[0][3];
@@ -4685,26 +4659,17 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		
 		// STEP 2. Create row data
 		
-		var stageData = Util.findItemFromList( me.sectionList, "id", stageId );
-		var sections = stageData.programStageSections;
-		var psDataElements = stageData.programStageDataElements;
-		
+		var sections = Util.findItemFromList( me.sectionList, "id", stageId ).programStageSections;
 		for( var i in sections )
 		{
 			rowTag = $("<tr style='display:none;'></tr>");
 			rowTag.append("<td colspan='2' style='font-weight:bold;background-color:#dde2e6;'>" + sections[i].displayName + "</td>");
 			tbody.append( rowTag );
 			
-			
-			var deList = sections[i].dataElements;
+			var deList = sections[i].programStageDataElements;
 			for( var l in deList)
 			{
 				var de = deList[l].dataElement;
-				var deId = deList[l].id;
-				var de = me.findDataElementInProgramStageDEList( deId, psDataElements );
-//				de.mandatory = eval( de.compulsory );
-				de = de.dataElement;
-				
 				rowTag = $("<tr style='display:none;'></tr>");
 				rowTag.append("<td>" + de.formName + "</td>");
 				rowTag.append("<td dataElement='" + de.id +"'></td>");
@@ -4856,7 +4821,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 						            }
 									,success: function( response ) 
 									{
-										var rows = response.listGrid.rows;
+										var rows = response.rows;
 										me.setUp_PartnerInfor( response );
 										me.checkAndShowCheckedIconForPartnerCUICTag();
 									}

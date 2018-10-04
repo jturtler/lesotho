@@ -274,19 +274,6 @@ Util.findItemFromList = function( listData, searchProperty, searchValue )
 	return foundData;
 };
 
-Util.findAndReplaceItemFromList = function( listData, searchProperty, searchValue, replacedData )
-{
-	$.each( listData, function( i, item )
-	{
-		if ( item[ searchProperty ] == searchValue )
-		{
-			listData[i] = JSON.parse( JSON.stringify( replacedData ) );
-			return false;
-		}
-	});
-
-};
-
 
 Util.RemoveFromArray = function( list, propertyName, value )
 {

@@ -154,11 +154,11 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 	
 	me.createSearchClientForm = function()
 	{
-		var attrGroups = me.metaData.attGroups.programSections;
+		var attrGroups = me.metaData.attGroups.trackedEntityAttributeGroups;
 		
 		for( var i in attrGroups )
 		{
-			var attrList = attrGroups[i].programTrackedEntityAttribute;
+			var attrList = attrGroups[i].trackedEntityAttributes;
 			for( var j in attrList )
 			{
 				var attribute = attrList[j];
@@ -227,7 +227,7 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 							var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_add" );
 							me.searchResultKeyTag.html( tranlatedText + " " + searchCriteria );
 							
-							var clientList = searchResult.listGrid.rows;
+							var clientList = searchResult.rows;
 							if( clientList.length > 0 )
 							{
 								me.populateSearchClientData( searchResult );
@@ -258,7 +258,7 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 	
 	me.populateSearchClientData = function( searchResult )
 	{
-		var clientList = searchResult.listGrid.rows;		
+		var clientList = searchResult.rows;		
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_rowTooltip" );
 		
 		for( var i in clientList )
@@ -285,13 +285,8 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 			
 			var adquisition = client[6].trim();
 			adquisition = ( adquisition != "" ) ? Util.formatDate_DisplayDate( adquisition ) : "";
-			var lastTestNS = "";
-			if( client[7] != null ) 
-			{
-				lastTestNS = lastTestNS.trim();
-				lastTestNS = ( lastTestNS != "" ) ? Util.formatDate_DisplayDate( lastTestNS ) : "";
-			}
-			
+			var lastTestNS = client[7].trim();
+			lastTestNS = ( lastTestNS != "" ) ? Util.formatDate_DisplayDate( lastTestNS ) : "";
 			
 			var rowTag = $("<tr title='" + tranlatedText + "' clientId='" + clientId + "'></tr>");
 			rowTag.append( "<td>" + firstName + "</td>" );

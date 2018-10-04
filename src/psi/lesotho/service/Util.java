@@ -31,8 +31,7 @@ public final class Util
 
     //// https://data.psi-mis.org
 //    public static String LOCATION_DHIS_SERVER = "https://data.psi-mis.org";
-//    public static String LOCATION_DHIS_SERVER = "https://clone.psi-mis.org";
-    public static String LOCATION_DHIS_SERVER = "https://latest.psi-mis.org";
+    public static String LOCATION_DHIS_SERVER = "https://clone.psi-mis.org";
     public static final String ID_TRACKED_ENTITY = "XV3kldsZq0H";
 //    
 //    // https://sandbox.psi-mis.org
@@ -60,9 +59,6 @@ public final class Util
     public static final String KEY_METADATA_ALL = "all";
     public static final String KEY_METADATA_DISTRICTLIST = "districtList";
     public static final String KEY_METADATA_OULIST = "ouList";
-    public static final String KEY_METADATA_ADD_PROGRAMSECTION = "addProgramSection";
-    public static final String KEY_METADATA_UPDATE_PROGRAMSECTION = "updateProgramSection";
-    public static final String KEY_METADATA_DELETE_PROGRAMSECTION = "deleteProgramSection";
         
     // -------------------------------------------------------------------------
     // Retrieve data
@@ -100,7 +96,6 @@ public final class Util
     public static String REQUEST_TYPE_GET = "GET";
     public static String REQUEST_TYPE_POST = "POST";
     public static String REQUEST_TYPE_PUT = "PUT";
-    public static String REQUEST_TYPE_DELETE = "DELETE";
 
 
     public static String PAMAM_ORGUNIT_ID = "ouId";
@@ -205,7 +200,7 @@ public final class Util
                 }
             }
         }
-        
+
         JSONObject jsonData = new JSONObject( sb.toString() );
         return jsonData;
     }
@@ -218,10 +213,11 @@ public final class Util
         System.out.println( "\n\n ====== \n requestUrl : " + url );
 
         String username = Util.ACCESS_SERVER_USERNAME;
-        String password = Util.ACCESS_SERVER_PASSWORD;   
+        String password = Util.ACCESS_SERVER_PASSWORD;
+        
         ResponseInfo responseInfo = new ResponseInfo();
         StringBuffer responseMsg = new StringBuffer();
-        
+
         // 2. Open HttpsURLConnection and Set Request Type.
         URL obj = new URL( url );
 
@@ -236,7 +232,6 @@ public final class Util
         }
         catch ( Exception ex )
         {
-            ex.printStackTrace();
             responseMsg.append( "{ \"msg\": \"DHIS reponse code: " + responseInfo.responseCode
                 + ", No Message - Error occurred during DHIS response processing: " + responseMsg.toString() + "\" }" );
         }
@@ -361,16 +356,20 @@ public final class Util
         con.setRequestProperty( "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" );
         con.setRequestProperty( "Accept-Language", "en-US,en;q=0.5" );
         con.setRequestProperty( "Content-Type", "application/json; charset=utf-8" );
-
+        
         String userpass = username + ":" + password;
         String basicAuth = "Basic " + new String( new Base64().encode( userpass.getBytes() ) );
         con.setRequestProperty( "Authorization", basicAuth );
-        
+
         // 3. Body Message Received Handle
         if ( jsonData != null && jsonData.length() > 0 )
-        { 
+        {
             // Send post request
             con.setDoOutput( true );
+//            DataOutputStream wr = new DataOutputStream( con.getOutputStream() );
+//            wr.writeBytes( jsonData.toString() );
+//            wr.flush();
+//            wr.close();
             
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream(), "UTF-8"));
             bw.write(jsonData.toString());
@@ -379,7 +378,7 @@ public final class Util
         }
 
         if ( params != null && !params.isEmpty() )
-        { 
+        {
             StringBuilder postData = new StringBuilder();
             for ( Map.Entry<String, Object> param : params.entrySet() )
             {
@@ -405,7 +404,7 @@ public final class Util
         responseInfo.responseCode = con.getResponseCode();
 
         // 5. Other response info
-        if ( con.getResponseCode() < 400 ) 
+        if ( con.getResponseCode() == HttpURLConnection.HTTP_OK ) 
         {
             BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
 
@@ -414,9 +413,9 @@ public final class Util
             {
                 responseMsg.append( inputLine );
             }
-            
-            in.close();
 
+            in.close();
+            
         } else 
         {
              String json = Util.readStream(con.getErrorStream());
@@ -522,6 +521,7 @@ public final class Util
         JSONObject rec = null;
 
         JSONObject recTemp = new JSONObject( output );
+
         if ( summaryType != null && summaryType.equals( "importSummaries" ) )
         {
             if ( recTemp.has( "response" ) )
@@ -544,18 +544,17 @@ public final class Util
         }
 
         if ( rec != null && rec.has( "status" ) && rec.getString( "status" ).equals( "SUCCESS" ) )
-        { 
-            if( rec.has( "importSummaries" ) )
+        {
+            JSONObject importCount = rec.getJSONObject( "importCount" );
+
+            // NOTE: In "importSummaries" case, it shows up as 0 for 'imported'
+            if ( (importCount.getInt( "imported" ) >= 1 || importCount.getInt( "updated" ) >= 1)
+                || summaryType.equals( "importSummaries" ) )
             {
-                JSONObject importSummaries = rec.getJSONArray( "importSummaries" ).getJSONObject( 0 );
-                if ( importSummaries.has( "reference" ) )
+                if ( rec.has( "reference" ) )
                 {
-                    referenceId = importSummaries.getString( "reference" );
-                }
-            }
-            else if ( rec.has( "reference" ) )
-            {
                     referenceId = rec.getString( "reference" );
+                }
             }
         }
 
@@ -564,7 +563,7 @@ public final class Util
 
     public static void processResponseMsg( ResponseInfo responseInfo, String importSummaryCase )
     {
-        if ( responseInfo.responseCode >= 400 )
+        if ( responseInfo.responseCode != 200 )
         {
             // If error occured, display the output as it is (received from
             // DHIS).

@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -29,12 +28,12 @@ public class ClientController
     // URLs
     // -------------------------------------------------------------------------
     
-    private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_CLIENTS + "/data.json?paging=false";
-    private static final String URL_QUERY_SEARCH_POSITIVE_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS + "/data.json?paging=false";
-    private static final String URL_QUERY_CREATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/30/trackedEntityInstances";
-    private static final String URL_QUERY_UPDATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/30/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID;
+    private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_CLIENTS + "/data.json";
+    private static final String URL_QUERY_SEARCH_POSITIVE_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS + "/data.json";
+    private static final String URL_QUERY_CREATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances";
+    private static final String URL_QUERY_UPDATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID;
     private static final String URL_QUERY_ENROLLMENT = Util.LOCATION_DHIS_SERVER + "/api/enrollments";
-    private static final String URL_QUERY_CLIENT_DETAILS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID + ".json?program=" + Util.ID_PROGRAM + "&fields=*,attributes[attribute,value]";
+    private static final String URL_QUERY_CLIENT_DETAILS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID + ".json?fields=*,attributes[attribute,value]";
     
         
     // -------------------------------------------------------------------------
@@ -161,7 +160,7 @@ public class ClientController
         try
         {
             String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
-            String url = ClientController.URL_QUERY_SEARCH_CLIENTS + "&" + condition;
+            String url = ClientController.URL_QUERY_SEARCH_CLIENTS + "?" + condition;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -179,7 +178,7 @@ public class ClientController
         try
         {
             String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
-            String url = ClientController.URL_QUERY_SEARCH_POSITIVE_CLIENTS + "&" + condition;
+            String url = ClientController.URL_QUERY_SEARCH_POSITIVE_CLIENTS + "?" + condition;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -197,11 +196,12 @@ public class ClientController
 
         try
         {
-            receivedData.put( "trackedEntityType", Util.ID_TRACKED_ENTITY );
+            receivedData.put( "trackedEntity", Util.ID_TRACKED_ENTITY );
             receivedData.put( "orgUnit", ouId );
             
             String requestUrl = ClientController.URL_QUERY_CREATE_CLIENT;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, receivedData, null );
+
             Util.processResponseMsg( responseInfo, "" );
             String clientId = responseInfo.referenceId;
             receivedData.put( "trackedEntityInstance", clientId );

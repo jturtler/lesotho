@@ -52,7 +52,6 @@
 <script src="../js/app/coordinator/coordinatorReportManagement.js"></script>
 <script src="../js/app/searchClientManagement.js"></script>
 <script src="../js/app/session/sessionTimeOutPicker.js"></script>
-<script src="../js/app/programSection.js"></script>
 
 
 </head>
@@ -619,17 +618,8 @@
 							</td>
 						</tr>
 						
-						<tr>
-							<td  keyword="settings_rowHeader_setupProgramSection"></td>
-							<td>	
-						        <button style="margin-top: 10px;" id="setupProgamSectionBtn" class="btn btn-default" keyword="settings_btn_setup">Setup</button>
-							</td>
-						</tr>
-						
 					</table>
 				</div>
-				
-				<div id='setupProgramSectionForm'></div>
 				
 				<!-- END Settings page -->
 				
@@ -751,7 +741,6 @@
 
 	$( document ).ready()
 	{
-		// $('#setupProgramSectionForm').load('programSection.html');
 		
 		var storageObj = new Storage();
 		var translationObj = new Translation( "../", storageObj );

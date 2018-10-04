@@ -21,16 +21,14 @@ public class MetaDataController
     // URLs
     // -------------------------------------------------------------------------
     
-    private static String URL_QUERY_LOAD_PROGRAM_STAGE_SECTIONS = Util.LOCATION_DHIS_SERVER + "/api/programs/" + Util.ID_PROGRAM + ".json?fields=programStages[id,name,programStageDataElements[compulsory,dataElement[id,formName,valueType,optionSet[id,name,options[code,name]]]],programStageSections[id,displayName,dataElements[id]]";
-    private static String URL_QUERY_LOAD_ATTRIBUTE_GROUPS = Util.LOCATION_DHIS_SERVER + "/api/programSections.json?filter=code:like:LSHTC&paging=false&fields=id,name,code,programTrackedEntityAttribute[id,shortName,valueType,optionSet[id,name,options[code,name]]";
+    private static String URL_QUERY_LOAD_PROGRAM_SECTIONS = Util.LOCATION_DHIS_SERVER + "/api/programs/" + Util.ID_PROGRAM + ".json?fields=programStages[id,name,programStageDataElements[compulsory,dataElement[id,formName,valueType,optionSet[id,name,options[code,name]]]],programStageSections[id,displayName,programStageDataElements[compulsory,dataElement[id,formName,valueType,optionSet[id,name,options[code,name]]]]";
+    private static String URL_QUERY_LOAD_ATTRIBUTE_GROUPS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributeGroups.json?filter=code:like:LSHTC&paging=false&fields=id,name,code,trackedEntityAttributes[id,shortName,valueType,optionSet[id,name,options[code,name]]";
     private static String URL_QUERY_LOAD_PROGRAM_ATTRIBUTES = Util.LOCATION_DHIS_SERVER + "/api/programs/" + Util.ID_PROGRAM + ".json?fields=programTrackedEntityAttributes[mandatory,trackedEntityAttribute[id,name]]";
     private static String URL_QUERY_LOAD_ORGUNIT_CHILDREN =  Util.LOCATION_DHIS_SERVER + "/api/organisationUnits/" + MetaDataController.PARAM_DISTRICT_ID + ".json?fields=children[id,name,code]";
     private static String URL_QUERY_LOAD_ORGUNITS_BY_LEVEL =  Util.LOCATION_DHIS_SERVER + "/api/organisationUnits/" + Util.ROOT_ORGTUNIT_LESOTHO + ".json?includeDescendants=true&fields=id,name,code&filter=level:eq:" + Util.REGISTER_DISTRICT_LEVEL;
     private static String URL_QUERY_LOAD_ORGUNITS_BY_PROGRAM =  Util.LOCATION_DHIS_SERVER + "/api/programs/" + Util.ID_PROGRAM + ".json?fields=organisationUnits[id]";
-    private static String URL_QUERY_GET_CATEGORY_OPTION_COMBO =  Util.LOCATION_DHIS_SERVER + "/api/categories/" + Util.USER_CATEGORY_ID + ".json?fields=categoryOptions[id,name,code]";
-    private static String URL_QUERY_GET_TRACKEDENTITYATTRIBUTE =  Util.LOCATION_DHIS_SERVER + "/api/trackedEntityAttributes.json?fields=id,name,shortName&paging=false";
+    private static String URL_QUERY_GET_CATEGORY_OPTION_cOMBO =  Util.LOCATION_DHIS_SERVER + "/api/categories/" + Util.USER_CATEGORY_ID + ".json?fields=categoryOptions[id,name,code]";
     
-    private static String URL_QUERY_SAVE_PROGRAMSECTION =  Util.LOCATION_DHIS_SERVER + "/api/programSections";
     
     // -------------------------------------------------------------------------
     // POST method
@@ -81,13 +79,6 @@ public class MetaDataController
                                     if( responseInfo.responseCode == 200 )
                                     {
                                         outputData.append( ",\"catOptions\":" + responseInfo.output );
-                                        
-                                        responseInfo = MetaDataController.getTrackedEntityAttributes();
-                                        if( responseInfo.responseCode == 200 )
-                                        {
-                                            outputData.append( ",\"attributes\":" + responseInfo.output );
-                                        }   
-                                        
                                     }
                                 }
                             }
@@ -105,27 +96,9 @@ public class MetaDataController
                 // Load orgUnit List only
                 else if ( key.equals( Util.KEY_METADATA_OULIST ) )
                 {
-                    String districtId = request.getParameter( "districtId" );
+                    String districtId = request.getParameter( Util.PAMAM_DISTRICT_ID );
                     responseInfo = MetaDataController.getOrgUnitList( districtId );
                 }
-                // Add ProgramSection
-                else if ( key.equals( Util.KEY_METADATA_ADD_PROGRAMSECTION ) )
-                {
-                    JSONObject receivedData = Util.getJsonFromInputStream( request.getInputStream() );
-                    responseInfo = MetaDataController.addProgramSection( receivedData );
-                }  
-                // Update ProgramSection
-                else if ( key.equals( Util.KEY_METADATA_UPDATE_PROGRAMSECTION ) )
-                {
-                    JSONObject receivedData = Util.getJsonFromInputStream( request.getInputStream() );
-                    responseInfo = MetaDataController.updateProgramSection( receivedData );
-                }
-                // Delete ProgramSection
-                else if ( key.equals( Util.KEY_METADATA_DELETE_PROGRAMSECTION ) )
-                {
-                    String id = request.getParameter( "id" );
-                    responseInfo = MetaDataController.deleteProgramSection( id );
-                } 
             }
 
             // STEP 3. Send back the messages
@@ -150,7 +123,7 @@ public class MetaDataController
         ResponseInfo responseInfo = null;
         try
         {
-            String url = MetaDataController.URL_QUERY_LOAD_PROGRAM_STAGE_SECTIONS;
+            String url = MetaDataController.URL_QUERY_LOAD_PROGRAM_SECTIONS;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -238,15 +211,12 @@ public class MetaDataController
         try
         {
             String url = MetaDataController.URL_QUERY_LOAD_ORGUNIT_CHILDREN;
-            System.out.println("\n\n === url 1 : " + url );
             url = url.replace( MetaDataController.PARAM_DISTRICT_ID, districtId );
-            System.out.println("\n\n === url 2 : " + url );
-
+            
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
         {
-            System.out.println("\n\n === ex : " + ex.getMessage() );
             ex.printStackTrace();
         }
         
@@ -290,23 +260,7 @@ public class MetaDataController
         ResponseInfo responseInfo = null;
         try
         {
-            String url = MetaDataController.URL_QUERY_GET_CATEGORY_OPTION_COMBO;
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
-        }
-        catch ( Exception ex )
-        {
-            ex.printStackTrace();
-        }
-
-        return responseInfo;
-    }
-
-    private static ResponseInfo getTrackedEntityAttributes()
-    {
-        ResponseInfo responseInfo = null;
-        try
-        {
-            String url = MetaDataController.URL_QUERY_GET_TRACKEDENTITYATTRIBUTE;
+            String url = MetaDataController.URL_QUERY_GET_CATEGORY_OPTION_cOMBO;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -317,54 +271,4 @@ public class MetaDataController
         return responseInfo;
     }
    
-    private static ResponseInfo addProgramSection( JSONObject receivedData )
-    {
-        ResponseInfo responseInfo = null;
-        try
-        {
-            String url = MetaDataController.URL_QUERY_SAVE_PROGRAMSECTION;
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, url, receivedData, null );
-        }
-        catch ( Exception ex )
-        {
-            ex.printStackTrace();
-        }
-
-        return responseInfo;
-    }
-
-    private static ResponseInfo updateProgramSection( JSONObject receivedData )
-    {
-        ResponseInfo responseInfo = null;
-        try
-        {
-            String url = MetaDataController.URL_QUERY_SAVE_PROGRAMSECTION + "/" + receivedData.getString("id");
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, url, receivedData, null );
-        }
-        catch ( Exception ex )
-        {
-            ex.printStackTrace();
-        }
-
-        return responseInfo;
-    }
-
-    private static ResponseInfo deleteProgramSection( String id )
-    {
-        ResponseInfo responseInfo = null;
-        try
-        {
-            String url = MetaDataController.URL_QUERY_SAVE_PROGRAMSECTION + "/" + id;
-            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_DELETE, url, null, null );
-        }
-        catch ( Exception ex )
-        {
-            ex.printStackTrace();
-        }
-
-        return responseInfo;
-    }
-    
-    
-
 }

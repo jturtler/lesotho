@@ -29,13 +29,10 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.versionDateTag = $("#versionDate");
 	
 	// [Common]
-	me.divSessionExpireMsgTag =  $("#divSessionExpireMsg");
+	me.divSessionExpireMsgTag =  $( "#divSessionExpireMsg" );
 	me.menuIcon = $("button.hamburger");
 	me.headerRightSideControlsTag = $("div.headerRightSideControls");
 	me.mainContentTags = $("div.mainContent");
-	
-	// [Program Section]
-	me.setupProgamSectionBtnTag = $("#setupProgamSectionBtn");
 	
 	me.ARTReferralOpeningStage_Id = "OSpZnLBMVhr";
 	me.ARTReferralOpeningStage_Name = "";
@@ -255,10 +252,10 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 				me.metaData = jsonData;
 				
 				// Look for option values of Districts/Councils/Health facilities for filtering
-				var attrGroups = jsonData.attGroups.programSections;
+				var attrGroups = jsonData.attGroups.trackedEntityAttributeGroups;
 				for( var i in attrGroups )
 				{	
-					var attributeList = attrGroups[i].programTrackedEntityAttribute;
+					var attributeList = attrGroups[i].trackedEntityAttributes;
 					for( var j in attributeList )
 					{
 						if( attributeList[j].id === me.attr_District )
