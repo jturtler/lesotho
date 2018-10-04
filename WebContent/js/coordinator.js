@@ -20,6 +20,7 @@ function Coordinator( storageObj, translationObj )
 	me.clientFormManagement;
 	me.reportManagement;
 	me.inputTagGeneration;
+	me.programSection;
 	
 	me.todayFULinkTag = $("#todayFULink");
 	me.allFULinkTag = $("#allFULink");
@@ -44,8 +45,10 @@ function Coordinator( storageObj, translationObj )
 	me.init = function()
 	{
 		MsgManager.initialSetup();		
+		
 		me.validationObj = new Validation( me.translationObj );	
 		me.setUp_Events();
+		
 		
 		
 		me.settingsManagement = new SettingsManagement( me, function( metaData ){
@@ -53,6 +56,7 @@ function Coordinator( storageObj, translationObj )
 			me.searchClientManagement = new SearchClientManagement( me, metaData, Commons.APPPAGE_COORDINATOR );
 			me.listManagement = new CoordinatorListManagement( me );
 			me.reportManagement = new CoordinatorReportManagement( me );
+			me.programSection = new ProgramSection( me, metaData, me.translationObj );
 			me.checkAndLoadDataAfterInit();
 			
 		} );
@@ -93,6 +97,7 @@ function Coordinator( storageObj, translationObj )
 		me.setup_ButtonsOnBrowser();
 		
 		me.setUp_Events_Menus();
+		
 	};
 
 	// Add Events for [Menu]
@@ -166,6 +171,7 @@ function Coordinator( storageObj, translationObj )
 		
 	};
 
+	
 
 	// Not allow user to click on Back buttons of browser
 	me.setup_ButtonsOnBrowser = function()

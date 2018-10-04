@@ -37,18 +37,18 @@ public class EventController
     // Load list
     
     private static String URL_QUERY_CASES_BY_TIME = Util.LOCATION_DHIS_SERVER
-        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_TODAY_CASE + "/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
+        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_TODAY_CASE + "/data.json?paging=false&var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
         + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.ID_STAGE;
 
     private static String URL_QUERY_POSITIVE_CASES = Util.LOCATION_DHIS_SERVER
-        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_POSITIVE_CASE + "/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
+        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_POSITIVE_CASE + "/data.json?paging=false&var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
         + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.ID_STAGE;
 
     private static String URL_QUERY_FUCASE_BY_USERNAME = Util.LOCATION_DHIS_SERVER
-        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_BY_USERNAME + "/data.json?var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
+        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_BY_USERNAME + "/data.json?paging=false&var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
         + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.ID_STAGE;
 
-    private static String URL_QUERY_FUCASE_ALL = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_ALL + "/data.json?var=username:";
+    private static String URL_QUERY_FUCASE_ALL = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_ALL + "/data.json?paging=false&var=username:";
     
     // -------------------------------------------------------------------------
     // Event
@@ -66,14 +66,14 @@ public class EventController
         + "/api/organisationUnits/" + PARAM_ORGUNIT_ID + ".json?fields=name,parent[name]";
 
     // Find partner details by event id
-    private static String URL_QUERY_GET_PARTNER_BY_EVENTID = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_FIND_PARTNER_BY_EVENTID + "/data.json?var=partnerEventId:" + EventController.PARAM_EVENT_ID; 
+    private static String URL_QUERY_GET_PARTNER_BY_EVENTID = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_FIND_PARTNER_BY_EVENTID + "/data.json?paging=false&var=partnerEventId:" + EventController.PARAM_EVENT_ID; 
     
     
     // -------------------------------------------------------------------------
     // Client
     
     // Find client partner information
-    private static String URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_FIND_PARTNER + "/data.json?var=startDate:" + EventController.PARAM_START_DATE 
+    private static String URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_FIND_PARTNER + "/data.json?paging=false&var=startDate:" + EventController.PARAM_START_DATE 
         + "&var=stageId:" + Util.ID_STAGE + "&var=username:" + EventController.PARAM_USERNAME + "&var=ouId:" + EventController.PARAM_ORGUNIT_ID + "&var=endDate:" + EventController.PARAM_END_DATE;
     
     
@@ -485,7 +485,7 @@ public class EventController
 
                 if( responseInfo.responseCode == 200 )
                 {
-                    Util.processResponseMsg( responseInfo, "importSummaries" );
+                    Util.processResponseMsg( responseInfo, "" );
 
                     String eventId = responseInfo.referenceId;
                     eventJson.put( "event", eventId );
@@ -519,7 +519,7 @@ public class EventController
 
             if( responseInfo.responseCode == 200 )
             {
-                Util.processResponseMsg( responseInfo, "importSummaries" );
+                Util.processResponseMsg( responseInfo, "" );
                 responseInfo.output = eventData.toString();
             }
 

@@ -52,6 +52,7 @@
 <script src="../js/app/coordinator/coordinatorReportManagement.js"></script>
 <script src="../js/app/searchClientManagement.js"></script>
 <script src="../js/app/session/sessionTimeOutPicker.js"></script>
+<script src="../js/app/programSection.js"></script>
 
 
 </head>
@@ -330,6 +331,7 @@
 				    		<li><a href="#thisTestDiv"><span keyword="dataEntryForm_tab_thisTest_headerTitle">New Test</span> <span style="color:red;display:none;padding-left: 10px;" class="tabIcon glyphicon glyphicon-lock"></span></a></li>
 				    		<li><a href="#contactLogDiv"><span keyword="dataEntryForm_tab_contactLog_headerTitle">Contact Log</span> <span style="color:red;padding-left: 10px;" class="tabIcon glyphicon glyphicon-user"></span></a></li>
 				    		<li><a href="#artReferDiv"><span keyword="dataEntryForm_tab_ARTRefer_headerTitle">ART Refer.</span> <span style="color:red;padding-left: 10px;" class="tabIcon glyphicon glyphicon-plus"></span></a></li>
+				  			<li><a href="#prepReferDiv"><span keyword="dataEntryForm_tab_prepRefer_headerTitle">PrEP Refer.</span> <span style="color:red;padding-left: 10px;" class="tabIcon glyphicon glyphicon-plus"></span></a></li>
 				  		</ul>
 				  		
 				  		
@@ -475,7 +477,7 @@
 								<tbody>
 									<tr>
 										<th colspan="2"><span keyword="artRefer_tab_msg_clientReferredToARTOn">Client referred to ART on</span>: <span style="font-weight:normal;" class="dateClientReferredARTOn"></span></th>
-										<th><span keyword="artRefer_tab_msg_status">Status</span>: <span style="font-weight:normal;" id="linkageStatus"></span></th>
+										<th><span keyword="artRefer_tab_msg_status">Status</span>: <span style="font-weight:normal;" id="artLinkageStatus"></span></th>
 										<th colspan="2"><div style="float:right;"> <span keyword="artRefer_tab_msg_timeElapsed">Time elapsed</span>: <span style="font-weight:normal;" class="timeClientReferredARTOn"></span></div>
 									</tr>
 								</tbody>
@@ -525,7 +527,60 @@
 							
 						</div>
 						  
-						  						
+						<div id="prepReferDiv">
+							<table class="table activeBar" id="prepReferEventInfoTb" >
+								<tbody>
+									<tr>
+										<th colspan="2"><span keyword="artRefer_tab_msg_clientReferredToARTOn">Client referred to ART on</span>: <span style="font-weight:normal;" class="dateClientReferredARTOn"></span></th>
+										<th><span keyword="artRefer_tab_msg_status">Status</span>: <span style="font-weight:normal;" id="prepReferLinkageStatus"></span></th>
+										<th colspan="2"><div style="float:right;"> <span keyword="artRefer_tab_msg_timeElapsed">Time elapsed</span>: <span style="font-weight:normal;" class="timeClientReferredARTOn"></span></div>
+									</tr>
+								</tbody>
+							</table>
+							
+							<table id="prepReferAttributeForm" class="table activeBar previousTestTb" style="display:none;">
+							</table>
+							
+							
+							<form class="form-horizontal">
+								<table class='table table-hover table-striped previousTestTb panel panel-default' id="prepReferOpenForm">
+																		
+									<!--  Action buttons -->
+									<tr class="actionBar">
+										<th style="width:20px;" class="actionCell">
+											<button id="discardPrepReferOpenEventBtn" class="imgBtn"><span class="glyphicon glyphicon-ban-circle"></span></button>
+										</th>
+										<th colspan="2">
+											<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+											<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+										</th>
+										<th style="width:20px;" class="actionCell">
+											<button id="savePrepReferOpenEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+										</th>						
+									</tr>
+								</table>
+							</form>
+							
+							<form class="form-horizontal">
+								<table class='table table-hover table-striped previousTestTb panel panel-default' id="prepReferCloseForm">
+								
+									<!--  Action buttons -->
+									<tr class="actionBar">
+										<th style="width:20px;" class="actionCell">
+											<button id="discardPrepReferCloseEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-ban-circle"></span></button>
+										</th>
+										<th colspan="2">
+											<span style="float:left;" keyword="contactLogForm_tab_discardChanges">Discard Changes</span>
+											<span style="float:right;" keyword="contactLogForm_tab_saveChanges">Save Changes</span>
+										</th>
+										<th style="width:20px;" class="actionCell">
+											<button id="savePrepReferCloseEventBtn" class="imgBtn"><span style="cursor:pointer;" class="glyphicon glyphicon-floppy-disk"></span></button>
+										</th>						
+									</tr>
+								</table>
+							</form>
+						</div>		
+								
 					</div>	
 					
 					<div class="form-group" style="text-align:center;">
@@ -618,8 +673,17 @@
 							</td>
 						</tr>
 						
+						<tr>
+							<td  keyword="settings_rowHeader_setupProgramSection"></td>
+							<td>	
+						        <button style="margin-top: 10px;" id="setupProgamSectionBtn" class="btn btn-default" keyword="settings_btn_setup">Setup</button>
+							</td>
+						</tr>
+						
 					</table>
 				</div>
+				
+				<div id='setupProgramSectionForm'></div>
 				
 				<!-- END Settings page -->
 				
@@ -741,6 +805,7 @@
 
 	$( document ).ready()
 	{
+		// $('#setupProgramSectionForm').load('programSection.html');
 		
 		var storageObj = new Storage();
 		var translationObj = new Translation( "../", storageObj );
