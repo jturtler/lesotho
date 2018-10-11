@@ -407,6 +407,24 @@ Util.DAYS = ["Sunday", "Monday", "Tuesday", "Webnesday", "Thursday", "Friday", "
 Util.MONTH_INDEXES = {"Jan" : "01", "Feb" : "02", "Mar" : "03", "Apr" : "04", "May" : "05", "Jun" : "06", "Jul" : "07", "Aug" : "08", "Sep" : "09", "Oct" : "10", "Nov" : "11", "Dec" : "12"};
 
 
+/** 
+ * Result : 2017-01-30
+ * **/
+Util.getCurrentDate = function()
+{
+	var date = new Date();
+	
+	var day = date.getDate();
+	day = ( day < 10 ) ? "0" + day : day;
+	
+	var month = date.getMonth();
+	month = ( month < 10 ) ? "0" + month : month;
+	
+	var year = date.getFullYear();
+	
+	return year + "-" + month + " " + day;
+};
+
 
 /** 
  * Get a past date object from a special date 

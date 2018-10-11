@@ -21,14 +21,12 @@ public class ClientController
 
     private static final String PARAM_CLIENT_ID = "@PARAM_CLIENT_ID";
     
-    private static ArrayList<String> searchVariables = new ArrayList<>(Arrays.asList( Util.ID_ATTR_FIRSTNAME, Util.ID_ATTR_LASTNAME
-            , Util.ID_ATTR_DOB, Util.ID_ATTR_DISTRICTOB, Util.ID_ATTR_BIRTHORDER ));
     
     // -------------------------------------------------------------------------
     // URLs
     // -------------------------------------------------------------------------
     
-    private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_CLIENTS + "/data.json";
+    private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?ou=" + Util.ROOT_ORGTUNIT_LESOTHO + "&ouMode=DESCENDANTS";
     private static final String URL_QUERY_SEARCH_POSITIVE_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS + "/data.json";
     private static final String URL_QUERY_CREATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances";
     private static final String URL_QUERY_UPDATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID;
@@ -160,7 +158,7 @@ public class ClientController
         try
         {
             String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
-            String url = ClientController.URL_QUERY_SEARCH_CLIENTS + "?" + condition;
+            String url = ClientController.URL_QUERY_SEARCH_CLIENTS + condition;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -303,26 +301,14 @@ public class ClientController
     @SuppressWarnings( "unchecked" )
     private static String createSearchClientCondition( JSONArray attributeList )
     {
-        ArrayList<String> searchVariableCopy = (ArrayList<String>)ClientController.searchVariables.clone();
-        
         String condition = "";
         for( int i=0; i<attributeList.length(); i++ ) 
         {
             String attributeId = attributeList.getJSONObject( i ).getString( "attribute" );
             String value = attributeList.getJSONObject( i ).getString( "value" );
-            value = value.replaceAll("'", "-");
+            value = value.replaceAll("'", "''");
             
-            condition += "var=" + attributeId + ":" + URLEncoder.encode( value ) + "&";
-            
-            if ( searchVariableCopy.indexOf( attributeId ) >= 0 )
-            {
-                searchVariableCopy.remove( attributeId );
-            }
-        }
-        
-        for( int i=0; i<searchVariableCopy.size(); i++ )
-        {
-            condition += "var=" + searchVariableCopy.get( i ) + ":%20&";
+            condition += "&filter=" + attributeId + ":LIKE:" + URLEncoder.encode( value );
         }
         
         return condition;

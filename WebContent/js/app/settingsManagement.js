@@ -41,6 +41,26 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.attr_HealthFacilityProvidingART = "LCLiPzJWVAb";
 	me.de_ClosureART_Status = "nOK8JcDWT9X";
 	
+
+	// [HIV Test Final result EVENT] Attributes
+	me.attr_ClientCUIC = "rw3W9pDCPb2";
+	me.attr_FirstName = "R9Lw1uNtRuj";
+	me.attr_LastName = "TBt2a4Bq0Lx";
+	me.attr_DoB = "BvsJfkddTgZ";
+	me.attr_DistrictOB = "u57uh7lHwF8";
+	me.attr_BirthOrder ="vTPYC9BXPNn";
+	me.attr_HasContactLogFormInfor = "i1NpXcIwfes"; // Set this one mandatory for Contact Log
+	me.attr_HIVTestFinalResult = "PoTcUsGrIbS";
+	me.attr_HIVEventDate = "AcpKX4a2iAx";
+	me.attr_HIVEventStatus = "JAMoB6GnGyw";
+	me.attr_HIVEventCatOpt = "hkf4GS79Sul";
+	me.attr_HIVEventNo = "Y1pdU5TSGrB";
+	me.attr_HIVEventOrgUnit = "uXg5tqrRsXJ";
+	me.attr_HasOpenEvent = "tmx7xkwsxPC";
+	me.attr_ARTStatus = "mYdfuRItatP";
+	me.attr_ARTFacility = "wLGxRN9x0uW";
+	
+	
 	me.de_ContactLog_TypeOfContact = "wzM3bUiPowS";
 	me.de_ContactLog_nextAction = "mcgzEFh5IV8";
 	

@@ -144,6 +144,12 @@ public final class Util
     public static final String ID_ATTR_DISTRICTOB = "u57uh7lHwF8";
     public static final String ID_ATTR_CLIENT_CUIC = "rw3W9pDCPb2";
     public static final String ID_ATTR_BIRTHORDER ="vTPYC9BXPNn";
+
+    public static final String ID_ATTR_HAS_CONTACT_LOG_INFOR ="i1NpXcIwfes";
+    public static final String ID_ATTR_HIV_TEST_FINAL_RESULT ="PoTcUsGrIbS";
+    public static final String ID_ATTR_HIV_TEST_FINAL_RESULT_EVENTDATE ="AcpKX4a2iAx";
+    public static final String ID_ATTR_HIV_TEST_FINAL_RESULT_CATOPT ="hkf4GS79Sul";
+    public static final String ID_ATTR_HIV_TESTING_EVENT_NUMBER ="Y1pdU5TSGrB";
     
     // DE Ids
     public static final String ID_DE_PARTNER_CUIC = "UYyCL2xz8Wz";
@@ -151,12 +157,12 @@ public final class Util
     public static final String ID_DE_COPUPLE_STATUS = "Umu8i2QXCZk";
     
     // SQL Views
-    public static final String ID_SQLVIEW_LOAD_TODAY_CASE = "IdFgIYoRINL";
-    public static final String ID_SQLVIEW_LOAD_POSITIVE_CASE = "mayPuvHkJ7G";
+//    public static final String ID_SQLVIEW_LOAD_TODAY_CASE = "IdFgIYoRINL";
+//    public static final String ID_SQLVIEW_LOAD_POSITIVE_CASE = "mayPuvHkJ7G";
     public static final String ID_SQLVIEW_LOAD_FUCASE_BY_USERNAME = "llbPbszABjd";
     public static final String ID_SQLVIEW_LOAD_FUCASE_ALL = "I8xOsd6qfyh";
     
-    public static final String ID_SQLVIEW_SEARCH_CLIENTS = "zPJW0n6mymH";
+//    public static final String ID_SQLVIEW_SEARCH_CLIENTS = "zPJW0n6mymH";
     public static final String ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS = "aUc8BV6Ipmu";
     
     public static final String ID_SQLVIEW_FIND_PARTNER = "SKI1rT5vA3m";
@@ -404,7 +410,7 @@ public final class Util
         responseInfo.responseCode = con.getResponseCode();
 
         // 5. Other response info
-        if ( con.getResponseCode() == HttpURLConnection.HTTP_OK ) 
+        if ( con.getResponseCode() < 400 ) 
         {
             BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
 
@@ -563,7 +569,7 @@ public final class Util
 
     public static void processResponseMsg( ResponseInfo responseInfo, String importSummaryCase )
     {
-        if ( responseInfo.responseCode != 200 )
+        if ( responseInfo.responseCode >= 400 )
         {
             // If error occured, display the output as it is (received from
             // DHIS).

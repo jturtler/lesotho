@@ -27,11 +27,11 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 	me.showTodayCaseTag = $("#showTodayCase");
 	
 	// Ids
-	me.attr_DoB = me.mainPage.clientFormManagement.attr_DoB;
-	me.attr_DistrictOB = me.mainPage.clientFormManagement.attr_DistrictOB;
-	me.attr_FirstName = me.mainPage.clientFormManagement.attr_FirstName;
-	me.attr_LastName = me.mainPage.clientFormManagement.attr_LastName;
-	me.attr_BirthOrder = me.mainPage.clientFormManagement.attr_BirthOrder;
+	me.attr_DoB = me.mainPage.settingsManagement.attr_DoB;
+	me.attr_DistrictOB = me.mainPage.settingsManagement.attr_DistrictOB;
+	me.attr_FirstName = me.mainPage.settingsManagement.attr_FirstName;
+	me.attr_LastName = me.mainPage.settingsManagement.attr_LastName;
+	me.attr_BirthOrder = me.mainPage.settingsManagement.attr_BirthOrder;
 	    
 	me.searchClientAttributeIds = [me.attr_DoB, me.attr_DistrictOB, me.attr_FirstName, me.attr_LastName, me.attr_BirthOrder];
 	
@@ -227,10 +227,10 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 							var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_add" );
 							me.searchResultKeyTag.html( tranlatedText + " " + searchCriteria );
 							
-							var clientList = searchResult.rows;
+							var clientList = searchResult.trackedEntityInstances;
 							if( clientList.length > 0 )
 							{
-								me.populateSearchClientData( searchResult );
+								me.populateSearchClientData( clientList );
 								me.highlightSearchMatches();
 								me.showSearchClientTableResult();
 							}
@@ -256,37 +256,39 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 		
 	};
 	
-	me.populateSearchClientData = function( searchResult )
-	{
-		var clientList = searchResult.rows;		
+	me.populateSearchClientData = function( clientList )
+	{		
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_rowTooltip" );
 		
 		for( var i in clientList )
 		{
-			var client = clientList[i];
-			var clientId = client[0];
-			var firstName = client[1].trim();
-			var lastName = client[2].trim();
+			var clientData = clientList[i];
+			var attrValues = clientData.attributes;
 			
-			var dob = client[3].trim();
+			var clientId = clientData.trackedEntityInstance;
+			var firstName = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_FirstName );
+			var lastName = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_LastName );
+			
+			var dob = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_DoB );
 			dob = ( dob != "" ) ? Util.formatDate_LocalDisplayDate( dob ) : "";
 			
-			var district = client[4].trim();
+			var district = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_DistrictOB );
 			if( district != "" ) {
 				var optionText = me.searchClientFormTag.find("[attribute='" + me.attr_DistrictOB + "'] option[value='" + district + "']").text();
 				district = ( optionText == "" ) ? district :  optionText;
 			}
 			
-			var birthOrder = client[5].trim();
+			var birthOrder = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_BirthOrder );
 			if( birthOrder != "" ) {
 				var optionText = me.searchClientFormTag.find("[attribute='" + me.attr_BirthOrder + "'] option[value='" + birthOrder + "']").text();
 				birthOrder = ( optionText == "" ) ? birthOrder :  optionText;
 			}
 			
-			var adquisition = client[6].trim();
+			var adquisition = clientData.created;
 			adquisition = ( adquisition != "" ) ? Util.formatDate_DisplayDate( adquisition ) : "";
-			var lastTestNS = client[7].trim();
+			var lastTestNS = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventDate );
 			lastTestNS = ( lastTestNS != "" ) ? Util.formatDate_DisplayDate( lastTestNS ) : "";
+			
 			
 			var rowTag = $("<tr title='" + tranlatedText + "' clientId='" + clientId + "'></tr>");
 			rowTag.append( "<td>" + firstName + "</td>" );
@@ -308,6 +310,14 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 		}
 		
 	};
+	
+
+	me.getAttributeValue = function( attributes, attrId )
+	{
+		var found = Util.findItemFromList( attributes, "attribute", attrId );
+		return ( found !== undefined ) ? found.value : "";
+	};
+	
 	
 	me.highlightSearchMatches = function()
 	{

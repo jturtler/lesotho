@@ -342,7 +342,7 @@ function CoordinatorListManagement( _mainPage )
 			            ,contentType: "application/json;charset=utf-8"
 						,success: function( response ) 
 						{
-							exeFunc( response.rows );
+							exeFunc( response.trackedEntityInstances );
 						}
 						,error: function(response)
 						{
@@ -381,11 +381,11 @@ function CoordinatorListManagement( _mainPage )
 		{
 			for( var i in list )
 			{
-				var event = list[i];
+				var clientData = list[i];
 				
-				var clientId = event[0];
+				var clientId = clientData.trackedEntityInstance;
 				var eventId = event[1];
-				var eventDate = event[2];
+				var eventDate = me.gefasdfasdf
 				var council = event[5];
 				var facilityRefer = event[6];
 				var cuic = event[3];
@@ -969,7 +969,6 @@ function CoordinatorListManagement( _mainPage )
 			me.councilFilterInfoTag.html( councils.join("; ") );
 		}
 	};
-	
 	
 	// -------------------------------------------------------------------------
 	// RUN init method

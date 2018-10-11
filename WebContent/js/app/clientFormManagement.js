@@ -61,6 +61,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	me.addEventFormTag = $("#addEventForm");
 	me.previousTestsTag = $("#previousTests");
 	me.thisTestDivTag = $("#thisTestDiv");
+	me.addClientAttrEventFormTag = $("#addClientAttrEventForm");
 	
 	me.discardEventFormBtnTag = $("#discardEventFormBtn");
 	me.saveEventBtnTag = $("#saveEventBtn");
@@ -101,15 +102,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 
 	
 	// [Register Attribute] Ids
+	me.attrGroup_EventDetails = "dO3lKCiPmVx";
 	me.attrGroup_ClientDetailsAndCUIC = "KgeLi7PFYxe";
-	
-	me.attr_FirstName = "R9Lw1uNtRuj";
-	me.attr_LastName = "TBt2a4Bq0Lx";
-	me.attr_DoB = "BvsJfkddTgZ";
-	me.attr_DistrictOB = "u57uh7lHwF8";
-	me.attr_ClientCUIC = "rw3W9pDCPb2";
-	me.attr_BirthOrder ="vTPYC9BXPNn";
-	
 	me.attr_Adquisition = "";
 	me.attr_Last_TestNS = "";
 	me.attr_LastContact = "";
@@ -145,7 +139,6 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	me.attr_NextKinPhoneNumber = "HtQU1Bfhc9m";
 	
 	
-	me.attr_LinkageStatus = "mYdfuRItatP";
 	me.de_ARTClosureLinkageOutcome  = "nOK8JcDWT9X";
 	me.de_LinkageStatusDropReason = "ZRfojTCqVhc";
 	
@@ -277,11 +270,11 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		
 		me.createClientForm();
 		
-		me.clientDoBTag = me.addClientFormTag.find("[attribute='" + me.attr_DoB + "']");
-		me.clientDistrictOBTag = me.addClientFormTag.find("[attribute='" + me.attr_DistrictOB + "']");
-		me.clientLastNameTag = me.addClientFormTag.find("[attribute='" + me.attr_LastName + "']");
-		me.clientFirstNameTag = me.addClientFormTag.find("[attribute='" + me.attr_FirstName + "']");
-		me.clientBirthOrderTag = me.addClientFormTag.find("[attribute='" + me.attr_BirthOrder + "']");
+		me.clientDoBTag = me.addClientFormTag.find("[attribute='" + me.mainPage.settingsManagement.attr_DoB + "']");
+		me.clientDistrictOBTag = me.addClientFormTag.find("[attribute='" + me.mainPage.settingsManagement.attr_DistrictOB + "']");
+		me.clientLastNameTag = me.addClientFormTag.find("[attribute='" + me.mainPage.settingsManagement.attr_LastName + "']");
+		me.clientFirstNameTag = me.addClientFormTag.find("[attribute='" + me.mainPage.settingsManagement.attr_FirstName + "']");
+		me.clientBirthOrderTag = me.addClientFormTag.find("[attribute='" + me.mainPage.settingsManagement.attr_BirthOrder + "']");
 		
 
 		me.resultTest1Tag = me.getDataElementField( me.de_Testing_ResultTest1 );
@@ -407,6 +400,10 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		});
 		
 		me.saveContactLogBtnTag.click(function(){
+
+			var hasContactLogFormInforTag = me.getAttributeField( me.mainPage.settingsManagement.attr_HasContactLogFormInfor );
+			hasContactLogFormInforTag.val( "true" );
+			
 			me.saveClient( me.contactLogFormTag, function(){
 				me.showAttrContactLogHistory();
 				me.hideIconInTab( me.TAB_NAME_CONTACT_LOG );
@@ -860,6 +857,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			me.execSaveEvent( me.thisTestDivTag, event, client.trackedEntityInstance, event.event, function( eventJson ){
 
 				me.updatePartnerInfo( eventJson );
+				me.updateClientRequiredInfo( eventJson );
 			} );
 		});
 				
@@ -874,8 +872,12 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				MsgManager.appBlock( tranlatedText + " ..." );
 				
 				me.completeEvent(function(){
+					var event = me.addEventFormTag.attr("event");
+					me.updateClientRequiredInfo( JSON.parse( event ) );
+					
 					me.addEventFormTag.removeAttr( "eventId" );
 					me.addEventFormTag.removeAttr( "event" );
+					
 				});
 				
 				return false;
@@ -893,6 +895,45 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.notAllowToCreateEventHeaderTag = $("#notAllowToCreateEventHeader");
 		
 	};
+	
+	
+	me.updateClientRequiredInfo = function( event )
+	{
+		me.setClientRequiredInfo( event );
+		me.saveClient( me.addClientAttrEventFormTag, function(){
+				
+		}, undefined, true );
+	};
+	
+	me.setClientRequiredInfo = function( event )
+	{
+		// Get data from [HIV Testing] event
+		var hivFinalTest = me.getEventDataValue( event, me.de_FinalResult_HIVStatus );
+		var hivEventDate = Util.formatDate_LocalDisplayDate( event.eventDate );
+		var userName = me.mainPage.settingsManagement.loginUsername;
+		var HIVEventNo = me.getAttributeField( me.attr_HIVEventNo ).val();
+		if( HIVEventNo == undefined || HIVEventNo == "" )
+		{
+			HIVEventNo = 0;
+		}
+		HIVEventNo = eval( HIVEventNo ) + 1;
+		
+		// Set data for TEA values
+		me.getAttributeField( me.mainPage.settingsManagement.attr_HIVTestFinalResult ).val( hivFinalTest );
+		me.getAttributeField( me.mainPage.settingsManagement.attr_HIVEventDate ).val( hivEventDate );
+		me.getAttributeField( me.mainPage.settingsManagement.attr_HIVEventCatOpt ).val( userName );
+		me.getAttributeField( me.mainPage.settingsManagement.attr_HIVEventNo ).val( HIVEventNo );
+		me.getAttributeField( me.mainPage.settingsManagement.attr_HIVEventStatus ).val( event.status );
+		
+		var orgUnitName = event.orgUnitName;
+		if( orgUnitName === undefined )
+		{
+			orgUnitName = me.orgUnitListTag.find("option[value='" +  event.orgUnit + "']").text();
+		}
+		me.getAttributeField( me.mainPage.settingsManagement.attr_HIVEventOrgUnit ).val( event.orgUnit + "$" + orgUnitName );
+		
+	};
+	
 	
 	me.disableClientDetailsAndCUICAttrGroup = function( disabled )
 	{
@@ -1437,7 +1478,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	me.populateEQCPPTPassedVal = function()
 	{
 		var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
-		var lastName = me.getAttributeValue( jsonClient, me.attr_LastName );
+		var lastName = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_LastName );
 		
 		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
 		if( me.resultTest1Tag.val() != "" && me.resultTest2Tag.val() != "" )
@@ -1616,12 +1657,19 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.createAttributeClientForm( me.contactLogFormTag, "LSHTC_LOG_", true );
 		me.createAttributeClientForm( me.artAttributeFormTag, "LSHTC_ART_", false );
 		me.createAttributeClientForm( me.artReferCloseFormTag, "LSHTC_ARTClosure_G1", false );
+		me.createAttributeClientForm( me.addClientAttrEventFormTag, "LSHTC_EVENT", false );
+//		me.find("tbody[groupId='" + me.attrGroup_EventDetails + "']").hide(); // Hide Attribute group in [New Test] tab
+		
+		
 		
 		
 		// set validation for firstName and lastName
-		me.getAttributeField( me.attr_FirstName ).attr( "notAllowSpecialChars", true );
-		me.getAttributeField( me.attr_LastName ).attr( "notAllowSpecialChars", true );
+		me.getAttributeField( me.mainPage.settingsManagement.attr_FirstName ).attr( "notAllowSpecialChars", true );
+		me.getAttributeField( me.mainPage.settingsManagement.attr_LastName ).attr( "notAllowSpecialChars", true );
 		
+		
+		// Hide attribute [LS - Has Contact log Information]
+		me.setHideLogicTag( me.getAttributeField( me.mainPage.settingsManagement.attr_HasContactLogFormInfor ), true);
 		
 		// Set Mandatory for [Consent to contact] field
 		me.addMandatoryForField( me.getAttributeField( me.attr_ConsentToContact ) );
@@ -1635,7 +1683,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.filterCouncilsByDistrict();
 		
 		// Add validation[EQC] for [First name]
-		me.getAttributeField( me.attr_FirstName ).attr( "valueNotAllow", "EQC" );
+		me.getAttributeField( me.mainPage.settingsManagement.attr_FirstName ).attr( "valueNotAllow", "EQC" );
 	};
 
 	me.createAttributeClientForm = function( table, preFixGroupName, addHistoryDiv )
@@ -1759,6 +1807,9 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		});
 		
 		saveBtnTag.click( function(){
+			var hasContactLogFormInforTag = me.getAttributeField( me.mainPage.settingsManagement.attr_HasContactLogFormInfor );
+			hasContactLogFormInforTag.val( "true" );
+			
 			me.saveClient( me.contactLogFormTag, function( id ){
 				me.showHistoryContactLogDetails( id );
 				editForm.removeClass("separateTb");
@@ -2038,15 +2089,15 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	me.setUp_ClientRegistrationFormValidation = function()
 	{
 		// Disable [Client CUIC] field. The value of this attribute will be generated from another attribute values		
-		Util.disableTag( me.getAttributeField( me.attr_ClientCUIC ), true );
+		Util.disableTag( me.getAttributeField( me.mainPage.settingsManagement.attr_ClientCUIC ), true );
 		
 		// Add [Delete] button for [Date Of Birth] field
-		var dobTag = me.getAttributeField( me.attr_DoB );
+		var dobTag = me.getAttributeField( me.mainPage.settingsManagement.attr_DoB );
 		dobTag.attr( "readonly", true );
 		
 		// Add [Min-Len] for [First name] and [Last name]
-		me.getAttributeField( me.attr_FirstName ).attr( "minlength", 2 );
-		me.getAttributeField( me.attr_LastName ).attr( "minlength", 2 );
+		me.getAttributeField( me.mainPage.settingsManagement.attr_FirstName ).attr( "minlength", 2 );
+		me.getAttributeField( me.mainPage.settingsManagement.attr_LastName ).attr( "minlength", 2 );
 		
 	};
 	
@@ -2091,7 +2142,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			me.setUp_ClientRegistrationFormLogic_everTested();
 		});
 		
-		var dobTag = me.getAttributeField( me.attr_DoB );
+		var dobTag = me.getAttributeField( me.mainPage.settingsManagement.attr_DoB );
 		dobTag.change( function(){
 			var ppocvTag = me.getAttributeField( me.attr_PPOVC );
 			ppocvTag.val("");
@@ -2193,7 +2244,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	
 	me.setUp_ClientRegistrationFormLogic_Age = function()
 	{
-		var dobTag = me.getAttributeField( me.attr_DoB );
+		var dobTag = me.getAttributeField( me.mainPage.settingsManagement.attr_DoB );
 		var age = "";
 		if( dobTag.val() != "" ){
 			var birthDateStr = Util.formatDate_DbDate( dobTag.val() );
@@ -2484,7 +2535,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.disableClientDetailsAndCUICAttrGroup( false );
 		
 		// Disable [Client CUIC] field. The value of this attribute will be generated from another attribute values		
-		Util.disableTag( me.getAttributeField( me.attr_ClientCUIC ), true );
+		Util.disableTag( me.getAttributeField( me.mainPage.settingsManagement.attr_ClientCUIC ), true );
 		
 		me.addClientFormTabTag.removeAttr( "client" );
 		me.addClientFormTabTag.removeAttr( "artHIVTestingEvent" );
@@ -2833,7 +2884,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		{
 			if( isInSession ) 
 			{
-				var partnerCUIC = me.getAttributeField( me.attr_ClientCUIC ).val();
+				var partnerCUIC = me.getAttributeField( me.mainPage.settingsManagement.attr_ClientCUIC ).val();
 				var partnerEventId = me.getDataElementField( me.de_PartnerEventId ).val();
 				var clientEventId = JSON.parse( me.addEventFormTag.attr( "event" ) ).event;
 				var coupleStatus = me.getDataElementField( me.de_CoupleStatus ).val();
@@ -2907,7 +2958,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.setARTLinkageStatusAttrValue();
 		
 		me.saveClient( me.artAttributeFormTag, function(){
-			var linkageStatusFieldTag = me.getAttributeField( me.attr_LinkageStatus );
+			var linkageStatusFieldTag = me.getAttributeField( me.mainPage.settingsManagement.attr_ARTStatus );
 			me.linkageStatusLableTag.html( linkageStatusFieldTag.find("option:selected").text() );
 			if( exeFunc != undefined ) exeFunc();
 		}, undefined, true );
@@ -2919,13 +2970,21 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		var artClosureEvent = me.artReferCloseFormTag.attr("event");
 		
 
-		var linkageStatusFieldTag = me.getAttributeField( me.attr_LinkageStatus );
-		
+		var linkageStatusFieldTag = me.getAttributeField( me.mainPage.settingsManagement.attr_ARTStatus );
 		var closureLinkageOutcomeTag = me.getDataElementField( me.de_ARTClosureLinkageOutcome );
+		var hasOpenEventTag = me.getAttributeField( me.mainPage.settingsManagement.attr_HasOpenEvent );
+		var artEventFacilityTag = me.getAttributeField( me.mainPage.settingsManagement.attr_ARTFacility );
 		
-		if( artOpeningEvent != undefined && artClosureEvent == undefined )
+		if( artOpeningEvent != undefined  )
 		{
-			linkageStatusFieldTag.val( "PENDING" );
+			hasOpenEventTag.val( "true" );
+			var facilityName = me.getDataElementField( me.de_ARTOpen_ReferralFacilityName );
+			artEventFacilityTag.val( facilityName.find("option:selected").text() );
+			
+			if( artClosureEvent == undefined )
+			{
+				linkageStatusFieldTag.val( "PENDING" );
+			}
 		}
 		else if( artClosureEvent != undefined )
 		{
@@ -2952,8 +3011,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		
 		// STEP 3. Display [This Test] Tab if the "status" mode is "Add Client"
 		
-		var firstName = me.getAttributeValue( response, me.attr_FirstName ).toUpperCase();
-		var surName = me.getAttributeValue( response, me.attr_LastName ).toUpperCase();
+		var firstName = me.getAttributeValue( response, me.mainPage.settingsManagement.attr_FirstName ).toUpperCase();
+		var surName = me.getAttributeValue( response, me.mainPage.settingsManagement.attr_LastName ).toUpperCase();
 		if( me.saveClientRegBtnTag.attr("status") == "add"  )
 		{
 			if( firstName != "EQC" && ( surName != "POS" || surName != "NEG" ) )
@@ -2997,8 +3056,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		var EQCPPTPassedTag = me.getDataElementField( me.de_EQCPPTPassed );
 		
 		
-		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
-		var surName = me.getAttributeValue( jsonClient, me.attr_LastName ).toUpperCase();
+		var firstName = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_FirstName ).toUpperCase();
+		var surName = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_LastName ).toUpperCase();
 		
 		if( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )
 		{
@@ -3016,7 +3075,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			
 			Util.disableTag( EQCPPTPassedTag, false );
 			
-			var dob = me.getAttributeValue( jsonClient, me.attr_DoB );
+			var dob = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_DoB );
 			if( dob != "" ){
 				var age = Util.calculateAge( dob );
 				if( age < 8 )
@@ -3057,7 +3116,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			me.checkAndSetClientTypeValue( jsonClient );
 		}
 		
-		var dobTag = me.getAttributeField( me.attr_DoB );
+		var dobTag = me.getAttributeField( me.mainPage.settingsManagement.attr_DoB );
 		var age = "";
 		if( dobTag.val() != "" ){
 			var birthDateStr = Util.formatDate_DbDate( dobTag.val() );
@@ -3226,7 +3285,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		    }, function(error) {
 		        clearTimeout(location_timeout);
 		        exeFunc( "", "" );
-		    });
+		    },{timeout:5000});
 		} else {
 			 exeFunc( "", "" );
 		}
@@ -3405,7 +3464,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			me.resetDataEntryForm();
 			
 			// Show 'Save' event button AND show "This test" form
-			var firstName = me.getAttributeValue( client, me.attr_FirstName ).toUpperCase();
+			var firstName = me.getAttributeValue( client, me.mainPage.settingsManagement.attr_FirstName ).toUpperCase();
 			
 			me.showTabInClientForm( me.TAB_NAME_THIS_TEST );
 			if( firstName != "EQC"  )
@@ -3446,8 +3505,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			
 			
 			var jsonClient = JSON.parse( me.addClientFormTabTag.attr( "client" ) );
-			var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
-			var surName = me.getAttributeValue( jsonClient, me.attr_LastName ).toUpperCase();
+			var firstName = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_FirstName ).toUpperCase();
+			var surName = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_LastName ).toUpperCase();
 			
 			if( me.isTodayEvent( jsonEvent ) && !(( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )))
 			{
@@ -3714,8 +3773,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		
 		// STEP 10. Except EQC client, Don't not allow to create a new event if there is one event today.
 		var jsonClient = JSON.parse( me.addClientFormTabTag.attr( "client" ) );
-		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
-		var surName = me.getAttributeValue( jsonClient, me.attr_LastName ).toUpperCase();
+		var firstName = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_FirstName ).toUpperCase();
+		var surName = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_LastName ).toUpperCase();
 		
 		if( me.addEventFormTag.attr( "event") == undefined && todayEvent && !(( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )) )
 		{
@@ -4050,8 +4109,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.showTabInClientForm( me.TAB_NAME_CONTACT_LOG );
 		
 		var jsonClient = JSON.parse( me.addClientFormTabTag.attr( "client" ) );
-		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
-		var surName = me.getAttributeValue( jsonClient, me.attr_LastName ).toUpperCase();
+		var firstName = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_FirstName ).toUpperCase();
+		var surName = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_LastName ).toUpperCase();
 		if( firstName == "EQC" && ( surName == "POS" || surName == "NEG" ) )
 		{
 			me.hideTabInClientForm( me.TAB_NAME_CONTACT_LOG );
@@ -4368,7 +4427,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	me.setUp_DataInPreviousTestTab = function( events, selectedEventId )
 	{
 		var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
-		var firstName = me.getAttributeValue( jsonClient, me.attr_FirstName ).toUpperCase();
+		var firstName = me.getAttributeValue( jsonClient, me.mainPage.settingsManagement.attr_FirstName ).toUpperCase();
 		if( firstName != "EQC" )
 		{
 			for( var i=0; i<events.length; i++ )
@@ -4774,11 +4833,11 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		
 		// Year(YY) Month(MM) DistrictOfBirth(DB) FirstName(2 Chars) LastName(2 Chars) BirthOrder(2 Chars)
 		
-		var dateOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DoB + "']").val();
-		var districtOfBirth = me.addClientFormTabTag.find("[attribute='" + me.attr_DistrictOB + "']").val();
-		var firstName = me.addClientFormTabTag.find("[attribute='" + me.attr_FirstName + "']").val().toUpperCase();
-		var lastName = me.addClientFormTabTag.find("[attribute='" + me.attr_LastName + "']").val().toUpperCase();
-		var birthOrder = me.addClientFormTabTag.find("[attribute='" + me.attr_BirthOrder + "']").val();
+		var dateOfBirth = me.addClientFormTabTag.find("[attribute='" + me.mainPage.settingsManagement.attr_DoB + "']").val();
+		var districtOfBirth = me.addClientFormTabTag.find("[attribute='" + me.mainPage.settingsManagement.attr_DistrictOB + "']").val();
+		var firstName = me.addClientFormTabTag.find("[attribute='" + me.mainPage.settingsManagement.attr_FirstName + "']").val().toUpperCase();
+		var lastName = me.addClientFormTabTag.find("[attribute='" + me.mainPage.settingsManagement.attr_LastName + "']").val().toUpperCase();
+		var birthOrder = me.addClientFormTabTag.find("[attribute='" + me.mainPage.settingsManagement.attr_BirthOrder + "']").val();
 		
 		// Remove white space and ' from firstName and lastName
 		
@@ -4796,7 +4855,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			clientCUIC = dateOfBirth.substring(9, 12) + Util.MONTH_INDEXES[dateOfBirth.substring(3, 6)] + districtOfBirth.substring(0, 2).toUpperCase() + firstCharsFirstName + firstCharsLastName + birthOrder;
 		}
 		
-		me.addClientFormTag.find("input[attribute='" + me.attr_ClientCUIC + "']").val( clientCUIC );
+		me.addClientFormTag.find("input[attribute='" + me.mainPage.settingsManagement.attr_ClientCUIC + "']").val( clientCUIC );
 	};
 	
 	me.populateParterCUIC = function()
