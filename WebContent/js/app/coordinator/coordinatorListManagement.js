@@ -290,7 +290,15 @@ function CoordinatorListManagement( _mainPage )
 		me.todayFUDateTag.html( Util.formatDate_LastNDate(0) );
 		me.listCases( "../event/todayFU", function( list )
 		{
-			me.populateTodayFU( list );
+			var tbodyTag = me.todayCaseTblTag.find("tbody");
+			tbodyTag.find("tr").remove();
+			
+			// Populate data
+			var contactLogEvent = list.contactLogEvent.trackedEntityInstances;
+			me.populateTodayFU( contactLogEvent );
+			var artClosureEvent = list.artClosureEvent.trackedEntityInstances;
+			me.populateTodayFU( artClosureEvent );
+			
 			me.todayCaseTblTag.show();
 			me.todayFUListTag.show("fast");
 			
@@ -342,7 +350,7 @@ function CoordinatorListManagement( _mainPage )
 			            ,contentType: "application/json;charset=utf-8"
 						,success: function( response ) 
 						{
-							exeFunc( response.trackedEntityInstances );
+							exeFunc( response );
 						}
 						,error: function(response)
 						{
@@ -375,55 +383,79 @@ function CoordinatorListManagement( _mainPage )
 	me.populateTodayFU = function( list )
 	{		
 		var tbodyTag = me.todayCaseTblTag.find("tbody");
-		tbodyTag.find("tr").remove();
 		
 		if( list.length > 0 )
 		{
 			for( var i in list )
 			{
 				var clientData = list[i];
-				
 				var clientId = clientData.trackedEntityInstance;
-				var eventId = event[1];
-				var eventDate = me.gefasdfasdf
-				var council = event[5];
-				var facilityRefer = event[6];
-				var cuic = event[3];
-				var referStatus = event[4];
-				var closureEventId = event[12];
 				
-				var nextAction = event[9];
-				var contactLogEventId = event[7];
-				if( contactLogEventId == "" && closureEventId == "" )
+				var clientRowTag = tbodyTag.find( "tr[clientId='" + clientId + "']" );
+				if( clientRowTag.length == 0 )
 				{
-					nextAction = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_nextStatusFollowUp" );
+					var attrValues = clientData.attributes;
+					
+					var eventDate = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventDate );
+					var cuic = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ClientCUIC );
+					var artClosureEventDate = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ARTClosure_EventDate );
+					
+					var council = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventOrgUnit );
+					if( council != undefined && council.split("$").length > 1 )
+					{
+						council = council.split("$")[1];
+					}
+					
+					var facilityRefer = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ARTFacility );
+					if( facilityRefer != "" )
+					{
+						facilityRefer = facilityRefer.split("$")[1];
+					}
+					
+					var referStatus = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ARTStatus );
+					if( referStatus != "" )
+					{
+						referStatus = Util.findItemFromList( me.mainPage.settingsManagement.artStatus, "code", referStatus ).name;
+					}
+					
+					var nextAction = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ContactLogEvent_NextAction );
+					if( nextAction == "" && artClosureEventDate == "" )
+					{
+						nextAction = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_nextStatusFollowUp" );
+					}
+					else if( nextAction != "" && artClosureEventDate != "" )
+					{
+						nextAction = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_nextStatusNone" );
+					}
+					else
+					{
+						nextAction = Util.findItemFromList( me.mainPage.settingsManagement.nextActionName, "code", nextAction ).name;
+					}
+					
+					eventDate = ( eventDate !== undefined ) ? eventDate : "";
+					var eventDateStr = eventDate;
+					if( eventDate !== "" )
+					{
+						eventDateStr = Util.formatTimeInDateTime( eventDate );
+					}
+	
+					var eventKey = eventDate.substring(11, 19).split(":").join("");
+					
+					
+					
+					var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
+					var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' ></tr>");							
+					rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
+					rowTag.append( "<td>" + council + "</td>" );
+					rowTag.append( "<td>" + facilityRefer + "</td>" );
+					rowTag.append( "<td>" + cuic + "</td>" );
+					rowTag.append( "<td>" + nextAction + "</td>" );
+					rowTag.append( "<td>" + referStatus + "</td>" );
+					
+					me.addEventForRowInList(rowTag);
+					
+					tbodyTag.append( rowTag );
 				}
-				else if( contactLogEventId != "" && closureEventId != "" )
-				{
-					nextAction = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_nextStatusNone" );
-				}
-				
-				eventDate = ( eventDate !== undefined ) ? eventDate : "";
-				var eventDateStr = eventDate;
-				if( eventDate !== "" )
-				{
-					eventDateStr = Util.formatTimeInDateTime( eventDate );
-				}
-
-				var eventKey = eventDate.substring(11, 19).split(":").join("");
-				
-				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
-				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
-				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
-				rowTag.append( "<td>" + council + "</td>" );
-				rowTag.append( "<td>" + facilityRefer + "</td>" );
-				rowTag.append( "<td>" + cuic + "</td>" );
-				rowTag.append( "<td>" + nextAction + "</td>" );
-				rowTag.append( "<td>" + referStatus + "</td>" );
-				
-				me.addEventForRowInList(rowTag);
-				
-				tbodyTag.append( rowTag );
 			}
 			
 		}
@@ -434,11 +466,13 @@ function CoordinatorListManagement( _mainPage )
 		me.todayFUNumberTag.html( me.todayCaseTblTag.find("tbody tr").length );
 	}
 
-	me.populateAllFUData = function( list )
+	me.populateAllFUData = function( response )
 	{	
 		me.allFUNumberTag.html( "0" );
 		var tbodyTag = me.allFUTblTag.find("tbody");
 		tbodyTag.find("tr").remove();
+		
+		var list = response.rows;
 		
 		if( list.length > 0 )
 		{

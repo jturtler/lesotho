@@ -25,9 +25,9 @@ public class ClientController
     // -------------------------------------------------------------------------
     // URLs
     // -------------------------------------------------------------------------
-    
-    private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?ou=" + Util.ROOT_ORGTUNIT_LESOTHO + "&ouMode=DESCENDANTS";
-    private static final String URL_QUERY_SEARCH_POSITIVE_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS + "/data.json";
+    public static final String URL_QUERY_CLIENT_BY_ID = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID + ".json";
+    private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?ouMode=ALL";
+    private static final String URL_QUERY_SEARCH_POSITIVE_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?ouMode=ALL&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT + ":EQ:POSITIVE";
     private static final String URL_QUERY_CREATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances";
     private static final String URL_QUERY_UPDATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID;
     private static final String URL_QUERY_ENROLLMENT = Util.LOCATION_DHIS_SERVER + "/api/enrollments";
@@ -151,6 +151,26 @@ public class ClientController
     // Supportive methods
     // ===============================================================================================================
 
+
+    public static ResponseInfo getClientById( String clientId )
+        throws UnsupportedEncodingException, ServletException, IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+            String requestUrl = ClientController.URL_QUERY_CLIENT_BY_ID;
+            requestUrl = requestUrl.replace( ClientController.PARAM_CLIENT_ID, clientId );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+    }
+    
     private static ResponseInfo searchClients( HttpServletRequest request, JSONObject jsonData )
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
@@ -176,7 +196,7 @@ public class ClientController
         try
         {
             String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
-            String url = ClientController.URL_QUERY_SEARCH_POSITIVE_CLIENTS + "?" + condition;
+            String url = ClientController.URL_QUERY_SEARCH_POSITIVE_CLIENTS +  condition;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -240,6 +260,52 @@ public class ClientController
 
         return responseInfo;
     }
+    
+    public static ResponseInfo updateAttrValues( String clientId, JSONArray updatedAttrValues )
+        throws IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+
+        System.out.println("\n\n +++++++ updatedAttrValues : " + updatedAttrValues.toString() );
+        try
+        {
+            responseInfo = ClientController.getClientById( clientId );
+            JSONObject clientData = responseInfo.data;
+            JSONArray clientAttrValues = clientData.getJSONArray( "attributes" );
+            for( int i=0; i< updatedAttrValues.length(); i++ )
+            {
+                JSONObject updatedAttrValue = updatedAttrValues.getJSONObject( i );
+                for( int j=0; j< clientAttrValues.length(); j++ )
+                {
+                    JSONObject clientAttrValue = clientAttrValues.getJSONObject( j );
+                    if( updatedAttrValue.getString( "attribute" ).equals( clientAttrValue.getString( "attribute" ) ) )
+                    {
+                        clientAttrValue.put( "value", updatedAttrValue.getString( "value" ) );
+                        break;
+                    }
+                }
+            }
+
+            
+            
+            clientData.remove( "attributes" );
+            clientData.put( "attributes", clientAttrValues );
+            responseInfo = ClientController.updateClient( clientId, clientData );
+            
+            
+            System.out.println("\n clientAttrValues : " + clientAttrValues.toString() );
+            System.out.println("\n clientData : " + clientData.toString() );
+            System.out.println("\n responseInfo : " + responseInfo.output );
+            
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }  
+
+        return responseInfo;
+    }
+    
 
     private static ResponseInfo enrollClient( String clientId, String ouId )
         throws IOException, Exception

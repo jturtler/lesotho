@@ -266,19 +266,19 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 			var attrValues = clientData.attributes;
 			
 			var clientId = clientData.trackedEntityInstance;
-			var firstName = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_FirstName );
-			var lastName = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_LastName );
+			var firstName = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_FirstName );
+			var lastName = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_LastName );
 			
-			var dob = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_DoB );
+			var dob = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_DoB );
 			dob = ( dob != "" ) ? Util.formatDate_LocalDisplayDate( dob ) : "";
 			
-			var district = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_DistrictOB );
+			var district = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_DistrictOB );
 			if( district != "" ) {
 				var optionText = me.searchClientFormTag.find("[attribute='" + me.attr_DistrictOB + "'] option[value='" + district + "']").text();
 				district = ( optionText == "" ) ? district :  optionText;
 			}
 			
-			var birthOrder = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_BirthOrder );
+			var birthOrder = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_BirthOrder );
 			if( birthOrder != "" ) {
 				var optionText = me.searchClientFormTag.find("[attribute='" + me.attr_BirthOrder + "'] option[value='" + birthOrder + "']").text();
 				birthOrder = ( optionText == "" ) ? birthOrder :  optionText;
@@ -286,7 +286,7 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 			
 			var adquisition = clientData.created;
 			adquisition = ( adquisition != "" ) ? Util.formatDate_DisplayDate( adquisition ) : "";
-			var lastTestNS = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventDate );
+			var lastTestNS = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventDate );
 			lastTestNS = ( lastTestNS != "" ) ? Util.formatDate_DisplayDate( lastTestNS ) : "";
 			
 			
@@ -309,13 +309,6 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 			me.searchResultTbTag.find("tbody").append( rowTag );
 		}
 		
-	};
-	
-
-	me.getAttributeValue = function( attributes, attrId )
-	{
-		var found = Util.findItemFromList( attributes, "attribute", attrId );
-		return ( found !== undefined ) ? found.value : "";
 	};
 	
 	

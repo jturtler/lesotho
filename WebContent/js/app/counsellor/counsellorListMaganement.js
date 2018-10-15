@@ -208,13 +208,6 @@ function CounsellorListMaganement( _mainPage  )
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Populate data to tables
 	// ---------------------------------------------------------------------------------------------------------------------------
-
-	me.getAttributeValue = function( attrValues, attrId )
-	{
-		var dataValues = event.dataValues;
-		var found = Util.findItemFromList( attrValues, "attribute", attrId );
-		return ( found !== undefined ) ? found.value : "";
-	};
 	
 	me.populateTodayCaseData = function( list )
 	{		
@@ -229,13 +222,18 @@ function CounsellorListMaganement( _mainPage  )
 				var attrValues = clientData.attributes;
 				
 				var clientId = clientData.trackedEntityInstance;
-				var eventDate = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventDate );
-				var hivTestResult = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVTestFinalResult );
-				var eventStatus = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventStatus );
-				var cuic = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_ClientCUIC );
-				var hasContactData = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HasContactLogFormInfor );
-				var hasOpenEvent = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HasOpenEvent );
-				var ouName = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventOrgUnit );
+				var eventDate = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventDate );
+				var hivTestResult = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVTestFinalResult );
+				var eventStatus = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventStatus );
+				var cuic = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ClientCUIC );
+				var hasContactData = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HasContactLogFormInfor );
+				var hasOpenEvent = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ARTFacility );
+				if( hasOpenEvent !== "" )
+				{
+					var hasOpenEvent = true;
+				}
+				
+				var ouName = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventOrgUnit );
 				if( ouName != undefined && ouName.split("$").length > 1 )
 				{
 					ouName = ouName.split("$")[1];
@@ -310,17 +308,17 @@ function CounsellorListMaganement( _mainPage  )
 				var attrValues = clientData.attributes;
 				
 				var clientId = clientData.trackedEntityInstance;
-				var hivTestResult = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVTestFinalResult );
-				var eventStatus = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventStatus );
-				var cuic = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_ClientCUIC );
-				var noTest = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventNo );
-				var ouName = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventOrgUnit );
+				var hivTestResult = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVTestFinalResult );
+				var eventStatus = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventStatus );
+				var cuic = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ClientCUIC );
+				var noTest = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventNo );
+				var ouName = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventOrgUnit );
 				if( ouName != undefined && ouName.split("$").length > 1 )
 				{
 					ouName = ouName.split("$")[1];
 				}
 				
-				var eventDate = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventDate );
+				var eventDate = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventDate );
 				var eventDateStr = eventDate;
 				if( eventDate !== "" )
 				{
@@ -364,19 +362,19 @@ function CounsellorListMaganement( _mainPage  )
 				var attrValues = clientData.attributes;
 				
 				var clientId = clientData.trackedEntityInstance;
-				var hivTestResult = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVTestFinalResult );
-				var eventStatus = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventStatus );
-				var cuic = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_ClientCUIC );
-				var numberOfTest = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventNo );
-				var artStatus = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_ARTStatus );
-				var openingFacility = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_ARTFacility );
-				var ouName = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventOrgUnit );
+				var hivTestResult = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVTestFinalResult );
+				var eventStatus = Util.getAttributeValue( attrValues,"attribute",  me.mainPage.settingsManagement.attr_HIVEventStatus );
+				var cuic = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ClientCUIC );
+				var numberOfTest = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventNo );
+				var artStatus = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ARTStatus );
+				var openingFacility = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_ARTFacility );
+				var ouName = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventOrgUnit );
 				if( ouName != undefined && ouName.split("$").length > 1 )
 				{
 					ouName = ouName.split("$")[1];
 				}
 				
-				var eventDate = me.getAttributeValue( attrValues, me.mainPage.settingsManagement.attr_HIVEventDate );
+				var eventDate = Util.getAttributeValue( attrValues, "attribute", me.mainPage.settingsManagement.attr_HIVEventDate );
 				var eventDateStr = eventDate;
 				if( eventDate !== "" )
 				{

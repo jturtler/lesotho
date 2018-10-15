@@ -49,17 +49,30 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.attr_DoB = "BvsJfkddTgZ";
 	me.attr_DistrictOB = "u57uh7lHwF8";
 	me.attr_BirthOrder ="vTPYC9BXPNn";
+	
 	me.attr_HasContactLogFormInfor = "i1NpXcIwfes"; // Set this one mandatory for Contact Log
+	
 	me.attr_HIVTestFinalResult = "PoTcUsGrIbS";
 	me.attr_HIVEventDate = "AcpKX4a2iAx";
 	me.attr_HIVEventStatus = "JAMoB6GnGyw";
 	me.attr_HIVEventCatOpt = "hkf4GS79Sul";
 	me.attr_HIVEventNo = "Y1pdU5TSGrB";
 	me.attr_HIVEventOrgUnit = "uXg5tqrRsXJ";
-	me.attr_HasOpenEvent = "tmx7xkwsxPC";
+	me.attr_HIVEventParnerOption = "HJQvtlJOmQm";
+	me.attr_HIVEventParnerCUIC = "s192aFpfWbW";
+	
 	me.attr_ARTStatus = "mYdfuRItatP";
 	me.attr_ARTFacility = "wLGxRN9x0uW";
+	me.attr_ARTEventDate = "OqrP3KFlFT1";
 	
+	me.attr_ContactLogEvent_LastAction = "jWl3jWdsogC";
+	me.attr_ContactLogEvent_LastActionDate = "L5NZ7vuyLe7";
+	me.attr_ContactLogEvent_NextAction = "kIREHjvNqNe";
+	me.attr_ContactLogEvent_Usernames = "L9SC2lA8eWg";
+	
+	me.attr_ARTClosure_EventDate = "D7CpzDGAPpy";
+	me.attr_ARTClosure_Usernames = "YhfhMtu82Pr";
+
 	
 	me.de_ContactLog_TypeOfContact = "wzM3bUiPowS";
 	me.de_ContactLog_nextAction = "mcgzEFh5IV8";
@@ -292,6 +305,10 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 						{
 							me.filterHealthFacilities = attributeList[j].optionSet.options;
 							me.filterHealthFacilities = Util.sortByKey( me.filterHealthFacilities, "code" );
+						}
+						else if( attributeList[j].id === me.attr_ARTStatus )
+						{
+							me.artStatus = attributeList[j].optionSet.options;
 						}
 					}
 				}

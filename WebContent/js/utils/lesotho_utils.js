@@ -923,6 +923,25 @@ Util.getCurrentQuarterly = function( reportPeriodList )
 	return period;
 };
 
+// Get data from JSON FILE
+Util.getAttributeValue = function( list, propertyName, id )
+{
+	var found = Util.findItemFromList( list, propertyName, id );
+	return ( found !== undefined ) ? found.value : "";
+};
+
+Util.setHideTag = function( tab, hidden )
+{
+	var rowTag = tab.closest("tr");
+	if( hidden )
+	{
+		rowTag.hide();
+	}
+	else
+	{
+		rowTag.show();
+	}
+};
 
 //=====================================================================================
 // FormBlock Utils
@@ -945,7 +964,6 @@ FormBlock.block = function( block, msg, cssSetting, tag )
 		else tag.unblock();
 	}
 }
-
 
 //=====================================================================================
 //FormBlock Utils
@@ -1049,5 +1067,6 @@ MsgManager.showDialogForm = function( msg ){
 	}).show();
 };
 	
+
 
 	
