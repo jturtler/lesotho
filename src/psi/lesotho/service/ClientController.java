@@ -266,7 +266,6 @@ public class ClientController
     {
         ResponseInfo responseInfo = null;
 
-        System.out.println("\n\n +++++++ updatedAttrValues : " + updatedAttrValues.toString() );
         try
         {
             responseInfo = ClientController.getClientById( clientId );
@@ -291,12 +290,6 @@ public class ClientController
             clientData.remove( "attributes" );
             clientData.put( "attributes", clientAttrValues );
             responseInfo = ClientController.updateClient( clientId, clientData );
-            
-            
-            System.out.println("\n clientAttrValues : " + clientAttrValues.toString() );
-            System.out.println("\n clientData : " + clientData.toString() );
-            System.out.println("\n responseInfo : " + responseInfo.output );
-            
         }
         catch ( Exception ex )
         {
