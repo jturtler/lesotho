@@ -143,12 +143,9 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	me.attr_Last_TestNS = "waitingId";
 	me.attr_LastContact = "waitingId";
 	
-	me.attr_Sex = "CCVO6BZMrnp";
+	me.attr_Sex = "JcGai6pHG1M";// CCVO6BZMrnp
 	me.attr_KeyPopulation = "Y35TizULMzg";
 	me.attr_PPOVC  = "vD0qayOxs64";
-//	me.attr_EverTested  = "PWy9kmp4Pmb";
-//	me.attr_LastHIVTestResult = "XTWSNIlxkEj";
-//	me.attr_DateLastHIVTest = "PyfoYtwNGrI";
 	
 
 	me.attr_ARTReferral_LinkageStatus = "mYdfuRItatP";
@@ -246,9 +243,9 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	me.de_DateLastHIVTest = "YJclMbMOAHn";
 	
 	
-	me.de_TestType = "waitingId";
-	me.de_WhereClientReceiveHIVTest = "waitingId";
-	me.de_ClientHIVSelfTestResult = "waitingId";
+	me.de_TestType = "sP6aH7AVARw";
+	me.de_WhereClientReceiveHIVTest = "rcXteHYxSrb";
+	me.de_ClientHIVSelfTestResult = "cxuBulrdK1F";
 
 	me.de_TestingMateria_DetermineLotNo = "TNZTzsa8rjI";
 	me.de_TestingMateria_DetermineLotNo_ExpiryDate = "Wcl3ptGFHb8";
@@ -1018,6 +1015,11 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.getDataElementField( me.de_Height ).change( me.setUp_DataElementBMI );
 		me.getDataElementField( me.de_Weight ).change( me.setUp_DataElementBMI );
 		
+		// Time Since Last Test
+		me.getDataElementField( me.de_DateLastHIVTest ).on('dp.change', function(e){ 
+			me.setUp_DataElementTimeSinceLastTest();
+		});
+		
 		// ---------------------------------------------------------------------
 		// Set up events for buttons
 		
@@ -1200,7 +1202,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.setUp_DataElementTBScreeningConductedLogic();
 		me.setUp_OtherReasonTagLogic();
 		me.setUp_DataElementBMI();
-		
+		me.setUp_DataElementTimeSinceLastTest();
 	}; 
 	
 	
@@ -1784,6 +1786,23 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		bmiTag.val( result );
 	};	
 	
+	me.setUp_DataElementTimeSinceLastTest = function()
+	{
+		var timeSinceLastTestTag = me.getDataElementField( me.de_TimeSinceLastTest );
+		var prevHIVTestDate = me.getDataElementField( me.de_DateLastHIVTest ).val();
+
+		if( prevHIVTestDate != "" )
+		{
+			prevHIVTestDate = Util.formatDate_DbDate( me.getDataElementField( me.de_DateLastHIVTest ).val() );
+			var noMonth = Util.getMonthsBetweenDates( Util.convertDateStrToObject( prevHIVTestDate ), new Date() );
+			timeSinceLastTestTag.val( noMonth );
+		}
+		else
+		{
+			timeSinceLastTestTag.val( "" );
+		}
+	};
+	
 	me.setUp_PartnerCUICOption = function()
 	{
 		var partnerCUICOptTag = me.getDataElementField( me.de_partnerCUICOpt );
@@ -1838,9 +1857,6 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			var minDate = new Date();
 			minDate.setFullYear( minDate.getFullYear() - 100 );
 			minDate = Util.convertDateObjToStr( minDate );
-//			var maxDate = Util.convertDateStrToObject( openingEventDate.eventDate );
-//			maxDate.setDate( maxDate.getDate() - 1 );
-//			maxDate = Util.convertDateObjToStr( maxDate );
 			Util.datePicker_SetDateRange( dateARTEnrollmentTag, minDate, Util.convertDateObjToStr( new Date() ) );
 			
 			dateARTEnrollmentTag.change();
@@ -1901,9 +1917,6 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			var minDate = new Date();
 			minDate.setFullYear( minDate.getFullYear() - 100 );
 			minDate = Util.convertDateObjToStr( minDate );
-//			var maxDate = Util.convertDateStrToObject( openingEventDate.eventDate );
-//			maxDate.setDate( maxDate.getDate() - 1 );
-//			maxDate = Util.convertDateObjToStr( maxDate );
 			Util.datePicker_SetDateRange( datePrepReferEnrollmentTag, minDate, Util.convertDateObjToStr( new Date() ) );
 			
 			datePrepReferEnrollmentTag.change();
@@ -2647,12 +2660,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		var referralOfferedTag = me.getDataElementField( me.de_Referral_Offered );
 		
 		// Reset option values for attribute [Key Population]
-		keyPopulationTag.find("option").show();
-//		keyPopulationTag.find("option[value='MSMSW']").hide();
-//		keyPopulationTag.find("option[value='MSMNONSW']").hide();
-//		keyPopulationTag.find("option[value='FSW']").hide();
-//		keyPopulationTag.find("option[value='TG SW']").hide();
-//		keyPopulationTag.find("option[value='TG Non SW']").hide();
+		keyPopulationTag.find("option").hide();
+		keyPopulationTag.find("option[value='']").show();
 		
 		// Reset data element [Circumcised]
 		me.setHideLogicTag( circumcisedTag, false );
@@ -2670,35 +2679,21 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			}
 		}
 		
-//		if( dataSaved )
-//		{
-//			// Reset data element [Circumcised]
-//			me.setHideLogicTag( circumcisedTag.closest("tr"), false );
-//		}
-
-		if( sexTag.val() == "Male" ) // If Sex = Male, HIDE FSW
+		if( sexTag.val() == "M" )
 		{
-			keyPopulationTag.find("option[value='FSW']").hide();
-			// Show option values [MSM] of attribute [Key Population]
-//			keyPopulationTag.find("option[value='MSMSW']").show();
-//			keyPopulationTag.find("option[value='MSMNONSW']").show();
+			keyPopulationTag.find("option[value='MSMSW']").show();
+			keyPopulationTag.find("option[value='MSMNONSW']").show();
 			
 			if( dataSaved && referralOfferedTag.val() == "true" )
 			{
-//				// Show data element [Circumcised]
-//				me.setHideLogicTag( circumcisedTag.closest("tr"), false );
-				
 				// Hide [Referral to VMMC]
 				me.setHideLogicTag( referralGivenVMMCTag, false );
 			}
 			
 		}
-		else if( sexTag.val() == "Female" ) // If Sex = Female, HIDE "MSM SW", "MSM Non SW"	
+		else if( sexTag.val() == "F" )
 		{
-			keyPopulationTag.find("option[value='MSMSW']").hide();
-			keyPopulationTag.find("option[value='MSMNONSW']").hide();
-			// Show option values [FSW] of attribute [Key Population]
-//			keyPopulationTag.find("option[value='FSW']").show();
+			keyPopulationTag.find("option[value='FSW']").show();
 			
 			if( dataSaved )
 			{
@@ -2710,14 +2705,8 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		}
 		else if( sexTag.val() == "T" ) // If Sex = Male, HIDE "TG SW" and "TG Non SW"
 		{
-//			if( dataSaved )
-//			{
-//				// Show data element [Circumcised]
-//				me.setHideLogicTag( circumcisedTag.closest("tr"), false );
-//			}
-			
-			keyPopulationTag.find("option[value='TGSW']").hide();
-			keyPopulationTag.find("option[value='TGNONSW']").hide();
+			keyPopulationTag.find("option[value='TGSW']").show();
+			keyPopulationTag.find("option[value='TGNONSW']").show();
 		}
 		else
 		{
@@ -2768,7 +2757,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		var whereClientReceiveHIVTestTag = me.getDataElementField( me.de_WhereClientReceiveHIVTest );
 		var clientHIVSelfTestResultTag = me.getDataElementField( me.de_ClientHIVSelfTestResult );
 		
-		if( testTypeTag.val() == "Confirmatory (After ST)" )
+		if( testTypeTag.val() == "CNF" )
 		{
 			me.addMandatoryForField( whereClientReceiveHIVTestTag );
 			me.setHideLogicTag( whereClientReceiveHIVTestTag, false );
@@ -3804,36 +3793,6 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			me.setHideLogicTag( numberSexualPartnersLast6MonthTag, false );
 		}
 		
-		
-		// --------------------------------------------------------------------------
-		// Init [Time since last test in months]
-		
-		var timeSinceLastTestTag = me.getDataElementField( me.de_TimeSinceLastTest );
-		
-		var prevHIVTestDate = "";
-		var latestHIVTestEvent = me.previousTestsTag.find("table").find("tbody[eventid]:first");
-		var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
-		if( latestHIVTestEvent.length > 0 )
-		{
-			prevHIVTestDate = latestHIVTestEvent.find("tr[header]").attr("eventDate");
-			prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
-		}
-		else if( jsonClient != undefined )
-		{
-			prevHIVTestDate = me.getAttributeValue( jsonClient, me.de_DateLastHIVTest );
-			prevHIVTestDate = ( prevHIVTestDate != undefined ) ? prevHIVTestDate : "";
-		}
-		
-		if( prevHIVTestDate != "" )
-		{
-			var noMonth = Util.getMonthsBetweenDates( Util.convertDateStrToObject( prevHIVTestDate ), new Date() );
-			timeSinceLastTestTag.val( noMonth );
-		}
-		else
-		{
-			timeSinceLastTestTag.val( "" );
-		}
-
 		
 		// --------------------------------------------------------------------------
 		
