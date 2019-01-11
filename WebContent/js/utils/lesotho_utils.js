@@ -92,6 +92,7 @@ Util.setAutoCompleteTag = function( selectTag )
         },
         select: function ( event, ui ) {	
     	  ui.item.option.selected = true;
+    	  selectTag.val( ui.item.option.value );
     	  selectTag.change();
         },
         focus: function(event, ui) {
@@ -209,10 +210,7 @@ Util.getArrayJsonData = function( key, formTag, isGetEmptyValue )
 		var item = $(this);
 		var attrId = item.attr(key);
 		var value = item.val();
-		if( attrId == "gn35714pj4p" )
-		{
-			var fadsfasd = 0;
-		}
+		
 		if( item.attr("type") == "checkbox" )
 		{
 			if( item.prop("checked") )
@@ -419,6 +417,24 @@ Util.MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "O
 Util.DAYS = ["Sunday", "Monday", "Tuesday", "Webnesday", "Thursday", "Friday", "Saturday"];
 Util.MONTH_INDEXES = {"Jan" : "01", "Feb" : "02", "Mar" : "03", "Apr" : "04", "May" : "05", "Jun" : "06", "Jul" : "07", "Aug" : "08", "Sep" : "09", "Oct" : "10", "Nov" : "11", "Dec" : "12"};
 
+
+/** 
+ * Result : 2017-01-30
+ * **/
+Util.getCurrentDate = function()
+{
+	var date = new Date();
+	
+	var day = date.getDate();
+	day = ( day < 10 ) ? "0" + day : day;
+	
+	var month = date.getMonth();
+	month = ( month < 10 ) ? "0" + month : month;
+	
+	var year = date.getFullYear();
+	
+	return year + "-" + month + " " + day;
+};
 
 
 /** 
@@ -918,6 +934,26 @@ Util.getCurrentQuarterly = function( reportPeriodList )
 	return period;
 };
 
+// Get data from JSON FILE
+Util.getAttributeValue = function( list, propertyName, id )
+{
+	var found = Util.findItemFromList( list, propertyName, id );
+	return ( found !== undefined ) ? found.value : "";
+};
+
+Util.setHideTag = function( tab, hidden )
+{
+	var rowTag = tab.closest("tr");
+	rowTag.attr( "alwaysHide", true );
+	if( hidden )
+	{
+		rowTag.hide();
+	}
+	else
+	{
+		rowTag.show();
+	}
+};
 
 //=====================================================================================
 // FormBlock Utils

@@ -20,6 +20,7 @@ public class EventController
     private static String PARAM_USERNAME = "@PARAM_USERNAME";
     private static String PARAM_START_DATE = "@PARAM_START_DATE";
     private static String PARAM_END_DATE = "@PARAM_END_DATE";
+    private static String PARAM_EVENT_DATE = "@PARAM_EVENT_DATE";
     private static String PARAM_CLIENT_ID = "@PARAM_CLIENT_ID";
     private static String PARAM_EVENT_ID = "@PARAM_EVENT_ID";
     private static String PARAM_ORGUNIT_ID = "@PARAM_ORGUNIT_ID";
@@ -36,17 +37,41 @@ public class EventController
     // -------------------------------------------------------------------------
     // Load list
     
-    private static String URL_QUERY_CASES_BY_TIME = Util.LOCATION_DHIS_SERVER
-        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_TODAY_CASE + "/data.json?paging=false&var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
-        + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.ID_STAGE;
+    public static final String URL_QUERY_CASES_TODAY = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?"
+        + "ouMode=ALL"
+        + "&program=" + Util.ID_PROGRAM
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT_CATOPT + ":EQ:" + EventController.PARAM_USERNAME
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT_EVENTDATE + ":GT:" + EventController.PARAM_EVENT_DATE;
+    
 
-    private static String URL_QUERY_POSITIVE_CASES = Util.LOCATION_DHIS_SERVER
-        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_POSITIVE_CASE + "/data.json?paging=false&var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
-        + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.ID_STAGE;
+    public static final String URL_QUERY_CASES_PAST = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?"
+        + "ouMode=ALL"
+        + "&program=" + Util.ID_PROGRAM
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT_CATOPT + ":EQ:" + EventController.PARAM_USERNAME
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT_EVENTDATE + ":GT:" + EventController.PARAM_START_DATE
+        + ":LT:" + EventController.PARAM_END_DATE;
+        
+        
+    public static final String URL_QUERY_POSITIVE_CASES = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?"
+        + "ouMode=ALL"
+        + "&program=" + Util.ID_PROGRAM
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT_CATOPT + ":EQ:" + EventController.PARAM_USERNAME
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT_EVENTDATE + ":GT:" + EventController.PARAM_START_DATE
+                        + ":LT:" + EventController.PARAM_END_DATE
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT + ":EQ:Positive";
+        
+        
+    private static String URL_QUERY_FUCASE_BY_CONTACTLOGEVENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?"
+        + "ouMode=ALL"
+        + "&program=" + Util.ID_PROGRAM
+        + "&filter=" + Util.ID_ATTR_CONTACTLOGEVENT_DATE + ":EQ:" + EventController.PARAM_EVENT_DATE
+        + "&filter=" + Util.ID_ATTR_CONTACTLOGEVENT_USERNAMES + ":LIKE:" + EventController.PARAM_USERNAME;
 
-    private static String URL_QUERY_FUCASE_BY_USERNAME = Util.LOCATION_DHIS_SERVER
-        + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_BY_USERNAME + "/data.json?paging=false&var=startDate:" + EventController.PARAM_START_DATE + "&var=endDate:"
-        + EventController.PARAM_END_DATE + "&var=username:" + PARAM_USERNAME + "&var=stageId:" + Util.ID_STAGE;
+    private static String URL_QUERY_FUCASE_BY_ARTCLOSUREEVENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?"
+        + "ouMode=ALL"
+        + "&program=" + Util.ID_PROGRAM
+        + "&filter=" + Util.ID_ATTR_ARTCLOSURE_DATE + ":EQ:" + EventController.PARAM_EVENT_DATE
+        + "&filter=" + Util.ID_ATTR_ARTCLOSURE_USERNAMES + ":LIKE:" + EventController.PARAM_USERNAME;
 
     private static String URL_QUERY_FUCASE_ALL = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_LOAD_FUCASE_ALL + "/data.json?paging=false&var=username:";
     
@@ -55,7 +80,7 @@ public class EventController
 
     private static String URL_QUERY_CREATE_EVENT = Util.LOCATION_DHIS_SERVER + "/api/events";
     private static String URL_QUERY_UPDATE_EVENT = Util.LOCATION_DHIS_SERVER + "/api/events/" + EventController.PARAM_EVENT_ID;
-    private static String URL_QUERY_EVENTS_BY_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/events.json?ouMode=ACCESSIBLE&skipPaging=true&order=eventDate:DESC&trackedEntityInstance=" + EventController.PARAM_CLIENT_ID;
+    private static String URL_QUERY_EVENTS_BY_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/events.json?skipPaging=true&order=eventDate:DESC&trackedEntityInstance=" + EventController.PARAM_CLIENT_ID;
     
     // Load event details
     private static String URL_QUERY_EVENT_BY_ID = Util.LOCATION_DHIS_SERVER
@@ -65,16 +90,17 @@ public class EventController
     private static String URL_QUERY_ORGUNIT = Util.LOCATION_DHIS_SERVER
         + "/api/organisationUnits/" + PARAM_ORGUNIT_ID + ".json?fields=name,parent[name]";
 
-    // Find partner details by event id
-    private static String URL_QUERY_GET_PARTNER_BY_EVENTID = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_FIND_PARTNER_BY_EVENTID + "/data.json?paging=false&var=partnerEventId:" + EventController.PARAM_EVENT_ID; 
-    
-    
     // -------------------------------------------------------------------------
     // Client
     
+    
     // Find client partner information
-    private static String URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_FIND_PARTNER + "/data.json?paging=false&var=startDate:" + EventController.PARAM_START_DATE 
-        + "&var=stageId:" + Util.ID_STAGE + "&var=username:" + EventController.PARAM_USERNAME + "&var=ouId:" + EventController.PARAM_ORGUNIT_ID + "&var=endDate:" + EventController.PARAM_END_DATE;
+    private static String URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?"
+        + "ou=" + EventController.PARAM_ORGUNIT_ID 
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_PARTNER_OPTION + ":EQ:1"
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_PARTNER_CUIC + ":EQ:NULL" 
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT_CATOPT + ":LIKE:" + EventController.PARAM_USERNAME
+        + "&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT_EVENTDATE + ":EQ:" + EventController.PARAM_EVENT_DATE;
     
     
     // -------------------------------------------------------------------------
@@ -221,7 +247,19 @@ public class EventController
                 // Load Today F/U
                 else if ( key.equals( Util.KEY_TODAY_FU ) )
                 {
-                    responseInfo = EventController.getTodayFU( request, loginUsername );
+                    responseInfo = EventController.getTodayFU_ContactLogEvent( request, loginUsername );
+                    String output = "\"contactLogEvent\":" + responseInfo.output + "";
+                    
+                    if( responseInfo.responseCode == 200 )
+                    {
+                        ResponseInfo responseInfo_ARTClosureEvent = EventController.getTodayFU_ARTClosureEvent( request, loginUsername );
+                        if( responseInfo_ARTClosureEvent.responseCode == 200 )
+                        {
+                            output += ",\"artClosureEvent\":" + responseInfo_ARTClosureEvent.output + "";
+                        }
+                    }
+                    
+                    responseInfo.output = "{" + output + "}";
                 }  
                 // Load Previous F/U
                 else if ( key.equals( Util.KEY_ALL_FU ) )
@@ -237,13 +275,15 @@ public class EventController
                 else if ( key.equals( Util.KEY_SAVE_PARTNER_CUIC ) )
                 {
                     String clientEventId = request.getParameter( Util.PAMAM_EVENT_ID );
-                    String partnerEventId = request.getParameter( Util.PAMAM_PARTNER_ID );
+                    String clientCUIC = request.getParameter( Util.PAMAM_CLIENT_CUIC );
+                    String partnerEventId = request.getParameter( Util.PAMAM_PARTNER_EVENT_ID );
                     String partnerCUIC = request.getParameter( Util.PAMAM_PARTNER_CUIC );
                     String coupleStatus = request.getParameter( Util.PAMAM_COUPLE_STAUTS );
 
                     responseInfo = EventController.getEventById( partnerEventId );
                    
                     JSONObject jsonEvent = responseInfo.data;
+                    String partnerId = jsonEvent.getString( "trackedEntityInstance" );
                     
                     JSONObject dataValueCUIC = new JSONObject();                    
                     dataValueCUIC.put( "dataElement", Util.ID_DE_PARTNER_CUIC );
@@ -262,6 +302,18 @@ public class EventController
                     
                     
                     responseInfo = EventController.updateEvent( partnerEventId, jsonEvent, loginUsername );
+                    
+                    if( responseInfo.responseCode == 200 )
+                    {
+                        JSONArray attrValues = new JSONArray();
+                        
+                        JSONObject attrValue = new JSONObject();
+                        attrValue.put( "attribute", Util.ID_ATTR_HIV_TEST_PARTNER_CUIC );
+                        attrValue.put( "value", clientCUIC ); 
+                        attrValues.put( attrValue );
+                        
+                        ResponseInfo responseInfo_partner = ClientController.updateAttrValues( partnerId, attrValues );
+                    }
                     
                 } 
                
@@ -293,13 +345,11 @@ public class EventController
 
         try
         {
-            String curDate = Util.getCurrentDate();
-            String tomorrow = Util.getXLastDate( -1 );
+            String yesterday = Util.getXLastDate( 1 );
 
-            String requestUrl = EventController.URL_QUERY_CASES_BY_TIME;
+            String requestUrl = EventController.URL_QUERY_CASES_TODAY;
             requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
-            requestUrl = requestUrl.replace( PARAM_START_DATE, curDate );
-            requestUrl = requestUrl.replace( PARAM_END_DATE, tomorrow );
+            requestUrl = requestUrl.replace( PARAM_EVENT_DATE, yesterday );
 
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
 
@@ -319,13 +369,13 @@ public class EventController
 
         try
         {
-            String startDate = Util.getXLastMonth( 12 );
-            String endDate = Util.getCurrentDate();
-
-            String requestUrl = EventController.URL_QUERY_CASES_BY_TIME;
+            String today = Util.getCurrentDate();
+            String last12Month = Util.getXLastMonth( 12 );
+            
+            String requestUrl = EventController.URL_QUERY_CASES_PAST;
             requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
-            requestUrl = requestUrl.replace( PARAM_START_DATE, startDate );
-            requestUrl = requestUrl.replace( PARAM_END_DATE, endDate );
+            requestUrl = requestUrl.replace( PARAM_START_DATE, last12Month );
+            requestUrl = requestUrl.replace( PARAM_END_DATE, today );
 
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
 
@@ -510,16 +560,15 @@ public class EventController
         throws IOException, Exception
     {
         ResponseInfo responseInfo = new ResponseInfo();
-
+        
         try
         {
             String requestUrl = URL_QUERY_UPDATE_EVENT;
             requestUrl = requestUrl.replace( EventController.PARAM_EVENT_ID, eventId );
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, eventData, null );
-
             if( responseInfo.responseCode == 200 )
             {
-                Util.processResponseMsg( responseInfo, "" );
+//                Util.processResponseMsg( responseInfo, "" );
                 responseInfo.output = eventData.toString();
             }
 
@@ -611,19 +660,43 @@ public class EventController
     private static ResponseInfo findClientPartner( String ouId, String loginUsername )
     {
         ResponseInfo responseInfo = null;
-
+        String outputData = "";
         try
         {
-            String startDate = Util.getCurrentDate();
-            String endDate = Util.getXLastDate( -1 );
+            String today = Util.getCurrentDate();
             
             String requestUrl = EventController.URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE;
-            requestUrl = requestUrl.replace( EventController.PARAM_START_DATE, startDate );
-            requestUrl = requestUrl.replace( EventController.PARAM_END_DATE, endDate );
+            requestUrl = requestUrl.replace( EventController.PARAM_EVENT_DATE, today );
             requestUrl = requestUrl.replace( EventController.PARAM_USERNAME, loginUsername );
             requestUrl = requestUrl.replace( EventController.PARAM_ORGUNIT_ID, ouId );
             
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+            
+            if( responseInfo.responseCode == 200 )
+            {
+                JSONObject partnerData = new JSONObject( responseInfo.output );
+                JSONArray list = partnerData.getJSONArray( "trackedEntityInstances" );
+                
+                if( list.length() == 1 )
+                {
+                    JSONObject clientData = list.getJSONObject( 0 );
+                    outputData = "\"clientDetails\":" + clientData.toString();
+                    
+                    ResponseInfo responseInfo_Events = EventController.getEventsByClient( clientData.getString( "trackedEntityInstance" ) );
+                    if( responseInfo_Events.responseCode == 200 )
+                    {
+                        JSONObject eventData = new JSONObject( responseInfo_Events.output );
+                        JSONArray eventList = eventData.getJSONArray( "events" );
+                        if( eventList.length() > 0 )
+                        {
+                            outputData += ",\"eventDetails\":" + eventList.getJSONObject( 0 ).toString();
+                        }
+                    }
+                }
+                
+                responseInfo.output = "{" + outputData + "}";  
+            }
+            
         }
         catch ( Exception ex )
         {
@@ -645,14 +718,31 @@ public class EventController
     public static ResponseInfo getPartnerByEventId( String eventId )
     {
         ResponseInfo responseInfo = null;
-
+        String outputData = "";
+        
         try
-        {
-           
-            String requestUrl = EventController.URL_QUERY_GET_PARTNER_BY_EVENTID;
+        { 
+            String requestUrl = EventController.URL_QUERY_EVENT_BY_ID;
             requestUrl = requestUrl.replace( EventController.PARAM_EVENT_ID, eventId );
             
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+            
+            outputData +="\"eventDetails\":" + responseInfo.output;
+            
+            
+            if( responseInfo.responseCode == 200 )
+            {
+                JSONObject eventData = new JSONObject( responseInfo.output );
+                String clientId = eventData.getString( "trackedEntityInstance" );
+                
+                ResponseInfo responseInfo_Client = ClientController.getClientById( clientId );
+                if( responseInfo_Client.responseCode == 200 )
+                {
+                    outputData += ",\"clientDetails\":" + responseInfo_Client.output;
+                }
+            }
+
+            responseInfo.output = "{" + outputData + "}";
         }
         catch ( Exception ex )
         {
@@ -668,7 +758,7 @@ public class EventController
     // Coordinator
     // ===============================================================================================================
 
-    private static ResponseInfo getTodayFU( HttpServletRequest request, String loginUsername )
+    private static ResponseInfo getTodayFU_ContactLogEvent( HttpServletRequest request, String loginUsername )
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
         ResponseInfo responseInfo = null;
@@ -676,12 +766,34 @@ public class EventController
         try
         {
             String curDate = Util.getCurrentDate();
-            String tomorrow = Util.getXLastDate( -1 );
-
-            String requestUrl = EventController.URL_QUERY_FUCASE_BY_USERNAME;
+         
+            String requestUrl = EventController.URL_QUERY_FUCASE_BY_CONTACTLOGEVENT;
             requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
-            requestUrl = requestUrl.replace( PARAM_START_DATE, curDate );
-            requestUrl = requestUrl.replace( PARAM_END_DATE, tomorrow );
+            requestUrl = requestUrl.replace( PARAM_EVENT_DATE, curDate );
+
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+    }
+    
+
+    private static ResponseInfo getTodayFU_ARTClosureEvent( HttpServletRequest request, String loginUsername )
+        throws UnsupportedEncodingException, ServletException, IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+            String curDate = Util.getCurrentDate();
+         
+            String requestUrl = EventController.URL_QUERY_FUCASE_BY_ARTCLOSUREEVENT;
+            requestUrl = requestUrl.replace( PARAM_USERNAME, loginUsername );
+            requestUrl = requestUrl.replace( PARAM_EVENT_DATE, curDate );
 
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
         }

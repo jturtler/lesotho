@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -22,17 +21,15 @@ public class ClientController
 
     private static final String PARAM_CLIENT_ID = "@PARAM_CLIENT_ID";
     
-    private static ArrayList<String> searchVariables = new ArrayList<>(Arrays.asList( Util.ID_ATTR_FIRSTNAME, Util.ID_ATTR_LASTNAME
-            , Util.ID_ATTR_DOB, Util.ID_ATTR_DISTRICTOB, Util.ID_ATTR_BIRTHORDER ));
     
     // -------------------------------------------------------------------------
     // URLs
     // -------------------------------------------------------------------------
-    
-    private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_CLIENTS + "/data.json?paging=false";
-    private static final String URL_QUERY_SEARCH_POSITIVE_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS + "/data.json?paging=false";
-    private static final String URL_QUERY_CREATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/30/trackedEntityInstances";
-    private static final String URL_QUERY_UPDATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/30/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID;
+    public static final String URL_QUERY_CLIENT_BY_ID = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID + ".json?program=" + Util.ID_PROGRAM;
+    private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?ouMode=ALL&program=" + Util.ID_PROGRAM;
+    private static final String URL_QUERY_SEARCH_POSITIVE_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?program=" + Util.ID_PROGRAM + "&ouMode=ALL&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT + ":EQ:POSITIVE";
+    private static final String URL_QUERY_CREATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances";
+    private static final String URL_QUERY_UPDATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID;
     private static final String URL_QUERY_ENROLLMENT = Util.LOCATION_DHIS_SERVER + "/api/enrollments";
     private static final String URL_QUERY_CLIENT_DETAILS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID + ".json?program=" + Util.ID_PROGRAM + "&fields=*,attributes[attribute,value]";
     
@@ -154,6 +151,26 @@ public class ClientController
     // Supportive methods
     // ===============================================================================================================
 
+
+    public static ResponseInfo getClientById( String clientId )
+        throws UnsupportedEncodingException, ServletException, IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+            String requestUrl = ClientController.URL_QUERY_CLIENT_BY_ID;
+            requestUrl = requestUrl.replace( ClientController.PARAM_CLIENT_ID, clientId );
+            responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, requestUrl, null, null );
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }
+
+        return responseInfo;
+    }
+    
     private static ResponseInfo searchClients( HttpServletRequest request, JSONObject jsonData )
         throws UnsupportedEncodingException, ServletException, IOException, Exception
     {
@@ -161,7 +178,7 @@ public class ClientController
         try
         {
             String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
-            String url = ClientController.URL_QUERY_SEARCH_CLIENTS + "&" + condition;
+            String url = ClientController.URL_QUERY_SEARCH_CLIENTS + condition;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -179,7 +196,7 @@ public class ClientController
         try
         {
             String condition = ClientController.createSearchClientCondition( jsonData.getJSONArray( "attributes" ) );
-            String url = ClientController.URL_QUERY_SEARCH_POSITIVE_CLIENTS + "&" + condition;
+            String url = ClientController.URL_QUERY_SEARCH_POSITIVE_CLIENTS +  condition;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_GET, url, null, null );
         }
         catch ( Exception ex )
@@ -227,7 +244,6 @@ public class ClientController
             requestUrl = requestUrl.replace( ClientController.PARAM_CLIENT_ID, clientId );
             
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, receivedData, null );
-  
             if( responseInfo.responseCode == 200 )
             {
                 responseInfo.output = receivedData.toString();
@@ -242,6 +258,45 @@ public class ClientController
 
         return responseInfo;
     }
+    
+    public static ResponseInfo updateAttrValues( String clientId, JSONArray updatedAttrValues )
+        throws IOException, Exception
+    {
+        ResponseInfo responseInfo = null;
+
+        try
+        {
+            responseInfo = ClientController.getClientById( clientId );
+            JSONObject clientData = responseInfo.data;
+            JSONArray clientAttrValues = clientData.getJSONArray( "attributes" );
+            for( int i=0; i< updatedAttrValues.length(); i++ )
+            {
+                JSONObject updatedAttrValue = updatedAttrValues.getJSONObject( i );
+                for( int j=0; j< clientAttrValues.length(); j++ )
+                {
+                    JSONObject clientAttrValue = clientAttrValues.getJSONObject( j );
+                    if( updatedAttrValue.getString( "attribute" ).equals( clientAttrValue.getString( "attribute" ) ) )
+                    {
+                        clientAttrValue.put( "value", updatedAttrValue.getString( "value" ) );
+                        break;
+                    }
+                }
+            }
+
+            
+            
+            clientData.remove( "attributes" );
+            clientData.put( "attributes", clientAttrValues );
+            responseInfo = ClientController.updateClient( clientId, clientData );
+        }
+        catch ( Exception ex )
+        {
+            System.out.println( "Exception: " + ex.toString() );
+        }  
+
+        return responseInfo;
+    }
+    
 
     private static ResponseInfo enrollClient( String clientId, String ouId )
         throws IOException, Exception
@@ -303,26 +358,14 @@ public class ClientController
     @SuppressWarnings( "unchecked" )
     private static String createSearchClientCondition( JSONArray attributeList )
     {
-        ArrayList<String> searchVariableCopy = (ArrayList<String>)ClientController.searchVariables.clone();
-        
         String condition = "";
         for( int i=0; i<attributeList.length(); i++ ) 
         {
             String attributeId = attributeList.getJSONObject( i ).getString( "attribute" );
             String value = attributeList.getJSONObject( i ).getString( "value" );
-            value = value.replaceAll("'", "-");
+            value = value.replaceAll("'", "''");
             
-            condition += "var=" + attributeId + ":" + URLEncoder.encode( value ) + "&";
-            
-            if ( searchVariableCopy.indexOf( attributeId ) >= 0 )
-            {
-                searchVariableCopy.remove( attributeId );
-            }
-        }
-        
-        for( int i=0; i<searchVariableCopy.size(); i++ )
-        {
-            condition += "var=" + searchVariableCopy.get( i ) + ":%20&";
+            condition += "&filter=" + attributeId + ":LIKE:" + URLEncoder.encode( value );
         }
         
         return condition;
