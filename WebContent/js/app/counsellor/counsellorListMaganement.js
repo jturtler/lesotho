@@ -170,12 +170,9 @@ function CounsellorListMaganement( _mainPage  )
 	me.listCases = function( url, exeFunc )
 	{
 		me.storageObj.removeItem("param" );
-		
-		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
-		
 		Util.resetPageDisplay();
 		
-		MsgManager.appBlock( tranlatedText + " ..." );
+		
 		
 		Commons.checkSession( function( isInSession ) 
 		{
@@ -187,6 +184,11 @@ function CounsellorListMaganement( _mainPage  )
 						,url: url
 						,dataType: "json"
 			            ,contentType: "application/json;charset=utf-8"
+		            	,beforeSend: function()
+		 	            {
+		            		var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
+		            		MsgManager.appBlock( tranlatedText + " ..." ); 
+		 	            }
 						,success: function( response ) 
 						{
 							exeFunc( response.trackedEntityInstances );

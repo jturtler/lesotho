@@ -32,6 +32,7 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 	me.attr_FirstName = me.mainPage.settingsManagement.attr_FirstName;
 	me.attr_LastName = me.mainPage.settingsManagement.attr_LastName;
 	me.attr_BirthOrder = me.mainPage.settingsManagement.attr_BirthOrder;
+	me.attr_HIVEventDate = me.mainPage.settingsManagement.attr_HIVEventDate;
 	    
 	me.searchClientAttributeIds = [me.attr_DoB, me.attr_DistrictOB, me.attr_FirstName, me.attr_LastName, me.attr_BirthOrder];
 	

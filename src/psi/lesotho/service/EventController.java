@@ -97,6 +97,7 @@ public class EventController
     // Find client partner information
     private static String URL_QUERY_FIND_FIRST_CLIENT_IN_COUPLE = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?"
         + "ou=" + EventController.PARAM_ORGUNIT_ID 
+        + "&program=" + Util.ID_PROGRAM
         + "&filter=" + Util.ID_ATTR_HIV_TEST_PARTNER_OPTION + ":EQ:1"
         + "&filter=" + Util.ID_ATTR_HIV_TEST_PARTNER_CUIC + ":EQ:NULL" 
         + "&filter=" + Util.ID_ATTR_HIV_TEST_FINAL_RESULT_CATOPT + ":LIKE:" + EventController.PARAM_USERNAME
@@ -529,7 +530,7 @@ public class EventController
             if ( catOptionComboId != null )
             {
                 JSONObject eventJson = EventController.composeJsonEvent( eventData, clientId, ouId, catOptionComboId );
-                
+
                 String requestUrl = EventController.URL_QUERY_CREATE_EVENT;
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, eventJson, null );
 

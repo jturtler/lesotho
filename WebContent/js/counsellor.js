@@ -59,13 +59,16 @@ function Counsellor( storageObj, translationObj )
 		me.setUp_Events();
 		
 		me.settingsManagement = new SettingsManagement( me, function( metaData ){
+			
+			var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
+    		MsgManager.appBlock( tranlatedText + " ..." ); 
+    		
 			me.clientFormManagement = new ClientFormManagement( me, metaData, Commons.APPPAGE_COUNSELLOR );
 			me.searchClientManagement = new SearchClientManagement( me, metaData, Commons.APPPAGE_COUNSELLOR );
 			me.listManagement = new CounsellorListMaganement( me );
 			me.reportManagement = new CounsellorReportManagement( me );
 			me.programSection = new ProgramSection( me, metaData, me.translationObj );
 			me.checkAndLoadDataAfterInit();
-			
 		} );
 		
 		
@@ -254,6 +257,9 @@ function Counsellor( storageObj, translationObj )
 		
 		if( page == me.settingsManagement.PAGE_TODAY_LIST )
 		{
+			var tranlatedText = me.translationObj.getTranslatedValueByKey( "common_msg_loadingData" );
+    		MsgManager.appBlock( tranlatedText + " ..." ); 
+    		
 			me.listManagement.listTodayCases( function(){
 				me.loadSearchSubPage( me.listManagement.todayCaseTblTag, subPage );
 			});
