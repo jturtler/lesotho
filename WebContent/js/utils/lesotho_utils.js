@@ -238,6 +238,10 @@ Util.getArrayJsonData = function( key, formTag, isGetEmptyValue )
 				
 				value = Util.formatDate_DbDate( value );
 			}
+			else if( item.attr("isDateTime") !== undefined && item.attr("isDateTime") == "true" && value != "" )
+			{
+				value = Util.formatDate_DbDate( value );
+			}
 			
 			var data = {};
 			data[key] = attrId;
@@ -423,7 +427,7 @@ Util.MONTH_INDEXES = {"Jan" : "01", "Feb" : "02", "Mar" : "03", "Apr" : "04", "M
  * **/
 Util.getCurrentDate = function()
 {
-	var date = new Date();
+	var date = Util.getLastNDate( 0 );
 	
 	var day = date.getDate();
 	day = ( day < 10 ) ? "0" + day : day;
@@ -434,6 +438,28 @@ Util.getCurrentDate = function()
 	var year = date.getFullYear();
 	
 	return year + "-" + month + "-" + day;
+};
+
+/** 
+ * Result : 2017-01-30 10:30
+ * **/
+Util.getCurrentDateTime = function()
+{
+	var date = Util.getLastNDate( 0 );
+	
+	var day = date.getDate();
+	day = ( day < 10 ) ? "0" + day : day;
+	
+	var month = date.getMonth() + 1;
+	month = ( month < 10 ) ? "0" + month : month;
+	
+	var year = date.getFullYear();
+	
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
+	var seconds = date.getSeconds();
+	
+	return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
 };
 
 
@@ -535,7 +561,15 @@ Util.formatDate_LocalDisplayDate = function( localDateStr )
 	var month = eval( localDateStr.substring( 5,7 ) ) - 1;
 	var day = localDateStr.substring( 8, 10 );
 	
-	return day + " " + Util.MONTHS[month] + " " + year;
+	var formattedDateStr = day + " " + Util.MONTHS[month] + " " + year;
+	if( localDateStr.length > 10 )
+	{
+		var hours = localDateStr.substring( 11,13 );
+		var minutes = localDateStr.substring( 14, 16 );
+		var seconds = localDateStr.substring( 17, 19 );
+		formattedDateStr += " " + hours + ":" + minutes + ":" + seconds;
+	}
+	return formattedDateStr;
 };
 
 
@@ -553,11 +587,11 @@ Util.formatDate_LocalDisplayMonthYear = function( localDateStr )
 };
 
 
-/** 
+/** Convert a date from server UTM time to local time
  * dateStr : "2017-02-07T09:56:10.298"
  * Result : 07 Feb 2017 09:56
  * **/
-Util.formatDate_DisplayDateTime = function( dateStr )
+Util.formatDate_DisplayDateTime = function( dateStr, showSeconds )
 {
 	var date = Util.convertUTCDateToLocalDate( dateStr );
 	
@@ -573,8 +607,16 @@ Util.formatDate_DisplayDateTime = function( dateStr )
 	var minutes = date.getMinutes();
 	minutes = ( minutes < 10 ) ? "0" + minutes : "" + minutes;
 	
-	return dayInMonth + " " + Util.MONTHS[month] + " " + year + " " + hours + ":" + minutes;
+	var seconds = "";
+	if( showSeconds ){
+		seconds = date.getSeconds();
+		seconds = ( seconds < 10 ) ? "0" + seconds : "" + seconds;
+	}
+	
+	
+	return dayInMonth + " " + Util.MONTHS[month] + " " + year + " " + hours + ":" + minutes + ":" + seconds;
 };
+
 
 /** 
  * dateObj : "2017-02-07T09:56:10.298"
@@ -592,6 +634,30 @@ Util.formatDateObj_DisplayDate = function( dateObj )
 };
 
 /** 
+ * dateObj : "2017-02-07T09:56:10.298"
+ * Result : 07 Feb 2017 09:56
+ * **/
+Util.formatDateObj_DisplayDateTime = function( dateObj )
+{	
+	var year = dateObj.getFullYear();
+	var month = dateObj.getMonth();
+	
+	var dayInMonth = dateObj.getDate();
+	dayInMonth = ( dayInMonth < 10 ) ? "0" + dayInMonth : dayInMonth;
+	
+	var hours = date.getHours();
+	hours = ( hours < 10 ) ? "0" + hours : "" + hours;
+	
+	var minutes = date.getMinutes();
+	minutes = ( minutes < 10 ) ? "0" + minutes : "" + minutes;
+	
+	var seconds = date.getSeconds();
+	seconds = ( seconds < 10 ) ? "0" + seconds : "" + seconds;
+	
+	return dayInMonth + " " + Util.MONTHS[month] + " " + year + " " + hours + ":" + minutes + ":" + seconds;;
+};
+
+/** 
  * dateStr : "2017 Jan 07"
  * Result : 2017-01-07
  * **/
@@ -599,9 +665,19 @@ Util.formatDate_DbDate = function( dateStr )
 {
 	var day = dateStr.substring(0,2);
 	var month = Util.MONTH_INDEXES[dateStr.substring(3,6)];
-	var year = dateStr.substring(7,12);
+	var year = dateStr.substring(7,11);
 	
-	return year + "-" + month + "-" + day;
+	var formattedDateStr = year + "-" + month + "-" + day;
+	
+	if( dateStr.length > 11 )
+	{
+		var hours = dateStr.substring( 12,14 );
+		var minutes = dateStr.substring( 15, 17 );
+		var seconds = dateStr.substring( 18, 20 );
+		formattedDateStr += "T" + hours + ":" + minutes + ":" + seconds;
+	}
+	
+	return formattedDateStr;
 };
 
 /** 
@@ -821,6 +897,7 @@ Util.dateFuturePicker = function( dateTag )
 	});
 };
 
+
 Util.dateFutureOnlyPicker = function( dateTag )
 {
 	dateTag.attr( "readonly", true );
@@ -841,6 +918,68 @@ Util.dateFutureOnlyPicker = function( dateTag )
 	});
 		  
 };
+
+Util.dateTimePicker = function( dateTag )
+{
+	dateTag.attr( "readonly", true );
+	
+	dateTag.datetimepicker({
+		viewMode: 'years'
+        ,format: Commons.dateTimeFormat
+        ,widgetPositioning: { 
+            vertical: 'bottom'
+        }
+		,maxDate: new Date()
+		,ignoreReadonly: true
+        ,showClear: true
+     });
+	 
+	dateTag.on('dp.change', function(e){ 
+		dateTag.change();
+	});
+	
+};
+
+Util.dateTimeFuturePicker = function( dateTag )
+{
+	dateTag.attr( "readonly", true );
+	
+	dateTag.datetimepicker({
+		viewMode: 'years'
+        ,format: Commons.dateTimeFormat
+        ,widgetPositioning: { 
+            vertical: 'bottom'
+        }
+		,ignoreReadonly: true
+	    ,showClear: true
+     });
+	
+	dateTag.on('dp.change', function(e){ 
+		dateTag.change();
+	});
+};
+
+Util.dateTimeFutureOnlyPicker = function( dateTag )
+{
+	dateTag.attr( "readonly", true );
+	
+	dateTag.datetimepicker({
+		viewMode: 'years'
+        ,format: Commons.dateTimeFormat
+        ,widgetPositioning: { 
+            vertical: 'bottom'
+        }
+		,minDate: new Date()
+		,ignoreReadonly: true
+        ,showClear: true
+     });
+	
+	dateTag.on('dp.change', function(e){ 
+		dateTag.change();
+	});
+		  
+};
+
 
 Util.datePickerStartEnd = function( dateTag, startDateStr, endDateStr )
 {

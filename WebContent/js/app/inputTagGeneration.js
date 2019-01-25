@@ -37,6 +37,10 @@ function InputTagGeneration( attribute )
 		{
 			inputTag = "<input type='text' isDate='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
 		}
+		else if( attribute.valueType === "DATETIME" )
+		{
+			inputTag = "<input type='text' isDateTime='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";
+		}
 //		else if( attribute.valueType === "PHONE_NUMBER" )
 //		{
 //			inputTag = "<input type='text' phonenumber='true' class='form-control' " + inputKey + "='" + attribute.id + "' mandatory='" + attribute.mandatory + "' >";

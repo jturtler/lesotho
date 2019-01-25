@@ -1,8 +1,8 @@
 
 function Commons() {}
 
-Commons.VERSION = "v0.54";
-Commons.VERSION_DATE = "Jan 16 2019";
+Commons.VERSION = "v0.54.2";
+Commons.VERSION_DATE = "Jan 24 2019";
 Util.SITE_INFO = "This is developing site";
 
 Commons.wsUrl = "ls-dev";
@@ -15,7 +15,7 @@ Commons.APPPAGE_COORDINATOR = "coordinator";
 Commons.APPPAGE_COUNSELLOR = "counsellor";
 
 
-Commons.sessionTimeOut = 60 * 60 * 1000;; // Get from [web.xml] configuration file
+Commons.sessionTimeOut = 60 * 60 * 1000; // Get from [web.xml] configuration file
 Commons.intervalCheckSession = 60000; // 1 minute
 
 Commons.checkSession = function( returnFunc )

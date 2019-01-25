@@ -399,22 +399,16 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		});
 		
 		
-		/* // ---------------------------------------------------------------------
-		// Add [Date picker] for date field
+		// ---------------------------------------------------------------------
+		// Add [Date picker] for date fields if any
 		
 		me.addClientFormTag.find("[isDate='true']").each(function(){
-			var attrId = $(this).attr("attribute");
-			if( attrId == me.de_DateLastHIVTest )
-			{
-				Util.monthYearPicker( $(this) );
-				$(this).attr( "isMonthYear", true );
-			}
-			else
-			{
-				Util.datePicker( $(this) );
-			}
-			
-		}); */
+			Util.datePicker( $(this) );
+		});
+		
+		me.addClientFormTag.find("[isDateTime='true']").each(function(){
+			Util.dateTimePicker( $(this) );
+		});
 		
 		// ---------------------------------------------------------------------
 		// 	Save Client information
@@ -1251,14 +1245,20 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			partnerCUIC = "NULL";
 		}
 		
+		// Update TEI Attribute values
 		var hivFinalTest = me.getEventDataValue( event, me.de_FinalResult_HIVStatus );
-		var eventDate = event.eventDate;
-		if( eventDate == undefined )
+		var hivEventDate = event.eventDate;
+		if( hivEventDate == undefined )
 		{
-			event.eventDate = Util.getCurrentDate();
+			hivEventDate = Util.getCurrentDateTime();
+			hivEventDate = Util.convertLocalTimeToUTM( hivEventDate );
+			hivEventDate = Util.formatDateObj_DisplayDateTime( hivEventDate ); // Need to convert date from local time to server time
 		}
-			
-		var hivEventDate = Util.formatDate_LocalDisplayDate( eventDate );
+		else	
+		{
+			hivEventDate = Util.formatDate_LocalDisplayDate( hivEventDate, true ); // Don't need to convert because event date is server time
+		}
+		
 		var userName = me.mainPage.settingsManagement.loginUsername;
 		var HIVEventNo = me.getAttributeField( me.attr_HIVEventNo ).val();
 		if( HIVEventNo == undefined || HIVEventNo == "" )
@@ -2241,6 +2241,10 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		me.addClientFormTag.find("input[isDate='true']").each(function(){
 			Util.datePicker( $(this) );
 		});
+		
+		me.addClientFormTag.find("input[dateTimePicker='true']").each(function(){
+			Util.dateTimePicker( $(this) );
+		});
 	};
 
 	me.createAttributeClientForm = function( table, preFixGroupName, addHistoryDiv )
@@ -2539,6 +2543,18 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				Util.datePicker( $(this) );
 			}
 		});
+		
+		me.addContactLogEventFormTag.find("input[isDateTime='true']").each(function(){
+			if( $(this).attr("dataelement") == me.de_DueDate )
+			{
+				Util.dateFutureOnlyPicker( $(this) );
+			}
+			else
+			{
+				Util.dateTimePicker( $(this) );
+			}
+		});
+		
 	};
 	
 	me.createDataEntryForm_ARTReferTag = function()
@@ -2576,6 +2592,10 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			Util.datePicker( $(this) );
 		});
 		
+		me.artReferOpenFormTag.find("input[isDateTime='true']").each(function(){
+			Util.dateTimePicker( $(this) );
+		});
+		
 		// Set mandatory for attributes in form
 		me.artReferOpenFormTag.find("input[attribute],select[attribute],textarea[attribute]").each(function(){
 			me.addMandatoryForField( $(this) );
@@ -2608,6 +2628,10 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		//Add "DATE" picker for "Date" field
 		me.artReferCloseFormTag.find("input[isDate='true']").each(function(){
 			Util.datePicker( $(this) );
+		});
+		
+		me.artReferCloseFormTag.find("input[isDateTime='true']").each(function(){
+			Util.dateTimePicker( $(this) );
 		});
 		
 		// Set autocompleted for [Referral facility name] in [ART Closure] form
@@ -2680,6 +2704,10 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			Util.datePicker( $(this) );
 		});
 		
+		me.prepReferOpenFormTag.find("input[isDateTime='true']").each(function(){
+			Util.dateTimePicker( $(this) );
+		});
+		
 		// Set mandatory for attributes in form
 		me.prepReferOpenFormTag.find("input[attribute],select[attribute],textarea[attribute]").each(function(){
 			me.addMandatoryForField( $(this) );
@@ -2713,6 +2741,10 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		//Add "DATE" picker for "Date" field
 		me.prepReferCloseFormTag.find("input[isDate='true']").each(function(){
 			Util.datePicker( $(this) );
+		});
+		
+		me.prepReferCloseFormTag.find("input[isDateTime='true']").each(function(){
+			Util.dateTimePicker( $(this) );
 		});
 		
 		// Set autocompleted for [Referral facility name] in [ART Closure] form
@@ -4870,25 +4902,13 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	
 	me.setValueForInputTag = function( inputTag, value )
 	{
-		if( inputTag.attr("isDate") === "true" && value != "" )
-		{
-			if( inputTag.attr("isMonthYear") === "true" )
-			{
-				value = Util.formatDate_LocalDisplayMonthYear( value );
-			}
-			else
-			{
-				value = Util.formatDate_LocalDisplayDate( value );
-			}
-			
-			inputTag.val( value );
-		}
-		else if( inputTag.attr("type") == "checkbox" )
+		if( inputTag.attr("type") == "checkbox" )
 		{
 			inputTag.prop("checked", value );
 		}
 		else
 		{
+			var value = me.displayValueInInputTag( value, inputTag );
 			inputTag.val( value );
 		}
 		
@@ -4899,6 +4919,28 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		}
 	};
 	
+	me.displayValueInInputTag = function( value, inputTag )
+	{
+		var displayValue = value;
+		
+		if( ( inputTag.attr("isDate") === "true" || inputTag.attr("isDateTime") === "true" ) && value != "" )
+		{
+			if( inputTag.attr("isMonthYear") === "true" )
+			{
+				displayValue = Util.formatDate_LocalDisplayMonthYear( value );
+			}
+			else
+			{
+				displayValue = Util.formatDate_LocalDisplayDate( value );
+			}
+		}
+		else if( inputTag.attr("type") == "checkbox" )
+		{
+			displayValue = "Yes";
+		}
+		
+		return displayValue;
+	};
 	
 	// -------------------------------------------------------------------------
 	// Setup "Contact Log" TAB
@@ -5591,10 +5633,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				var value = dataValues[i].value;
 				
 				var inputTag = me.contactLogEventFormTag.find("[dataelement='" + deId + "']");
-				if( inputTag.attr("isDate") ==  "true" )
-				{
-					value = Util.formatDate_LocalDisplayDate( value );
-				}
+				value = me.displayValueInInputTag( value, inputTag );
 				inputTag.val( value );
 			}
 
@@ -5665,7 +5704,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			{
 				value = inputTag.find("option[value='" + value + "']").text();
 			}
-			else if( inputTag.attr("isDate") === "true" && value != "" )
+			else if( ( inputTag.attr("isDate") === "true" || inputTag.attr("isDateTime") === "true" ) && value != "" )
 			{
 				value = Util.formatDate_LocalDisplayDate( value );
 			}
@@ -5939,7 +5978,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 		var onclickEvent="window.open(\"" + url + "\",\"Event Report\",\"width=400,height=500\");"
 		headerTag.append("<th colspan='2'>"
 				+ "<span class='headerInfor'> <img style='float:left' class='arrowRightImg showHide' src='../images/tab_right.png'> " 
-				+ Util.formatDate_DisplayDateTime( eventDate ) 
+				+ Util.formatDate_DisplayDateTime( eventDate, false ) 
 				+ "<font class='saperate'> | </font>" + orgUnitName 
 				+ "<font class='saperate'> | </font>" + counsellor 
 				+ "<font class='saperate'> | </font>" + testResult + "</span>"

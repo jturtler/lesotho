@@ -530,7 +530,6 @@ public class EventController
             if ( catOptionComboId != null )
             {
                 JSONObject eventJson = EventController.composeJsonEvent( eventData, clientId, ouId, catOptionComboId );
-
                 String requestUrl = EventController.URL_QUERY_CREATE_EVENT;
                 responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, eventJson, null );
 
@@ -564,6 +563,7 @@ public class EventController
         
         try
         {
+           
             String requestUrl = URL_QUERY_UPDATE_EVENT;
             requestUrl = requestUrl.replace( EventController.PARAM_EVENT_ID, eventId );
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_PUT, requestUrl, eventData, null );
