@@ -620,7 +620,6 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				
 				// Save data
 				
-				
 				me.setAndSaveARTLinkageStatusAttrValue( me.artReferOpenFormTag, function(){
 					
 					var artClosureEvent = me.artReferCloseFormTag.attr("event");
@@ -729,29 +728,6 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				});
 			}
 			
-
-//			if( me.validationObj.checkFormEntryTagsData( me.artReferCloseFormTag ) )
-//			{
-//				// Set [event] attribute for [ART Refer Opening] Tab
-//				me.artReferOpenFormTag.attr( "event", JSON.stringify( response ) );
-//				
-//				var artClosureEvent = me.artReferCloseFormTag.attr("event");
-//				if( artClosureEvent === undefined )
-//				{
-//					me.artReferCloseFormTag.removeAttr("event");
-//				}
-//				
-////				me.setARTLinkageStatusAttrValue();
-//				
-//				me.setAndSaveARTLinkageStatusAttrValue( me.artAttributeFormTag, function( response ){
-//					
-//					Util.disableForm( me.thisTestDivTag, true );
-//					me.showDateClientReferredARTOn();
-//					me.showTabInClientForm( me.TAB_NAME_ART_REFER );
-//					Util.disableForm( me.artReferOpenFormTag, true );
-//				} );
-//			}
-//			
 			return false;
 			
 		});
@@ -815,21 +791,6 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				// Set [event] attribute for [ART Refer Opening] Tab
 				me.prepReferOpenFormTag.attr( "event", JSON.stringify( response ) );
 				
-//				// Set data for required attribute values
-//
-//				var prepReferEventDateTag = me.getAttributeField( me.mainPage.settingsManagement.attr_PrEPReferEventDate );
-//				var prepReferEventFacilityTag = me.getAttributeField( me.mainPage.settingsManagement.attr_PrEPReferFacility );
-//				var facilityNameOptionTag = me.getDataElementField( me.prepReferOpenFormTag, me.de_prepReferOpen_ReferralFacilityName ).find("option:selected");
-//				var facilityOtherNameTag = me.getDataElementField( me.prepReferOpenFormTag, me.de_prepReferOpen_OtherSpecialFacilityName );
-//				var facilityName = facilityNameOptionTag.text();
-//				if( facilityOtherNameTag.val() !== "" )
-//				{
-//					facilityName = facilityOtherNameTag.val();
-//				}
-//				
-//				prepReferEventDateTag.val( Util.formatDate_LocalDisplayDate( response.eventDate ));
-//				prepReferEventFacilityTag.val( facilityNameOptionTag.val() + "$" + facilityName );
-							
 				// Save data
 				
 				me.setAndSavePrepReferLinkageStatusAttrValue( function(){
@@ -899,33 +860,61 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 
 			if( me.validationObj.checkFormEntryTagsData( me.prepReferCloseFormTag ) )
 			{
-				var closureEvent = me.prepReferCloseFormTag.attr("event");
-				if( closureEvent === undefined )
-				{
-					me.prepReferCloseFormTag.removeAttr("event");
-				}
-				me.setPrepReferLinkageStatusAttrValue();
+				var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
 				
-//				// Update attribute values
-//				var closureEventDateTag = me.getAttributeField( me.mainPage.settingsManagement.attr_PrEPReferClosure_EventDate  );
-//				var closureUserNameTag = me.getAttributeField( me.mainPage.settingsManagement.attr_PrEPReferClosure_Usernames );
-//				var closureLinkageOutcomeTag = me.getDataElementField( me.artReferCloseFormTag, me.de_prepReferClosureLinkageOutcome );
-//				var loginUsername = me.mainPage.settingsManagement.loginUsername;
-//
-//				closureEventDateTag.val( Util.formatDate_LocalDisplayDate( Util.getCurrentDate() ) );
-//				if( closureUserNameTag.val().indexOf( loginUsername ) < 0 )
+				var jsonEvent = me.prepReferCloseFormTag.attr("event");
+				var eventId;
+				if( jsonEvent !== undefined )
+				{
+					jsonEvent = JSON.parse( jsonEvent );
+					eventId = jsonEvent.event;
+				}
+				else
+				{
+					jsonEvent = { 
+						"programStage": me.stage_prepReferralClosure
+						,"status": "COMPLETED"
+					};
+				}
+							
+				jsonEvent.dataValues = Util.getArrayJsonData( "dataElement", me.prepReferCloseFormTag );
+				
+				me.execSaveEvent( me.prepReferCloseFormTag, jsonEvent, jsonClient.trackedEntityInstance, eventId, function( response ){
+					
+					// Set [event] attribute for [ART Refer Opening] Tab
+					me.prepReferCloseFormTag.attr( "event", JSON.stringify( response ) );
+					
+					// Save data
+					me.setAndSavePrepReferLinkageStatusAttrValue( function(){
+						
+						var prepReferOpenEvent = me.prepReferOpenFormTag.attr("event");
+						prepReferOpenEvent = JSON.parse( prepReferOpenEvent );
+						
+						// Generate [Time Elapsed] attribute value for [PreRefer Closure] form
+						me.populateTimeElapsed( prepReferOpenEvent, response, false );
+						
+						me.prepReferCloseFormTag.show();
+					
+						me.hideIconInTab( me.TAB_NAME_PREP_REFER );
+					});
+					
+				});
+				
+				
+//				var closureEvent = me.prepReferCloseFormTag.attr("event");
+//				if( closureEvent === undefined )
 //				{
-//					var usernames = closureUserNameTag.val() + ";" + loginUsername;
-//					closureUserNameTag.val(usernames);
+//					me.prepReferCloseFormTag.removeAttr("event");
 //				}
-
-				// Save client and event data
-				me.saveClientAndEvent( me.prepReferCloseFormTag, me.stage_prepReferralClosure, function( response ){
-					Util.disableForm( me.thisTestDivTag, true );
-					me.showDateClientReferredARTOn();
-					me.showTabInClientForm( me.TAB_NAME_PREP_REFER );
-					Util.disableForm( me.prepReferOpenFormTag, true );
-				} );
+//				me.setPrepReferLinkageStatusAttrValue();
+//				
+//				// Save client and event data
+//				me.saveClientAndEvent( me.prepReferCloseFormTag, me.stage_prepReferralClosure, function( response ){
+//					Util.disableForm( me.thisTestDivTag, true );
+//					me.showDateClientReferredARTOn();
+//					me.showTabInClientForm( me.TAB_NAME_PREP_REFER );
+//					Util.disableForm( me.prepReferOpenFormTag, true );
+//				} );
 			}
 			
 			return false;
@@ -3492,6 +3481,30 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 			
 			// Remove the old attribute values
 			me.getRemoveOldAttrValueFromJson( clientData.attributes, formTag );
+
+			// Add [ART Status] attribute value if any
+			var linkageStatusFieldTag = me.getAttributeField( me.mainPage.settingsManagement.attr_ARTStatus );
+			if( linkageStatusFieldTag.val() != "" )
+			{
+				// Remove the old attribute value
+				var artStatusAttrValue = {
+						"attribute" : me.mainPage.settingsManagement.attr_ARTStatus
+						,"value" : linkageStatusFieldTag.val()
+				}
+				Util.findAndReplaceItemFromList(attributeData, "attribute", me.mainPage.settingsManagement.attr_ARTStatus, artStatusAttrValue );
+			}
+			
+			// Add [PrepRefer Status] attribute value if any
+			linkageStatusFieldTag = me.getAttributeField( me.mainPage.settingsManagement.attr_PrEPReferStatus );
+			if( linkageStatusFieldTag.val() != "" )
+			{
+				// Remove the old attribute value
+				var artStatusAttrValue = {
+						"attribute" : me.mainPage.settingsManagement.attr_PrEPReferStatus
+						,"value" : linkageStatusFieldTag.val()
+				}
+				Util.findAndReplaceItemFromList( attributeData, "attribute", me.mainPage.settingsManagement.attr_ARTStatus, artStatusAttrValue );
+			}
 			
 			// Add new attribute values
 			clientData.attributes = clientData.attributes.concat( attributeData );
@@ -3553,7 +3566,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 				MsgManager.appBlock( tranlatedMsg );
 				
 				if( me.validationObj.checkFormEntryTagsData( formTag ) )
-				{
+				{	
 					$.ajax(
 						{
 							type: "POST"
@@ -3795,7 +3808,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	{
 		me.setPrepReferLinkageStatusAttrValue();
 		
-		me.saveClient( me.prepReferAttributeFormTag, function(){
+		me.saveClient( me.prepReferCloseFormTag.closest("div"), function(){
 			var linkageStatusFieldTag = me.getAttributeField( me.mainPage.settingsManagement.attr_PrEPReferStatus );
 			me.prepReferLinkageStatusLableTag.html( linkageStatusFieldTag.find("option:selected").text() );
 			if( exeFunc != undefined ) exeFunc();

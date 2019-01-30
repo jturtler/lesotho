@@ -126,7 +126,6 @@ public class ClientController
                     else
                     {
                         responseInfo = ClientController.createClient( receivedData, ouId );
-
                         StringBuffer output = new StringBuffer();
                         output.append( responseInfo.output );
 
@@ -233,7 +232,6 @@ public class ClientController
             String clientId = responseInfo.referenceId;
             receivedData.put( "trackedEntityInstance", clientId );
             responseInfo.output = receivedData.toString();
-
         }
         catch ( Exception ex )
         {
@@ -316,7 +314,6 @@ public class ClientController
         try
         {
             JSONObject enrollmentJson = ClientController.getEnrollmentJson( clientId, Util.ID_PROGRAM, ouId );
-
             String requestUrl = ClientController.URL_QUERY_ENROLLMENT;
             responseInfo = Util.sendRequest( Util.REQUEST_TYPE_POST, requestUrl, enrollmentJson, null );
         }

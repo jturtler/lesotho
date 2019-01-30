@@ -279,15 +279,23 @@ Util.findItemFromList = function( listData, searchProperty, searchValue )
 
 Util.findAndReplaceItemFromList = function( listData, searchProperty, searchValue, replacedData )
 {
+	var found = false;
+	
+	// Found item, replace a new one
 	$.each( listData, function( i, item )
 	{
 		if ( item[ searchProperty ] == searchValue )
 		{
 			listData[i] = JSON.parse( JSON.stringify( replacedData ) );
-			return false;
+			found = true;
 		}
 	});
 
+	// Not found item, add a new one
+	if( !found )
+	{
+		listData[listData.length] = replacedData;
+	}
 };
 
 
