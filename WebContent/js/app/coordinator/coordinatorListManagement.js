@@ -291,6 +291,16 @@ function CoordinatorListManagement( _mainPage )
 		me.listCases( "../event/todayFU", function( list )
 		{
 			me.populateTodayFU( list );
+			
+//			var tbodyTag = me.todayCaseTblTag.find("tbody");
+//			tbodyTag.find("tr").remove();
+//			
+//			// Populate data
+//			var contactLogEvent = list.contactLogEvent.trackedEntityInstances;
+//			me.populateTodayFU( contactLogEvent );
+//			var artClosureEvent = list.artClosureEvent.trackedEntityInstances;
+//			me.populateTodayFU( artClosureEvent );
+			
 			me.todayCaseTblTag.show();
 			me.todayFUListTag.show("fast");
 			
@@ -342,11 +352,11 @@ function CoordinatorListManagement( _mainPage )
 			            ,contentType: "application/json;charset=utf-8"
 						,success: function( response ) 
 						{
-							exeFunc( response.rows );
+							exeFunc( response.listGrid.rows );
 						}
 						,error: function(response)
 						{
-							console.log(response);
+							console.log( response );
 						}
 					});
 			} 
@@ -375,14 +385,13 @@ function CoordinatorListManagement( _mainPage )
 	me.populateTodayFU = function( list )
 	{		
 		var tbodyTag = me.todayCaseTblTag.find("tbody");
-		tbodyTag.find("tr").remove();
 		
 		if( list.length > 0 )
 		{
 			for( var i in list )
 			{
 				var event = list[i];
-				
+
 				var clientId = event[0];
 				var eventId = event[1];
 				var eventDate = event[2];
@@ -391,7 +400,7 @@ function CoordinatorListManagement( _mainPage )
 				var cuic = event[3];
 				var referStatus = event[4];
 				var closureEventId = event[12];
-				
+
 				var nextAction = event[9];
 				var contactLogEventId = event[7];
 				if( contactLogEventId == "" && closureEventId == "" )
@@ -403,15 +412,16 @@ function CoordinatorListManagement( _mainPage )
 					nextAction = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_nextStatusNone" );
 				}
 				
+				
 				eventDate = ( eventDate !== undefined ) ? eventDate : "";
 				var eventDateStr = eventDate;
 				if( eventDate !== "" )
 				{
 					eventDateStr = Util.formatTimeInDateTime( eventDate );
 				}
-
-				var eventKey = eventDate.substring(11, 19).split(":").join("");
 				
+				var eventKey = eventDate.substring(11, 19).split(":").join("");
+
 				var tranlatedText = me.translationObj.getTranslatedValueByKey( "allCaseList_msg_clickToOpenEditForm" );
 				var rowTag = $("<tr clientId='" + clientId + "' title='" + tranlatedText + "' eventId='" + eventId + "' ></tr>");							
 				rowTag.append( "<td><span style='display:none;'>" + eventKey + "</span><span>" + eventDateStr + "</span></td>" );
@@ -420,9 +430,9 @@ function CoordinatorListManagement( _mainPage )
 				rowTag.append( "<td>" + cuic + "</td>" );
 				rowTag.append( "<td>" + nextAction + "</td>" );
 				rowTag.append( "<td>" + referStatus + "</td>" );
-				
+
 				me.addEventForRowInList(rowTag);
-				
+
 				tbodyTag.append( rowTag );
 			}
 			
@@ -434,11 +444,13 @@ function CoordinatorListManagement( _mainPage )
 		me.todayFUNumberTag.html( me.todayCaseTblTag.find("tbody tr").length );
 	}
 
-	me.populateAllFUData = function( list )
+	me.populateAllFUData = function( response )
 	{	
 		me.allFUNumberTag.html( "0" );
 		var tbodyTag = me.allFUTblTag.find("tbody");
 		tbodyTag.find("tr").remove();
+		
+		var list = response.rows;
 		
 		if( list.length > 0 )
 		{

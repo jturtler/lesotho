@@ -29,10 +29,13 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.versionDateTag = $("#versionDate");
 	
 	// [Common]
-	me.divSessionExpireMsgTag =  $( "#divSessionExpireMsg" );
+	me.divSessionExpireMsgTag =  $("#divSessionExpireMsg");
 	me.menuIcon = $("button.hamburger");
 	me.headerRightSideControlsTag = $("div.headerRightSideControls");
 	me.mainContentTags = $("div.mainContent");
+	
+	// [Program Section]
+	me.setupProgamSectionBtnTag = $("#setupProgamSectionBtn");
 	
 	me.ARTReferralOpeningStage_Id = "OSpZnLBMVhr";
 	me.ARTReferralOpeningStage_Name = "";
@@ -40,6 +43,28 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 	me.attr_Council = "NLNTtpbT3c5";
 	me.attr_HealthFacilityProvidingART = "LCLiPzJWVAb";
 	me.de_ClosureART_Status = "nOK8JcDWT9X";
+	
+
+	// [Client Infor] Attributes
+	me.attr_ClientCUIC = "rw3W9pDCPb2";
+	me.attr_FirstName = "R9Lw1uNtRuj";
+	me.attr_LastName = "TBt2a4Bq0Lx";
+	me.attr_DoB = "BvsJfkddTgZ";
+	me.attr_DistrictOB = "u57uh7lHwF8";
+	me.attr_BirthOrder ="vTPYC9BXPNn";
+	
+	me.attr_HasContactLogFormInfor = "i1NpXcIwfes"; // Set this one mandatory for Contact Log
+	
+	// [ART Opening] attributes
+	me.attr_ARTStatus = "mYdfuRItatP";
+//	me.attr_ARTFacility = "wLGxRN9x0uW";
+//	me.attr_ARTEventDate = "OqrP3KFlFT1";
+
+
+	// [PrEP Refer. Opening] attributes
+	me.attr_PrEPReferStatus = "Gt0fW3hxpek";
+//	me.attr_PrEPReferFacility = "Q57XfdQD146";
+//	me.attr_PrEPReferEventDate = "xvXK3b9PJRT";
 	
 	me.de_ContactLog_TypeOfContact = "wzM3bUiPowS";
 	me.de_ContactLog_nextAction = "mcgzEFh5IV8";
@@ -252,10 +277,10 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 				me.metaData = jsonData;
 				
 				// Look for option values of Districts/Councils/Health facilities for filtering
-				var attrGroups = jsonData.attGroups.trackedEntityAttributeGroups;
+				var attrGroups = jsonData.attGroups.programSections;
 				for( var i in attrGroups )
 				{	
-					var attributeList = attrGroups[i].trackedEntityAttributes;
+					var attributeList = attrGroups[i].programTrackedEntityAttribute;
 					for( var j in attributeList )
 					{
 						if( attributeList[j].id === me.attr_District )
@@ -272,6 +297,10 @@ function SettingsManagement( mainPage, _afterLoadedMetaDataFunc )
 						{
 							me.filterHealthFacilities = attributeList[j].optionSet.options;
 							me.filterHealthFacilities = Util.sortByKey( me.filterHealthFacilities, "code" );
+						}
+						else if( attributeList[j].id === me.attr_ARTStatus )
+						{
+							me.artStatus = attributeList[j].optionSet.options;
 						}
 					}
 				}

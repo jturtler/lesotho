@@ -27,11 +27,12 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 	me.showTodayCaseTag = $("#showTodayCase");
 	
 	// Ids
-	me.attr_DoB = me.mainPage.clientFormManagement.attr_DoB;
-	me.attr_DistrictOB = me.mainPage.clientFormManagement.attr_DistrictOB;
-	me.attr_FirstName = me.mainPage.clientFormManagement.attr_FirstName;
-	me.attr_LastName = me.mainPage.clientFormManagement.attr_LastName;
-	me.attr_BirthOrder = me.mainPage.clientFormManagement.attr_BirthOrder;
+	me.attr_DoB = me.mainPage.settingsManagement.attr_DoB;
+	me.attr_DistrictOB = me.mainPage.settingsManagement.attr_DistrictOB;
+	me.attr_FirstName = me.mainPage.settingsManagement.attr_FirstName;
+	me.attr_LastName = me.mainPage.settingsManagement.attr_LastName;
+	me.attr_BirthOrder = me.mainPage.settingsManagement.attr_BirthOrder;
+	me.attr_HIVEventDate = me.mainPage.settingsManagement.attr_HIVEventDate;
 	    
 	me.searchClientAttributeIds = [me.attr_DoB, me.attr_DistrictOB, me.attr_FirstName, me.attr_LastName, me.attr_BirthOrder];
 	
@@ -154,11 +155,11 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 	
 	me.createSearchClientForm = function()
 	{
-		var attrGroups = me.metaData.attGroups.trackedEntityAttributeGroups;
+		var attrGroups = me.metaData.attGroups.programSections;
 		
 		for( var i in attrGroups )
 		{
-			var attrList = attrGroups[i].trackedEntityAttributes;
+			var attrList = attrGroups[i].programTrackedEntityAttribute;
 			for( var j in attrList )
 			{
 				var attribute = attrList[j];
@@ -227,10 +228,10 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 							var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchResult_msg_add" );
 							me.searchResultKeyTag.html( tranlatedText + " " + searchCriteria );
 							
-							var clientList = searchResult.rows;
+							var clientList = searchResult.listGrid.rows;
 							if( clientList.length > 0 )
 							{
-								me.populateSearchClientData( searchResult );
+								me.populateSearchClientData( clientList );
 								me.highlightSearchMatches();
 								me.showSearchClientTableResult();
 							}
@@ -256,9 +257,8 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 		
 	};
 	
-	me.populateSearchClientData = function( searchResult )
-	{
-		var clientList = searchResult.rows;		
+	me.populateSearchClientData = function( clientList )
+	{		
 		var tranlatedText = me.translationObj.getTranslatedValueByKey( "searchClient_result_rowTooltip" );
 		
 		for( var i in clientList )
@@ -285,8 +285,13 @@ function SearchClientManagement( _mainPage, _metaData, _appPage )
 			
 			var adquisition = client[6].trim();
 			adquisition = ( adquisition != "" ) ? Util.formatDate_DisplayDate( adquisition ) : "";
-			var lastTestNS = client[7].trim();
-			lastTestNS = ( lastTestNS != "" ) ? Util.formatDate_DisplayDate( lastTestNS ) : "";
+			var lastTestNS = "";
+			
+			if( client[7] != null ) 
+			{
+				lastTestNS = client[7].trim();
+				lastTestNS = ( lastTestNS != "" ) ? Util.formatDate_DisplayDate( lastTestNS ) : "";
+			}
 			
 			var rowTag = $("<tr title='" + tranlatedText + "' clientId='" + clientId + "'></tr>");
 			rowTag.append( "<td>" + firstName + "</td>" );

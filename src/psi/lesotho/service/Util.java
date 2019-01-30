@@ -32,6 +32,7 @@ public final class Util
     //// https://data.psi-mis.org
     public static String LOCATION_DHIS_SERVER = "https://data.psi-mis.org";
 //    public static String LOCATION_DHIS_SERVER = "https://clone.psi-mis.org";
+//    public static String LOCATION_DHIS_SERVER = "https://leap.psi-mis.org";
     public static final String ID_TRACKED_ENTITY = "XV3kldsZq0H";
 //    
 //    // https://sandbox.psi-mis.org
@@ -59,6 +60,9 @@ public final class Util
     public static final String KEY_METADATA_ALL = "all";
     public static final String KEY_METADATA_DISTRICTLIST = "districtList";
     public static final String KEY_METADATA_OULIST = "ouList";
+    public static final String KEY_METADATA_ADD_PROGRAMSECTION = "addProgramSection";
+    public static final String KEY_METADATA_UPDATE_PROGRAMSECTION = "updateProgramSection";
+    public static final String KEY_METADATA_DELETE_PROGRAMSECTION = "deleteProgramSection";
         
     // -------------------------------------------------------------------------
     // Retrieve data
@@ -96,14 +100,17 @@ public final class Util
     public static String REQUEST_TYPE_GET = "GET";
     public static String REQUEST_TYPE_POST = "POST";
     public static String REQUEST_TYPE_PUT = "PUT";
+    public static String REQUEST_TYPE_DELETE = "DELETE";
 
 
     public static String PAMAM_ORGUNIT_ID = "ouId";
     public static String PAMAM_CLIENT_ID = "clientId";
     public static String PAMAM_EVENT_ID = "eventId";
-    public static String PAMAM_PARTNER_ID = "partnerEventId";
+    public static String PAMAM_PARTNER_EVENT_ID = "partnerEventId";
     public static String PAMAM_DISTRICT_ID = "districtId";
     public static String PAMAM_PARTNER_CUIC = "partnerCUIC";
+    public static String PAMAM_CLIENT_CUIC = "clientCUIC";
+    public static String PAMAM_PARTNER_ID = "partnerId";
     public static String PAMAM_COUPLE_STAUTS = "coupleStatus";
     
     
@@ -145,23 +152,41 @@ public final class Util
     public static final String ID_ATTR_CLIENT_CUIC = "rw3W9pDCPb2";
     public static final String ID_ATTR_BIRTHORDER ="vTPYC9BXPNn";
     
+    
+    public static final String ID_ATTR_HIV_TEST_PARTNER_OPTION ="HJQvtlJOmQm";
+    public static final String ID_ATTR_HIV_TEST_PARTNER_CUIC = "s192aFpfWbW";   
+    public static final String ID_ATTR_HIV_TEST_FINAL_RESULT = "PoTcUsGrIbS";
+    public static final String ID_ATTR_HIV_TEST_FINAL_RESULT_EVENTDATE = "AcpKX4a2iAx";
+    public static final String ID_ATTR_HIV_TEST_FINAL_RESULT_CATOPT = "hkf4GS79Sul";
+    public static final String ID_ATTR_HIV_TESTING_EVENT_NUMBER = "Y1pdU5TSGrB";
+
+//    public static final String ID_ATTR_HAS_CONTACT_LOG_INFOR = "i1NpXcIwfes";
+//
+//    public static final String ID_ATTR_CONTACTLOGEVENT_DATE = "L5NZ7vuyLe7";
+//    public static final String ID_ATTR_CONTACTLOGEVENT_USERNAMES ="L9SC2lA8eWg";
+//    
+//    public static final String ID_ATTR_ARTCLOSURE_DATE = "D7CpzDGAPpy";
+//    public static final String ID_ATTR_ARTCLOSURE_USERNAMES = "YhfhMtu82Pr";
+    
+
+
     // DE Ids
     public static final String ID_DE_PARTNER_CUIC = "UYyCL2xz8Wz";
     public static final String ID_DE_PARTNER_EVENTID = "UV2AsoZJ7fw";
     public static final String ID_DE_COPUPLE_STATUS = "Umu8i2QXCZk";
+    
     
     // SQL Views
     public static final String ID_SQLVIEW_LOAD_TODAY_CASE = "IdFgIYoRINL";
     public static final String ID_SQLVIEW_LOAD_POSITIVE_CASE = "mayPuvHkJ7G";
     public static final String ID_SQLVIEW_LOAD_FUCASE_BY_USERNAME = "llbPbszABjd";
     public static final String ID_SQLVIEW_LOAD_FUCASE_ALL = "I8xOsd6qfyh";
-    
+
     public static final String ID_SQLVIEW_SEARCH_CLIENTS = "zPJW0n6mymH";
     public static final String ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS = "aUc8BV6Ipmu";
-    
+
     public static final String ID_SQLVIEW_FIND_PARTNER = "SKI1rT5vA3m";
     public static final String ID_SQLVIEW_FIND_PARTNER_BY_EVENTID = "aZX9hTaN0aj";
-    
     
     // --------------------------------------------------------------------------------------------------------------
     // HTTPS GET/POST/PUT request
@@ -200,7 +225,7 @@ public final class Util
                 }
             }
         }
-
+        
         JSONObject jsonData = new JSONObject( sb.toString() );
         return jsonData;
     }
@@ -213,11 +238,10 @@ public final class Util
         System.out.println( "\n\n ====== \n requestUrl : " + url );
 
         String username = Util.ACCESS_SERVER_USERNAME;
-        String password = Util.ACCESS_SERVER_PASSWORD;
-        
+        String password = Util.ACCESS_SERVER_PASSWORD;   
         ResponseInfo responseInfo = new ResponseInfo();
         StringBuffer responseMsg = new StringBuffer();
-
+        
         // 2. Open HttpsURLConnection and Set Request Type.
         URL obj = new URL( url );
 
@@ -356,29 +380,26 @@ public final class Util
         con.setRequestProperty( "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" );
         con.setRequestProperty( "Accept-Language", "en-US,en;q=0.5" );
         con.setRequestProperty( "Content-Type", "application/json; charset=utf-8" );
-        
+
         String userpass = username + ":" + password;
         String basicAuth = "Basic " + new String( new Base64().encode( userpass.getBytes() ) );
         con.setRequestProperty( "Authorization", basicAuth );
 
+        
         // 3. Body Message Received Handle
         if ( jsonData != null && jsonData.length() > 0 )
-        {
+        { 
             // Send post request
             con.setDoOutput( true );
-//            DataOutputStream wr = new DataOutputStream( con.getOutputStream() );
-//            wr.writeBytes( jsonData.toString() );
-//            wr.flush();
-//            wr.close();
             
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream(), "UTF-8"));
             bw.write(jsonData.toString());
             bw.flush();
             bw.close();
         }
-
+    
         if ( params != null && !params.isEmpty() )
-        {
+        { 
             StringBuilder postData = new StringBuilder();
             for ( Map.Entry<String, Object> param : params.entrySet() )
             {
@@ -399,12 +420,11 @@ public final class Util
             wr.flush();
             wr.close();
         }
-
         // 4. Send and get Response
         responseInfo.responseCode = con.getResponseCode();
 
         // 5. Other response info
-        if ( con.getResponseCode() == HttpURLConnection.HTTP_OK ) 
+        if ( con.getResponseCode() < 400 ) 
         {
             BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream(), "UTF-8" ) );
 
@@ -413,9 +433,9 @@ public final class Util
             {
                 responseMsg.append( inputLine );
             }
-
-            in.close();
             
+            in.close();
+
         } else 
         {
              String json = Util.readStream(con.getErrorStream());
@@ -521,7 +541,6 @@ public final class Util
         JSONObject rec = null;
 
         JSONObject recTemp = new JSONObject( output );
-
         if ( summaryType != null && summaryType.equals( "importSummaries" ) )
         {
             if ( recTemp.has( "response" ) )
@@ -544,17 +563,18 @@ public final class Util
         }
 
         if ( rec != null && rec.has( "status" ) && rec.getString( "status" ).equals( "SUCCESS" ) )
-        {
-            JSONObject importCount = rec.getJSONObject( "importCount" );
-
-            // NOTE: In "importSummaries" case, it shows up as 0 for 'imported'
-            if ( (importCount.getInt( "imported" ) >= 1 || importCount.getInt( "updated" ) >= 1)
-                || summaryType.equals( "importSummaries" ) )
+        { 
+            if( rec.has( "importSummaries" ) )
             {
-                if ( rec.has( "reference" ) )
+                JSONObject importSummaries = rec.getJSONArray( "importSummaries" ).getJSONObject( 0 );
+                if ( importSummaries.has( "reference" ) )
                 {
-                    referenceId = rec.getString( "reference" );
+                    referenceId = importSummaries.getString( "reference" );
                 }
+            }
+            else if ( rec.has( "reference" ) )
+            {
+                    referenceId = rec.getString( "reference" );
             }
         }
 
@@ -563,7 +583,7 @@ public final class Util
 
     public static void processResponseMsg( ResponseInfo responseInfo, String importSummaryCase )
     {
-        if ( responseInfo.responseCode != 200 )
+        if ( responseInfo.responseCode >= 400 )
         {
             // If error occured, display the output as it is (received from
             // DHIS).

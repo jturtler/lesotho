@@ -1,9 +1,8 @@
 
 function Commons() {}
 
-
-Commons.VERSION = "v0.51";
-Commons.VERSION_DATE = "Feb 28 2018";
+Commons.VERSION = "v0.54.3";
+Commons.VERSION_DATE = "Jan 29 2019";
 Util.SITE_INFO = "";
 
 Commons.wsUrl = "ls";
@@ -16,7 +15,7 @@ Commons.APPPAGE_COORDINATOR = "coordinator";
 Commons.APPPAGE_COUNSELLOR = "counsellor";
 
 
-Commons.sessionTimeOut = 60 * 60 * 1000;; // Get from [web.xml] configuration file
+Commons.sessionTimeOut = 60 * 60 * 1000; // Get from [web.xml] configuration file
 Commons.intervalCheckSession = 60000; // 1 minute
 
 Commons.checkSession = function( returnFunc )
@@ -58,6 +57,10 @@ Commons.checkForSessionExpired = function( response )
 
 Commons.checkSessionTimeOut = function( returnFunc )
 {
+
+	console.log('--- sessionTimeOut : ' + Commons.sessionTimeOut);
+	console.log('intervalCheckSession : ' + Commons.intervalCheckSession);
+	
 	Commons.sessionTimeOut = Commons.sessionTimeOut - Commons.intervalCheckSession;
 	var expired = ( Commons.sessionTimeOut <=0 );
 	returnFunc( expired, Commons.sessionTimeOut );
