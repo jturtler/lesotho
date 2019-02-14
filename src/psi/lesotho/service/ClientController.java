@@ -29,7 +29,7 @@ public class ClientController
     // -------------------------------------------------------------------------
     
     private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_CLIENTS + "/data.json?paging=false&";
-    private static final String URL_QUERY_SEARCH_POSITIVE_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS + "/data.json?paging=false";
+    private static final String URL_QUERY_SEARCH_POSITIVE_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/sqlViews/" + Util.ID_SQLVIEW_SEARCH_POSITIVE_CLIENTS + "/data.json?paging=false&";
     private static final String URL_QUERY_CREATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/30/trackedEntityInstances";
     private static final String URL_QUERY_UPDATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/30/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID;
     private static final String URL_QUERY_ENROLLMENT = Util.LOCATION_DHIS_SERVER + "/api/enrollments";
