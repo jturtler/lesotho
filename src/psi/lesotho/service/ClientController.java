@@ -126,6 +126,7 @@ public class ClientController
                     else
                     {
                         responseInfo = ClientController.createClient( receivedData, ouId );
+
                         StringBuffer output = new StringBuffer();
                         output.append( responseInfo.output );
 

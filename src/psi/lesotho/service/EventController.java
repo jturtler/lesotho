@@ -20,7 +20,6 @@ public class EventController
     private static String PARAM_USERNAME = "@PARAM_USERNAME";
     private static String PARAM_START_DATE = "@PARAM_START_DATE";
     private static String PARAM_END_DATE = "@PARAM_END_DATE";
-    private static String PARAM_EVENT_DATE = "@PARAM_EVENT_DATE";
     private static String PARAM_CLIENT_ID = "@PARAM_CLIENT_ID";
     private static String PARAM_EVENT_ID = "@PARAM_EVENT_ID";
     private static String PARAM_ORGUNIT_ID = "@PARAM_ORGUNIT_ID";
@@ -56,8 +55,9 @@ public class EventController
 
     private static String URL_QUERY_CREATE_EVENT = Util.LOCATION_DHIS_SERVER + "/api/events";
     private static String URL_QUERY_UPDATE_EVENT = Util.LOCATION_DHIS_SERVER + "/api/events/" + EventController.PARAM_EVENT_ID;
-    private static String URL_QUERY_EVENTS_BY_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/events.json?ouMode=ACCESSIBLE&skipPaging=true&order=eventDate:DESC&trackedEntityInstance=" + EventController.PARAM_CLIENT_ID;
- 
+    // private static String URL_QUERY_EVENTS_BY_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/events.json?ouMode=ACCESSIBLE&skipPaging=true&order=eventDate:DESC&trackedEntityInstance=" + EventController.PARAM_CLIENT_ID;
+    private static String URL_QUERY_EVENTS_BY_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/events.json?skipPaging=true&order=eventDate:DESC&trackedEntityInstance=" + EventController.PARAM_CLIENT_ID;
+    
     // Load event details
     private static String URL_QUERY_EVENT_BY_ID = Util.LOCATION_DHIS_SERVER
         + "/api/events/" + EventController.PARAM_EVENT_ID + ".json";
@@ -234,15 +234,18 @@ public class EventController
                 else if ( key.equals( Util.KEY_SAVE_PARTNER_CUIC ) )
                 {
                     String clientEventId = request.getParameter( Util.PAMAM_EVENT_ID );
+                    String clientCUIC = request.getParameter( Util.PAMAM_CLIENT_CUIC );
                     String partnerEventId = request.getParameter( Util.PAMAM_PARTNER_EVENT_ID );
                     String partnerCUIC = request.getParameter( Util.PAMAM_PARTNER_CUIC );
-                    String clientCUIC = request.getParameter( Util.PAMAM_CLIENT_CUIC );
                     String coupleStatus = request.getParameter( Util.PAMAM_COUPLE_STAUTS );
 
-                    // Save partner information
+                    // ---------------------------------------------------------
+                    // For Partner - Update Event with partner information
+                    
                     responseInfo = EventController.getEventById( partnerEventId );
                    
                     JSONObject jsonEvent = responseInfo.data;
+                    String partnerId = jsonEvent.getString( "trackedEntityInstance" );
                     
                     JSONObject dataValueCUIC = new JSONObject();                    
                     dataValueCUIC.put( "dataElement", Util.ID_DE_PARTNER_CUIC );
@@ -261,9 +264,32 @@ public class EventController
                     
                     
                     responseInfo = EventController.updateEvent( partnerEventId, jsonEvent, loginUsername );
+
+                    // ---------------------------------------------------------		
+                    // For Partner - Save Partner attribute information
+                    
+                    if( responseInfo.responseCode == 200 )
+                    {
+                        JSONArray attrValues = new JSONArray();
+                        
+                        JSONObject attrValue = new JSONObject();
+                        attrValue.put( "attribute", Util.ID_ATTR_HIV_TEST_PARTNER_CUIC );
+                        attrValue.put( "value", clientCUIC ); 
+                        attrValues.put( attrValue );
+                        
+
+                        JSONObject attrOptionValue = new JSONObject();
+                        attrOptionValue.put( "attribute", Util.ID_ATTR_HIV_TEST_PARTNER_OPTION );
+                        attrOptionValue.put( "value", "2" ); 
+                        attrValues.put( attrOptionValue );
+                        
+                        responseInfo = ClientController.updateAttrValues( partnerId, attrValues );
+                    }
                     
                     
-                    // Save Client information
+                    // ---------------------------------------------------------                
+                    // For Client - Update Event with partner information
+                    
                     ResponseInfo responseInfo_Client = EventController.getEventById( clientEventId );
  
                     JSONObject jsonClientEvent = responseInfo_Client.data;
@@ -283,9 +309,28 @@ public class EventController
                     dataValueClientCoupleStatus.put( "value", coupleStatus );
                     jsonClientEvent.getJSONArray( "dataValues" ).put( dataValueClientCoupleStatus );
                     
+
+                    responseInfo_Client = EventController.updateEvent( clientEventId, jsonClientEvent, loginUsername );  
                     
-                    responseInfo_Client = EventController.updateEvent( clientEventId, jsonClientEvent, loginUsername );
+                    // ---------------------------------------------------------                
+                    // For Client - Save Partner attribute information 
                     
+                    if( responseInfo.responseCode == 200 )
+                    {
+                        JSONArray attrValues = new JSONArray();
+                        
+                        JSONObject attrValue = new JSONObject();
+                        attrValue.put( "attribute", Util.ID_ATTR_HIV_TEST_PARTNER_CUIC );
+                        attrValue.put( "value", partnerCUIC ); 
+                        attrValues.put( attrValue );
+
+                        JSONObject attrOptionValue = new JSONObject();
+                        attrOptionValue.put( "attribute", Util.ID_ATTR_HIV_TEST_PARTNER_OPTION );
+                        attrOptionValue.put( "value", "1" ); 
+                        attrValues.put( attrOptionValue );
+                        
+                        responseInfo_Client = ClientController.updateAttrValues( clientEventId, attrValues );
+                    }
                 } 
                
             }

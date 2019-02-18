@@ -31,8 +31,8 @@ public final class Util
 
     //// https://data.psi-mis.org
 //    public static String LOCATION_DHIS_SERVER = "https://data.psi-mis.org";
-    public static String LOCATION_DHIS_SERVER = "https://clone.psi-mis.org";
-//    public static String LOCATION_DHIS_SERVER = "https://leap.psi-mis.org";
+//    public static String LOCATION_DHIS_SERVER = "https://clone.psi-mis.org";
+    public static String LOCATION_DHIS_SERVER = "https://leap.psi-mis.org";
     public static final String ID_TRACKED_ENTITY = "XV3kldsZq0H";
 //    
 //    // https://sandbox.psi-mis.org
@@ -152,7 +152,7 @@ public final class Util
     public static final String ID_ATTR_CLIENT_CUIC = "rw3W9pDCPb2";
     public static final String ID_ATTR_BIRTHORDER ="vTPYC9BXPNn";
     
-    
+    // Attributes for [HIV Testing] stage
     public static final String ID_ATTR_HIV_TEST_PARTNER_OPTION ="HJQvtlJOmQm";
     public static final String ID_ATTR_HIV_TEST_PARTNER_CUIC = "s192aFpfWbW";   
     public static final String ID_ATTR_HIV_TEST_FINAL_RESULT = "PoTcUsGrIbS";
@@ -160,15 +160,18 @@ public final class Util
     public static final String ID_ATTR_HIV_TEST_FINAL_RESULT_CATOPT = "hkf4GS79Sul";
     public static final String ID_ATTR_HIV_TESTING_EVENT_NUMBER = "Y1pdU5TSGrB";
 
-//    public static final String ID_ATTR_HAS_CONTACT_LOG_INFOR = "i1NpXcIwfes";
-//
-//    public static final String ID_ATTR_CONTACTLOGEVENT_DATE = "L5NZ7vuyLe7";
-//    public static final String ID_ATTR_CONTACTLOGEVENT_USERNAMES ="L9SC2lA8eWg";
-//    
-//    public static final String ID_ATTR_ARTCLOSURE_DATE = "D7CpzDGAPpy";
-//    public static final String ID_ATTR_ARTCLOSURE_USERNAMES = "YhfhMtu82Pr";
-    
+    // Attributes for [Contact Log form] client form
+    public static final String ID_ATTR_HAS_CONTACT_LOG_INFOR = "i1NpXcIwfes";
 
+	// Attributes for [Contact Log Event] stage
+    public static final String ID_ATTR_CONTACTLOGEVENT_DATE = "L5NZ7vuyLe7";
+    public static final String ID_ATTR_CONTACTLOGEVENT_USERNAMES ="L9SC2lA8eWg";
+    
+	// Attributes for [ART Closure] stage
+    public static final String ID_ATTR_ARTCLOSURE_DATE = "D7CpzDGAPpy";
+    public static final String ID_ATTR_ARTCLOSURE_USERNAMES = "YhfhMtu82Pr";
+	
+	
 
     // DE Ids
     public static final String ID_DE_PARTNER_CUIC = "UYyCL2xz8Wz";
@@ -384,7 +387,6 @@ public final class Util
         String userpass = username + ":" + password;
         String basicAuth = "Basic " + new String( new Base64().encode( userpass.getBytes() ) );
         con.setRequestProperty( "Authorization", basicAuth );
-
         
         // 3. Body Message Received Handle
         if ( jsonData != null && jsonData.length() > 0 )
@@ -397,7 +399,7 @@ public final class Util
             bw.flush();
             bw.close();
         }
-    
+        
         if ( params != null && !params.isEmpty() )
         { 
             StringBuilder postData = new StringBuilder();
@@ -420,6 +422,7 @@ public final class Util
             wr.flush();
             wr.close();
         }
+
         // 4. Send and get Response
         responseInfo.responseCode = con.getResponseCode();
 
