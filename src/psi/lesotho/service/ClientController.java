@@ -33,7 +33,7 @@ public class ClientController
     private static final String URL_QUERY_CREATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/30/trackedEntityInstances";
     private static final String URL_QUERY_UPDATE_CLIENT = Util.LOCATION_DHIS_SERVER + "/api/30/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID;
     private static final String URL_QUERY_ENROLLMENT = Util.LOCATION_DHIS_SERVER + "/api/enrollments";
-    private static final String URL_QUERY_CLIENT_DETAILS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID + ".json?program=" + Util.ID_PROGRAM + "&fields=*,attributes[attribute,value]";
+    private static final String URL_QUERY_CLIENT_DETAILS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID + ".json?program=" + Util.ID_PROGRAM;
 
 //    public static final String URL_QUERY_CLIENT_BY_ID = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances/" + ClientController.PARAM_CLIENT_ID + ".json?program=" + Util.ID_PROGRAM;
 //    private static final String URL_QUERY_SEARCH_CLIENTS = Util.LOCATION_DHIS_SERVER + "/api/trackedEntityInstances.json?ouMode=ALL&program=" + Util.ID_PROGRAM;
@@ -86,28 +86,36 @@ public class ClientController
                     if ( responseInfo.responseCode == 200 )
                     {
                         outputData = "\"client\":" + responseInfo.output;
-                        responseInfo = EventController.getEventsByClient( clientId );
-                        if ( responseInfo.responseCode == 200 )
+                        
+                        JSONObject checkEQCFistname = getAttributeValue( responseInfo.data, Util.ID_ATTR_FIRSTNAME );
+                        if( !checkEQCFistname.getString( "value" ).equals("EQC") )
                         {
-                            outputData += ",\"events\":" + responseInfo.output;
-                             
-                            // STEP 2.2.1 Get active event
-                            JSONArray eventList = responseInfo.data.getJSONArray( "events" );
-                            JSONObject activeHIVTestingEvent = EventController.getActiveEvent( eventList, Util.ID_STAGE );
-                            String partnerEventId = EventController.getPartnerEventId( activeHIVTestingEvent );
-                            if( partnerEventId != null )
+                            responseInfo = EventController.getEventsByClient( clientId );
+                            if ( responseInfo.responseCode == 200 )
                             {
-                                responseInfo = EventController.getPartnerByEventId( partnerEventId );
-                                if ( responseInfo.responseCode == 200 )
+                                outputData += ",\"events\":" + responseInfo.output;
+                                
+                                // STEP 2.2.1 Get active event
+                                JSONArray eventList = responseInfo.data.getJSONArray( "events" );
+                                JSONObject activeHIVTestingEvent = EventController.getActiveEvent( eventList, Util.ID_STAGE );
+                                String partnerEventId = EventController.getPartnerEventId( activeHIVTestingEvent );
+                                if( partnerEventId != null )
                                 {
-                                    outputData += ",\"partner\":" + responseInfo.output;
+                                    responseInfo = EventController.getPartnerByEventId( partnerEventId );
+                                    if ( responseInfo.responseCode == 200 )
+                                    {
+                                        outputData += ",\"partner\":" + responseInfo.output;
+                                    }
                                 }
                             }
-                            
-                            outputData = "{" + outputData + "}";
-                            responseInfo.output = outputData; 
-                            
                         }
+                        else
+                        {
+                            outputData += ",\"events\":{\"events\": []}";
+                        }
+                        
+                        outputData = "{" + outputData + "}";
+                        responseInfo.output = outputData; 
                     }
                 }
                 // STEP 2.3. Add / Update Client
@@ -389,5 +397,21 @@ public class ClientController
         
         return condition;
     }
+    
+    private static JSONObject getAttributeValue( JSONObject clientData, String attrId )
+    {
+        JSONArray attributeValues = clientData.getJSONArray( "attributes" );
+        for(int i=0; i<attributeValues.length(); i++ )
+        {
+            JSONObject attributeValue = attributeValues.getJSONObject( i );
+            if( attributeValue.getString( "attribute" ).equals( attrId ) )
+            {
+                return attributeValue;
+            }
+        }
+        
+        return null;
+    }
+    
 
 }
