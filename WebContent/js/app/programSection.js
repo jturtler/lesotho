@@ -87,6 +87,10 @@ function ProgramSection( _mainPage, _metaData, _translationObj )
 			me.programTag.val("KDgzpKX3h2S");
         	me.programSectionListDivTag.hide();
         	me.programSectionFormTag.show("fast"); 
+
+        	me.availableAttributeTag.find("option").remove();
+        	me.selectedAttributeTag.find("option").remove();
+        	me.populateAvailableAttributes();
 		});
 		
 		// Back to Setting Page
