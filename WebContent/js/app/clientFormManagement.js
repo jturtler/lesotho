@@ -1828,7 +1828,7 @@ function ClientFormManagement( _mainPage, _metaData, _appPage )
 	me.populateEQCPPTPassedVal = function()
 	{
 		var jsonClient = JSON.parse( me.addClientFormTabTag.attr("client") );
-		var lastName = Util.getAttributeValue( jsonClient, "attribute", me.mainPage.settingsManagement.attr_LastName );
+		var lastName = Util.getAttributeValue( jsonClient.attributes, "attribute", me.mainPage.settingsManagement.attr_LastName );
 		
 		var EQCPPTPassedTag = me.getDataElementField( me.addEventFormTag, me.de_EQCPPTPassed );
 		if( me.resultTest1Tag.val() != "" && me.resultTest2Tag.val() != "" )
